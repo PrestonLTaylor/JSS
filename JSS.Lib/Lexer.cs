@@ -29,6 +29,10 @@ internal sealed class Lexer
 			{
 				IgnoreMultiLineComment();
 			}
+			else if (IsHashBangComment())
+			{
+				IgnoreHashBangComment();
+			}
 			else
 			{
 				throw new NotImplementedException();
@@ -71,7 +75,7 @@ internal sealed class Lexer
 	{
 		return _consumer.Matches("//");
 	}
-    
+
     private void IgnoreSingleLineComment()
 	{
 		_consumer.ConsumeWhile((_) => !IsLineTerminator());
@@ -91,5 +95,16 @@ internal sealed class Lexer
 		// FIXME: If the consumer is at the end of the string then the multi-line comment had no ending "*/"
 		// then we need to produce a SyntaxError
 		_consumer.TryConsumeString("*/");
+	}
+
+    // 12.5 Hashbang Comments, https://tc39.es/ecma262/#sec-hashbang
+    private bool IsHashBangComment()
+	{
+		return _consumer.Matches("#!");
+	}
+
+	private void IgnoreHashBangComment()
+	{
+		_consumer.ConsumeWhile((_) => !IsLineTerminator());
 	}
 }

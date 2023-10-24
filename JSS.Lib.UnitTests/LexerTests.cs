@@ -179,7 +179,52 @@ internal sealed class LexerTests
         Assert.That(tokens, Is.Empty);
     }
 
-	private void AssertThatTokenIs(Token actual, TokenType expectedType, string expectedData)
+    // Tests for 12.5 Hashbang Comments, https://tc39.es/ecma262/#sec-hashbang
+    [Test]
+    public void Lex_ReturnsEmptyListOfTokens_WhenProvidingAnHashBangComment()
+    {
+        // Arrange
+        const string emptyCommentString = "#!";
+        var lexer = new Lexer(emptyCommentString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Is.Empty);
+    }
+
+    [Test]
+    public void Lex_ReturnsEmptyListOfTokens_WhenProvidingAHashBangComment()
+    {
+        // Arrange
+        const string commentString = "#! Hash Bang Comment";
+        var lexer = new Lexer(commentString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Is.Empty);
+    }
+
+    [Test]
+    public void Lex_ReturnsLineTerminatorToken_WhenProvidingAHashBangComment_WithALineTerminator()
+    {
+        // Arrange
+        const string lineTerminatorCodePoint = "\u2029";
+        const string commentWithLineTerminatorString = "#!" + lineTerminatorCodePoint;
+        var lexer = new Lexer(commentWithLineTerminatorString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.LineTerminator, lineTerminatorCodePoint);
+    }
+
+    private void AssertThatTokenIs(Token actual, TokenType expectedType, string expectedData)
     {
         Assert.Multiple(() =>
         {
