@@ -1,0 +1,156 @@
+﻿namespace JSS.Lib.UnitTests;
+
+internal sealed class ConsumerTests
+{
+    [Test]
+    public void CanConsume_ReturnsFalse_WhenProvidedEmptyString()
+    {
+        // Arrange
+        var consumer = new Consumer("");
+
+        // Act
+
+        // Assert
+        Assert.That(consumer.CanConsume(), Is.False);
+    }
+
+    [Test]
+    public void CanConsume_ReturnsTrue_WhenProvidedNonEmptyString()
+    {
+        // Arrange
+        const string testString = "a";
+        var consumer = new Consumer(testString);
+
+        // Act
+
+        // Assert
+        Assert.That(consumer.CanConsume(), Is.True);
+    }
+
+    [Test]
+    public void CanConsume_ReturnsFalse_WhenStringIsFullyConsumed()
+    {
+        // Arrange
+        const string testString = "a";
+        var consumer = new Consumer(testString);
+
+        // Act
+        consumer.Consume();
+
+        // Assert
+        Assert.That(consumer.CanConsume(), Is.False);
+    }
+
+    [Test]
+    public void CanConsume_ReturnsTrue_WhenStringIsPartiallyConsumed()
+    {
+        // Arrange
+        const string testString = "ab";
+        var consumer = new Consumer(testString);
+
+        // Act
+        consumer.Consume();
+
+        // Assert
+        Assert.That(consumer.CanConsume(), Is.True);
+    }
+
+    [Test]
+    public void Consume_ReturnsFirstCharacterOfString_WhenCalledOnce()
+    {
+        // Arrange
+        const string testString = "abcd";
+        var consumer = new Consumer(testString);
+
+        // Act
+        var consumed = consumer.Consume();
+
+        // Assert
+        Assert.That(consumed, Is.EqualTo(testString[0]));
+    }
+
+    [Test]
+    public void Consume_ThrowsIndexOutOfRangeException_WhenCanConsumeIsFalse()
+    {
+        // Arrange
+        var consumer = new Consumer("");
+
+        // Act
+        
+        // Assert
+        Assert.That(consumer.Consume, Throws.Exception.TypeOf<IndexOutOfRangeException>());
+    }
+
+    [Test]
+    public void ConsumeUntilCanConsumeIsFalse_ProducesTheSameStringInputted()
+    {
+        // Arrange
+        const string expectedString = "abcd";
+        var consumer = new Consumer(expectedString);
+
+        // Act
+        string actualString = "";
+        while (consumer.CanConsume())
+        {
+            actualString += consumer.Consume();
+        }
+
+        // Assert
+        Assert.That(actualString, Is.EqualTo(expectedString));
+    }
+
+    [Test]
+    public void Peek_ReturnsFirstCharacterOfString_WhenCalled()
+    {
+        // Arrange
+        const string testString = "abcd";
+        var consumer = new Consumer(testString);
+
+        // Act
+        var peeked = consumer.Peek();
+
+        // Assert
+        Assert.That(peeked, Is.EqualTo(testString[0]));
+    }
+
+    [Test]
+    public void Peek_ReturnsTheSameCharacter_WhenCalledMultipleTimes()
+    {
+        // Arrange
+        const string testString = "abcd";
+        var consumer = new Consumer(testString);
+
+        // Act
+        var firstPeek = consumer.Peek();
+        var secondPeek = consumer.Peek();
+
+        // Assert
+        Assert.That(firstPeek, Is.EqualTo(secondPeek));
+    }
+
+    [Test]
+    public void Peek_DoesntChangeCanConsume_WhenPeekingLastCharacter()
+    {
+        // Arrange
+        const string testString = "a";
+        var consumer = new Consumer(testString);
+
+        // Act
+        consumer.Peek();
+
+        // Assert
+        Assert.That(consumer.CanConsume(), Is.True);
+    }
+
+    [Test]
+    public void Peek_ThrowsIndexOutOfRangeException_WhenCanConsumeIsFalse()
+    {
+        // Arrange
+        var consumer = new Consumer("");
+
+        // Act
+
+        // Assert
+        Assert.That(consumer.Peek, Throws.Exception.TypeOf<IndexOutOfRangeException>());
+    }
+}
