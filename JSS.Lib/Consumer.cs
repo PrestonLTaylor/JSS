@@ -29,6 +29,14 @@ internal sealed class Consumer
         return consumed;
     }
 
+    public bool TryConsumeString(string toConsume)
+    {
+        if (!Matches(toConsume)) return false;
+
+        _index += toConsume.Length;
+        return true;
+    }
+
     public char Peek(int offset = 0)
     {
         return _toConsume[_index + offset];

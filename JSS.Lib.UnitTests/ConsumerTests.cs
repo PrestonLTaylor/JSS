@@ -140,6 +140,98 @@ internal sealed class ConsumerTests
     }
 
     [Test]
+    public void TryConsumeString_ReturnsTrue_WhenProvidedEmptyStringOnEmptyConsumer()
+    {
+        // Arrange
+        var consumer = new Consumer("");
+
+        // Act
+        var didConsume = consumer.TryConsumeString("");
+
+        // Assert
+        Assert.That(didConsume, Is.True);
+    }
+
+    [Test]
+    public void TryConsumeString_ReturnsTrue_WhenProvidedEmptyString()
+    {
+        // Arrange
+        var consumer = new Consumer("abcd");
+
+        // Act
+        var didConsume = consumer.TryConsumeString("");
+
+        // Assert
+        Assert.That(didConsume, Is.True);
+    }
+
+    [Test]
+    public void TryConsumeString_ReturnsTrue_WhenProvidedSameStrings()
+    {
+        // Arrange
+        var testString = "abcd";
+        var consumer = new Consumer(testString);
+
+        // Act
+        var didConsume = consumer.TryConsumeString(testString);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(didConsume, Is.True);
+            Assert.That(consumer.CanConsume(), Is.False);
+        });
+    }
+
+    [Test]
+    public void TryConsumeString_ReturnsTrue_WhenProvidedSubString()
+    {
+        // Arrange
+        var subString = "ab";
+        var testString = subString + "cd";
+        var consumer = new Consumer(testString);
+
+        // Act
+        var didConsume = consumer.TryConsumeString(subString);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(didConsume, Is.True);
+            Assert.That(consumer.CanConsume(), Is.True);
+        });
+    }
+
+    [Test]
+    public void TryConsumeString_ReturnsFalse_WhenProvidedDifferentSubString()
+    {
+        // Arrange
+        var testString = "abcd";
+        var consumer = new Consumer(testString);
+
+        // Act
+        var didConsume = consumer.TryConsumeString("dcba");
+
+        // Assert
+        Assert.That(didConsume, Is.False);
+    }
+
+    [Test]
+    public void TryConsumeString_ReturnsFalse_ProvidingAString_WhenCanConsumeIsFalse()
+    {
+        // Arrange
+        var testString = "a";
+        var consumer = new Consumer(testString);
+
+        // Act
+        consumer.Consume();
+        var didConsume = consumer.TryConsumeString(testString);
+
+        // Assert
+        Assert.That(didConsume, Is.False);
+    }
+
+    [Test]
     public void Peek_ReturnsFirstCharacterOfString_WhenCalled()
     {
         // Arrange

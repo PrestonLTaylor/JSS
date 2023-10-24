@@ -21,9 +21,13 @@ internal sealed class Lexer
 			{
 				yield return LexLineTerminator();
 			}
-			else if (IsComment())
+			else if (IsSingleLineComment())
 			{
-				IgnoreComment();
+				IgnoreSingleLineComment();
+			}
+			else if (IsMultiLineComment())
+			{
+				IgnoreMultiLineComment();
 			}
 			else
 			{
@@ -63,15 +67,29 @@ internal sealed class Lexer
 	}
 
     // 12.4 Comments, https://tc39.es/ecma262/#sec-comments
-	private bool IsComment()
+	private bool IsSingleLineComment()
 	{
 		return _consumer.Matches("//");
 	}
-
-    // FIXME: Comments behave like white space and are discarded except that, if a MultiLineComment contains a line terminator code point,
-	// then the entire comment is considered to be a LineTerminator for purposes of parsing by the syntactic grammar
-    private void IgnoreComment()
+    
+    private void IgnoreSingleLineComment()
 	{
 		_consumer.ConsumeWhile((_) => !IsLineTerminator());
+	}
+
+	private bool IsMultiLineComment()
+	{
+		return _consumer.Matches("/*");
+	}
+
+    // FIXME: Comments behave like white space and are discarded except that, if a MultiLineComment contains a line terminator code point,
+    // then the entire comment is considered to be a LineTerminator for purposes of parsing by the syntactic grammar
+    private void IgnoreMultiLineComment()
+	{
+		_consumer.ConsumeWhile((_) => !_consumer.Matches("*/"));
+
+		// FIXME: If the consumer is at the end of the string then the multi-line comment had no ending "*/"
+		// then we need to produce a SyntaxError
+		_consumer.TryConsumeString("*/");
 	}
 }

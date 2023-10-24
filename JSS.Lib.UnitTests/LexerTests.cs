@@ -136,7 +136,50 @@ internal sealed class LexerTests
         AssertThatTokenIs(tokens[0], TokenType.LineTerminator, lineTerminatorCodePoint);
     }
 
-    private void AssertThatTokenIs(Token actual, TokenType expectedType, string expectedData)
+    [Test]
+    public void Lex_ReturnsEmptyListOfTokens_WhenProvidingAnEmptyMultiLineComment()
+    {
+		// Arrange
+		const string emptyCommentString = "/**/";
+		var lexer = new Lexer(emptyCommentString);
+
+		// Act
+		var tokens = lexer.Lex().ToList();
+
+		// Assert
+		Assert.That(tokens, Is.Empty);
+	}
+
+	[Test]
+	public void Lex_ReturnsEmptyListOfTokens_WhenProvidingAMultiLineComment()
+	{
+		// Arrange
+		const string commentString = "/* This is a multi-line comment */";
+		var lexer = new Lexer(commentString);
+
+		// Act
+		var tokens = lexer.Lex().ToList();
+
+		// Assert
+		Assert.That(tokens, Is.Empty);
+	}
+
+    // FIXME: See FIXME in Lexer about Line Terminators
+    [Test]
+    public void Lex_ReturnsEmptyListOfTokens_WhenProvidingAMultiLineCommentWithLineTerminators()
+    {
+        // Arrange
+        const string commentString = "/* This is a \n multi-line comment */";
+        var lexer = new Lexer(commentString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Is.Empty);
+    }
+
+	private void AssertThatTokenIs(Token actual, TokenType expectedType, string expectedData)
     {
         Assert.Multiple(() =>
         {
