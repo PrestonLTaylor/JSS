@@ -100,6 +100,46 @@ internal sealed class ConsumerTests
     }
 
     [Test]
+    public void ConsumeWhile_ConsumesUntilPredicateIsFalse()
+    {
+        // Arrange
+        const string testString = "abcde";
+        var consumer = new Consumer(testString);
+
+        // Act
+        var consumed = consumer.ConsumeWhile((codePoint) =>
+        {
+            return codePoint != 'e';
+        });
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(consumer.CanConsume(), Is.True);
+            Assert.That(consumed, Is.EqualTo("abcd"));
+            Assert.That(consumer.Peek(), Is.EqualTo('e'));
+        });
+    }
+
+    [Test]
+    public void ConsumeWhile_DoesNotThrow_WhenFullyConsumingString()
+    {
+        // Arrange
+        const string testString = "abcd";
+        var consumer = new Consumer(testString);
+
+        // Act
+        var consumed = consumer.ConsumeWhile((_) => true);
+
+        // Assert
+        Assert.Multiple(() =>
+        {
+            Assert.That(consumer.CanConsume(), Is.False);
+            Assert.That(consumed, Is.EqualTo(testString));
+        });
+    }
+
+    [Test]
     public void Peek_ReturnsFirstCharacterOfString_WhenCalled()
     {
         // Arrange
@@ -152,5 +192,89 @@ internal sealed class ConsumerTests
 
         // Assert
         Assert.That(consumer.Peek, Throws.Exception.TypeOf<IndexOutOfRangeException>());
+    }
+
+    [Test]
+    public void Matches_ReturnsTrue_WhenProvidedEmptyStringOnEmptyConsumer()
+    {
+        // Arrange
+        var consumer = new Consumer("");
+
+        // Act
+        var matches = consumer.Matches("");
+
+        // Assert
+        Assert.That(matches, Is.True);
+    }
+
+    [Test]
+    public void Matches_ReturnsTrue_WhenProvidedEmptyString()
+    {
+        // Arrange
+        var consumer = new Consumer("abcd");
+
+        // Act
+        var matches = consumer.Matches("");
+
+        // Assert
+        Assert.That(matches, Is.True);
+    }
+
+    [Test]
+    public void Matches_ReturnsTrue_WhenProvidedSameStrings()
+    {
+        // Arrange
+        var testString = "abcd";
+        var consumer = new Consumer(testString);
+
+        // Act
+        var matches = consumer.Matches(testString);
+
+        // Assert
+        Assert.That(matches, Is.True);
+    }
+
+    [Test]
+    public void Matches_ReturnsTrue_WhenProvidedSubString()
+    {
+        // Arrange
+        var subString = "ab";
+        var testString = subString + "cd";
+        var consumer = new Consumer(testString);
+
+        // Act
+        var matches = consumer.Matches(subString);
+
+        // Assert
+        Assert.That(matches, Is.True);
+    }
+
+    [Test]
+    public void Matches_ReturnsFalse_WhenProvidedDifferentSubString()
+    {
+        // Arrange
+        var testString = "abcd";
+        var consumer = new Consumer(testString);
+
+        // Act
+        var matches = consumer.Matches("dcba");
+
+        // Assert
+        Assert.That(matches, Is.False);
+    }
+
+    [Test]
+    public void Matches_ReturnsFalse_ProvidingAString_WhenCanConsumeIsFalse()
+    {
+        // Arrange
+        var testString = "a";
+        var consumer = new Consumer(testString);
+
+        // Act
+        consumer.Consume();
+        var matches = consumer.Matches(testString);
+
+        // Assert
+        Assert.That(matches, Is.False);
     }
 }
