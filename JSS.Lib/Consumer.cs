@@ -29,9 +29,9 @@ internal sealed class Consumer
         return consumed;
     }
 
-    public char Peek()
+    public char Peek(int offset = 0)
     {
-        return _toConsume[_index];
+        return _toConsume[_index + offset];
     }
 
     public bool Matches(string toMatch)

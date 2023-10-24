@@ -153,7 +153,21 @@ internal sealed class ConsumerTests
         Assert.That(peeked, Is.EqualTo(testString[0]));
     }
 
-    [Test]
+	[Test]
+	public void Peek_ReturnsSecondCharacterOfString_WhenCalledWithOffsetOf1()
+	{
+		// Arrange
+		const string testString = "abcd";
+		var consumer = new Consumer(testString);
+
+		// Act
+		var peeked = consumer.Peek(1);
+
+		// Assert
+		Assert.That(peeked, Is.EqualTo(testString[1]));
+	}
+
+	[Test]
     public void Peek_ReturnsTheSameCharacter_WhenCalledMultipleTimes()
     {
         // Arrange
@@ -191,7 +205,7 @@ internal sealed class ConsumerTests
         // Act
 
         // Assert
-        Assert.That(consumer.Peek, Throws.Exception.TypeOf<IndexOutOfRangeException>());
+        Assert.Throws<IndexOutOfRangeException>(() => consumer.Peek());
     }
 
     [Test]
