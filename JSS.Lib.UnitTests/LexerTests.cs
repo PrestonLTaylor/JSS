@@ -30,65 +30,21 @@ internal sealed class LexerTests
         Assert.That(tokens, Is.Empty);
     }
 
-	// Tests for 12.3 Line Terminators, https://tc39.es/ecma262/#table-white-space-code-points
-	[Test]
-	public void Lex_ReturnsLineTerminatorToken_WhenProvidingALineFeed()
-	{
-		// Arrange
-		const string lineFeedCodePoint = "\u000A";
-		var lexer = new Lexer(lineFeedCodePoint);
+    // Tests for 12.3 Line Terminators, https://tc39.es/ecma262/#table-white-space-code-points
+    static private readonly List<string> lineTerminatorTestCases = new() { "\u000A", "\u000D", "\u2028", "\u2029" };
 
-		// Act
-		var tokens = lexer.Lex().ToList();
-
-		// Assert
-		Assert.That(tokens, Has.Count.EqualTo(1));
-        AssertThatTokenIs(tokens[0], TokenType.LineTerminator, lineFeedCodePoint);
-	}
-
-    [Test]
-    public void Lex_ReturnsLineTerminatorToken_WhenProvidingACarriageReturn()
+    [TestCaseSource(nameof(lineTerminatorTestCases))]
+    public void Lex_ReturnsLineTerminatorToken_WhenProvidingALineTerminator(string lineTerminatorCodePoint)
     {
         // Arrange
-        const string carriageReturnCodePoint = "\u000D";
-        var lexer = new Lexer(carriageReturnCodePoint);
+        var lexer = new Lexer(lineTerminatorCodePoint);
 
         // Act
         var tokens = lexer.Lex().ToList();
 
         // Assert
         Assert.That(tokens, Has.Count.EqualTo(1));
-        AssertThatTokenIs(tokens[0], TokenType.LineTerminator, carriageReturnCodePoint);
-    }
-
-    [Test]
-    public void Lex_ReturnsLineTerminatorToken_WhenProvidingALineSeperator()
-    {
-        // Arrange
-        const string lineSeperatorCodePoint = "\u2028";
-        var lexer = new Lexer(lineSeperatorCodePoint);
-
-        // Act
-        var tokens = lexer.Lex().ToList();
-
-        // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
-        AssertThatTokenIs(tokens[0], TokenType.LineTerminator, lineSeperatorCodePoint);
-    }
-
-    [Test]
-    public void Lex_ReturnsLineTerminatorToken_WhenProvidingAParagraphSeperator()
-    {
-        // Arrange
-        const string paragraphSeperatorCodePoint = "\u2029";
-        var lexer = new Lexer(paragraphSeperatorCodePoint);
-
-        // Act
-        var tokens = lexer.Lex().ToList();
-
-        // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
-        AssertThatTokenIs(tokens[0], TokenType.LineTerminator, paragraphSeperatorCodePoint);
+        AssertThatTokenIs(tokens[0], TokenType.LineTerminator, lineTerminatorCodePoint);
     }
 
     // Tests for 12.4 Comments, https://tc39.es/ecma262/#sec-comments
