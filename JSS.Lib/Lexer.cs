@@ -1,50 +1,114 @@
-﻿namespace JSS.Lib;
+﻿using JSS.Lib;
+
+namespace JSS.Lib;
 
 internal sealed class Lexer
 {
 	// https://tc39.es/ecma262/#prod-ReservedWord
     static private readonly Dictionary<string, TokenType> reservedWordToType = new()
-        {
-            { "await", TokenType.Await },
-            { "break", TokenType.Break },
-            { "case", TokenType.Case },
-            { "catch", TokenType.Catch },
-            { "class", TokenType.Class },
-            { "const", TokenType.Const },
-            { "continue", TokenType.Continue },
-            { "debugger", TokenType.Debugger },
-            { "default", TokenType.Default },
-            { "delete", TokenType.Delete },
-            { "do", TokenType.Do },
-            { "else", TokenType.Else },
-            { "enum", TokenType.Enum },
-            { "export", TokenType.Export },
-            { "extends", TokenType.Extends },
-            { "false", TokenType.False },
-            { "finally", TokenType.Finally },
-            { "for", TokenType.For },
-            { "function", TokenType.Function },
-            { "if", TokenType.If },
-            { "import", TokenType.Import },
-			// NOTE: We put instanceof due to wanting to match instanceof before in as they both have "in" in the as a common substring
-            { "instanceof", TokenType.InstanceOf },
-            { "in", TokenType.In },
-            { "new", TokenType.New },
-            { "null", TokenType.Null },
-            { "return", TokenType.Return },
-            { "super", TokenType.Super },
-            { "switch", TokenType.Switch },
-            { "this", TokenType.This },
-            { "throw", TokenType.Throw },
-            { "true", TokenType.True },
-            { "try", TokenType.Try },
-            { "typeof", TokenType.TypeOf },
-            { "var", TokenType.Var },
-            { "void", TokenType.Void },
-            { "while", TokenType.While },
-            { "with", TokenType.With },
-            { "yield", TokenType.Yield },
-        };
+    {
+       { "await", TokenType.Await },
+       { "break", TokenType.Break },
+       { "case", TokenType.Case },
+       { "catch", TokenType.Catch },
+       { "class", TokenType.Class },
+       { "const", TokenType.Const },
+       { "continue", TokenType.Continue },
+       { "debugger", TokenType.Debugger },
+       { "default", TokenType.Default },
+       { "delete", TokenType.Delete },
+       { "do", TokenType.Do },
+       { "else", TokenType.Else },
+       { "enum", TokenType.Enum },
+       { "export", TokenType.Export },
+       { "extends", TokenType.Extends },
+       { "false", TokenType.False },
+       { "finally", TokenType.Finally },
+       { "for", TokenType.For },
+       { "function", TokenType.Function },
+       { "if", TokenType.If },
+       { "import", TokenType.Import },
+		// NOTE: We put instanceof due to wanting to match instanceof before in as they both have "in" in the as a common substring
+       { "instanceof", TokenType.InstanceOf },
+       { "in", TokenType.In },
+       { "new", TokenType.New },
+       { "null", TokenType.Null },
+       { "return", TokenType.Return },
+       { "super", TokenType.Super },
+       { "switch", TokenType.Switch },
+       { "this", TokenType.This },
+       { "throw", TokenType.Throw },
+       { "true", TokenType.True },
+       { "try", TokenType.Try },
+       { "typeof", TokenType.TypeOf },
+       { "var", TokenType.Var },
+       { "void", TokenType.Void },
+       { "while", TokenType.While },
+       { "with", TokenType.With },
+       { "yield", TokenType.Yield },
+    };
+
+    // https://tc39.es/ecma262/#prod-Punctuator
+    static private readonly Dictionary<string, TokenType> punctuatorToType = new()
+	{
+        // NOTE: Punctuators should be sorted by their length (maximal munch)
+        { ">>>=", TokenType.UnsignedRightShiftAssignment },
+        { "!==", TokenType.StrictNotEquals },
+        { "&&=", TokenType.AndAssignment },
+        { "**=", TokenType.ExponentiationAssignment },
+        { "...", TokenType.Spread },
+        { "/=", TokenType.DivisionAssignment },
+        { "<<=", TokenType.LeftShiftAssignment },
+        { "===", TokenType.StrictEqualsEquals },
+        { ">>=", TokenType.RightShiftAssignment },
+        { ">>>", TokenType.UnsignedRightShift },
+        { "??=", TokenType.NullCoalescingAssignment },
+        { "||=", TokenType.OrAssignment },
+        { "!=", TokenType.NotEquals },
+        { "%=", TokenType.ModuloAssignment },
+        { "&&", TokenType.And },
+        { "&=", TokenType.BitwiseAndAssignment },
+        { "**", TokenType.Exponentiation },
+        { "*=", TokenType.MultiplyAssignment },
+        { "++", TokenType.Increment },
+        { "+=", TokenType.PlusAssignment },
+        { "-=", TokenType.MinusAssignment },
+        { "<<", TokenType.LeftShift },
+        { "<=", TokenType.LessThanEqual },
+        { "==", TokenType.EqualEquals },
+        { "=>", TokenType.ArrowFunction },
+        { ">=", TokenType.GreaterThanEqual },
+        { ">>", TokenType.RightShift },
+        { "?.", TokenType.OptionalChaining },
+        { "??", TokenType.NullCoalescing },
+        { "^=", TokenType.BitwiseXorAssignment },
+        { "{", TokenType.OpenBrace },
+        { "|=", TokenType.BitwiseOrAssignment },
+        { "||", TokenType.Or },
+        { "!", TokenType.Not },
+        { "%", TokenType.Modulo },
+        { "&", TokenType.BitwiseAnd },
+        { "(", TokenType.OpenParen },
+        { ")", TokenType.ClosedParen },
+        { "*", TokenType.Multiply },
+        { "+", TokenType.Plus },
+        { ",", TokenType.Comma },
+        { "-", TokenType.Minus },
+        { ".", TokenType.Dot },
+        { "/", TokenType.Division },
+        { ":", TokenType.Colon },
+        { ";", TokenType.SemiColon },
+        { "<", TokenType.LessThan },
+        { "=", TokenType.Assignment },
+        { ">", TokenType.GreaterThan },
+        { "?", TokenType.Ternary },
+        { "[", TokenType.OpenSquare },
+        { "]", TokenType.ClosedSquare },
+        { "^", TokenType.BitwiseXor },
+        { "|", TokenType.BitwiseOr },
+        { "}", TokenType.ClosedBrace },
+        { "~", TokenType.BitwiseNot },
+    };
 
     private readonly Consumer _consumer;
 
@@ -53,6 +117,7 @@ internal sealed class Lexer
 		_consumer = new Consumer(toLex);
 	}
 
+    // FIXME: Fix "maximal munch" temporal issues
 	public IEnumerable<Token> Lex()
 	{
 		while (_consumer.CanConsume())
@@ -89,7 +154,12 @@ internal sealed class Lexer
 			{
 				yield return LexIdentifier();
 			}
-			else
+            // NOTE: Lexxing of punctuators is at the end because of symbols like "/*" being lexed as a punctuator
+            else if (TryLexPunctuator(out Token? punctuatorToken))
+            {
+                yield return punctuatorToken!.Value;
+            }
+            else
 			{
 				throw new NotImplementedException();
 			}
@@ -231,4 +301,24 @@ internal sealed class Lexer
 		token = null;
 		return false;
 	}
+
+    // 12.8 Punctuators, https://tc39.es/ecma262/#sec-punctuators
+	private bool TryLexPunctuator(out Token? token)
+	{
+        foreach (var kv in punctuatorToType)
+        {
+            var punctuator = kv.Key;
+            if (_consumer.Matches(punctuator))
+            {
+                _consumer.TryConsumeString(punctuator);
+
+                var tokenType = kv.Value;
+                token = new Token { type = tokenType, data = punctuator };
+                return true;
+            }
+        }
+
+        token = null;
+        return false;
+    }
 }

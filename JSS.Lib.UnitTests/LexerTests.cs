@@ -406,6 +406,83 @@ internal sealed class LexerTests
         AssertThatTokenIs(tokens[0], expectedTokenType, keywordString);
     }
 
+    // Tests for 12.8 Punctuators, https://tc39.es/ecma262/#sec-punctuators
+    static private readonly Dictionary<string, TokenType> punctuatorToTypeTestCases = new()
+    {
+        { ">>>=", TokenType.UnsignedRightShiftAssignment },
+        { "!==", TokenType.StrictNotEquals },
+        { "&&=", TokenType.AndAssignment },
+        { "**=", TokenType.ExponentiationAssignment },
+        { "...", TokenType.Spread },
+        { "/=", TokenType.DivisionAssignment },
+        { "<<=", TokenType.LeftShiftAssignment },
+        { "===", TokenType.StrictEqualsEquals },
+        { ">>=", TokenType.RightShiftAssignment },
+        { ">>>", TokenType.UnsignedRightShift },
+        { "??=", TokenType.NullCoalescingAssignment },
+        { "||=", TokenType.OrAssignment },
+        { "!=", TokenType.NotEquals },
+        { "%=", TokenType.ModuloAssignment },
+        { "&&", TokenType.And },
+        { "&=", TokenType.BitwiseAndAssignment },
+        { "**", TokenType.Exponentiation },
+        { "*=", TokenType.MultiplyAssignment },
+        { "++", TokenType.Increment },
+        { "+=", TokenType.PlusAssignment },
+        { "-=", TokenType.MinusAssignment },
+        { "<<", TokenType.LeftShift },
+        { "<=", TokenType.LessThanEqual },
+        { "==", TokenType.EqualEquals },
+        { "=>", TokenType.ArrowFunction },
+        { ">=", TokenType.GreaterThanEqual },
+        { ">>", TokenType.RightShift },
+        { "?.", TokenType.OptionalChaining },
+        { "??", TokenType.NullCoalescing },
+        { "^=", TokenType.BitwiseXorAssignment },
+        { "{", TokenType.OpenBrace },
+        { "|=", TokenType.BitwiseOrAssignment },
+        { "||", TokenType.Or },
+        { "!", TokenType.Not },
+        { "%", TokenType.Modulo },
+        { "&", TokenType.BitwiseAnd },
+        { "(", TokenType.OpenParen },
+        { ")", TokenType.ClosedParen },
+        { "*", TokenType.Multiply },
+        { "+", TokenType.Plus },
+        { ",", TokenType.Comma },
+        { "-", TokenType.Minus },
+        { ".", TokenType.Dot },
+        { "/", TokenType.Division },
+        { ":", TokenType.Colon },
+        { ";", TokenType.SemiColon },
+        { "<", TokenType.LessThan },
+        { "=", TokenType.Assignment },
+        { ">", TokenType.GreaterThan },
+        { "?", TokenType.Ternary },
+        { "[", TokenType.OpenSquare },
+        { "]", TokenType.ClosedSquare },
+        { "^", TokenType.BitwiseXor },
+        { "|", TokenType.BitwiseOr },
+        { "}", TokenType.ClosedBrace },
+        { "~", TokenType.BitwiseNot },
+    };
+
+    [TestCaseSource(nameof(punctuatorToTypeTestCases))]
+    public void Lex_ReturnsExpectedPunctuatorToken_WhenProvidingPunctuator(KeyValuePair<string, TokenType> punctuatorToExpectedTokenType)
+    {
+        // Arrange
+        var punctuatorString = punctuatorToExpectedTokenType.Key;
+        var expectedTokenType = punctuatorToExpectedTokenType.Value;
+        var lexer = new Lexer(punctuatorString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], expectedTokenType, punctuatorString);
+    }
+
     private void AssertThatTokenIs(Token actual, TokenType expectedType, string expectedData)
     {
         Assert.Multiple(() =>
