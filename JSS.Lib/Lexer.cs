@@ -81,6 +81,14 @@ internal sealed class Lexer
 			{
 				IgnoreHashBangComment();
 			}
+			else if (IsPrivateIdentifier())
+			{
+				yield return LexPrivateIdentifier();
+			}
+			else if (IsIdentifierStart())
+			{
+				yield return LexIdentifier();
+			}
 			else
 			{
 				throw new NotImplementedException();
@@ -156,11 +164,39 @@ internal sealed class Lexer
 		_consumer.ConsumeWhile((_) => !IsLineTerminator());
 	}
 
-    // 12.7 Names and Keywords, https://tc39.es/ecma262/#sec-names-and-keywords
+    // 12.7.1 Identifier Names, https://tc39.es/ecma262/#sec-identifier-names
+    // https://tc39.es/ecma262/#prod-PrivateIdentifier
+    private bool IsPrivateIdentifier()
+	{
+		return _consumer.Peek() == '#';
+	}
+
+	private Token LexPrivateIdentifier()
+	{
+		// Consumes the # so we can lex the identifier
+		_consumer.Consume();
+		var identifierToken = LexIdentifier();
+		identifierToken.type = TokenType.PrivateIdentifier;
+		identifierToken.data = '#' + identifierToken.data;
+		return identifierToken;
+	}
+
+    // https://tc39.es/ecma262/#prod-IdentifierStart
+    private bool IsIdentifierStart(int offset = 0)
+	{
+		if (!_consumer.CanConsume(offset)) return false;
+
+		// FIXME: We want to lex unicode escape sequences
+		// FIXME: Match the whole set of ID_Start code points: https://unicode.org/reports/tr31/#D1 
+		var codePoint = _consumer.Peek();
+		return char.IsLetter(codePoint) || codePoint == '$' || codePoint == '_';
+	}
+
     // https://tc39.es/ecma262/#prod-IdentifierPart
     private bool IsIdentifierPart(int offset = 0)
 	{
 		if (!_consumer.CanConsume(offset)) return false;
+		if (IsIdentifierStart(offset)) return true;
 
 		// FIXME: We want to lex unicode escape sequences
 		// FIXME: Match the whole set of ID_Continue code points: https://unicode.org/reports/tr31/#D1 
@@ -168,6 +204,13 @@ internal sealed class Lexer
 		return char.IsLetterOrDigit(codePoint);
     }
 
+	private Token LexIdentifier()
+	{
+		var consumedIdentifier = _consumer.ConsumeWhile((_) => IsIdentifierPart());
+		return new Token { type = TokenType.Identifier, data = consumedIdentifier };
+	}
+
+    // 12.7.2 Keywords and Reserved Words, https://tc39.es/ecma262/#sec-keywords-and-reserved-words
     // https://tc39.es/ecma262/#prod-ReservedWord
     private bool TryLexReservedWord(out Token? token)
 	{

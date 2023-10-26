@@ -4,6 +4,10 @@ internal enum TokenType
 {
     LineTerminator,
 
+    // https://tc39.es/ecma262/#sec-identifier-names
+    PrivateIdentifier,
+    Identifier,
+    
     // https://tc39.es/ecma262/#prod-ReservedWord
     Await,
     Break,

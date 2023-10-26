@@ -224,7 +224,173 @@ internal sealed class LexerTests
         AssertThatTokenIs(tokens[0], TokenType.LineTerminator, lineTerminatorCodePoint);
     }
 
-    // Tests 12.7 Names and Keywords, https://tc39.es/ecma262/#sec-names-and-keywords
+    // Tests for 12.7.1 Identifier Names, https://tc39.es/ecma262/#sec-identifier-names
+    [Test]
+    public void Lex_ReturnsPrivateIdentifier_WhenProvidedHashAndLowerCaseLetter()
+    {
+        // Arrange
+        const string lowerCaseLetter = "#a";
+        var lexer = new Lexer(lowerCaseLetter);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.PrivateIdentifier, lowerCaseLetter);
+    }
+
+    [Test]
+    public void Lex_ReturnsIdentifier_WhenProvidedHashAndUpperCaseLetter()
+    {
+        // Arrange
+        const string upperCaseLetter = "#A";
+        var lexer = new Lexer(upperCaseLetter);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.PrivateIdentifier, upperCaseLetter);
+    }
+
+    [Test]
+    public void Lex_ReturnsIdentifier_WhenProvidedOnlyHashAndUnderscore()
+    {
+        // Arrange
+        const string underscoreCodePoint = "#_";
+        var lexer = new Lexer(underscoreCodePoint);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.PrivateIdentifier, underscoreCodePoint);
+    }
+
+    [Test]
+    public void Lex_ReturnsIdentifier_WhenProvidedOnlyHashAndDollar()
+    {
+        // Arrange
+        const string dollarCodePoint = "#$";
+        var lexer = new Lexer(dollarCodePoint);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.PrivateIdentifier, dollarCodePoint);
+    }
+
+    [Test]
+    public void Lex_ReturnsIdentifier_WhenProvidedHashAndLongValidName()
+    {
+        // Arrange
+        const string validName = "#$_valid_name_123";
+        var lexer = new Lexer(validName);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.PrivateIdentifier, validName);
+    }
+
+    [Test]
+    public void Lex_ReturnsIdentifier_WhenProvidedLowerCaseLetter()
+    {
+        // Arrange
+        const string lowerCaseLetter = "a";
+        var lexer = new Lexer(lowerCaseLetter);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+        
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Identifier, lowerCaseLetter);
+    }
+
+    [Test]
+    public void Lex_ReturnsIdentifier_WhenProvidedUpperCaseLetter()
+    {
+        // Arrange
+        const string upperCaseLetter = "A";
+        var lexer = new Lexer(upperCaseLetter);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Identifier, upperCaseLetter);
+    }
+
+    [Test]
+    public void Lex_ReturnsIdentifier_WhenProvidedOnlyAnUnderscore()
+    {
+        // Arrange
+        const string underscoreCodePoint = "_";
+        var lexer = new Lexer(underscoreCodePoint);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Identifier, underscoreCodePoint);
+    }
+
+    [Test]
+    public void Lex_ReturnsIdentifier_WhenProvidedOnlyADollar()
+    {
+        // Arrange
+        const string dollarCodePoint = "$";
+        var lexer = new Lexer(dollarCodePoint);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Identifier, dollarCodePoint);
+    }
+
+    [Test]
+    public void Lex_ReturnsIdentifier_WhenProvidedALongValidName()
+    {
+        // Arrange
+        const string validName = "$_valid_name_123";
+        var lexer = new Lexer(validName);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Identifier, validName);
+    }
+
+    [Test]
+    public void Lex_ReturnsIdentifier_WhenProvidedAKeywordWithAnExtraLetter()
+    {
+        // Arrange
+        const string awaitKeywordWithEd = "awaited";
+        var lexer = new Lexer(awaitKeywordWithEd);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Identifier, awaitKeywordWithEd);
+    }
+
+    // Tests for 12.7.2 Keywords and Reserved Words, https://tc39.es/ecma262/#sec-keywords-and-reserved-words
     [Test]
     public void Lex_ReturnsAwaitToken_WhenProvidingAwait()
     {
