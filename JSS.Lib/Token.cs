@@ -109,6 +109,9 @@ internal enum TokenType
 
     // https://tc39.es/ecma262/#sec-literals-numeric-literals
     Number,
+
+    // https://tc39.es/ecma262/#sec-literals-string-literals
+    String,
 }
 
 // FIXME: Support character/line numbers with tokens

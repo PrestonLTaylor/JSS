@@ -500,6 +500,23 @@ internal sealed class LexerTests
         AssertThatTokenIs(tokens[0], TokenType.Number, numericLiteral);
     }
 
+    // Tests for 12.9.4 String Literals, https://tc39.es/ecma262/#sec-literals-string-literals
+    static private readonly List<string> validStringLiteralTestCases = new() { "\"\"", "''", "\"this is a string literal\"", "'this is a string literal'", "\"'\"", "'\"'" };
+
+    [TestCaseSource(nameof(validStringLiteralTestCases))]
+    public void Lex_ReturnsStringToken_WhenProvidingValidStringLiteral(string stringLiteral)
+    {
+        // Arrange
+        var lexer = new Lexer(stringLiteral);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.String, stringLiteral);
+    }
+
     private void AssertThatTokenIs(Token actual, TokenType expectedType, string expectedData)
     {
         Assert.Multiple(() =>

@@ -158,6 +158,10 @@ internal sealed class Lexer
             {
                 yield return LexNumericLiteral();
             }
+            else if (IsStringLiteral())
+            {
+                yield return LexStringLiteral();
+            }
             // NOTE: Lexxing of punctuators is at the end because of symbols like "/*" being lexed as a punctuator
             else if (TryLexPunctuator(out Token? punctuatorToken))
             {
@@ -341,4 +345,27 @@ internal sealed class Lexer
         var consumedLiteral = _consumer.ConsumeWhile((_) => IsDecimalLiteral());
         return new Token { type = TokenType.Number, data = consumedLiteral };
     }
+
+    // 12.9.4 String Literals, https://tc39.es/ecma262/#sec-literals-string-literals
+    private bool IsStringLiteral()
+    {
+        return _consumer.Peek() == '\'' || _consumer.Peek() == '"';
+    }
+
+    // FIXME: Implement support for fully lexxing https://tc39.es/ecma262/#prod-StringLiteral (e.g. escape sequences)
+    private Token LexStringLiteral()
+    {
+        var quoteCodePoint = _consumer.Consume();
+
+        var consumedString = _consumer.ConsumeWhile((codePoint) => codePoint != quoteCodePoint);
+
+        // FIXME: Error if no closing quote is given
+        _consumer.TryConsumeString(quoteCodePoint.ToString());
+
+        return new Token { type = TokenType.String, data = quoteCodePoint + consumedString + quoteCodePoint };
+    }
+
+    // FIXME: 12.9.5 Regular Expression Literals, https://tc39.es/ecma262/#sec-literals-regular-expression-literals
+    // FIXME: 12.9.6 Template Literal Lexical Components, https://tc39.es/ecma262/#sec-template-literal-lexical-components
+    // FIXME: 12.10 Automatic Semicolon Insertion, https://tc39.es/ecma262/#sec-automatic-semicolon-insertion
 }
