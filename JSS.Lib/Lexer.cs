@@ -154,6 +154,10 @@ internal sealed class Lexer
 			{
 				yield return LexIdentifier();
 			}
+            else if (IsDecimalLiteral())
+            {
+                yield return LexNumericLiteral();
+            }
             // NOTE: Lexxing of punctuators is at the end because of symbols like "/*" being lexed as a punctuator
             else if (TryLexPunctuator(out Token? punctuatorToken))
             {
@@ -320,5 +324,21 @@ internal sealed class Lexer
 
         token = null;
         return false;
+    }
+
+    // 12.9.3 Numeric Literals, https://tc39.es/ecma262/#sec-literals-numeric-literals
+    // FIXME: Implement support for fully lexxing https://tc39.es/ecma262/#prod-NumericLiteral
+    // https://tc39.es/ecma262/#prod-DecimalIntegerLiteral
+    private bool IsDecimalLiteral()
+    {
+        var codePoint = _consumer.Peek();
+        return char.IsNumber(codePoint);
+    }
+
+    private Token LexNumericLiteral()
+    {
+        // FIXME: The SourceCharacter immediately following a NumericLiteral must not be an IdentifierStart or DecimalDigit.
+        var consumedLiteral = _consumer.ConsumeWhile((_) => IsDecimalLiteral());
+        return new Token { type = TokenType.Number, data = consumedLiteral };
     }
 }

@@ -106,6 +106,9 @@ internal enum TokenType
     Division,
     DivisionAssignment,
     ClosedBrace,
+
+    // https://tc39.es/ecma262/#sec-literals-numeric-literals
+    Number,
 }
 
 // FIXME: Support character/line numbers with tokens

@@ -483,6 +483,23 @@ internal sealed class LexerTests
         AssertThatTokenIs(tokens[0], expectedTokenType, punctuatorString);
     }
 
+    // Tests for 12.9.3 Numeric Literals, https://tc39.es/ecma262/#sec-literals-numeric-literals
+    static private readonly List<string> validNumericLiteralTestCases = new() { "0", "1", "123", "1234567890" };
+
+    [TestCaseSource(nameof(validNumericLiteralTestCases))]
+    public void Lex_ReturnsNumberToken_WhenProvidingValidNumericLiteral(string numericLiteral)
+    {
+        // Arrange
+        var lexer = new Lexer(numericLiteral);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Number, numericLiteral);
+    }
+
     private void AssertThatTokenIs(Token actual, TokenType expectedType, string expectedData)
     {
         Assert.Multiple(() =>
