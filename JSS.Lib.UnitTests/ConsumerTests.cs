@@ -56,6 +56,19 @@ internal sealed class ConsumerTests
     }
 
     [Test]
+    public void CanConsume_ReturnsFalse_WhenOffsetIsOutsideOfString()
+    {
+        // Arrange
+        const string testString = "ab";
+        var consumer = new Consumer(testString);
+
+        // Act
+
+        // Assert
+        Assert.That(consumer.CanConsume(testString.Length + 1), Is.False);
+    }
+
+    [Test]
     public void Consume_ReturnsFirstCharacterOfString_WhenCalledOnce()
     {
         // Arrange
@@ -364,6 +377,20 @@ internal sealed class ConsumerTests
 
         // Act
         var matches = consumer.Matches("dcba");
+
+        // Assert
+        Assert.That(matches, Is.False);
+    }
+
+    [Test]
+    public void Matches_ReturnsFalse_WhenProvidedABiggerString()
+    {
+        // Arrange
+        var testString = "abcd";
+        var consumer = new Consumer(testString);
+
+        // Act
+        var matches = consumer.Matches("abcde");
 
         // Assert
         Assert.That(matches, Is.False);

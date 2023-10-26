@@ -10,7 +10,7 @@ internal sealed class Consumer
         _toConsume = toConsume;
     }
 
-    public bool CanConsume() => _index < _toConsume.Length;
+    public bool CanConsume(int offset = 0) => _index + offset <_toConsume.Length;
 
     public char Consume()
     {
@@ -44,9 +44,15 @@ internal sealed class Consumer
 
     public bool Matches(string toMatch)
     {
+        if (toMatch.Length > Remaining()) return false;
         if (!CanConsume()) return string.IsNullOrEmpty(toMatch);
 
         string substring = _toConsume.Substring(_index, toMatch.Length);
         return substring == toMatch;
+    }
+
+    private int Remaining()
+    {
+        return _toConsume.Length - _index;
     }
 }

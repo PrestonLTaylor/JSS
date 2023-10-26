@@ -2,7 +2,51 @@
 
 internal sealed class Lexer
 {
-	private readonly Consumer _consumer;
+	// https://tc39.es/ecma262/#prod-ReservedWord
+    static private readonly Dictionary<string, TokenType> reservedWordToType = new()
+        {
+            { "await", TokenType.Await },
+            { "break", TokenType.Break },
+            { "case", TokenType.Case },
+            { "catch", TokenType.Catch },
+            { "class", TokenType.Class },
+            { "const", TokenType.Const },
+            { "continue", TokenType.Continue },
+            { "debugger", TokenType.Debugger },
+            { "default", TokenType.Default },
+            { "delete", TokenType.Delete },
+            { "do", TokenType.Do },
+            { "else", TokenType.Else },
+            { "enum", TokenType.Enum },
+            { "export", TokenType.Export },
+            { "extends", TokenType.Extends },
+            { "false", TokenType.False },
+            { "finally", TokenType.Finally },
+            { "for", TokenType.For },
+            { "function", TokenType.Function },
+            { "if", TokenType.If },
+            { "import", TokenType.Import },
+			// NOTE: We put instanceof due to wanting to match instanceof before in as they both have "in" in the as a common substring
+            { "instanceof", TokenType.InstanceOf },
+            { "in", TokenType.In },
+            { "new", TokenType.New },
+            { "null", TokenType.Null },
+            { "return", TokenType.Return },
+            { "super", TokenType.Super },
+            { "switch", TokenType.Switch },
+            { "this", TokenType.This },
+            { "throw", TokenType.Throw },
+            { "true", TokenType.True },
+            { "try", TokenType.Try },
+            { "typeof", TokenType.TypeOf },
+            { "var", TokenType.Var },
+            { "void", TokenType.Void },
+            { "while", TokenType.While },
+            { "with", TokenType.With },
+            { "yield", TokenType.Yield },
+        };
+
+    private readonly Consumer _consumer;
 
 	public Lexer(string toLex)
 	{
@@ -13,7 +57,11 @@ internal sealed class Lexer
 	{
 		while (_consumer.CanConsume())
 		{
-			if (IsWhiteSpace())
+			if (TryLexReservedWord(out Token? reservedWordToken))
+			{
+				yield return reservedWordToken!.Value;
+			}
+			else if (IsWhiteSpace())
 			{
 				IgnoreWhiteSpace();
 			}
@@ -106,5 +154,38 @@ internal sealed class Lexer
 	private void IgnoreHashBangComment()
 	{
 		_consumer.ConsumeWhile((_) => !IsLineTerminator());
+	}
+
+    // 12.7 Names and Keywords, https://tc39.es/ecma262/#sec-names-and-keywords
+    // https://tc39.es/ecma262/#prod-IdentifierPart
+    private bool IsIdentifierPart(int offset = 0)
+	{
+		if (!_consumer.CanConsume(offset)) return false;
+
+		// FIXME: We want to lex unicode escape sequences
+		// FIXME: Match the whole set of ID_Continue code points: https://unicode.org/reports/tr31/#D1 
+		var codePoint = _consumer.Peek();
+		return char.IsLetterOrDigit(codePoint);
+    }
+
+    // https://tc39.es/ecma262/#prod-ReservedWord
+    private bool TryLexReservedWord(out Token? token)
+	{
+		foreach (var kv in reservedWordToType)
+		{
+			var reservedWord = kv.Key;
+			// We watch to match the reserved word but only match if there isn't an identifier part at the end
+			if (_consumer.Matches(reservedWord) && !IsIdentifierPart(reservedWord.Length))
+			{
+				_consumer.TryConsumeString(reservedWord);
+
+				var tokenType = kv.Value;
+				token = new Token { type = tokenType, data = reservedWord };
+				return true;
+			}
+		}
+
+		token = null;
+		return false;
 	}
 }

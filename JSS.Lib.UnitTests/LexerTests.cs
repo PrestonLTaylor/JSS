@@ -224,6 +224,577 @@ internal sealed class LexerTests
         AssertThatTokenIs(tokens[0], TokenType.LineTerminator, lineTerminatorCodePoint);
     }
 
+    // Tests 12.7 Names and Keywords, https://tc39.es/ecma262/#sec-names-and-keywords
+    [Test]
+    public void Lex_ReturnsAwaitToken_WhenProvidingAwait()
+    {
+        // Arrange
+        const string awaitString = "await";
+        var lexer = new Lexer(awaitString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Await, awaitString);
+    }
+
+    [Test]
+    public void Lex_ReturnsBreakToken_WhenProvidingBreak()
+    {
+        // Arrange
+        const string breakString = "break";
+        var lexer = new Lexer(breakString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Break, breakString);
+    }
+
+    [Test]
+    public void Lex_ReturnsCaseToken_WhenProvidingCase()
+    {
+        // Arrange
+        const string caseString = "case";
+        var lexer = new Lexer(caseString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Case, caseString);
+    }
+
+    [Test]
+    public void Lex_ReturnsCatchToken_WhenProvidingCatch()
+    {
+        // Arrange
+        const string catchString = "catch";
+        var lexer = new Lexer(catchString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Catch, catchString);
+    }
+
+    [Test]
+    public void Lex_ReturnsClassToken_WhenProvidingClass()
+    {
+        // Arrange
+        const string classString = "class";
+        var lexer = new Lexer(classString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Class, classString);
+    }
+
+    [Test]
+    public void Lex_ReturnsConstToken_WhenProvidingConst()
+    {
+        // Arrange
+        const string constString = "const";
+        var lexer = new Lexer(constString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Const, constString);
+    }
+
+    [Test]
+    public void Lex_ReturnsContinueToken_WhenProvidingContinue()
+    {
+        // Arrange
+        const string continueString = "continue";
+        var lexer = new Lexer(continueString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Continue, continueString);
+    }
+
+    [Test]
+    public void Lex_ReturnsDebuggerToken_WhenProvidingDebugger()
+    {
+        // Arrange
+        const string debuggerString = "debugger";
+        var lexer = new Lexer(debuggerString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Debugger, debuggerString);
+    }
+
+    [Test]
+    public void Lex_ReturnsDefaultToken_WhenProvidingDefault()
+    {
+        // Arrange
+        const string defaultString = "default";
+        var lexer = new Lexer(defaultString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Default, defaultString);
+    }
+
+    [Test]
+    public void Lex_ReturnsDeleteToken_WhenProvidingDelete()
+    {
+        // Arrange
+        const string deleteString = "delete";
+        var lexer = new Lexer(deleteString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Delete, deleteString);
+    }
+
+    [Test]
+    public void Lex_ReturnsDoToken_WhenProvidingDo()
+    {
+        // Arrange
+        const string doString = "do";
+        var lexer = new Lexer(doString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Do, doString);
+    }
+
+    [Test]
+    public void Lex_ReturnsElseToken_WhenProvidingElse()
+    {
+        // Arrange
+        const string elseString = "else";
+        var lexer = new Lexer(elseString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Else, elseString);
+    }
+
+    [Test]
+    public void Lex_ReturnsEnumToken_WhenProvidingEnum()
+    {
+        // Arrange
+        const string enumString = "enum";
+        var lexer = new Lexer(enumString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Enum, enumString);
+    }
+
+    [Test]
+    public void Lex_ReturnsExportToken_WhenProvidingExport()
+    {
+        // Arrange
+        const string exportString = "export";
+        var lexer = new Lexer(exportString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Export, exportString);
+    }
+
+    [Test]
+    public void Lex_ReturnsExtendsToken_WhenProvidingExtends()
+    {
+        // Arrange
+        const string extendsString = "extends";
+        var lexer = new Lexer(extendsString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Extends, extendsString);
+    }
+
+    [Test]
+    public void Lex_ReturnsFalseToken_WhenProvidingFalse()
+    {
+        // Arrange
+        const string falseString = "false";
+        var lexer = new Lexer(falseString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.False, falseString);
+    }
+
+    [Test]
+    public void Lex_ReturnsFinallyToken_WhenProvidingFinally()
+    {
+        // Arrange
+        const string finallyString = "finally";
+        var lexer = new Lexer(finallyString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Finally, finallyString);
+    }
+
+    [Test]
+    public void Lex_ReturnsForToken_WhenProvidingFor()
+    {
+        // Arrange
+        const string forString = "for";
+        var lexer = new Lexer(forString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.For, forString);
+    }
+
+    [Test]
+    public void Lex_ReturnsFunctionToken_WhenProvidingFunction()
+    {
+        // Arrange
+        const string functionString = "function";
+        var lexer = new Lexer(functionString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Function, functionString);
+    }
+
+    [Test]
+    public void Lex_ReturnsIfToken_WhenProvidingIf()
+    {
+        // Arrange
+        const string ifString = "if";
+        var lexer = new Lexer(ifString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.If, ifString);
+    }
+
+    [Test]
+    public void Lex_ReturnsImportToken_WhenProvidingImport()
+    {
+        // Arrange
+        const string importString = "import";
+        var lexer = new Lexer(importString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Import, importString);
+    }
+
+    [Test]
+    public void Lex_ReturnsInToken_WhenProvidingIn()
+    {
+        // Arrange
+        const string inString = "in";
+        var lexer = new Lexer(inString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.In, inString);
+    }
+
+    [Test]
+    public void Lex_ReturnsInstanceOfToken_WhenProvidingInstanceOf()
+    {
+        // Arrange
+        const string instanceofString = "instanceof";
+        var lexer = new Lexer(instanceofString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.InstanceOf, instanceofString);
+    }
+
+    [Test]
+    public void Lex_ReturnsNewToken_WhenProvidingNew()
+    {
+        // Arrange
+        const string newString = "new";
+        var lexer = new Lexer(newString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.New, newString);
+    }
+
+    [Test]
+    public void Lex_ReturnsNullToken_WhenProvidingNull()
+    {
+        // Arrange
+        const string nullString = "null";
+        var lexer = new Lexer(nullString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Null, nullString);
+    }
+
+    [Test]
+    public void Lex_ReturnsReturnToken_WhenProvidingReturn()
+    {
+        // Arrange
+        const string returnString = "return";
+        var lexer = new Lexer(returnString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Return, returnString);
+    }
+
+    [Test]
+    public void Lex_ReturnsSuperToken_WhenProvidingSuper()
+    {
+        // Arrange
+        const string superString = "super";
+        var lexer = new Lexer(superString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Super, superString);
+    }
+
+    [Test]
+    public void Lex_ReturnsSwitchToken_WhenProvidingSwitch()
+    {
+        // Arrange
+        const string switchString = "switch";
+        var lexer = new Lexer(switchString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Switch, switchString);
+    }
+
+    [Test]
+    public void Lex_ReturnsThisToken_WhenProvidingThis()
+    {
+        // Arrange
+        const string thisString = "this";
+        var lexer = new Lexer(thisString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.This, thisString);
+    }
+
+    [Test]
+    public void Lex_ReturnsThrowToken_WhenProvidingThrow()
+    {
+        // Arrange
+        const string throwString = "throw";
+        var lexer = new Lexer(throwString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Throw, throwString);
+    }
+
+    [Test]
+    public void Lex_ReturnsTrueToken_WhenProvidingTrue()
+    {
+        // Arrange
+        const string trueString = "true";
+        var lexer = new Lexer(trueString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.True, trueString);
+    }
+
+    [Test]
+    public void Lex_ReturnsTryToken_WhenProvidingTry()
+    {
+        // Arrange
+        const string tryString = "try";
+        var lexer = new Lexer(tryString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Try, tryString);
+    }
+
+    [Test]
+    public void Lex_ReturnsTypeOfToken_WhenProvidingTypeOf()
+    {
+        // Arrange
+        const string typeOfString = "typeof";
+        var lexer = new Lexer(typeOfString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.TypeOf, typeOfString);
+    }
+
+    [Test]
+    public void Lex_ReturnsVarToken_WhenProvidingVar()
+    {
+        // Arrange
+        const string varString = "var";
+        var lexer = new Lexer(varString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Var, varString);
+    }
+
+    [Test]
+    public void Lex_ReturnsVoidToken_WhenProvidingVoid()
+    {
+        // Arrange
+        const string voidString = "void";
+        var lexer = new Lexer(voidString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Void, voidString);
+    }
+
+    [Test]
+    public void Lex_ReturnsWhileToken_WhenProvidingWhile()
+    {
+        // Arrange
+        const string whileString = "while";
+        var lexer = new Lexer(whileString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.While, whileString);
+    }
+
+    [Test]
+    public void Lex_ReturnsWithToken_WhenProvidingWith()
+    {
+        // Arrange
+        const string withString = "with";
+        var lexer = new Lexer(withString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.With, withString);
+    }
+
+    [Test]
+    public void Lex_ReturnsYieldToken_WhenProvidingYield()
+    {
+        // Arrange
+        const string yieldString = "yield";
+        var lexer = new Lexer(yieldString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], TokenType.Yield, yieldString);
+    }
+
     private void AssertThatTokenIs(Token actual, TokenType expectedType, string expectedData)
     {
         Assert.Multiple(() =>
