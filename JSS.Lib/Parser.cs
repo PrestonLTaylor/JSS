@@ -30,6 +30,10 @@ internal sealed class Parser
         {
             return ParseThisExpression();
         }
+        if (IsIdentifier())
+        {
+            return ParseIdentifier();
+        }
 
         throw new NotImplementedException();
     }
@@ -43,6 +47,23 @@ internal sealed class Parser
     private ExpressionStatement ParseThisExpression()
     {
         _consumer.ConsumeTokenOfType(TokenType.This);
-        return new ExpressionStatement(new ThisExpression());
+        return WrapExpression(new ThisExpression());
+    }
+
+    // 13.2.2 Identifier Reference, https://tc39.es/ecma262/#sec-identifier-reference
+    private bool IsIdentifier()
+    {
+        return _consumer.IsTokenOfType(TokenType.Identifier);
+    }
+
+    private ExpressionStatement ParseIdentifier()
+    {
+        var identifierToken = _consumer.ConsumeTokenOfType(TokenType.Identifier);
+        return WrapExpression(new Identifier(identifierToken.data));
+    }
+
+    private ExpressionStatement WrapExpression(IExpression expression)
+    {
+        return new ExpressionStatement(expression);
     }
 }
