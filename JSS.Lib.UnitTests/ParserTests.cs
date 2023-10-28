@@ -25,7 +25,7 @@ internal sealed class ParserTests
     }
 
     [Test]
-    public void Parse_ReturnsIdentifier_WhenProvidingValidIdentifier()
+    public void Parse_ReturnsExpressionStatement_WithIdentifier_WhenProvidingValidIdentifier()
     {
         // Arrange
         const string identifierString = "validIdentifier";
@@ -46,5 +46,23 @@ internal sealed class ParserTests
         Assert.That(identifier.Name, Is.EqualTo(identifierString));
     }
 
+    [Test]
+    public void Parse_ReturnsExpressionStatement_WithNullLiteral_WhenProvidingValidIdentifier()
+    {
+        // Arrange
+        var parser = new Parser("null");
 
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var nullLiteral = expressionStatement.Expression as NullLiteral;
+        Assert.That(nullLiteral, Is.Not.Null);
+    }
 }

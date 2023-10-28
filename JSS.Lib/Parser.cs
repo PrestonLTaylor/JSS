@@ -34,6 +34,10 @@ internal sealed class Parser
         {
             return ParseIdentifier();
         }
+        if (IsNullLiteral())
+        {
+            return ParseNullLiteral();
+        }
 
         throw new NotImplementedException();
     }
@@ -60,6 +64,18 @@ internal sealed class Parser
     {
         var identifierToken = _consumer.ConsumeTokenOfType(TokenType.Identifier);
         return WrapExpression(new Identifier(identifierToken.data));
+    }
+
+    // 13.2.3 Literals, https://tc39.es/ecma262/#sec-primary-expression-literals
+    private bool IsNullLiteral()
+    {
+        return _consumer.IsTokenOfType(TokenType.Null);
+    }
+
+    private ExpressionStatement ParseNullLiteral()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Null);
+        return WrapExpression(new NullLiteral());
     }
 
     private ExpressionStatement WrapExpression(IExpression expression)
