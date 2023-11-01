@@ -43,6 +43,10 @@ internal sealed class Parser
         {
             return ParseBooleanLiteral();
         }
+        if (IsNumericLiteral())
+        {
+            return ParseNumericLiteral();
+        }
         if (IsStringLiteral())
         {
             return ParseStringLiteral();
@@ -98,6 +102,20 @@ internal sealed class Parser
         var booleanToken = _consumer.Consume();
         var booleanValue = booleanToken.type == TokenType.True;
         return WrapExpression(new BooleanLiteral(booleanValue));
+    }
+
+    private bool IsNumericLiteral()
+    {
+        return _consumer.IsTokenOfType(TokenType.Number);
+    }
+
+    private ExpressionStatement ParseNumericLiteral()
+    {
+        var numericToken = _consumer.ConsumeTokenOfType(TokenType.Number);
+        // FIXME: Proper error reporting
+        // FIXME: Parse numbers according to the JS spec rather than the C# parse library
+        var numericValue = double.Parse(numericToken.data);
+        return WrapExpression(new NumericLiteral(numericValue));
     }
 
     private bool IsStringLiteral()

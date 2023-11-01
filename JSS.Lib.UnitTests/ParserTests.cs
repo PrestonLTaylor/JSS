@@ -109,6 +109,34 @@ internal sealed class ParserTests
         Assert.That(booleanLiteral.Value, Is.EqualTo(true));
     }
 
+    static private readonly Dictionary<string, double> numericLiteralToValueTestCases = new()
+    {
+        { "0", 0.0 }, { "1", 1.0 }, { "123", 123.0 }, { "1234567890", 1234567890.0 }
+    };
+
+    [TestCaseSource(nameof(numericLiteralToValueTestCases))]
+    public void Parse_ReturnsExpressionStatement_WithNumericLiteral_WhenProvidingNumericLiteral(KeyValuePair<string, double> numericLiteralToValue)
+    {
+        // Arrange
+        var numericLiteral = numericLiteralToValue.Key;
+        var numericValue = numericLiteralToValue.Value;
+        var parser = new Parser(numericLiteral);
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var parsedLiteral = expressionStatement.Expression as NumericLiteral;
+        Assert.That(parsedLiteral, Is.Not.Null);
+        Assert.That(parsedLiteral.Value, Is.EqualTo(numericValue));
+    }
+
     static private readonly Dictionary<string, string> stringLiteralToValueTestCases = new() 
     {
         { "\"\"", "" },
