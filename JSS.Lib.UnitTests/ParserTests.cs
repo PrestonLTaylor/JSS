@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.AST;
+using JSS.Lib.AST.Literal;
 
 namespace JSS.Lib.UnitTests;
 
@@ -64,5 +65,47 @@ internal sealed class ParserTests
 
         var nullLiteral = expressionStatement.Expression as NullLiteral;
         Assert.That(nullLiteral, Is.Not.Null);
+    }
+
+    [Test]
+    public void Parse_ReturnsExpressionStatement_WithFalseBooleanLiteral_WhenProvidingFalseLiteral()
+    {
+        // Arrange
+        var parser = new Parser("false");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var booleanLiteral = expressionStatement.Expression as BooleanLiteral;
+        Assert.That(booleanLiteral, Is.Not.Null);
+        Assert.That(booleanLiteral.Value, Is.EqualTo(false));
+    }
+
+    [Test]
+    public void Parse_ReturnsExpressionStatement_WithTrueBooleanLiteral_WhenProvidingTrueLiteral()
+    {
+        // Arrange
+        var parser = new Parser("true");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var booleanLiteral = expressionStatement.Expression as BooleanLiteral;
+        Assert.That(booleanLiteral, Is.Not.Null);
+        Assert.That(booleanLiteral.Value, Is.EqualTo(true));
     }
 }

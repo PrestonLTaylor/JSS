@@ -1,4 +1,4 @@
-﻿namespace JSS.Lib.AST;
+﻿namespace JSS.Lib.AST.Literal;
 
 // 13.2.3 Literals
 internal sealed class NullLiteral : IExpression

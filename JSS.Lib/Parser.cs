@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.AST;
+using JSS.Lib.AST.Literal;
 
 namespace JSS.Lib;
 
@@ -38,6 +39,10 @@ internal sealed class Parser
         {
             return ParseNullLiteral();
         }
+        if (IsBooleanLiteral())
+        {
+            return ParseBooleanLiteral();
+        }
 
         throw new NotImplementedException();
     }
@@ -76,6 +81,19 @@ internal sealed class Parser
     {
         _consumer.ConsumeTokenOfType(TokenType.Null);
         return WrapExpression(new NullLiteral());
+    }
+
+    private bool IsBooleanLiteral()
+    {
+        return _consumer.IsTokenOfType(TokenType.False) || _consumer.IsTokenOfType(TokenType.True);
+    }
+
+    private ExpressionStatement ParseBooleanLiteral()
+    {
+        // FIXME: This doesn't have an explicit assertion
+        var booleanToken = _consumer.Consume();
+        var booleanValue = booleanToken.type == TokenType.True;
+        return WrapExpression(new BooleanLiteral(booleanValue));
     }
 
     private ExpressionStatement WrapExpression(IExpression expression)
