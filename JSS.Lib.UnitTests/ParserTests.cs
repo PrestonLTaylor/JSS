@@ -108,4 +108,37 @@ internal sealed class ParserTests
         Assert.That(booleanLiteral, Is.Not.Null);
         Assert.That(booleanLiteral.Value, Is.EqualTo(true));
     }
+
+    static private readonly Dictionary<string, string> stringLiteralToValueTestCases = new() 
+    {
+        { "\"\"", "" },
+        { "''", "" },
+        { "\"this is a string literal\"", "this is a string literal" },
+        { "'this is a string literal'", "this is a string literal" },
+        { "\"'\"", "'" },
+        { "'\"'", "\"" }
+    };
+
+    [TestCaseSource(nameof(stringLiteralToValueTestCases))]
+    public void Parse_ReturnsExpressionStatement_WithStringLiteral_WhenProvidingStringLiteral(KeyValuePair<string, string> stringLiteralToValue)
+    {
+        // Arrange
+        var stringLiteral = stringLiteralToValue.Key;
+        var stringValue = stringLiteralToValue.Value;
+        var parser = new Parser(stringLiteral);
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var parsedLiteral = expressionStatement.Expression as StringLiteral;
+        Assert.That(parsedLiteral, Is.Not.Null);
+        Assert.That(parsedLiteral.Value, Is.EqualTo(stringValue));
+    }
 }

@@ -43,6 +43,10 @@ internal sealed class Parser
         {
             return ParseBooleanLiteral();
         }
+        if (IsStringLiteral())
+        {
+            return ParseStringLiteral();
+        }
 
         throw new NotImplementedException();
     }
@@ -94,6 +98,18 @@ internal sealed class Parser
         var booleanToken = _consumer.Consume();
         var booleanValue = booleanToken.type == TokenType.True;
         return WrapExpression(new BooleanLiteral(booleanValue));
+    }
+
+    private bool IsStringLiteral()
+    {
+        return _consumer.IsTokenOfType(TokenType.String);
+    }
+
+    private ExpressionStatement ParseStringLiteral()
+    {
+        var stringLiteral = _consumer.ConsumeTokenOfType(TokenType.String);
+        var stringValue = stringLiteral.data[1..^1];
+        return WrapExpression(new StringLiteral(stringValue));
     }
 
     private ExpressionStatement WrapExpression(IExpression expression)
