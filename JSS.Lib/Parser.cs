@@ -51,6 +51,10 @@ internal sealed class Parser
         {
             return ParseStringLiteral();
         }
+        if (IsBlock())
+        {
+            return ParseBlock();
+        }
 
         throw new NotImplementedException();
     }
@@ -128,6 +132,28 @@ internal sealed class Parser
         var stringLiteral = _consumer.ConsumeTokenOfType(TokenType.String);
         var stringValue = stringLiteral.data[1..^1];
         return WrapExpression(new StringLiteral(stringValue));
+    }
+
+    // 14.2 Block, https://tc39.es/ecma262/#sec-block
+    private bool IsBlock()
+    {
+        return _consumer.IsTokenOfType(TokenType.OpenBrace);
+    }
+
+    private Block ParseBlock()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
+
+        List<INode> blockNodes = new();
+        while (!_consumer.IsTokenOfType(TokenType.ClosedBrace))
+        {
+            throw new NotImplementedException();
+        }
+
+        // FIXME: Throw a SyntaxError if we encounter a Block without a closed brace
+        _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
+
+        return new Block(blockNodes);
     }
 
     private ExpressionStatement WrapExpression(IExpression expression)

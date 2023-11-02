@@ -169,4 +169,22 @@ internal sealed class ParserTests
         Assert.That(parsedLiteral, Is.Not.Null);
         Assert.That(parsedLiteral.Value, Is.EqualTo(stringValue));
     }
+
+    [Test]
+    public void Parse_ReturnsAnEmptyBlock_WhenProvidingAnEmptyBlock()
+    {
+        // Arrange
+        var parser = new Parser("{}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var block = rootNodes[0] as Block;
+        Assert.That(block, Is.Not.Null);
+        Assert.That(block.Nodes, Is.Empty);
+    }
 }
