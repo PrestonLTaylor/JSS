@@ -7,5 +7,5 @@ internal sealed class Program
         RootNodes = rootNodes;
     }
 
-    public List<INode> RootNodes { get; }
+    public IReadOnlyList<INode> RootNodes { get; }
 }
