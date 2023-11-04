@@ -59,6 +59,10 @@ internal sealed class Parser
         {
             return ParseLetDeclaration();
         }
+        if (IsConstDeclaration())
+        {
+            return ParseConstDeclaration();
+        }
 
         throw new NotImplementedException();
     }
@@ -180,7 +184,7 @@ internal sealed class Parser
         // FIXME: Throw a SyntaxError instead of throwing (also have a specific error if the next token is let as specified in the spec)
         var identifierToken = _consumer.ConsumeTokenOfType(TokenType.Identifier);
 
-        // FIXME: We should parse multiple bindings in a single let declaration
+        // FIXME: We should allow parsing multiple bindings in a single let declaration
         INode? initializer = null;
         if (_consumer.IsTokenOfType(TokenType.Assignment))
         {
@@ -189,6 +193,33 @@ internal sealed class Parser
         }
 
         return new LetDeclaration(identifierToken.data, initializer);
+    }
+
+    private bool IsConstDeclaration()
+    {
+        return _consumer.IsTokenOfType(TokenType.Const);
+    }
+
+    private ConstDeclaration ParseConstDeclaration()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Const);
+
+
+        // FIXME: Allow Await/Yield to be used as an indentifier when specified in the spec
+        // FIXME: Throw a SyntaxError instead of throwing (also have a specific error if the next token is let as specified in the spec)
+        var identifierToken = _consumer.ConsumeTokenOfType(TokenType.Identifier);
+
+        // FIXME: We should allow parsing multiple bindings in a single const declaration
+        if (!_consumer.IsTokenOfType(TokenType.Assignment))
+        {
+            // FIXME: Throw a SyntaxError
+            throw new InvalidOperationException();
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.Assignment);
+        var initializer = ParseInitializer();
+
+        return new ConstDeclaration(identifierToken.data, initializer);
     }
 
     private INode ParseInitializer()

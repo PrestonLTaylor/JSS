@@ -241,4 +241,38 @@ internal sealed class ParserTests
         Assert.That(letDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
         Assert.That(letDeclaration.Initializer, Is.InstanceOf(expectedInitializerType));
     }
+
+    [TestCaseSource(nameof(initializerToExpectedTypeTestCases))]
+    public void Parse_ReturnsConstDeclaration_WhenProvidingConstDeclaration(KeyValuePair<string, Type> initializerToExpectedType)
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        var initializer = initializerToExpectedType.Key;
+        var expectedInitializerType = initializerToExpectedType.Value;
+        var parser = new Parser($"const {expectedIdentifier} = {initializer}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var constDeclaration = rootNodes[0] as ConstDeclaration;
+        Assert.That(constDeclaration, Is.Not.Null);
+        Assert.That(constDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
+        Assert.That(constDeclaration.Initializer, Is.InstanceOf(expectedInitializerType));
+    }
+
+    [Test]
+    public void Parse_ThrowsInvalidOperationException_WhenProvidingConstDeclartion_WithNoInitializer()
+    {
+        // Arrange
+        var parser = new Parser("const a");
+
+        // Act
+
+        // Assert
+        Assert.That(parser.Parse, Throws.Exception.TypeOf<InvalidOperationException>());
+    }
 }
