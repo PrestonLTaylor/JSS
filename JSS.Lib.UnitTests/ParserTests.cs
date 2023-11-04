@@ -170,6 +170,7 @@ internal sealed class ParserTests
         Assert.That(parsedLiteral.Value, Is.EqualTo(stringValue));
     }
 
+    // Tests for 14.2 Block, https://tc39.es/ecma262/#sec-block
     [Test]
     public void Parse_ReturnsAnEmptyBlock_WhenProvidingAnEmptyBlock()
     {
@@ -188,6 +189,7 @@ internal sealed class ParserTests
         Assert.That(block.Nodes, Is.Empty);
     }
 
+    // Tests for 14.3.1 Let and Const Declarations, https://tc39.es/ecma262/#sec-let-and-const-declarations
     [Test]
     public void Parse_ReturnsLetDeclaration_WithNoInitializer_WhenProvidingLetDeclaration_WithNoInitializer()
     {
@@ -206,5 +208,37 @@ internal sealed class ParserTests
         Assert.That(letDeclaration, Is.Not.Null);
         Assert.That(letDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
         Assert.That(letDeclaration.Initializer, Is.Null);
+    }
+
+    static private readonly Dictionary<string, Type> initializerToExpectedTypeTestCases = new()
+    {
+        { "''", typeof(StringLiteral) },
+        { "1", typeof(NumericLiteral) },
+        { "false", typeof(BooleanLiteral) },
+        { "null", typeof(NullLiteral) },
+        { "otherIdentifier", typeof(Identifier) },
+        { "this", typeof(ThisExpression) },
+    };
+
+    [TestCaseSource(nameof(initializerToExpectedTypeTestCases))]
+    public void Parse_ReturnsLetDeclaration_WhenProvidingLetDeclaration(KeyValuePair<string, Type> initializerToExpectedType)
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        var initializer = initializerToExpectedType.Key;
+        var expectedInitializerType = initializerToExpectedType.Value;
+        var parser = new Parser($"let {expectedIdentifier} = {initializer}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var letDeclaration = rootNodes[0] as LetDeclaration;
+        Assert.That(letDeclaration, Is.Not.Null);
+        Assert.That(letDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
+        Assert.That(letDeclaration.Initializer, Is.InstanceOf(expectedInitializerType));
     }
 }
