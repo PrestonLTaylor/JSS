@@ -67,6 +67,10 @@ internal sealed class Parser
         {
             return ParseVarStatement();
         }
+        if (IsEmptyStatement())
+        {
+            return ParseEmptyStatement();
+        }
 
         throw new NotImplementedException();
     }
@@ -281,5 +285,18 @@ internal sealed class Parser
 
         // FIXME: Throw a SyntaxError instead
         throw new InvalidOperationException();
+    }
+
+    // 14.4 Empty Statement, https://tc39.es/ecma262/#sec-empty-statement
+    private bool IsEmptyStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.SemiColon);
+    }
+
+    private EmptyStatement ParseEmptyStatement()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.SemiColon);
+        // FIXME: Have a "global" EmptyStatement, so we don't have multiple redunant empty statements
+        return new EmptyStatement();
     }
 }

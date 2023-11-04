@@ -318,4 +318,22 @@ internal sealed class ParserTests
         Assert.That(varStatement.Identifier, Is.EqualTo(expectedIdentifier));
         Assert.That(varStatement.Initializer, Is.InstanceOf(expectedInitializerType));
     }
+
+    // Tests for 14.4 Empty Statement, https://tc39.es/ecma262/#sec-empty-statement
+    [Test]
+    public void Parse_ReturnsEmptyStatement_WhenProvidingEmptyStatement()
+    {
+        // Arrange
+        var parser = new Parser(";");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var emptyStatement = rootNodes[0] as EmptyStatement;
+        Assert.That(emptyStatement, Is.Not.Null);
+    }
 }
