@@ -187,4 +187,24 @@ internal sealed class ParserTests
         Assert.That(block, Is.Not.Null);
         Assert.That(block.Nodes, Is.Empty);
     }
+
+    [Test]
+    public void Parse_ReturnsLetDeclaration_WithNoInitializer_WhenProvidingLetDeclaration_WithNoInitializer()
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        var parser = new Parser($"let {expectedIdentifier}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var letDeclaration = rootNodes[0] as LetDeclaration;
+        Assert.That(letDeclaration, Is.Not.Null);
+        Assert.That(letDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
+        Assert.That(letDeclaration.Initializer, Is.Null);
+    }
 }

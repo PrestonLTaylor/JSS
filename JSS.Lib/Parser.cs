@@ -55,6 +55,10 @@ internal sealed class Parser
         {
             return ParseBlock();
         }
+        if (IsLetDeclaration())
+        {
+            return ParseLetDeclaration();
+        }
 
         throw new NotImplementedException();
     }
@@ -134,6 +138,11 @@ internal sealed class Parser
         return WrapExpression(new StringLiteral(stringValue));
     }
 
+    private ExpressionStatement WrapExpression(IExpression expression)
+    {
+        return new ExpressionStatement(expression);
+    }
+
     // 14.2 Block, https://tc39.es/ecma262/#sec-block
     private bool IsBlock()
     {
@@ -156,8 +165,27 @@ internal sealed class Parser
         return new Block(blockNodes);
     }
 
-    private ExpressionStatement WrapExpression(IExpression expression)
+    // 14.3.1 Let and Const Declarations, https://tc39.es/ecma262/#sec-let-and-const-declarations
+    private bool IsLetDeclaration()
     {
-        return new ExpressionStatement(expression);
+        return _consumer.IsTokenOfType(TokenType.Let);
+    }
+
+    private LetDeclaration ParseLetDeclaration()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Let);
+
+        // FIXME: If let is being used as an identifier or as a var declaration then we parse it as such instead of throwing
+        // FIXME: Allow Await/Yield to be used as an indentifier when specified in the spec
+        // FIXME: Throw a SyntaxError instead of throwing (also have a specific error if the next token is let as specified in the spec)
+        var identifierToken = _consumer.ConsumeTokenOfType(TokenType.Identifier);
+
+        // FIXME: We should parse multiple bindings in a single let declaration
+        if (_consumer.IsTokenOfType(TokenType.Assignment))
+        {
+            throw new NotImplementedException();
+        }
+
+        return new LetDeclaration(identifierToken.data, null);
     }
 }

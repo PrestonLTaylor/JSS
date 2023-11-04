@@ -388,6 +388,8 @@ internal sealed class LexerTests
             { "while", TokenType.While },
             { "with", TokenType.With },
             { "yield", TokenType.Yield },
+            // NOTE: let isnt a reserved words but it's easier to treat it like one
+            { "let", TokenType.Let },
         };
 
     [TestCaseSource(nameof(reservedWordToTypeTestCases))]

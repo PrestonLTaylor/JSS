@@ -44,6 +44,8 @@ internal sealed class Lexer
        { "while", TokenType.While },
        { "with", TokenType.With },
        { "yield", TokenType.Yield },
+       // NOTE: let isnt a reserved words but it's easier to treat it like one
+       { "let", TokenType.Let },
     };
 
     // https://tc39.es/ecma262/#prod-Punctuator
