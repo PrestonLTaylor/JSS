@@ -25,7 +25,7 @@ internal sealed class TokenConsumer
 
     public bool IsTokenOfType(TokenType type)
     {
-        return Peek().type == type;
+        return CanConsume() && Peek().type == type;
     }
 
     // NOTE: This function has an invariant that the next token MUST be of the same type, otherwise it is a parser bug
