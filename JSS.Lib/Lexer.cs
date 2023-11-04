@@ -1,6 +1,4 @@
-﻿using JSS.Lib;
-
-namespace JSS.Lib;
+﻿namespace JSS.Lib;
 
 internal sealed class Lexer
 {
@@ -266,7 +264,7 @@ internal sealed class Lexer
 
 		// FIXME: We want to lex unicode escape sequences
 		// FIXME: Match the whole set of ID_Start code points: https://unicode.org/reports/tr31/#D1 
-		var codePoint = _consumer.Peek();
+		var codePoint = _consumer.Peek(offset);
 		return char.IsLetter(codePoint) || codePoint == '$' || codePoint == '_';
 	}
 
@@ -278,7 +276,7 @@ internal sealed class Lexer
 
 		// FIXME: We want to lex unicode escape sequences
 		// FIXME: Match the whole set of ID_Continue code points: https://unicode.org/reports/tr31/#D1 
-		var codePoint = _consumer.Peek();
+		var codePoint = _consumer.Peek(offset);
 		return char.IsLetterOrDigit(codePoint);
     }
 

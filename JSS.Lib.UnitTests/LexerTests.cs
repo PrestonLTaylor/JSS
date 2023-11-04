@@ -406,6 +406,22 @@ internal sealed class LexerTests
         AssertThatTokenIs(tokens[0], expectedTokenType, keywordString);
     }
 
+    [TestCaseSource(nameof(reservedWordToTypeTestCases))]
+    public void Lex_ReturnsExpectedKeywordToken_WhenProvidingKeyword_WithExtraWhitespaceAfter(KeyValuePair<string, TokenType> keywordToExpectedTokenType)
+    {
+        // Arrange
+        var keywordString = keywordToExpectedTokenType.Key;
+        var expectedTokenType = keywordToExpectedTokenType.Value;
+        var lexer = new Lexer($"{keywordString} ");
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], expectedTokenType, keywordString);
+    }
+
     // Tests for 12.8 Punctuators, https://tc39.es/ecma262/#sec-punctuators
     static private readonly Dictionary<string, TokenType> punctuatorToTypeTestCases = new()
     {
