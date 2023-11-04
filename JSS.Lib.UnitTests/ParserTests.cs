@@ -189,6 +189,16 @@ internal sealed class ParserTests
         Assert.That(block.Nodes, Is.Empty);
     }
 
+    static private readonly Dictionary<string, Type> initializerToExpectedTypeTestCases = new()
+    {
+        { "''", typeof(StringLiteral) },
+        { "1", typeof(NumericLiteral) },
+        { "false", typeof(BooleanLiteral) },
+        { "null", typeof(NullLiteral) },
+        { "otherIdentifier", typeof(Identifier) },
+        { "this", typeof(ThisExpression) },
+    };
+
     // Tests for 14.3.1 Let and Const Declarations, https://tc39.es/ecma262/#sec-let-and-const-declarations
     [Test]
     public void Parse_ReturnsLetDeclaration_WithNoInitializer_WhenProvidingLetDeclaration_WithNoInitializer()
@@ -209,16 +219,6 @@ internal sealed class ParserTests
         Assert.That(letDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
         Assert.That(letDeclaration.Initializer, Is.Null);
     }
-
-    static private readonly Dictionary<string, Type> initializerToExpectedTypeTestCases = new()
-    {
-        { "''", typeof(StringLiteral) },
-        { "1", typeof(NumericLiteral) },
-        { "false", typeof(BooleanLiteral) },
-        { "null", typeof(NullLiteral) },
-        { "otherIdentifier", typeof(Identifier) },
-        { "this", typeof(ThisExpression) },
-    };
 
     [TestCaseSource(nameof(initializerToExpectedTypeTestCases))]
     public void Parse_ReturnsLetDeclaration_WhenProvidingLetDeclaration(KeyValuePair<string, Type> initializerToExpectedType)
@@ -274,5 +274,48 @@ internal sealed class ParserTests
 
         // Assert
         Assert.That(parser.Parse, Throws.Exception.TypeOf<InvalidOperationException>());
+    }
+
+    // Tests for 14.3.2 Variable Statement, https://tc39.es/ecma262/#sec-variable-statement
+    [Test] 
+    public void Parse_ReturnsVarStatement_WithNoInitializer_WhenProvidingVarStatement_WithNoInitializer()
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        var parser = new Parser($"var {expectedIdentifier}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var varStatement = rootNodes[0] as VarStatement;
+        Assert.That(varStatement, Is.Not.Null);
+        Assert.That(varStatement.Identifier, Is.EqualTo(expectedIdentifier));
+        Assert.That(varStatement.Initializer, Is.Null);
+    }
+
+    [TestCaseSource(nameof(initializerToExpectedTypeTestCases))]
+    public void Parse_ReturnsVarStatement_WhenProvidingVarStatement(KeyValuePair<string, Type> initializerToExpectedType)
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        var initializer = initializerToExpectedType.Key;
+        var expectedInitializerType = initializerToExpectedType.Value;
+        var parser = new Parser($"var {expectedIdentifier} = {initializer}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var varStatement = rootNodes[0] as VarStatement;
+        Assert.That(varStatement, Is.Not.Null);
+        Assert.That(varStatement.Identifier, Is.EqualTo(expectedIdentifier));
+        Assert.That(varStatement.Initializer, Is.InstanceOf(expectedInitializerType));
     }
 }

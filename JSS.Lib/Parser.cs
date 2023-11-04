@@ -63,6 +63,10 @@ internal sealed class Parser
         {
             return ParseConstDeclaration();
         }
+        if (IsVarStatement())
+        {
+            return ParseVarStatement();
+        }
 
         throw new NotImplementedException();
     }
@@ -180,7 +184,7 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.Let);
 
         // FIXME: If let is being used as an identifier or as a var declaration then we parse it as such instead of throwing
-        // FIXME: Allow Await/Yield to be used as an indentifier when specified in the spec
+        // FIXME: Allow await/yield to be used as an indentifier when specified in the spec
         // FIXME: Throw a SyntaxError instead of throwing (also have a specific error if the next token is let as specified in the spec)
         var identifierToken = _consumer.ConsumeTokenOfType(TokenType.Identifier);
 
@@ -204,8 +208,7 @@ internal sealed class Parser
     {
         _consumer.ConsumeTokenOfType(TokenType.Const);
 
-
-        // FIXME: Allow Await/Yield to be used as an indentifier when specified in the spec
+        // FIXME: Allow await/yield to be used as an indentifier when specified in the spec
         // FIXME: Throw a SyntaxError instead of throwing (also have a specific error if the next token is let as specified in the spec)
         var identifierToken = _consumer.ConsumeTokenOfType(TokenType.Identifier);
 
@@ -220,6 +223,31 @@ internal sealed class Parser
         var initializer = ParseInitializer();
 
         return new ConstDeclaration(identifierToken.data, initializer);
+    }
+
+    // 14.3.2 Variable Statement, https://tc39.es/ecma262/#sec-variable-statement
+    private bool IsVarStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.Var);
+    }
+
+    private VarStatement ParseVarStatement()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Var);
+
+        // FIXME: Allow let/await/yield to be used as an indentifier when specified in the spec
+        // FIXME: Throw a SyntaxError instead of throwing
+        var identifierToken = _consumer.ConsumeTokenOfType(TokenType.Identifier);
+
+        // FIXME: We should allow parsing multiple bindings in a single var statement 
+        INode? initializer = null;
+        if (_consumer.IsTokenOfType(TokenType.Assignment))
+        {
+            _consumer.ConsumeTokenOfType(TokenType.Assignment);
+            initializer = ParseInitializer();
+        }
+
+        return new VarStatement(identifierToken.data, initializer);
     }
 
     private INode ParseInitializer()
