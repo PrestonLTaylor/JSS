@@ -336,4 +336,23 @@ internal sealed class ParserTests
         var emptyStatement = rootNodes[0] as EmptyStatement;
         Assert.That(emptyStatement, Is.Not.Null);
     }
+
+    // Tests for 14.10 The return Statement, https://tc39.es/ecma262/#sec-return-statement
+    [Test]
+    public void Parse_ReturnsReturnStatement_WithNoExpression_WhenProvidingReturn_WithNoExpression()
+    {
+        // Arrange
+        var parser = new Parser("return");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var returnStatement = rootNodes[0] as ReturnStatement;
+        Assert.That(returnStatement, Is.Not.Null);
+        Assert.That(returnStatement.ReturnExpression, Is.Null);
+    }
 }

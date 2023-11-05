@@ -71,6 +71,10 @@ internal sealed class Parser
         {
             return ParseEmptyStatement();
         }
+        if (IsReturnStatement())
+        {
+            return ParseReturnStatement();
+        }
 
         throw new NotImplementedException();
     }
@@ -298,5 +302,17 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.SemiColon);
         // FIXME: Have a "global" EmptyStatement, so we don't have multiple redunant empty statements
         return new EmptyStatement();
+    }
+
+    // 14.10 The return Statement, https://tc39.es/ecma262/#sec-return-statement
+    private bool IsReturnStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.Return);
+    }
+
+    private ReturnStatement ParseReturnStatement()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Return);
+        return new ReturnStatement(null);
     }
 }
