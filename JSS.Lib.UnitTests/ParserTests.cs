@@ -347,6 +347,63 @@ internal sealed class ParserTests
         { "this", typeof(ThisExpression) },
     };
 
+    // Tests for 14.6 The if Statement, https://tc39.es/ecma262/#sec-if-statement
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsIfStatement_WithNoElse_WhenProvidingIf_WithNoElse(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"if ({expression}) {{ }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var ifStatement = rootNodes[0] as IfStatement;
+        Assert.That(ifStatement, Is.Not.Null);
+        Assert.That(ifStatement.IfExpression, Is.InstanceOf(expectedExpressionType));
+        Assert.That(ifStatement.IfCaseStatement, Is.Not.Null);
+        Assert.That(ifStatement.ElseCaseStatement, Is.Null);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsIfStatement_WhenProvidingIf(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"if ({expression}) {{ }} else {{ }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var ifStatement = rootNodes[0] as IfStatement;
+        Assert.That(ifStatement, Is.Not.Null);
+        Assert.That(ifStatement.IfExpression, Is.InstanceOf(expectedExpressionType));
+        Assert.That(ifStatement.IfCaseStatement, Is.Not.Null);
+        Assert.That(ifStatement.ElseCaseStatement, Is.Not.Null);
+    }
+
+    [Test]
+    public void Parse_ThrowsInvalidOperationException_WhenProvidingIf_WithoutIfExpression()
+    {
+        // Arrange
+        var parser = new Parser("if { }");
+
+        // Act
+
+        // Assert
+        Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
+    }
+
     // Tests for 14.10 The return Statement, https://tc39.es/ecma262/#sec-return-statement
     [Test]
     public void Parse_ReturnsReturnStatement_WithNoExpression_WhenProvidingReturn_WithNoExpression()

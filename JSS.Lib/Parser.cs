@@ -51,6 +51,10 @@ internal sealed class Parser
         {
             return ParseEmptyStatement();
         }
+        if (IsIfStatement())
+        {
+            return ParseIfStatement();
+        }
         if (IsReturnStatement())
         {
             return ParseReturnStatement();
@@ -301,6 +305,47 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.SemiColon);
         // FIXME: Have a "global" EmptyStatement, so we don't have multiple redunant empty statements
         return new EmptyStatement();
+    }
+
+    // 14.6 The if Statement, https://tc39.es/ecma262/#sec-if-statement
+    private bool IsIfStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.If);
+    }
+
+    // FIXME: Implement 14.6.1 Static Semantics: Early Errors, https://tc39.es/ecma262/#sec-if-statement-static-semantics-early-errors
+    private IfStatement ParseIfStatement()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.If);
+        _consumer.ConsumeTokenOfType(TokenType.OpenParen);
+
+        IExpression? ifExpression;
+        if (!TryParseExpression(out ifExpression))
+        {
+            // FIXME: Throw a SyntaxError
+            throw new InvalidOperationException();
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
+
+        var ifCaseStatement = ParseStatement();
+        TryParseElseStatement(out INode? elseCaseStatement);
+
+        return new IfStatement(ifExpression!, ifCaseStatement, elseCaseStatement);
+    }
+
+    private bool TryParseElseStatement(out INode? elseCaseStatement)
+    {
+        if (!_consumer.IsTokenOfType(TokenType.Else))
+        {
+            elseCaseStatement = null;
+            return false;
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.Else);
+
+        elseCaseStatement = ParseStatement();
+        return true;
     }
 
     // 14.10 The return Statement, https://tc39.es/ecma262/#sec-return-statement
