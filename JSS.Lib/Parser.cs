@@ -304,6 +304,10 @@ internal sealed class Parser
     private ReturnStatement ParseReturnStatement()
     {
         _consumer.ConsumeTokenOfType(TokenType.Return);
-        return new ReturnStatement(null);
+
+        // FIXME: return [no LineTerminator here] Expression[+In, ?Yield, ?Await] ;
+        // Don't parse an expression if there is a line terminator after the return
+        TryParseExpression(out IExpression? returnExpression);
+        return new ReturnStatement(returnExpression);
     }
 }

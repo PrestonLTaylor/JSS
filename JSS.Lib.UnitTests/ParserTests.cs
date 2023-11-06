@@ -137,7 +137,7 @@ internal sealed class ParserTests
         Assert.That(parsedLiteral.Value, Is.EqualTo(numericValue));
     }
 
-    static private readonly Dictionary<string, string> stringLiteralToValueTestCases = new() 
+    static private readonly Dictionary<string, string> stringLiteralToValueTestCases = new()
     {
         { "\"\"", "" },
         { "''", "" },
@@ -277,7 +277,7 @@ internal sealed class ParserTests
     }
 
     // Tests for 14.3.2 Variable Statement, https://tc39.es/ecma262/#sec-variable-statement
-    [Test] 
+    [Test]
     public void Parse_ReturnsVarStatement_WithNoInitializer_WhenProvidingVarStatement_WithNoInitializer()
     {
         // Arrange
@@ -337,6 +337,16 @@ internal sealed class ParserTests
         Assert.That(emptyStatement, Is.Not.Null);
     }
 
+    static private readonly Dictionary<string, Type> expressionToExpectedTypeTestCases = new()
+    {
+        { "''", typeof(StringLiteral) },
+        { "1", typeof(NumericLiteral) },
+        { "false", typeof(BooleanLiteral) },
+        { "null", typeof(NullLiteral) },
+        { "otherIdentifier", typeof(Identifier) },
+        { "this", typeof(ThisExpression) },
+    };
+
     // Tests for 14.10 The return Statement, https://tc39.es/ecma262/#sec-return-statement
     [Test]
     public void Parse_ReturnsReturnStatement_WithNoExpression_WhenProvidingReturn_WithNoExpression()
@@ -354,5 +364,25 @@ internal sealed class ParserTests
         var returnStatement = rootNodes[0] as ReturnStatement;
         Assert.That(returnStatement, Is.Not.Null);
         Assert.That(returnStatement.ReturnExpression, Is.Null);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsReturnStatement_WhenProvidingReturn(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"return {expression}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var returnStatement = rootNodes[0] as ReturnStatement;
+        Assert.That(returnStatement, Is.Not.Null);
+        Assert.That(returnStatement.ReturnExpression, Is.InstanceOf(expectedExpressionType));
     }
 }
