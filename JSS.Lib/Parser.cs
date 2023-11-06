@@ -59,6 +59,10 @@ internal sealed class Parser
         {
             return ParseThrowStatement();
         }
+        if (IsTryStatement())
+        {
+            return ParseTryStatement();
+        }
 
         throw new NotImplementedException();
     }
@@ -336,5 +340,81 @@ internal sealed class Parser
             // FIXME: Throw a SyntaxError
             throw new InvalidOperationException();
         }
+    }
+
+    // 14.15 The try Statement, https://tc39.es/ecma262/#sec-try-statement
+    private bool IsTryStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.Try);
+    }
+
+    private TryStatement ParseTryStatement()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Try);
+
+        var tryBlock = ParseBlock();
+
+        var didParseCatch = TryParseCatchBlock(out Block? catchBlock, out Identifier? catchParameter);
+        var didParseFinally = TryParseFinallyBlock(out Block? finallyBlock);
+
+        if (!didParseCatch && !didParseFinally)
+        {
+            // FIXME: Throw SyntaxError
+            throw new InvalidOperationException();
+        }
+
+        return new TryStatement(tryBlock, catchBlock, catchParameter, finallyBlock);
+    }
+
+    private bool TryParseCatchBlock(out Block? catchBlock, out Identifier? catchParameter)
+    {
+        if (_consumer.IsTokenOfType(TokenType.Catch))
+        {
+            ParseCatchBlock(out catchBlock, out catchParameter);
+            return true;
+        }
+
+        catchBlock = null;
+        catchParameter = null;
+        return false;
+    }
+
+    private void ParseCatchBlock(out Block catchBlock, out Identifier? catchParameter)
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Catch);
+
+        TryParseCatchParameter(out catchParameter);
+
+        catchBlock = ParseBlock();
+    }
+
+    private bool TryParseCatchParameter(out Identifier? catchParameter)
+    {
+        if (!_consumer.IsTokenOfType(TokenType.OpenParen))
+        {
+            catchParameter = null;
+            return false;
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.OpenParen);
+
+        catchParameter = ParseIdentifier();
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
+
+        return true;
+    }
+
+    private bool TryParseFinallyBlock(out Block? finallyBlock)
+    {
+        if (!_consumer.IsTokenOfType(TokenType.Finally))
+        {
+            finallyBlock = null;
+            return false;
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.Finally);
+        finallyBlock = ParseBlock();
+        return true;
     }
 }

@@ -418,4 +418,127 @@ internal sealed class ParserTests
         // Assert
         Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
     }
+
+    // Tests for 14.15 The try Statement, https://tc39.es/ecma262/#sec-try-statement
+    [Test]
+    public void Parse_ReturnsTryStatement_WithParameterlessCatch_WhenProvidingTry_WithParameterlessCatch()
+    {
+        // Arrange
+        var parser = new Parser("try { } catch { }");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var tryStatement = rootNodes[0] as TryStatement;
+        Assert.That(tryStatement, Is.Not.Null);
+        Assert.That(tryStatement.TryBlock, Is.Not.Null);
+        Assert.That(tryStatement.CatchBlock, Is.Not.Null);
+        Assert.That(tryStatement.CatchParameter, Is.Null);
+        Assert.That(tryStatement.FinallyBlock, Is.Null);
+    }
+
+    // FIXME: Tests for BindingPatterns
+    [Test]
+    public void Parse_ReturnsTryStatement_WithCatch_WhenProvidingTry_WithCatch()
+    {
+        // Arrange
+        const string expectedCatchIdentifier = "expectedIdentifier";
+        var parser = new Parser($"try {{ }} catch ({expectedCatchIdentifier}) {{ }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var tryStatement = rootNodes[0] as TryStatement;
+        Assert.That(tryStatement, Is.Not.Null);
+        Assert.That(tryStatement.TryBlock, Is.Not.Null);
+        Assert.That(tryStatement.CatchBlock, Is.Not.Null);
+        Assert.That(tryStatement.CatchParameter, Is.Not.Null);
+        Assert.That(tryStatement.CatchParameter!.Name, Is.EqualTo(expectedCatchIdentifier));
+        Assert.That(tryStatement.FinallyBlock, Is.Null);
+    }
+
+    [Test]
+    public void Parse_ReturnsTryStatement_WithFinally_WhenProvidingTry_WithFinally()
+    {
+        // Arrange
+        var parser = new Parser("try { } finally { }");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var tryStatement = rootNodes[0] as TryStatement;
+        Assert.That(tryStatement, Is.Not.Null);
+        Assert.That(tryStatement.TryBlock, Is.Not.Null);
+        Assert.That(tryStatement.CatchBlock, Is.Null);
+        Assert.That(tryStatement.CatchParameter, Is.Null);
+        Assert.That(tryStatement.FinallyBlock, Is.Not.Null);
+    }
+
+    [Test]
+    public void Parse_ReturnsTryStatement_WithParameterlessCatchFinally_WhenProvidingTry_WithParameterlessCatchFinally()
+    {
+        // Arrange
+        var parser = new Parser("try { } catch { } finally { }");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var tryStatement = rootNodes[0] as TryStatement;
+        Assert.That(tryStatement, Is.Not.Null);
+        Assert.That(tryStatement.TryBlock, Is.Not.Null);
+        Assert.That(tryStatement.CatchBlock, Is.Not.Null);
+        Assert.That(tryStatement.CatchParameter, Is.Null);
+        Assert.That(tryStatement.FinallyBlock, Is.Not.Null);
+    }
+
+    [Test]
+    public void Parse_ReturnsTryStatement_WithCatchFinally_WhenProvidingTry_WithCatchFinally()
+    {
+        // Arrange
+        const string expectedCatchIdentifier = "expectedIdentifier";
+        var parser = new Parser($"try {{ }} catch ({expectedCatchIdentifier}) {{ }} finally {{ }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var tryStatement = rootNodes[0] as TryStatement;
+        Assert.That(tryStatement, Is.Not.Null);
+        Assert.That(tryStatement.TryBlock, Is.Not.Null);
+        Assert.That(tryStatement.CatchBlock, Is.Not.Null);
+        Assert.That(tryStatement.CatchParameter, Is.Not.Null);
+        Assert.That(tryStatement.CatchParameter!.Name, Is.EqualTo(expectedCatchIdentifier));
+        Assert.That(tryStatement.FinallyBlock, Is.Not.Null);
+    }
+
+    [Test]
+    public void Parse_ThrowsInvalidOperationException_WhenProvidingTry_WithoutCatchOrFinally()
+    {
+        // Arrange
+        var parser = new Parser("try { }");
+
+        // Act
+        
+        // Assert
+        Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
+    }
 }
