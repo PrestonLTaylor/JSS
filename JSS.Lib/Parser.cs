@@ -27,29 +27,9 @@ internal sealed class Parser
 
     private INode ParseStatement()
     {
-        if (IsThisExpression())
+        if (TryParseExpression(out IExpression? parsedExpression))
         {
-            return WrapExpression(ParseThisExpression());
-        }
-        if (IsIdentifier())
-        {
-            return WrapExpression(ParseIdentifier());
-        }
-        if (IsNullLiteral())
-        {
-            return WrapExpression(ParseNullLiteral());
-        }
-        if (IsBooleanLiteral())
-        {
-            return WrapExpression(ParseBooleanLiteral());
-        }
-        if (IsNumericLiteral())
-        {
-            return WrapExpression(ParseNumericLiteral());
-        }
-        if (IsStringLiteral())
-        {
-            return WrapExpression(ParseStringLiteral());
+            return new ExpressionStatement(parsedExpression!);
         }
         if (IsBlock())
         {
@@ -79,9 +59,41 @@ internal sealed class Parser
         throw new NotImplementedException();
     }
 
-    private ExpressionStatement WrapExpression(IExpression expression)
+    private bool TryParseExpression(out IExpression? parsedExpression)
     {
-        return new ExpressionStatement(expression);
+        if (IsThisExpression())
+        {
+            parsedExpression = ParseThisExpression();
+            return true;
+        }
+        if (IsIdentifier())
+        {
+            parsedExpression = ParseIdentifier();
+            return true;
+        }
+        if (IsNullLiteral())
+        {
+            parsedExpression = ParseNullLiteral();
+            return true;
+        }
+        if (IsBooleanLiteral())
+        {
+            parsedExpression = ParseBooleanLiteral();
+            return true;
+        }
+        if (IsNumericLiteral())
+        {
+            parsedExpression = ParseNumericLiteral();
+            return true;
+        }
+        if (IsStringLiteral())
+        {
+            parsedExpression = ParseStringLiteral();
+            return true;
+        }
+
+        parsedExpression = null;
+        return false;
     }
 
     // 13.2.1 The this Keyword, https://tc39.es/ecma262/#sec-this-keyword
@@ -261,30 +273,9 @@ internal sealed class Parser
     private INode ParseInitializer()
     {
         // FIXME: Parse according to the spec: https://tc39.es/ecma262/#prod-Initializer
-        // FIXME: Refactor to not repeat code with ParseStatement
-        if (IsThisExpression())
+        if (TryParseExpression(out IExpression? parsedExpression))
         {
-            return ParseThisExpression();
-        }
-        if (IsIdentifier())
-        {
-            return ParseIdentifier();
-        }
-        if (IsNullLiteral())
-        {
-            return ParseNullLiteral();
-        }
-        if (IsBooleanLiteral())
-        {
-            return ParseBooleanLiteral();
-        }
-        if (IsNumericLiteral())
-        {
-            return ParseNumericLiteral();
-        }
-        if (IsStringLiteral())
-        {
-            return ParseStringLiteral();
+            return parsedExpression!;
         }
 
         // FIXME: Throw a SyntaxError instead
