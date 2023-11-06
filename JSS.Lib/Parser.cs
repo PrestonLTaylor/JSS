@@ -55,6 +55,10 @@ internal sealed class Parser
         {
             return ParseReturnStatement();
         }
+        if (IsThrowStatement())
+        {
+            return ParseThrowStatement();
+        }
 
         throw new NotImplementedException();
     }
@@ -309,5 +313,28 @@ internal sealed class Parser
         // Don't parse an expression if there is a line terminator after the return
         TryParseExpression(out IExpression? returnExpression);
         return new ReturnStatement(returnExpression);
+    }
+
+    // 14.14 The throw Statement, https://tc39.es/ecma262/#sec-throw-statement
+    private bool IsThrowStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.Throw);
+    }
+
+    private ThrowStatement ParseThrowStatement()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Throw);
+
+        // FIXME: throw [no LineTerminator here] Expression[+In, ?Yield, ?Await] ;
+        // Don't parse an expression if there is a line terminator after the return
+        if (TryParseExpression(out IExpression? throwExpression))
+        {
+            return new ThrowStatement(throwExpression!);
+        }
+        else
+        {
+            // FIXME: Throw a SyntaxError
+            throw new InvalidOperationException();
+        }
     }
 }

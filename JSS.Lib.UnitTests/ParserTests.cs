@@ -385,4 +385,37 @@ internal sealed class ParserTests
         Assert.That(returnStatement, Is.Not.Null);
         Assert.That(returnStatement.ReturnExpression, Is.InstanceOf(expectedExpressionType));
     }
+
+    // Tests for 14.14 The throw Statement, https://tc39.es/ecma262/#sec-throw-statement
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsThrowStatement_WhenProvidingThrow(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"throw {expression}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var throwStatement = rootNodes[0] as ThrowStatement;
+        Assert.That(throwStatement, Is.Not.Null);
+        Assert.That(throwStatement.ThrowExpression, Is.InstanceOf(expectedExpressionType));
+    }
+
+    [Test]
+    public void Parse_ThrowsInvalidOperationException_WhenProvidingThrow_WithNoExpression()
+    {
+        // Arrange
+        var parser = new Parser("throw");
+
+        // Act
+
+        // Assert
+        Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
+    }
 }
