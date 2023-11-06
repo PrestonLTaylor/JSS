@@ -404,7 +404,7 @@ internal sealed class ParserTests
         Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
     }
 
-    // Tests for 14.8 The continue Statement, https://tc39.es/ecma262/#prod-ContinueStatement
+    // Tests for 14.8 The continue Statement, https://tc39.es/ecma262/#sec-continue-statement
     [Test]
     public void Parse_ReturnsContinueStatement_WhenProvidingContinue()
     {
@@ -426,7 +426,7 @@ internal sealed class ParserTests
     }
 
     [Test]
-    public void Parse_ReturnsContinueStatement_WithoutLable_WhenProvidingContinue_WithoutLabel()
+    public void Parse_ReturnsContinueStatement_WithoutLabel_WhenProvidingContinue_WithoutLabel()
     {
         // Arrange
         var parser = new Parser("continue");
@@ -441,6 +441,45 @@ internal sealed class ParserTests
         var continueStatement = rootNodes[0] as ContinueStatement;
         Assert.That(continueStatement, Is.Not.Null);
         Assert.That(continueStatement.Label, Is.Null);
+    }
+
+    // Tests for 14.9 The break Statement, https://tc39.es/ecma262/#sec-break-statement
+    [Test]
+    public void Parse_ReturnsBreakStatement_WhenProvidingBreak()
+    {
+        // Arrange
+        const string expectedLabel = "expectedLabel";
+        var parser = new Parser($"break {expectedLabel}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var breakStatement = rootNodes[0] as BreakStatement;
+        Assert.That(breakStatement, Is.Not.Null);
+        Assert.That(breakStatement.Label, Is.Not.Null);
+        Assert.That(breakStatement.Label.Name, Is.EqualTo(expectedLabel));
+    }
+
+    [Test]
+    public void Parse_ReturnsBreakStatement_WithoutLabel_WhenProvidingBreak_WithoutLabel()
+    {
+        // Arrange
+        var parser = new Parser("break");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var breakStatement = rootNodes[0] as BreakStatement;
+        Assert.That(breakStatement, Is.Not.Null);
+        Assert.That(breakStatement.Label, Is.Null);
     }
 
     // Tests for 14.10 The return Statement, https://tc39.es/ecma262/#sec-return-statement

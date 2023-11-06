@@ -63,6 +63,10 @@ internal sealed class Parser
         {
             return ParseContinueStatement();
         }
+        if (IsBreakStatement())
+        {
+            return ParseBreakStatement();
+        }
         if (IsThrowStatement())
         {
             return ParseThrowStatement();
@@ -352,7 +356,7 @@ internal sealed class Parser
         return true;
     }
 
-    // 14.8 The continue Statement, https://tc39.es/ecma262/#prod-ContinueStatement
+    // 14.8 The continue Statement, https://tc39.es/ecma262/#sec-continue-statement
     private bool IsContinueStatement()
     {
         return _consumer.IsTokenOfType(TokenType.Continue);
@@ -369,6 +373,25 @@ internal sealed class Parser
         }
 
         return new ContinueStatement(label);
+    }
+
+    // Tests for 14.9 The break Statement, https://tc39.es/ecma262/#sec-break-statement
+    private bool IsBreakStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.Break);
+    }
+
+    private BreakStatement ParseBreakStatement()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Break);
+
+        Identifier? label = null;
+        if (IsIdentifier())
+        {
+            label = ParseIdentifier();
+        }
+
+        return new BreakStatement(label);
     }
 
     // 14.10 The return Statement, https://tc39.es/ecma262/#sec-return-statement
