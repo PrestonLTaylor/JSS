@@ -59,6 +59,10 @@ internal sealed class Parser
         {
             return ParseReturnStatement();
         }
+        if (IsContinueStatement())
+        {
+            return ParseContinueStatement();
+        }
         if (IsThrowStatement())
         {
             return ParseThrowStatement();
@@ -346,6 +350,25 @@ internal sealed class Parser
 
         elseCaseStatement = ParseStatement();
         return true;
+    }
+
+    // 14.8 The continue Statement, https://tc39.es/ecma262/#prod-ContinueStatement
+    private bool IsContinueStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.Continue);
+    }
+
+    private ContinueStatement ParseContinueStatement()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Continue);
+
+        Identifier? label = null;
+        if (IsIdentifier())
+        {
+            label = ParseIdentifier();
+        }
+
+        return new ContinueStatement(label);
     }
 
     // 14.10 The return Statement, https://tc39.es/ecma262/#sec-return-statement

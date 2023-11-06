@@ -404,6 +404,45 @@ internal sealed class ParserTests
         Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
     }
 
+    // Tests for 14.8 The continue Statement, https://tc39.es/ecma262/#prod-ContinueStatement
+    [Test]
+    public void Parse_ReturnsContinueStatement_WhenProvidingContinue()
+    {
+        // Arrange
+        const string expectedLabel = "expectedLabel";
+        var parser = new Parser($"continue {expectedLabel}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var continueStatement = rootNodes[0] as ContinueStatement;
+        Assert.That(continueStatement, Is.Not.Null);
+        Assert.That(continueStatement.Label, Is.Not.Null);
+        Assert.That(continueStatement.Label.Name, Is.EqualTo(expectedLabel));
+    }
+
+    [Test]
+    public void Parse_ReturnsContinueStatement_WithoutLable_WhenProvidingContinue_WithoutLabel()
+    {
+        // Arrange
+        var parser = new Parser("continue");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var continueStatement = rootNodes[0] as ContinueStatement;
+        Assert.That(continueStatement, Is.Not.Null);
+        Assert.That(continueStatement.Label, Is.Null);
+    }
+
     // Tests for 14.10 The return Statement, https://tc39.es/ecma262/#sec-return-statement
     [Test]
     public void Parse_ReturnsReturnStatement_WithNoExpression_WhenProvidingReturn_WithNoExpression()
