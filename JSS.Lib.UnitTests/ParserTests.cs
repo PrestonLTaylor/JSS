@@ -189,6 +189,40 @@ internal sealed class ParserTests
         Assert.That(block.Nodes, Is.Empty);
     }
 
+    // FIXME: Make test cases for a variety of statements/declarations
+    [Test]
+    public void Parse_ReturnsABlock_WhenProvidingABlock()
+    {
+        // Arrange
+        var parser = new Parser("{ 0 }");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var block = rootNodes[0] as Block;
+        Assert.That(block, Is.Not.Null);
+
+        var blockNodes = block.Nodes;
+        Assert.That(blockNodes, Has.Count.EqualTo(1));
+        Assert.That(blockNodes[0], Is.InstanceOf<ExpressionStatement>());
+    }
+
+    [Test]
+    public void Parse_ThrowsInvalidOperationException_WhenProvidingABlock_WithoutAClosingBrace()
+    {
+        // Arrange
+        var parser = new Parser("{");
+
+        // Act
+
+        // Assert
+        Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
+    }
+
     static private readonly Dictionary<string, Type> initializerToExpectedTypeTestCases = new()
     {
         { "''", typeof(StringLiteral) },

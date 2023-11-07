@@ -35,6 +35,7 @@ internal sealed class Parser
         {
             return ParseBlock();
         }
+        // FIXME: Technically, in the spec, these declarations aren't statements, but for now it's easier to keep as a statement
         if (IsLetDeclaration())
         {
             return ParseLetDeclaration();
@@ -218,9 +219,9 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
 
         List<INode> blockNodes = new();
-        while (!_consumer.IsTokenOfType(TokenType.ClosedBrace))
+        while (_consumer.CanConsume() && !_consumer.IsTokenOfType(TokenType.ClosedBrace))
         {
-            throw new NotImplementedException();
+            blockNodes.Add(ParseStatement());
         }
 
         // FIXME: Throw a SyntaxError if we encounter a Block without a closed brace
