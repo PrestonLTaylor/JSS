@@ -59,6 +59,10 @@ internal sealed class Parser
         {
             return ParseDoWhileStatement();
         }
+        if (IsWhileStatement())
+        {
+            return ParseWhileStatement();
+        }
         if (IsReturnStatement())
         {
             return ParseReturnStatement();
@@ -376,18 +380,44 @@ internal sealed class Parser
 
         var iterationStatement = ParseStatement();
 
-        _consumer.ConsumeTokenOfType(TokenType.While);
-        _consumer.ConsumeTokenOfType(TokenType.OpenParen);
-
         IExpression? whileExpression;
-        if (!TryParseExpression(out whileExpression))
+        if (!TryParseWhileExpression(out whileExpression))
         {
             throw new InvalidOperationException();
         }
 
+        return new DoWhileStatement(whileExpression!, iterationStatement);
+    }
+
+    // 14.7.3 The while Statement, https://tc39.es/ecma262/#sec-while-statement
+    private bool IsWhileStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.While);
+    }
+
+    private WhileStatement ParseWhileStatement()
+    {
+        IExpression? whileExpression;
+        if (!TryParseWhileExpression(out whileExpression))
+        {
+            throw new InvalidOperationException();
+        }
+
+        var iterationStatement = ParseStatement();
+
+        return new WhileStatement(whileExpression!, iterationStatement);
+    }
+
+    private bool TryParseWhileExpression(out IExpression? whileExpression)
+    {
+        _consumer.ConsumeTokenOfType(TokenType.While);
+        _consumer.ConsumeTokenOfType(TokenType.OpenParen);
+
+        if (!TryParseExpression(out whileExpression)) return false;
+
         _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
 
-        return new DoWhileStatement(whileExpression!, iterationStatement);
+        return true;
     }
 
     // 14.8 The continue Statement, https://tc39.es/ecma262/#sec-continue-statement
