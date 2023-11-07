@@ -55,6 +55,10 @@ internal sealed class Parser
         {
             return ParseIfStatement();
         }
+        if (IsDoWhileStatement())
+        {
+            return ParseDoWhileStatement();
+        }
         if (IsReturnStatement())
         {
             return ParseReturnStatement();
@@ -358,6 +362,32 @@ internal sealed class Parser
 
         elseCaseStatement = ParseStatement();
         return true;
+    }
+
+    // 14.7.2 The do-while Statement, https://tc39.es/ecma262/#sec-do-while-statement
+    private bool IsDoWhileStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.Do);
+    }
+
+    private DoWhileStatement ParseDoWhileStatement()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Do);
+
+        var iterationStatement = ParseStatement();
+
+        _consumer.ConsumeTokenOfType(TokenType.While);
+        _consumer.ConsumeTokenOfType(TokenType.OpenParen);
+
+        IExpression? whileExpression;
+        if (!TryParseExpression(out whileExpression))
+        {
+            throw new InvalidOperationException();
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
+
+        return new DoWhileStatement(whileExpression!, iterationStatement);
     }
 
     // 14.8 The continue Statement, https://tc39.es/ecma262/#sec-continue-statement

@@ -404,6 +404,40 @@ internal sealed class ParserTests
         Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
     }
 
+    // Tests for 14.7 Iteration Statements, https://tc39.es/ecma262/#sec-iteration-statements
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsDoWhileStatement_WhenProvidingDoWhile(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"do {{ }} while ({expression})");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var doWhileStatement = rootNodes[0] as DoWhileStatement;
+        Assert.That(doWhileStatement, Is.Not.Null);
+        Assert.That(doWhileStatement.WhileExpression, Is.InstanceOf(expectedExpressionType));
+        Assert.That(doWhileStatement.IterationStatement, Is.Not.Null);
+    }
+
+    [Test]
+    public void Parse_ThrowsInvalidOperationException_WhenProvidingDoWhile_WithNoExpression()
+    {
+        // Arrange
+        var parser = new Parser("do { } while");
+
+        // Act
+
+        // Assert
+        Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
+    }
+
     // Tests for 14.8 The continue Statement, https://tc39.es/ecma262/#sec-continue-statement
     [Test]
     public void Parse_ReturnsContinueStatement_WhenProvidingContinue()

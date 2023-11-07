@@ -28,11 +28,11 @@ internal sealed class TokenConsumer
         return CanConsume() && Peek().type == type;
     }
 
-    // NOTE: This function has an invariant that the next token MUST be of the same type, otherwise it is a parser bug
-    // FIXME: Introduce proper reporting of parser bugs
     public Token ConsumeTokenOfType(TokenType type)
     {
-        if (!IsTokenOfType(type)) throw new InvalidOperationException($"Parser Bug: Tried to consume a token of type {type} but got {Peek().type}");
+        // FIXME: Throw SyntaxErrors
+        if (!CanConsume()) throw new InvalidOperationException();
+        if (!IsTokenOfType(type)) throw new InvalidOperationException();
         return Consume();
     }
 }
