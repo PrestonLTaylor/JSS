@@ -676,4 +676,22 @@ internal sealed class ParserTests
         // Assert
         Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
     }
+
+    // Tests for 14.16 The debugger Statement, https://tc39.es/ecma262/#sec-debugger-statement
+    [Test]
+    public void Parse_ReturnsDebuggerStatement_WhenProvidingDebugger()
+    {
+        // Arrange
+        var parser = new Parser("debugger");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var debuggerStatement = rootNodes[0] as DebuggerStatement;
+        Assert.That(debuggerStatement, Is.Not.Null);
+    }
 }

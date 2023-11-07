@@ -75,6 +75,10 @@ internal sealed class Parser
         {
             return ParseTryStatement();
         }
+        if (IsDebuggerStatement())
+        {
+            return ParseDebuggerStatement();
+        }
 
         throw new NotImplementedException();
     }
@@ -507,5 +511,17 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.Finally);
         finallyBlock = ParseBlock();
         return true;
+    }
+
+    // 14.16 The debugger Statement, https://tc39.es/ecma262/#sec-debugger-statement
+    private bool IsDebuggerStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.Debugger);
+    }
+
+    private DebuggerStatement ParseDebuggerStatement()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Debugger);
+        return new DebuggerStatement();
     }
 }
