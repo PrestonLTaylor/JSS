@@ -471,6 +471,125 @@ internal sealed class ParserTests
         Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
     }
 
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsForStatement_WhenProvidingFor(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"for ({expression}; {expression}; {expression}) {{ }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var forStatement = rootNodes[0] as ForStatement;
+        Assert.That(forStatement, Is.Not.Null);
+        Assert.That(forStatement.InitializationExpression, Is.InstanceOf(expectedExpressionType));
+        Assert.That(forStatement.TestExpression, Is.InstanceOf(expectedExpressionType));
+        Assert.That(forStatement.IncrementExpression, Is.InstanceOf(expectedExpressionType));
+        Assert.That(forStatement.IterationStatement, Is.Not.Null);
+    }
+
+    [Test]
+    public void Parse_ReturnsForStatement_WhenProvidingFor_WithNoExpressions()
+    {
+        // Arrange
+        var parser = new Parser($"for (;;) {{ }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var forStatement = rootNodes[0] as ForStatement;
+        Assert.That(forStatement, Is.Not.Null);
+        Assert.That(forStatement.InitializationExpression, Is.Null);
+        Assert.That(forStatement.TestExpression, Is.Null);
+        Assert.That(forStatement.IncrementExpression, Is.Null);
+        Assert.That(forStatement.IterationStatement, Is.Not.Null);
+    }
+
+    [Test]
+    public void Parse_ReturnsForStatement_WhenProvidingFor_WithVariableDeclaration()
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        var parser = new Parser($"for (var {expectedIdentifier};;) {{ }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var forStatement = rootNodes[0] as ForStatement;
+        Assert.That(forStatement, Is.Not.Null);
+        Assert.That(forStatement.TestExpression, Is.Null);
+        Assert.That(forStatement.IncrementExpression, Is.Null);
+        Assert.That(forStatement.IterationStatement, Is.Not.Null);
+
+        var varStatement = forStatement.InitializationExpression as VarStatement;
+        Assert.That(varStatement, Is.Not.Null);
+        Assert.That(varStatement.Identifier, Is.EqualTo(expectedIdentifier));
+    }
+
+    [Test]
+    public void Parse_ReturnsForStatement_WhenProvidingFor_WithLetDeclaration()
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        var parser = new Parser($"for (let {expectedIdentifier};;) {{ }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var forStatement = rootNodes[0] as ForStatement;
+        Assert.That(forStatement, Is.Not.Null);
+        Assert.That(forStatement.TestExpression, Is.Null);
+        Assert.That(forStatement.IncrementExpression, Is.Null);
+        Assert.That(forStatement.IterationStatement, Is.Not.Null);
+
+        var varStatement = forStatement.InitializationExpression as LetDeclaration;
+        Assert.That(varStatement, Is.Not.Null);
+        Assert.That(varStatement.Identifier, Is.EqualTo(expectedIdentifier));
+    }
+
+    [Test]
+    public void Parse_ReturnsForStatement_WhenProvidingFor_WithConstDeclaration()
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        var parser = new Parser($"for (const {expectedIdentifier} = 0;;) {{ }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var forStatement = rootNodes[0] as ForStatement;
+        Assert.That(forStatement, Is.Not.Null);
+        Assert.That(forStatement.TestExpression, Is.Null);
+        Assert.That(forStatement.IncrementExpression, Is.Null);
+        Assert.That(forStatement.IterationStatement, Is.Not.Null);
+
+        var varStatement = forStatement.InitializationExpression as ConstDeclaration;
+        Assert.That(varStatement, Is.Not.Null);
+        Assert.That(varStatement.Identifier, Is.EqualTo(expectedIdentifier));
+    }
+
     // Tests for 14.8 The continue Statement, https://tc39.es/ecma262/#sec-continue-statement
     [Test]
     public void Parse_ReturnsContinueStatement_WhenProvidingContinue()

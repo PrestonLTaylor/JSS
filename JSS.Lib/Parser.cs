@@ -63,6 +63,10 @@ internal sealed class Parser
         {
             return ParseWhileStatement();
         }
+        if (IsForStatement())
+        {
+            return ParseForStatement();
+        }
         if (IsReturnStatement())
         {
             return ParseReturnStatement();
@@ -418,6 +422,62 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
 
         return true;
+    }
+
+    // 14.7.4 The for Statement, https://tc39.es/ecma262/#sec-for-statement
+    private bool IsForStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.For);
+    }
+
+    private ForStatement ParseForStatement()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.For);
+        _consumer.ConsumeTokenOfType(TokenType.OpenParen);
+
+        TryParseForInitializationExpression(out INode? initializationExpression);
+
+        _consumer.ConsumeTokenOfType(TokenType.SemiColon);
+
+        TryParseExpression(out IExpression? testExpression);
+
+        _consumer.ConsumeTokenOfType(TokenType.SemiColon);
+
+        TryParseExpression(out IExpression? incrementExpression);
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
+
+        var iterationStatement = ParseStatement();
+
+        return new ForStatement(initializationExpression, testExpression, incrementExpression, iterationStatement);
+    }
+
+    private bool TryParseForInitializationExpression(out INode? initializationExpression)
+    {
+        // FIXME: This seems a bit clunky
+        if (TryParseExpression(out IExpression? expression))
+        {
+            initializationExpression = expression;
+            return true;
+        }
+        if (IsVarStatement())
+        {
+            initializationExpression = ParseVarStatement();
+            return true;
+        }
+        if (IsLetDeclaration())
+        {
+            initializationExpression = ParseLetDeclaration();
+            return true;
+        }
+        if (IsConstDeclaration())
+        {
+            initializationExpression = ParseConstDeclaration();
+            return true;
+        }
+
+        initializationExpression = null;
+        return false;
     }
 
     // 14.8 The continue Statement, https://tc39.es/ecma262/#sec-continue-statement
