@@ -914,4 +914,79 @@ internal sealed class ParserTests
         var debuggerStatement = rootNodes[0] as DebuggerStatement;
         Assert.That(debuggerStatement, Is.Not.Null);
     }
+
+    // Tests for 15.2 Function Definitions, https://tc39.es/ecma262/#sec-function-definitions
+    // FIXME: More varied tests for function parsing
+    [Test]
+    public void Parse_ReturnsFunctionDeclaration_WithNoParameters_WhenProvidingFunctionDeclaration_WithNoParameters()
+    {
+        // Arrange
+        const string expectedFunctionIdentifier = "expectedIdentifier";
+        var parser = new Parser($"function {expectedFunctionIdentifier}() {{}}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var functionDeclaration = rootNodes[0] as FunctionDeclaration;
+        Assert.That(functionDeclaration, Is.Not.Null);
+        Assert.That(functionDeclaration.Identifier, Is.EqualTo(expectedFunctionIdentifier));
+        Assert.That(functionDeclaration.Parameters, Is.Empty);
+        Assert.That(functionDeclaration.Body, Is.Empty);
+    }
+
+    [Test]
+    public void Parse_ReturnsFunctionDeclaration_WhenProvidingFunctionDeclaration()
+    {
+        // Arrange
+        const string expectedFunctionIdentifier = "expectedIdentifier";
+        const string expectedFirstParameterIdentifier = "expectedFirstParameter";
+        const string expectedSecondParameterIdentifier = "expectedSecondParameter";
+        var parser = new Parser($"function {expectedFunctionIdentifier}({expectedFirstParameterIdentifier}, {expectedSecondParameterIdentifier}) {{}}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var functionDeclaration = rootNodes[0] as FunctionDeclaration;
+        Assert.That(functionDeclaration, Is.Not.Null);
+        Assert.That(functionDeclaration.Identifier, Is.EqualTo(expectedFunctionIdentifier));
+        Assert.That(functionDeclaration.Body, Is.Empty);
+
+        var parameters  = functionDeclaration.Parameters;
+        Assert.That(parameters, Has.Count.EqualTo(2));
+        Assert.That(parameters[0].Name, Is.EqualTo(expectedFirstParameterIdentifier));
+        Assert.That(parameters[1].Name, Is.EqualTo(expectedSecondParameterIdentifier));
+    }
+
+    [Test]
+    public void Parse_ReturnsFunctionDeclaration_WhenProvidingFunctionDeclaration_WithTrailingComma_InParameterList()
+    {
+        // Arrange
+        const string expectedFunctionIdentifier = "expectedIdentifier";
+        const string expectedParameterIdentifier = "expectedFirstParameter";
+        var parser = new Parser($"function {expectedFunctionIdentifier}({expectedParameterIdentifier},) {{}}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var functionDeclaration = rootNodes[0] as FunctionDeclaration;
+        Assert.That(functionDeclaration, Is.Not.Null);
+        Assert.That(functionDeclaration.Identifier, Is.EqualTo(expectedFunctionIdentifier));
+        Assert.That(functionDeclaration.Body, Is.Empty);
+
+        var parameters = functionDeclaration.Parameters;
+        Assert.That(parameters, Has.Count.EqualTo(1));
+        Assert.That(parameters[0].Name, Is.EqualTo(expectedParameterIdentifier));
+    }
 }

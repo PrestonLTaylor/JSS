@@ -154,6 +154,11 @@ internal sealed class Parser
             declaration = ParseConstDeclaration();
             return true;
         }
+        if (IsFunctionDeclaration())
+        {
+            declaration = ParseFunctionDeclaration();
+            return true;
+        }
 
         declaration = null;
         return false;
@@ -704,5 +709,56 @@ internal sealed class Parser
     {
         _consumer.ConsumeTokenOfType(TokenType.Debugger);
         return new DebuggerStatement();
+    }
+
+    // 15.1 Parameter Lists, https://tc39.es/ecma262/#sec-parameter-lists
+    private List<Identifier> ParseFormalParameters()
+    {
+        // FIXME: Parse FormalParameters as BindingElements, https://tc39.es/ecma262/#prod-FormalParameter
+        // FIXME: Parse "Rest" parameters (using the ... operator)
+        List<Identifier> formalParameters = new();
+
+        while (IsIdentifier())
+        {
+            formalParameters.Add(ParseIdentifier());
+
+            if (!_consumer.IsTokenOfType(TokenType.Comma))
+            {
+                break;
+            }
+
+            // NOTE: Trailing commas are allowed in formal parameters
+            _consumer.ConsumeTokenOfType(TokenType.Comma);
+        }
+
+        return formalParameters;
+    }
+
+    // 15.2 Function Definitions, https://tc39.es/ecma262/#sec-function-definitions
+    private bool IsFunctionDeclaration()
+    {
+        return _consumer.IsTokenOfType(TokenType.Function);
+    }
+
+    private FunctionDeclaration ParseFunctionDeclaration()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Function);
+
+        var identifier = ParseIdentifier();
+
+        _consumer.ConsumeTokenOfType(TokenType.OpenParen);
+
+        var parameters = ParseFormalParameters();
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
+
+        _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
+
+        var body = ParseStatementListWhile(() => _consumer.CanConsume() && !_consumer.IsTokenOfType(TokenType.ClosedBrace));
+
+        // FIXME: Throw SyntaxError if no closed brace
+        _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
+
+        return new FunctionDeclaration(identifier.Name, parameters, body);
     }
 }
