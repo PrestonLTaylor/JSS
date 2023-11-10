@@ -15,87 +15,151 @@ internal sealed class Parser
 
     public Program Parse()
     {
-        List<INode> nodes = new();
-
-        while (_consumer.CanConsume())
-        {
-            nodes.Add(ParseStatement());
-        }
-
-        return new Program(nodes);
+        return new Program(ParseScript());
     }
 
-    private INode ParseStatement()
+    // 16.1 Scripts, https://tc39.es/ecma262/#sec-scripts
+    private List<INode> ParseScript()
     {
-        if (TryParseExpression(out IExpression? parsedExpression))
+        return ParseStatementListWhile(() => _consumer.CanConsume());
+    }
+
+    // StatementList, https://tc39.es/ecma262/#prod-StatementList
+    private List<INode> ParseStatementListWhile(Func<bool> shouldParse)
+    {
+        List<INode> nodes = new();
+
+        while (shouldParse())
         {
-            return new ExpressionStatement(parsedExpression!);
+            nodes.Add(ParseStatementListItem());
         }
-        if (IsBlock())
+
+        return nodes;
+    }
+
+    // StatementListItem, https://tc39.es/ecma262/#prod-StatementListItem
+    private INode ParseStatementListItem()
+    {
+        if (TryParseStatement(out INode? statement))
         {
-            return ParseBlock();
+            return statement!;
         }
-        // FIXME: Technically, in the spec, these declarations aren't statements, but for now it's easier to keep as a statement
-        if (IsLetDeclaration())
+        if (TryParseDeclaration(out INode? declaration))
         {
-            return ParseLetDeclaration();
-        }
-        if (IsConstDeclaration())
-        {
-            return ParseConstDeclaration();
-        }
-        if (IsVarStatement())
-        {
-            return ParseVarStatement();
-        }
-        if (IsEmptyStatement())
-        {
-            return ParseEmptyStatement();
-        }
-        if (IsIfStatement())
-        {
-            return ParseIfStatement();
-        }
-        if (IsDoWhileStatement())
-        {
-            return ParseDoWhileStatement();
-        }
-        if (IsWhileStatement())
-        {
-            return ParseWhileStatement();
-        }
-        if (IsForStatement())
-        {
-            return ParseForStatement();
-        }
-        if (IsReturnStatement())
-        {
-            return ParseReturnStatement();
-        }
-        if (IsContinueStatement())
-        {
-            return ParseContinueStatement();
-        }
-        if (IsBreakStatement())
-        {
-            return ParseBreakStatement();
-        }
-        if (IsThrowStatement())
-        {
-            return ParseThrowStatement();
-        }
-        if (IsTryStatement())
-        {
-            return ParseTryStatement();
-        }
-        if (IsDebuggerStatement())
-        {
-            return ParseDebuggerStatement();
+            return declaration!;
         }
 
         throw new NotImplementedException();
     }
 
+    // Statement, https://tc39.es/ecma262/#prod-Statement
+    private INode ParseStatement()
+    {
+        if (TryParseStatement(out INode? statement))
+        {
+            return statement!;
+        }
+
+        // FIXME: Change to SyntaxError when we have full statement parsing
+        throw new NotImplementedException();
+    }
+
+    private bool TryParseStatement(out INode? statement)
+    {
+        if (IsBlock())
+        {
+            statement = ParseBlock();
+            return true;
+        }
+        if (IsVarStatement())
+        {
+            statement = ParseVarStatement();
+            return true;
+        }
+        if (IsEmptyStatement())
+        {
+            statement = ParseEmptyStatement();
+            return true;
+        }
+        if (TryParseExpression(out IExpression? parsedExpression))
+        {
+            statement = new ExpressionStatement(parsedExpression!);
+            return true;
+        }
+        if (IsIfStatement())
+        {
+            statement = ParseIfStatement();
+            return true;
+        }
+        if (IsDoWhileStatement())
+        {
+            statement = ParseDoWhileStatement();
+            return true;
+        }
+        if (IsWhileStatement())
+        {
+            statement = ParseWhileStatement();
+            return true;
+        }
+        if (IsForStatement())
+        {
+            statement = ParseForStatement();
+            return true;
+        }
+        if (IsBreakStatement())
+        {
+            statement = ParseBreakStatement();
+            return true;
+        }
+        if (IsContinueStatement())
+        {
+            statement = ParseContinueStatement();
+            return true;
+        }
+        if (IsReturnStatement())
+        {
+            statement = ParseReturnStatement();
+            return true;
+        }
+        if (IsThrowStatement())
+        {
+            statement = ParseThrowStatement();
+            return true;
+        }
+        if (IsTryStatement())
+        {
+            statement = ParseTryStatement();
+            return true;
+        }
+        if (IsDebuggerStatement())
+        {
+            statement = ParseDebuggerStatement();
+            return true;
+        }
+
+        statement = null;
+        return false;
+    }
+
+    // Declaration, https://tc39.es/ecma262/#prod-Declaration
+    private bool TryParseDeclaration(out INode? declaration)
+    {
+        if (IsLetDeclaration())
+        {
+            declaration = ParseLetDeclaration();
+            return true;
+        }
+        if (IsConstDeclaration())
+        {
+            declaration = ParseConstDeclaration();
+            return true;
+        }
+
+        declaration = null;
+        return false;
+    }
+
+    // Expression, https://tc39.es/ecma262/#prod-Expression
     private bool TryParseExpression(out IExpression? parsedExpression)
     {
         if (IsThisExpression())
@@ -218,11 +282,7 @@ internal sealed class Parser
     {
         _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
 
-        List<INode> blockNodes = new();
-        while (_consumer.CanConsume() && !_consumer.IsTokenOfType(TokenType.ClosedBrace))
-        {
-            blockNodes.Add(ParseStatement());
-        }
+        var blockNodes = ParseStatementListWhile(() => _consumer.CanConsume() && !_consumer.IsTokenOfType(TokenType.ClosedBrace));
 
         // FIXME: Throw a SyntaxError if we encounter a Block without a closed brace
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
