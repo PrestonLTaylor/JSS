@@ -916,7 +916,6 @@ internal sealed class ParserTests
     }
 
     // Tests for 15.2 Function Definitions, https://tc39.es/ecma262/#sec-function-definitions
-    // FIXME: More varied tests for function parsing
     [Test]
     public void Parse_ReturnsFunctionDeclaration_WithNoParameters_WhenProvidingFunctionDeclaration_WithNoParameters()
     {
@@ -988,5 +987,29 @@ internal sealed class ParserTests
         var parameters = functionDeclaration.Parameters;
         Assert.That(parameters, Has.Count.EqualTo(1));
         Assert.That(parameters[0].Name, Is.EqualTo(expectedParameterIdentifier));
+    }
+
+    // Tests for 15.7 Class Definitions, https://tc39.es/ecma262/#sec-class-definitions
+    [Test]
+    public void Parse_ReturnsEmptyClassDeclaration_WhenProvidingEmptyClass()
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        var parser = new Parser($"class {expectedIdentifier} {{ }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var classDeclaration = rootNodes[0] as ClassDeclaration;
+        Assert.That(classDeclaration, Is.Not.Null);
+        Assert.That(classDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
+        Assert.That(classDeclaration.Methods, Is.Empty);
+        Assert.That(classDeclaration.StaticMethods, Is.Empty);
+        Assert.That(classDeclaration.Fields, Is.Empty);
+        Assert.That(classDeclaration.StaticFields, Is.Empty);
     }
 }

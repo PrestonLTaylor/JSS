@@ -159,6 +159,11 @@ internal sealed class Parser
             declaration = ParseFunctionDeclaration();
             return true;
         }
+        if (IsClassDeclaration())
+        {
+            declaration = ParseClassDeclaration();
+            return true;
+        }
 
         declaration = null;
         return false;
@@ -760,5 +765,27 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
         return new FunctionDeclaration(identifier.Name, parameters, body);
+    }
+
+    // 15.7 Class Definitions, https://tc39.es/ecma262/#sec-class-definitions
+    private bool IsClassDeclaration()
+    {
+        return _consumer.IsTokenOfType(TokenType.Class);
+    }
+
+    private ClassDeclaration ParseClassDeclaration()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Class);
+
+        var identifier = ParseIdentifier();
+
+        _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
+
+        // FIXME: Implement parsing of ClassBody
+        if (!_consumer.IsTokenOfType(TokenType.ClosedBrace)) throw new NotImplementedException();
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
+
+        return new ClassDeclaration(identifier.Name, new(), new(), new(), new());
     }
 }
