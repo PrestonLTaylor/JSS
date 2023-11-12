@@ -759,12 +759,17 @@ internal sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
 
-        var body = ParseStatementListWhile(() => _consumer.CanConsume() && !_consumer.IsTokenOfType(TokenType.ClosedBrace));
+        var body = ParseFunctionBody();
 
         // FIXME: Throw SyntaxError if no closed brace
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
         return new FunctionDeclaration(identifier.Name, parameters, body);
+    }
+
+    private List<INode> ParseFunctionBody()
+    {
+        return ParseStatementListWhile(() => _consumer.CanConsume() && !_consumer.IsTokenOfType(TokenType.ClosedBrace));
     }
 
     // 15.7 Class Definitions, https://tc39.es/ecma262/#sec-class-definitions
@@ -781,11 +786,102 @@ internal sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
 
-        // FIXME: Implement parsing of ClassBody
-        if (!_consumer.IsTokenOfType(TokenType.ClosedBrace)) throw new NotImplementedException();
+        List<MethodDeclaration> methods = new();
+        List<MethodDeclaration> staticMethods = new();
+        List<FieldDeclaration> fields = new();
+        List<FieldDeclaration> staticFields = new();
+        ParseClassBody(methods, staticMethods, fields, staticFields);
 
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
-        return new ClassDeclaration(identifier.Name, new(), new(), new(), new());
+        return new ClassDeclaration(identifier.Name, methods, staticMethods, fields, staticFields);
+    }
+
+    private void ParseClassBody(List<MethodDeclaration> methods, List<MethodDeclaration> staticMethods, List<FieldDeclaration> fields, List<FieldDeclaration> staticFields)
+    {
+        while (!_consumer.IsTokenOfType(TokenType.ClosedBrace))
+        {
+            ParseClassMember(methods, staticMethods, fields, staticFields);
+        }
+    }
+
+    private void ParseClassMember(List<MethodDeclaration> methods, List<MethodDeclaration> staticMethods, List<FieldDeclaration> fields, List<FieldDeclaration> staticFields)
+    {
+        var isStatic = IsStaticClassMember();
+        var isPrivate = IsPrivateClassMember();
+        var memberIdentifier = ParseClassMemberIdentifier();
+
+        if (IsClassMethod())
+        {
+            // FIXME: This is a bit janky
+            var method = ParseClassMethod(isPrivate, memberIdentifier);
+            if (isStatic)
+            {
+                staticMethods.Add(method);
+            }
+            else
+            {
+                methods.Add(method);
+            }
+        }
+        else
+        {
+            throw new NotImplementedException();
+        }
+    }
+
+    private bool IsStaticClassMember()
+    {
+        if (!_consumer.IsTokenOfType(TokenType.Identifier)) return false;
+
+        var identifier = _consumer.Peek();
+        if (identifier.data != "static") return false;
+
+        _consumer.Consume();
+        return true;
+    }
+
+    private bool IsPrivateClassMember()
+    {
+        return _consumer.IsTokenOfType(TokenType.PrivateIdentifier);
+    }
+
+    private string ParseClassMemberIdentifier()
+    {
+        if (_consumer.IsTokenOfType(TokenType.Identifier))
+        {
+            var identifier = _consumer.Consume();
+            return identifier.data;
+        }
+        else if (_consumer.IsTokenOfType(TokenType.PrivateIdentifier))
+        {
+            var identifier = _consumer.Consume();
+            return identifier.data[1..];
+        }
+
+        // FIXME: Throw SyntaxError
+        throw new InvalidOperationException();
+    }
+
+    private bool IsClassMethod()
+    {
+        return _consumer.IsTokenOfType(TokenType.OpenParen);
+    }
+
+    private MethodDeclaration ParseClassMethod(bool isPrivate, string memberIdentifier)
+    {
+        _consumer.ConsumeTokenOfType(TokenType.OpenParen);
+
+        var parameters = ParseFormalParameters();
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
+
+        _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
+
+        var body = ParseFunctionBody();
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
+
+        return new MethodDeclaration(memberIdentifier, parameters, body, isPrivate);
     }
 }

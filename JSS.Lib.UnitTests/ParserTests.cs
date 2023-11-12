@@ -1012,4 +1012,128 @@ internal sealed class ParserTests
         Assert.That(classDeclaration.Fields, Is.Empty);
         Assert.That(classDeclaration.StaticFields, Is.Empty);
     }
+
+    [Test]
+    public void Parse_ReturnsClassDeclaration_WithPublicMethod_WhenProvidingClass_WithPublicMethod()
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        const string expectedMethodIdentifier = "expectedMethodIdentifier";
+        var parser = new Parser($"class {expectedIdentifier} {{ {expectedMethodIdentifier}() {{ }} }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var classDeclaration = rootNodes[0] as ClassDeclaration;
+        Assert.That(classDeclaration, Is.Not.Null);
+        Assert.That(classDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
+        Assert.That(classDeclaration.StaticMethods, Is.Empty);
+        Assert.That(classDeclaration.Fields, Is.Empty);
+        Assert.That(classDeclaration.StaticFields, Is.Empty);
+
+        Assert.That(classDeclaration.Methods, Has.Count.EqualTo(1));
+
+        var publicMethod = classDeclaration.Methods[0];
+        Assert.That(publicMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
+        Assert.That(publicMethod.Parameters, Is.Empty);
+        Assert.That(publicMethod.Body, Is.Empty);
+        Assert.That(publicMethod.IsPrivate, Is.False);
+    }
+
+    [Test]
+    public void Parse_ReturnsClassDeclaration_WithPrivateMethod_WhenProvidingClass_WithPrivateMethod()
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        const string expectedMethodIdentifier = "expectedMethodIdentifier";
+        var parser = new Parser($"class {expectedIdentifier} {{ #{expectedMethodIdentifier}() {{ }} }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var classDeclaration = rootNodes[0] as ClassDeclaration;
+        Assert.That(classDeclaration, Is.Not.Null);
+        Assert.That(classDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
+        Assert.That(classDeclaration.StaticMethods, Is.Empty);
+        Assert.That(classDeclaration.Fields, Is.Empty);
+        Assert.That(classDeclaration.StaticFields, Is.Empty);
+
+        Assert.That(classDeclaration.Methods, Has.Count.EqualTo(1));
+
+        var privateMethod = classDeclaration.Methods[0];
+        Assert.That(privateMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
+        Assert.That(privateMethod.Parameters, Is.Empty);
+        Assert.That(privateMethod.Body, Is.Empty);
+        Assert.That(privateMethod.IsPrivate, Is.True);
+    }
+
+    [Test]
+    public void Parse_ReturnsClassDeclaration_WithStaticPublicMethod_WhenProvidingClass_WithStaticPublicMethod()
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        const string expectedMethodIdentifier = "expectedMethodIdentifier";
+        var parser = new Parser($"class {expectedIdentifier} {{ static {expectedMethodIdentifier}() {{ }} }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var classDeclaration = rootNodes[0] as ClassDeclaration;
+        Assert.That(classDeclaration, Is.Not.Null);
+        Assert.That(classDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
+        Assert.That(classDeclaration.Methods, Is.Empty);
+        Assert.That(classDeclaration.Fields, Is.Empty);
+        Assert.That(classDeclaration.StaticFields, Is.Empty);
+
+        Assert.That(classDeclaration.StaticMethods, Has.Count.EqualTo(1));
+
+        var staticPublicMethod = classDeclaration.StaticMethods[0];
+        Assert.That(staticPublicMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
+        Assert.That(staticPublicMethod.Parameters, Is.Empty);
+        Assert.That(staticPublicMethod.Body, Is.Empty);
+        Assert.That(staticPublicMethod.IsPrivate, Is.False);
+    }
+
+    [Test]
+    public void Parse_ReturnsClassDeclaration_WithPrivateMethod_WhenProvidingClass_WithStaticPrivateMethod()
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        const string expectedMethodIdentifier = "expectedMethodIdentifier";
+        var parser = new Parser($"class {expectedIdentifier} {{ static #{expectedMethodIdentifier}() {{ }} }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var classDeclaration = rootNodes[0] as ClassDeclaration;
+        Assert.That(classDeclaration, Is.Not.Null);
+        Assert.That(classDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
+        Assert.That(classDeclaration.Methods, Is.Empty);
+        Assert.That(classDeclaration.Fields, Is.Empty);
+        Assert.That(classDeclaration.StaticFields, Is.Empty);
+
+        Assert.That(classDeclaration.StaticMethods, Has.Count.EqualTo(1));
+
+        var staticPrivateMethod = classDeclaration.StaticMethods[0];
+        Assert.That(staticPrivateMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
+        Assert.That(staticPrivateMethod.Parameters, Is.Empty);
+        Assert.That(staticPrivateMethod.Body, Is.Empty);
+        Assert.That(staticPrivateMethod.IsPrivate, Is.True);
+    }
 }
