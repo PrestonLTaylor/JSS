@@ -5,12 +5,25 @@ namespace JSS.Lib.UnitTests;
 
 internal sealed class ParserTests
 {
-    // Tests for LogicalORExpression, https://tc39.es/ecma262/#prod-LogicalORExpression
-    [Test]
-    public void Parse_ReturnsExpressionStatement_WithLogicalOrExpression_WhenProvidingLogicalOr()
+    static private readonly Dictionary<string, Type> expressionStatementToTypeTestCases = new()
+    {
+        { "1 || 2", typeof(LogicalOrExpression) },
+        { "1 && 2", typeof(LogicalAndExpression) },
+        { "1 | 2", typeof(BitwiseOrExpression) },
+        { "1 ^ 2", typeof(BitwiseXorExpression) },
+        { "1 & 2", typeof(BitwiseAndExpression) },
+        { "this", typeof(ThisExpression) },
+        { "null", typeof(NullLiteral) },
+    };
+
+    // Tests for Expression, https://tc39.es/ecma262/#prod-Expression
+    [TestCaseSource(nameof(expressionStatementToTypeTestCases))]
+    public void Parse_ReturnsExpressionStatement_WithExpectedType_WhenProvidedExpessionStatement(KeyValuePair<string, Type> expressionStatementToType)
     {
         // Arrange
-        var parser = new Parser("1 || 2");
+        var expressionStatement = expressionStatementToType.Key;
+        var expectedType = expressionStatementToType.Value;
+        var parser = new Parser(expressionStatement);
 
         // Act
         var parsedProgram = parser.Parse();
@@ -19,16 +32,27 @@ internal sealed class ParserTests
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
 
-        var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
-        Assert.That(expressionStatement.Expression as LogicalOrExpression, Is.Not.Null);
+        var actualExpressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(actualExpressionStatement, Is.Not.Null);
+        Assert.That(actualExpressionStatement.Expression, Is.InstanceOf(expectedType));
     }
 
-    [Test]
-    public void Parse_ReturnsExpressionStatement_WithNestedLogicalOrExpression_WhenProvidingMultipleLogicalOrs()
+    static private readonly Dictionary<string, Type> nestedExpressionStatementToTypeTestCases = new()
+    {
+        { "1 || 2 || 3", typeof(LogicalOrExpression) },
+        { "1 && 2 && 3", typeof(LogicalAndExpression) },
+        { "1 | 2 | 3", typeof(BitwiseOrExpression) },
+        { "1 ^ 2 ^ 3", typeof(BitwiseXorExpression) },
+        { "1 & 2 & 3", typeof(BitwiseAndExpression) },
+    };
+
+    [TestCaseSource(nameof(nestedExpressionStatementToTypeTestCases))]
+    public void Parse_ReturnsExpressionStatement_WithExpectedType_WhenProvidedNestedExpessionStatement(KeyValuePair<string, Type> expressionStatementToType)
     {
         // Arrange
-        var parser = new Parser("1 || 2 || 3");
+        var expressionStatement = expressionStatementToType.Key;
+        var expectedType = expressionStatementToType.Value;
+        var parser = new Parser(expressionStatement);
 
         // Act
         var parsedProgram = parser.Parse();
@@ -37,197 +61,9 @@ internal sealed class ParserTests
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
 
-        var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
-
-        // FIXME: We want the LHS to be the LogicalOrExpression, as that is how the grammar in the spec is defined
-        var outerOrExpression = expressionStatement.Expression as LogicalOrExpression;
-        Assert.That(outerOrExpression, Is.Not.Null);
-        Assert.That(outerOrExpression.Rhs as LogicalOrExpression, Is.Not.Null);
-    }
-
-    // Tests for LogicalANDExpression, https://tc39.es/ecma262/#prod-LogicalANDExpression
-    [Test]
-    public void Parse_ReturnsExpressionStatement_WithLogicalAndExpression_WhenProvidingLogicalAnd()
-    {
-        // Arrange
-        var parser = new Parser("1 && 2");
-
-        // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
-
-        // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
-
-        var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
-        Assert.That(expressionStatement.Expression as LogicalAndExpression, Is.Not.Null);
-    }
-
-    [Test]
-    public void Parse_ReturnsExpressionStatement_WithNestedLogicalAndExpression_WhenProvidingMultipleLogicalAnds()
-    {
-        // Arrange
-        var parser = new Parser("1 && 2 && 3");
-
-        // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
-
-        // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
-
-        var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
-
-        // FIXME: We want the LHS to be the LogicalAndExpression, as that is how the grammar in the spec is defined
-        var outerAndExpression = expressionStatement.Expression as LogicalAndExpression;
-        Assert.That(outerAndExpression, Is.Not.Null);
-        Assert.That(outerAndExpression.Rhs as LogicalAndExpression, Is.Not.Null);
-    }
-
-    // Tests for BitwiseORExpression, https://tc39.es/ecma262/#prod-BitwiseORExpression
-    [Test]
-    public void Parse_ReturnsExpressionStatement_WithBitwiseOrExpression_WhenProvidingBitwiseOr()
-    {
-        // Arrange
-        var parser = new Parser("1 | 2");
-
-        // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
-
-        // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
-
-        var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
-        Assert.That(expressionStatement.Expression as BitwiseOrExpression, Is.Not.Null);
-    }
-
-    [Test]
-    public void Parse_ReturnsExpressionStatement_WithNestedBitwiseOrExpression_WhenProvidingMultipleBitwiseOrs()
-    {
-        // Arrange
-        var parser = new Parser("1 | 2 | 3");
-
-        // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
-
-        // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
-
-        var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
-
-        // FIXME: We want the LHS to be the BitwiseOrExpression, as that is how the grammar in the spec is defined
-        var outerOrExpression = expressionStatement.Expression as BitwiseOrExpression;
-        Assert.That(outerOrExpression, Is.Not.Null);
-        Assert.That(outerOrExpression.Rhs as BitwiseOrExpression, Is.Not.Null);
-    }
-
-    // Tests for BitwiseXORExpression, https://tc39.es/ecma262/#prod-BitwiseXORExpression
-    [Test]
-    public void Parse_ReturnsExpressionStatement_WithBitwiseXorExpression_WhenProvidingBitwiseXor()
-    {
-        // Arrange
-        var parser = new Parser("1 ^ 2");
-
-        // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
-
-        // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
-
-        var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
-        Assert.That(expressionStatement.Expression as BitwiseXorExpression, Is.Not.Null);
-    }
-
-    [Test]
-    public void Parse_ReturnsExpressionStatement_WithNestedBitwiseXorExpression_WhenProvidingMultipleBitwiseXors()
-    {
-        // Arrange
-        var parser = new Parser("1 ^ 2 ^ 3");
-
-        // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
-
-        // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
-
-        var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
-
-        // FIXME: We want the LHS to be the BitwiseOrExpression, as that is how the grammar in the spec is defined
-        var outerXorExpression = expressionStatement.Expression as BitwiseXorExpression;
-        Assert.That(outerXorExpression, Is.Not.Null);
-        Assert.That(outerXorExpression.Rhs as BitwiseXorExpression, Is.Not.Null);
-    }
-
-    // Tests for BitwiseANDExpression, https://tc39.es/ecma262/#prod-BitwiseANDExpression
-    [Test]
-    public void Parse_ReturnsExpressionStatement_WithBitwiseAndExpression_WhenProvidingBitwiseAnd()
-    {
-        // Arrange
-        var parser = new Parser("1 & 2");
-
-        // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
-
-        // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
-
-        var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
-        Assert.That(expressionStatement.Expression as BitwiseAndExpression, Is.Not.Null);
-    }
-
-    [Test]
-    public void Parse_ReturnsExpressionStatement_WithNestedBitwiseAndExpression_WhenProvidingMultipleBitwiseAnds()
-    {
-        // Arrange
-        var parser = new Parser("1 & 2 & 3");
-
-        // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
-
-        // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
-
-        var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
-
-        // FIXME: We want the LHS to be the LogicalAndExpression, as that is how the grammar in the spec is defined
-        var outerAndExpression = expressionStatement.Expression as BitwiseAndExpression;
-        Assert.That(outerAndExpression, Is.Not.Null);
-        Assert.That(outerAndExpression.Rhs as BitwiseAndExpression, Is.Not.Null);
-    }
-
-    // Tests for 13.2 Primary Expression, https://tc39.es/ecma262/#sec-primary-expression
-    [Test]
-    public void Parse_ReturnsExpressionStatement_WithThisExpression_WhenProvidingThis()
-    {
-        // Arrange
-        var parser = new Parser("this");
-
-        // Act
-        // FIXME: Decide if we should have a "IsExpressionStatement" kind of design as a virtual function inside of INode
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
-
-        // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
-
-        var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
-        Assert.That(expressionStatement.Expression as ThisExpression, Is.Not.Null);
+        var actualExpressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(actualExpressionStatement, Is.Not.Null);
+        Assert.That(actualExpressionStatement.Expression, Is.InstanceOf(expectedType));
     }
 
     [Test]
@@ -250,26 +86,6 @@ internal sealed class ParserTests
         var identifier = expressionStatement.Expression as Identifier;
         Assert.That(identifier, Is.Not.Null);
         Assert.That(identifier.Name, Is.EqualTo(identifierString));
-    }
-
-    [Test]
-    public void Parse_ReturnsExpressionStatement_WithNullLiteral_WhenProvidingValidIdentifier()
-    {
-        // Arrange
-        var parser = new Parser("null");
-
-        // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
-
-        // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
-
-        var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
-
-        var nullLiteral = expressionStatement.Expression as NullLiteral;
-        Assert.That(nullLiteral, Is.Not.Null);
     }
 
     [Test]
