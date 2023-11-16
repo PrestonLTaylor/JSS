@@ -1,9 +1,9 @@
 ﻿namespace JSS.Lib.AST;
 
-// LogicalORExpression, https://tc39.es/ecma262/#prod-LogicalORExpression
-internal sealed class LogicalOrExpression : IExpression
+// LogicalANDExpression, https://tc39.es/ecma262/#prod-LogicalANDExpression
+internal sealed class LogicalAndExpression : IExpression
 {
-    public LogicalOrExpression(IExpression lhs, IExpression rhs)
+    public LogicalAndExpression(IExpression lhs, IExpression rhs)
     {
         Lhs = lhs;
         Rhs = rhs;

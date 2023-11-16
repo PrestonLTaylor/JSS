@@ -177,10 +177,6 @@ internal sealed class Parser
         {
             return true;
         }
-        if (TryParsePrimaryExpression(out parsedExpression))
-        {
-            return true;
-        }
 
         parsedExpression = null;
         return false;
@@ -224,10 +220,11 @@ internal sealed class Parser
         return false;
     }
 
-    // LogicalOrExpression, https://tc39.es/ecma262/#prod-LogicalORExpression
+    // LogicalORExpression, https://tc39.es/ecma262/#prod-LogicalORExpression
     private bool TryParseLogicalOrExpression(out IExpression? parsedExpression)
     {
-        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        if (!TryParseLogicalAndExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
@@ -242,11 +239,36 @@ internal sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.Or);
 
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         // FIXME: Throw a SyntaxError instead
         if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = new LogicalOrExpression(lhs!, rhs!);
+        return true;
+    }
+
+    // LogicalANDExpression, https://tc39.es/ecma262/#prod-LogicalANDExpression
+    private bool TryParseLogicalAndExpression(out IExpression? parsedExpression)
+    {
+        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        // If we don't have an &&, that means we've reached the end of the expression and lhs is the fully parsed expression
+        if (!_consumer.IsTokenOfType(TokenType.And))
+        {
+            parsedExpression = lhs;
+            return true;
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.And);
+
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        // FIXME: Throw a SyntaxError instead
+        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+
+        parsedExpression = new LogicalAndExpression(lhs!, rhs!);
         return true;
     }
 
