@@ -128,6 +128,47 @@ internal sealed class ParserTests
         Assert.That(outerOrExpression.Rhs as BitwiseOrExpression, Is.Not.Null);
     }
 
+    // Tests for BitwiseXORExpression, https://tc39.es/ecma262/#prod-BitwiseXORExpression
+    [Test]
+    public void Parse_ReturnsExpressionStatement_WithBitwiseXorExpression_WhenProvidingBitwiseXor()
+    {
+        // Arrange
+        var parser = new Parser("1 ^ 2");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+        Assert.That(expressionStatement.Expression as BitwiseXorExpression, Is.Not.Null);
+    }
+
+    [Test]
+    public void Parse_ReturnsExpressionStatement_WithNestedBitwiseXorExpression_WhenProvidingMultipleBitwiseXors()
+    {
+        // Arrange
+        var parser = new Parser("1 ^ 2 ^ 3");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        // FIXME: We want the LHS to be the BitwiseOrExpression, as that is how the grammar in the spec is defined
+        var outerXorExpression = expressionStatement.Expression as BitwiseXorExpression;
+        Assert.That(outerXorExpression, Is.Not.Null);
+        Assert.That(outerXorExpression.Rhs as BitwiseXorExpression, Is.Not.Null);
+    }
+
     // Tests for 13.2 Primary Expression, https://tc39.es/ecma262/#sec-primary-expression
     [Test]
     public void Parse_ReturnsExpressionStatement_WithThisExpression_WhenProvidingThis()

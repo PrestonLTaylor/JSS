@@ -275,7 +275,8 @@ internal sealed class Parser
     // BitwiseORExpression, https://tc39.es/ecma262/#prod-BitwiseORExpression
     private bool TryParseBitwiseORExpression(out IExpression? parsedExpression)
     {
-        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        if (!TryParseBitwiseXORExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
@@ -290,11 +291,36 @@ internal sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.BitwiseOr);
 
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         // FIXME: Throw a SyntaxError instead
         if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = new BitwiseOrExpression(lhs!, rhs!);
+        return true;
+    }
+
+    // BitwiseXORExpression, https://tc39.es/ecma262/#prod-BitwiseXORExpression
+    private bool TryParseBitwiseXORExpression(out IExpression? parsedExpression)
+    {
+        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        // If we don't have an |, that means we've reached the end of the expression and lhs is the fully parsed expression
+        if (!_consumer.IsTokenOfType(TokenType.BitwiseXor))
+        {
+            parsedExpression = lhs;
+            return true;
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.BitwiseXor);
+
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        // FIXME: Throw a SyntaxError instead
+        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+
+        parsedExpression = new BitwiseXorExpression(lhs!, rhs!);
         return true;
     }
 
