@@ -172,6 +172,87 @@ internal sealed class Parser
     // Expression, https://tc39.es/ecma262/#prod-Expression
     private bool TryParseExpression(out IExpression? parsedExpression)
     {
+        // FIXME: Implement the comma operator
+        if (TryParseAssignmentExpression(out parsedExpression))
+        {
+            return true;
+        }
+        if (TryParsePrimaryExpression(out parsedExpression))
+        {
+            return true;
+        }
+
+        parsedExpression = null;
+        return false;
+    }
+
+    // AssignmentExpression, https://tc39.es/ecma262/#prod-AssignmentExpression
+    private bool TryParseAssignmentExpression(out IExpression? parsedExpression)
+    {
+        if (TryParseConditionalExpression(out parsedExpression))
+        {
+            return true;
+        }
+
+        parsedExpression = null;
+        return false;
+    }
+
+    // ConditionalExpression, https://tc39.es/ecma262/#prod-ConditionalExpression
+    private bool TryParseConditionalExpression(out IExpression? parsedExpression)
+    {
+        // FIXME: Implement the '?' operator
+        if (TryParseShortCircuitExpression(out parsedExpression))
+        {
+            return true;
+        }
+
+        parsedExpression = null;
+        return false;
+    }
+
+    // ShortCircuitExpression, https://tc39.es/ecma262/#prod-ShortCircuitExpression
+    private bool TryParseShortCircuitExpression(out IExpression? parsedExpression)
+    {
+        // FIXME: Implement the coalesing operator
+        if (TryParseLogicalOrExpression(out parsedExpression))
+        {
+            return true;
+        }
+
+        parsedExpression = null;
+        return false;
+    }
+
+    // LogicalOrExpression, https://tc39.es/ecma262/#prod-LogicalORExpression
+    private bool TryParseLogicalOrExpression(out IExpression? parsedExpression)
+    {
+        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        // If we don't have an ||, that means we've reached the end of the expression and lhs is the fully parsed expression
+        if (!_consumer.IsTokenOfType(TokenType.Or))
+        {
+            parsedExpression = lhs;
+            return true;
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.Or);
+
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        // FIXME: Throw a SyntaxError instead
+        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+
+        parsedExpression = new LogicalOrExpression(lhs!, rhs!);
+        return true;
+    }
+
+    // 13.2 Primary Expression, https://tc39.es/ecma262/#sec-primary-expression
+    private bool TryParsePrimaryExpression(out IExpression? parsedExpression)
+    {
         if (IsThisExpression())
         {
             parsedExpression = ParseThisExpression();

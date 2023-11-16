@@ -5,6 +5,47 @@ namespace JSS.Lib.UnitTests;
 
 internal sealed class ParserTests
 {
+    // Tests for LogicalORExpression, https://tc39.es/ecma262/#prod-LogicalORExpression
+    [Test]
+    public void Parse_ReturnsExpressionStatement_WithLogicalOrExpression_WhenProvidingLogicalOr()
+    {
+        // Arrange
+        var parser = new Parser("1 || 2");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+        Assert.That(expressionStatement.Expression as LogicalOrExpression, Is.Not.Null);
+    }
+
+    [Test]
+    public void Parse_ReturnsExpressionStatement_WithNestedLogicalOrExpression_WhenProvidingMultipleLogicalOrs()
+    {
+        // Arrange
+        var parser = new Parser("1 || 2 || 3");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        // FIXME: We want the LHS to be the LogicalOrExpression, as that is how the grammar in the spec is defined
+        var outerOrExpression = expressionStatement.Expression as LogicalOrExpression;
+        Assert.That(outerOrExpression, Is.Not.Null);
+        Assert.That(outerOrExpression.Rhs as LogicalOrExpression, Is.Not.Null);
+    }
+
     // Tests for 13.2 Primary Expression, https://tc39.es/ecma262/#sec-primary-expression
     [Test]
     public void Parse_ReturnsExpressionStatement_WithThisExpression_WhenProvidingThis()
