@@ -25,6 +25,8 @@ internal sealed class ParserTests
         { "1 << 2", typeof(LeftShiftExpression) },
         { "1 >> 2", typeof(RightShiftExpression) },
         { "1 >>> 2", typeof(UnsignedRightShiftExpression) },
+        { "1 + 2", typeof(AdditionExpression) },
+        { "1 - 2", typeof(SubtractionExpression) },
         { "this", typeof(ThisExpression) },
         { "null", typeof(NullLiteral) },
     };
@@ -70,6 +72,8 @@ internal sealed class ParserTests
         { "1 << 2 << 3", typeof(LeftShiftExpression) },
         { "1 >> 2 >> 3", typeof(RightShiftExpression) },
         { "1 >>> 2 >>> 3", typeof(UnsignedRightShiftExpression) },
+        { "1 + 2 + 3", typeof(AdditionExpression) },
+        { "1 - 2 - 3", typeof(SubtractionExpression) },
     };
 
     [TestCaseSource(nameof(nestedExpressionStatementToTypeTestCases))]

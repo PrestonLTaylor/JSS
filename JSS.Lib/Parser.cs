@@ -452,7 +452,8 @@ internal sealed class Parser
     // 13.9 Bitwise Shift Operators, https://tc39.es/ecma262/#sec-bitwise-shift-operators 
     private bool TryParseBitwiseShiftExpression(out IExpression? parsedExpression)
     {
-        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        if (!TryParseAdditiveExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
@@ -468,7 +469,6 @@ internal sealed class Parser
         var shiftToken = _consumer.Consume();
 
         // FIXME: Throw a SyntaxError instead
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = CreateBitwiseShiftOperator(lhs!, rhs!, shiftToken);
@@ -492,6 +492,51 @@ internal sealed class Parser
             TokenType.RightShift => new RightShiftExpression(lhs, rhs),
             TokenType.UnsignedRightShift => new UnsignedRightShiftExpression(lhs, rhs),
             _ => throw new InvalidOperationException($"Parser Bug: Tried to create an shift expression with a token of type {shiftToken.type}"),
+        };
+    }
+
+    // 13.8 Additive Operators, https://tc39.es/ecma262/#sec-additive-operators 
+    private bool TryParseAdditiveExpression(out IExpression? parsedExpression)
+    {
+        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        // If we don't have a additive operator, that means we've reached the end of the expression and lhs is the fully parsed expression
+        if (!IsAdditiveOperator())
+        {
+            parsedExpression = lhs;
+            return true;
+        }
+
+        var additiveToken = _consumer.Consume();
+
+        // FIXME: Throw a SyntaxError instead
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+
+        parsedExpression = CreateAdditiveOperator(lhs!, rhs!, additiveToken);
+        return true;
+    }
+
+    private bool IsAdditiveOperator()
+    {
+        return _consumer.CanConsume() && _consumer.Peek().type switch
+        {
+            TokenType.Plus or TokenType.Minus => true,
+            _ => false,
+        };
+    }
+
+    private IExpression CreateAdditiveOperator(IExpression lhs, IExpression rhs, Token additiveToken)
+    {
+        return additiveToken.type switch
+        {
+            TokenType.Plus => new AdditionExpression(lhs, rhs),
+            TokenType.Minus => new SubtractionExpression(lhs, rhs),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an additive expression with a token of type {additiveToken.type}"),
         };
     }
 
