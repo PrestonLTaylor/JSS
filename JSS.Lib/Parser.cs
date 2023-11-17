@@ -353,7 +353,8 @@ internal sealed class Parser
     // 13.11 Equality Operators, https://tc39.es/ecma262/#sec-equality-operators
     private bool TryParseEqualityExpression(out IExpression? parsedExpression)
     {
-        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        if (!TryParseRelationalExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
@@ -368,7 +369,6 @@ internal sealed class Parser
 
         var equalityToken = _consumer.Consume();
 
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         // FIXME: Throw a SyntaxError instead
         if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
@@ -394,6 +394,58 @@ internal sealed class Parser
             TokenType.NotEquals => new LooseInequalityExpression(lhs, rhs),
             TokenType.StrictNotEquals => new StrictInequalityExpression(lhs, rhs),
             _ => throw new InvalidOperationException($"Parser Bug: Tried to create an equality expression with a token of type {equalityToken.type}"),
+        };
+    }
+
+    // 13.10 Relational Operators, https://tc39.es/ecma262/#prod-RelationalExpression
+    private bool TryParseRelationalExpression(out IExpression? parsedExpression)
+    {
+        // FIXME: The RelationalOperator in has special logic for parsing in Note 2, handle this rule
+        // FIXME: PrivateIdentifiers are parsed here using the in keyword, have a case to handle this rule
+        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        // If we don't have a relational operator, that means we've reached the end of the expression and lhs is the fully parsed expression
+        if (!IsRelationalOperator())
+        {
+            parsedExpression = lhs;
+            return true;
+        }
+
+        var relationalToken = _consumer.Consume();
+
+        // FIXME: Throw a SyntaxError instead
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+
+        parsedExpression = CreateRelationalOperator(lhs!, rhs!, relationalToken);
+        return true;
+    }
+
+    private bool IsRelationalOperator()
+    {
+        return _consumer.CanConsume() && _consumer.Peek().type switch
+        {
+            TokenType.LessThan or TokenType.GreaterThan or TokenType.LessThanEqual or 
+            TokenType.GreaterThanEqual or TokenType.InstanceOf or TokenType.In => true,
+            _ => false
+        };
+    }
+
+    private IExpression CreateRelationalOperator(IExpression lhs, IExpression rhs, Token relationalToken)
+    {
+        return relationalToken.type switch
+        {
+            TokenType.LessThan => new LessThanExpression(lhs, rhs),
+            TokenType.GreaterThan => new GreaterThanExpression(lhs, rhs),
+            TokenType.LessThanEqual => new LessThanEqualsExpression(lhs, rhs),
+            TokenType.GreaterThanEqual => new GreaterThanEqualsExpression(lhs, rhs),
+            TokenType.InstanceOf => new InstanceOfExpression(lhs, rhs),
+            TokenType.In => new InExpression(lhs, rhs),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an relational expression with a token of type {relationalToken.type}"),
         };
     }
 
