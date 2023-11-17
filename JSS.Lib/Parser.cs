@@ -498,7 +498,8 @@ internal sealed class Parser
     // 13.8 Additive Operators, https://tc39.es/ecma262/#sec-additive-operators 
     private bool TryParseAdditiveExpression(out IExpression? parsedExpression)
     {
-        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        if (!TryParseMultiplicativeExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
@@ -514,7 +515,6 @@ internal sealed class Parser
         var additiveToken = _consumer.Consume();
 
         // FIXME: Throw a SyntaxError instead
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = CreateAdditiveOperator(lhs!, rhs!, additiveToken);
@@ -537,6 +537,52 @@ internal sealed class Parser
             TokenType.Plus => new AdditionExpression(lhs, rhs),
             TokenType.Minus => new SubtractionExpression(lhs, rhs),
             _ => throw new InvalidOperationException($"Parser Bug: Tried to create an additive expression with a token of type {additiveToken.type}"),
+        };
+    }
+
+    // 13.7 Multiplicative Operators, https://tc39.es/ecma262/#sec-multiplicative-operators 
+    private bool TryParseMultiplicativeExpression(out IExpression? parsedExpression)
+    {
+        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        // If we don't have a multiplicative operator, that means we've reached the end of the expression and lhs is the fully parsed expression
+        if (!IsMultiplicativeOperator())
+        {
+            parsedExpression = lhs;
+            return true;
+        }
+
+        var multiplicativeToken = _consumer.Consume();
+
+        // FIXME: Throw a SyntaxError instead
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+
+        parsedExpression = CreateMultiplicativeOperator(lhs!, rhs!, multiplicativeToken);
+        return true;
+    }
+
+    private bool IsMultiplicativeOperator()
+    {
+        return _consumer.CanConsume() && _consumer.Peek().type switch
+        {
+            TokenType.Multiply or TokenType.Division or TokenType.Modulo => true,
+            _ => false,
+        };
+    }
+
+    private IExpression CreateMultiplicativeOperator(IExpression lhs, IExpression rhs, Token multiplicativeToken)
+    {
+        return multiplicativeToken.type switch
+        {
+            TokenType.Multiply => new MultiplicationExpression(lhs, rhs),
+            TokenType.Division => new DivisionExpression(lhs, rhs),
+            TokenType.Modulo => new ModuloExpression(lhs, rhs),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an multiplicative expression with a token of type {multiplicativeToken.type}"),
         };
     }
 
