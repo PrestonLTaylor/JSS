@@ -12,6 +12,10 @@ internal sealed class ParserTests
         { "1 | 2", typeof(BitwiseOrExpression) },
         { "1 ^ 2", typeof(BitwiseXorExpression) },
         { "1 & 2", typeof(BitwiseAndExpression) },
+        { "1 == 2", typeof(LooseEqualityExpression) },
+        { "1 != 2", typeof(LooseInequalityExpression) },
+        { "1 === 2", typeof(StrictEqualityExpression) },
+        { "1 !== 2", typeof(StrictInequalityExpression) },
         { "this", typeof(ThisExpression) },
         { "null", typeof(NullLiteral) },
     };
@@ -44,6 +48,10 @@ internal sealed class ParserTests
         { "1 | 2 | 3", typeof(BitwiseOrExpression) },
         { "1 ^ 2 ^ 3", typeof(BitwiseXorExpression) },
         { "1 & 2 & 3", typeof(BitwiseAndExpression) },
+        { "1 == 2 == 3", typeof(LooseEqualityExpression) },
+        { "1 != 2 != 3", typeof(LooseInequalityExpression) },
+        { "1 === 2 === 3", typeof(StrictEqualityExpression) },
+        { "1 !== 2 !== 3", typeof(StrictInequalityExpression) },
     };
 
     [TestCaseSource(nameof(nestedExpressionStatementToTypeTestCases))]

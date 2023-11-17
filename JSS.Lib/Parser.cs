@@ -327,7 +327,8 @@ internal sealed class Parser
     // BitwiseANDExpression, https://tc39.es/ecma262/#prod-BitwiseANDExpression
     private bool TryParseBitwiseAndExpression(out IExpression? parsedExpression)
     {
-        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        if (!TryParseEqualityExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
@@ -342,12 +343,58 @@ internal sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.BitwiseAnd);
 
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         // FIXME: Throw a SyntaxError instead
         if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = new BitwiseAndExpression(lhs!, rhs!);
         return true;
+    }
+
+    // 13.11 Equality Operators, https://tc39.es/ecma262/#sec-equality-operators
+    private bool TryParseEqualityExpression(out IExpression? parsedExpression)
+    {
+        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        // If we don't have an equality operator, that means we've reached the end of the expression and lhs is the fully parsed expression
+        if (!IsEqualityOperator())
+        {
+            parsedExpression = lhs;
+            return true;
+        }
+
+        var equalityToken = _consumer.Consume();
+
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        // FIXME: Throw a SyntaxError instead
+        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+
+        parsedExpression = CreateEqualityExpression(lhs!, rhs!, equalityToken);
+        return true;
+    }
+
+    private bool IsEqualityOperator()
+    {
+        return _consumer.CanConsume() && _consumer.Peek().type switch
+        {
+            TokenType.EqualEquals or TokenType.StrictEqualsEquals or TokenType.NotEquals or TokenType.StrictNotEquals => true,
+            _ => false,
+        };
+    }
+
+    private IExpression CreateEqualityExpression(IExpression lhs, IExpression rhs, Token equalityToken)
+    {
+        return equalityToken.type switch
+        {
+            TokenType.EqualEquals => new LooseEqualityExpression(lhs, rhs),
+            TokenType.StrictEqualsEquals => new StrictEqualityExpression(lhs, rhs),
+            TokenType.NotEquals => new LooseInequalityExpression(lhs, rhs),
+            TokenType.StrictNotEquals => new StrictInequalityExpression(lhs, rhs),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an equality expression with a token of type {equalityToken.type}"),
+        };
     }
 
     // 13.2 Primary Expression, https://tc39.es/ecma262/#sec-primary-expression
