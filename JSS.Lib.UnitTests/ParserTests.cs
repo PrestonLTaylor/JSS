@@ -22,6 +22,9 @@ internal sealed class ParserTests
         { "1 >= 2", typeof(GreaterThanEqualsExpression) },
         { "1 instanceof 2", typeof(InstanceOfExpression) },
         { "1 in 2", typeof(InExpression) },
+        { "1 << 2", typeof(LeftShiftExpression) },
+        { "1 >> 2", typeof(RightShiftExpression) },
+        { "1 >>> 2", typeof(UnsignedRightShiftExpression) },
         { "this", typeof(ThisExpression) },
         { "null", typeof(NullLiteral) },
     };
@@ -64,6 +67,9 @@ internal sealed class ParserTests
         { "1 >= 2 >= 3", typeof(GreaterThanEqualsExpression) },
         { "1 instanceof 2 instanceof 3", typeof(InstanceOfExpression) },
         { "1 in 2 in 3", typeof(InExpression) },
+        { "1 << 2 << 3", typeof(LeftShiftExpression) },
+        { "1 >> 2 >> 3", typeof(RightShiftExpression) },
+        { "1 >>> 2 >>> 3", typeof(UnsignedRightShiftExpression) },
     };
 
     [TestCaseSource(nameof(nestedExpressionStatementToTypeTestCases))]

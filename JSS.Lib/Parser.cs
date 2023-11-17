@@ -402,7 +402,8 @@ internal sealed class Parser
     {
         // FIXME: The RelationalOperator in has special logic for parsing in Note 2, handle this rule
         // FIXME: PrivateIdentifiers are parsed here using the in keyword, have a case to handle this rule
-        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        if (!TryParseBitwiseShiftExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
@@ -418,7 +419,6 @@ internal sealed class Parser
         var relationalToken = _consumer.Consume();
 
         // FIXME: Throw a SyntaxError instead
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = CreateRelationalOperator(lhs!, rhs!, relationalToken);
@@ -446,6 +446,52 @@ internal sealed class Parser
             TokenType.InstanceOf => new InstanceOfExpression(lhs, rhs),
             TokenType.In => new InExpression(lhs, rhs),
             _ => throw new InvalidOperationException($"Parser Bug: Tried to create an relational expression with a token of type {relationalToken.type}"),
+        };
+    }
+
+    // 13.9 Bitwise Shift Operators, https://tc39.es/ecma262/#sec-bitwise-shift-operators 
+    private bool TryParseBitwiseShiftExpression(out IExpression? parsedExpression)
+    {
+        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        // If we don't have a bitwise shift operator, that means we've reached the end of the expression and lhs is the fully parsed expression
+        if (!IsBitwiseShiftOperator())
+        {
+            parsedExpression = lhs;
+            return true;
+        }
+
+        var shiftToken = _consumer.Consume();
+
+        // FIXME: Throw a SyntaxError instead
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+
+        parsedExpression = CreateBitwiseShiftOperator(lhs!, rhs!, shiftToken);
+        return true;
+    }
+
+    private bool IsBitwiseShiftOperator()
+    {
+        return _consumer.CanConsume() && _consumer.Peek().type switch
+        {
+            TokenType.LeftShift or TokenType.RightShift or TokenType.UnsignedRightShift => true,
+            _ => false,
+        };
+    }
+
+    private IExpression CreateBitwiseShiftOperator(IExpression lhs, IExpression rhs, Token shiftToken)
+    {
+        return shiftToken.type switch
+        {
+            TokenType.LeftShift => new LeftShiftExpression(lhs, rhs),
+            TokenType.RightShift => new RightShiftExpression(lhs, rhs),
+            TokenType.UnsignedRightShift => new UnsignedRightShiftExpression(lhs, rhs),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an shift expression with a token of type {shiftToken.type}"),
         };
     }
 
