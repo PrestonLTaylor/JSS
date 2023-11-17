@@ -543,7 +543,8 @@ internal sealed class Parser
     // 13.7 Multiplicative Operators, https://tc39.es/ecma262/#sec-multiplicative-operators 
     private bool TryParseMultiplicativeExpression(out IExpression? parsedExpression)
     {
-        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        if (!TryParseExponentiationExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
@@ -559,7 +560,6 @@ internal sealed class Parser
         var multiplicativeToken = _consumer.Consume();
 
         // FIXME: Throw a SyntaxError instead
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = CreateMultiplicativeOperator(lhs!, rhs!, multiplicativeToken);
@@ -584,6 +584,37 @@ internal sealed class Parser
             TokenType.Modulo => new ModuloExpression(lhs, rhs),
             _ => throw new InvalidOperationException($"Parser Bug: Tried to create an multiplicative expression with a token of type {multiplicativeToken.type}"),
         };
+    }
+
+    // 13.6 Exponentiation Operator, https://tc39.es/ecma262/#sec-exp-operator
+    private bool TryParseExponentiationExpression(out IExpression? parsedExpression)
+    {
+        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        // If we don't have a multiplicative operator, that means we've reached the end of the expression and lhs is the fully parsed expression
+        if (!IsExponentiationOperator())
+        {
+            parsedExpression = lhs;
+            return true;
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.Exponentiation);
+
+        // FIXME: Throw a SyntaxError instead
+        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
+        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+
+        parsedExpression = new ExponentiationExpression(lhs!, rhs!);
+        return true;
+    }
+
+    private bool IsExponentiationOperator()
+    {
+        return _consumer.IsTokenOfType(TokenType.Exponentiation);
     }
 
     // 13.2 Primary Expression, https://tc39.es/ecma262/#sec-primary-expression
