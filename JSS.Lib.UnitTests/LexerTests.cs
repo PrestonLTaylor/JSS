@@ -446,6 +446,7 @@ internal sealed class LexerTests
         { "**", TokenType.Exponentiation },
         { "*=", TokenType.MultiplyAssignment },
         { "++", TokenType.Increment },
+        { "--", TokenType.Decrement },
         { "+=", TokenType.PlusAssignment },
         { "-=", TokenType.MinusAssignment },
         { "<<", TokenType.LeftShift },

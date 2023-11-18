@@ -38,6 +38,10 @@ internal sealed class ParserTests
         { "-1", typeof(UnaryMinusExpression) },
         { "~1", typeof(BitwiseNotExpression) },
         { "!1", typeof(LogicalNotExpression) },
+        { "1++", typeof(PostfixIncrementExpression) },
+        { "1--", typeof(PostfixDecrementExpression) },
+        { "++1", typeof(PrefixIncrementExpression) },
+        { "--1", typeof(PrefixDecrementExpression) },
         { "this", typeof(ThisExpression) },
         { "null", typeof(NullLiteral) },
     };

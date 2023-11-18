@@ -71,6 +71,7 @@ internal sealed class Lexer
         { "**", TokenType.Exponentiation },
         { "*=", TokenType.MultiplyAssignment },
         { "++", TokenType.Increment },
+        { "--", TokenType.Decrement },
         { "+=", TokenType.PlusAssignment },
         { "-=", TokenType.MinusAssignment },
         { "<<", TokenType.LeftShift },

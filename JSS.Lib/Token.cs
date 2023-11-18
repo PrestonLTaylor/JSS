@@ -74,6 +74,7 @@ internal enum TokenType
     Modulo,
     Exponentiation,
     Increment,
+    Decrement,
     LeftShift,
     RightShift,
     UnsignedRightShift,

@@ -623,7 +623,7 @@ internal sealed class Parser
         // FIXME: Handle parsing of the await keyword acording to the spec
         if (!IsUnaryOperator())
         {
-            return TryParsePrimaryExpression(out parsedExpression);
+            return TryParseUpdateExpression(out parsedExpression);
         }
 
         var unaryToken = _consumer.Consume();
@@ -659,6 +659,79 @@ internal sealed class Parser
             TokenType.BitwiseNot => new BitwiseNotExpression(innerExpression),
             TokenType.Not => new LogicalNotExpression(innerExpression),
             _ => throw new InvalidOperationException($"Parser Bug: Tried to create an unary expression with a token of type {unaryToken.type}"),
+        };
+    }
+
+    // 13.4 Update Expressions, https://tc39.es/ecma262/#sec-update-expressions
+    private bool TryParseUpdateExpression(out IExpression? parsedExpression)
+    {
+        // FIXME: Early Errors for parsing update expressions, https://tc39.es/ecma262/#sec-update-expressions-static-semantics-early-errors
+        if (TryParsePrefixUpdateExpression(out parsedExpression))
+        {
+            return true;
+        }
+        if (!TryParsePrimaryExpression(out IExpression? innerExpression))
+        {
+            return false;
+        }
+
+        // NOTE: If there is no postfix update operator, then the inner expression is the fully parsed expression
+        if (!IsUpdateOperator())
+        {
+            parsedExpression = innerExpression;
+            return true;
+        }
+
+        var postfixUpdateToken = _consumer.Consume();
+        parsedExpression = CreatePostfixUpdateExpression(innerExpression!, postfixUpdateToken);
+        return true;
+    }
+
+    private bool TryParsePrefixUpdateExpression(out IExpression? parsedExpression)
+    {
+        if (!IsUpdateOperator())
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        var prefixUpdateToken = _consumer.Consume();
+        if (!TryParseUnaryExpression(out IExpression? innerExpression))
+        {
+            // FIXME: Throw a SyntaxError
+            throw new InvalidOperationException();
+        }
+
+        parsedExpression = CreatePrefixUpdateExpression(innerExpression!, prefixUpdateToken);
+        return true;
+    }
+
+    private bool IsUpdateOperator()
+    {
+        return _consumer.CanConsume() && _consumer.Peek().type switch
+        {
+            TokenType.Increment or TokenType.Decrement => true,
+            _ => false,
+        };
+    }
+
+    private IExpression CreatePrefixUpdateExpression(IExpression innerExpression, Token prefixUpdateToken)
+    {
+        return prefixUpdateToken.type switch
+        {
+            TokenType.Increment => new PrefixIncrementExpression(innerExpression),
+            TokenType.Decrement => new PrefixDecrementExpression(innerExpression),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create a prefix update expression with a token of type {prefixUpdateToken.type}"),
+        };
+    }
+
+    private IExpression CreatePostfixUpdateExpression(IExpression innerExpression, Token prefixUpdateToken)
+    {
+        return prefixUpdateToken.type switch
+        {
+            TokenType.Increment => new PostfixIncrementExpression(innerExpression),
+            TokenType.Decrement => new PostfixDecrementExpression(innerExpression),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create a prefix update expression with a token of type {prefixUpdateToken.type}"),
         };
     }
 
