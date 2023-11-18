@@ -31,6 +31,13 @@ internal sealed class ParserTests
         { "1 / 2", typeof(DivisionExpression) },
         { "1 % 2", typeof(ModuloExpression) },
         { "1 ** 2", typeof(ExponentiationExpression) },
+        { "delete 1", typeof(DeleteExpression) },
+        { "void 1", typeof(VoidExpression) },
+        { "typeof 1", typeof(TypeOfExpression) },
+        { "+1", typeof(UnaryPlusExpression) },
+        { "-1", typeof(UnaryMinusExpression) },
+        { "~1", typeof(BitwiseNotExpression) },
+        { "!1", typeof(LogicalNotExpression) },
         { "this", typeof(ThisExpression) },
         { "null", typeof(NullLiteral) },
     };
@@ -82,6 +89,11 @@ internal sealed class ParserTests
         { "1 / 2 / 3", typeof(DivisionExpression) },
         { "1 % 2 % 3", typeof(ModuloExpression) },
         { "1 ** 2 ** 3", typeof(ExponentiationExpression) },
+        { "delete delete 1", typeof(DeleteExpression) },
+        { "void void 1", typeof(VoidExpression) },
+        { "typeof typeof 1", typeof(TypeOfExpression) },
+        { "~~1", typeof(BitwiseNotExpression) },
+        { "!!1", typeof(LogicalNotExpression) },
     };
 
     [TestCaseSource(nameof(nestedExpressionStatementToTypeTestCases))]

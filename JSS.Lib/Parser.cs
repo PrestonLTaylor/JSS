@@ -589,7 +589,7 @@ internal sealed class Parser
     // 13.6 Exponentiation Operator, https://tc39.es/ecma262/#sec-exp-operator
     private bool TryParseExponentiationExpression(out IExpression? parsedExpression)
     {
-        if (!TryParsePrimaryExpression(out IExpression? lhs))
+        if (!TryParseUnaryExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
@@ -615,6 +615,51 @@ internal sealed class Parser
     private bool IsExponentiationOperator()
     {
         return _consumer.IsTokenOfType(TokenType.Exponentiation);
+    }
+
+    // 13.5 Unary Operators, https://tc39.es/ecma262/#prod-UnaryExpression
+    private bool TryParseUnaryExpression(out IExpression? parsedExpression)
+    {
+        // FIXME: Handle parsing of the await keyword acording to the spec
+        if (!IsUnaryOperator())
+        {
+            return TryParsePrimaryExpression(out parsedExpression);
+        }
+
+        var unaryToken = _consumer.Consume();
+        if (!TryParseUnaryExpression(out IExpression? innerExpression))
+        {
+            // FIXME: Throw a SyntaxError
+            throw new InvalidOperationException();
+        }
+
+        parsedExpression = CreateUnaryExpression(innerExpression!, unaryToken);
+        return true;
+    }
+
+    private bool IsUnaryOperator()
+    {
+        return _consumer.CanConsume() && _consumer.Peek().type switch
+        {
+            TokenType.Delete or TokenType.Void or TokenType.TypeOf or TokenType.Plus
+            or TokenType.Minus or TokenType.BitwiseNot or TokenType.Not => true,
+            _ => false
+        };
+    }
+
+    private IExpression CreateUnaryExpression(IExpression innerExpression, Token unaryToken)
+    {
+        return unaryToken.type switch
+        {
+            TokenType.Delete => new DeleteExpression(innerExpression),
+            TokenType.Void => new VoidExpression(innerExpression),
+            TokenType.TypeOf => new TypeOfExpression(innerExpression),
+            TokenType.Plus => new UnaryPlusExpression(innerExpression),
+            TokenType.Minus => new UnaryMinusExpression(innerExpression),
+            TokenType.BitwiseNot => new BitwiseNotExpression(innerExpression),
+            TokenType.Not => new LogicalNotExpression(innerExpression),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an unary expression with a token of type {unaryToken.type}"),
+        };
     }
 
     // 13.2 Primary Expression, https://tc39.es/ecma262/#sec-primary-expression
