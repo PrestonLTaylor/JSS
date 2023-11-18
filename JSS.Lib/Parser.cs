@@ -1,5 +1,6 @@
 ﻿using JSS.Lib.AST;
 using JSS.Lib.AST.Literal;
+using System.Reflection.Metadata.Ecma335;
 
 namespace JSS.Lib;
 
@@ -670,7 +671,7 @@ internal sealed class Parser
         {
             return true;
         }
-        if (!TryParsePrimaryExpression(out IExpression? innerExpression))
+        if (!TryParseLeftHandSideExpression(out IExpression? innerExpression))
         {
             return false;
         }
@@ -733,6 +734,118 @@ internal sealed class Parser
             TokenType.Decrement => new PostfixDecrementExpression(innerExpression),
             _ => throw new InvalidOperationException($"Parser Bug: Tried to create a prefix update expression with a token of type {prefixUpdateToken.type}"),
         };
+    }
+
+    // 13.3 Left-Hand-Side Expressions, https://tc39.es/ecma262/#sec-left-hand-side-expressions
+    private bool TryParseLeftHandSideExpression(out IExpression? parsedExpression)
+    {
+        // FIXME: Implement parsing of CallExpressions
+        // FIXME: Implement parsing of OptionalExpressions
+        // FIXME: Early Errors for parsing according to the spec
+        if (TryParseNewExpression(out parsedExpression))
+        {
+            return true;
+        }
+        // NOTE: Technically this rule is inside new expression, but for simplicity we parse it seperately here
+        if (TryParseMemberExpression(out parsedExpression))
+        {
+            return true;
+        }
+
+        parsedExpression = null;
+        return false;
+    }
+
+    // NewExpression, https://tc39.es/ecma262/#prod-NewExpression
+    private bool TryParseNewExpression(out IExpression? parsedExpression)
+    {
+        if (!IsNewExpression())
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.New);
+
+        if (!TryParseInnerNewExpression(out IExpression? innerNewExpression))
+        {
+            // FIXME: Throw a SyntaxError
+            // NOTE: This happens when there is a new without a member expression at the end of the new chain
+            throw new InvalidOperationException();
+        }
+
+        // FIXME/NOTE: This rule is technically in MemberExpression, however it is simpilier to have it here
+        TryParseArguments(out List<IExpression> newArguments);
+
+        parsedExpression = new NewExpression(innerNewExpression!, newArguments);
+        return true;
+    }
+
+    private bool IsNewExpression()
+    {
+        return _consumer.IsTokenOfType(TokenType.New);
+    }
+
+    private bool TryParseInnerNewExpression(out IExpression? parsedExpression)
+    {
+        if (TryParseNewExpression(out parsedExpression))
+        {
+            return true;
+        }
+        if (TryParseMemberExpression(out parsedExpression))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    // Arguments, https://tc39.es/ecma262/#prod-Arguments
+    private bool TryParseArguments(out List<IExpression> arguments)
+    {
+        arguments = new List<IExpression>();
+        if (!IsArguments())
+        {
+            return false;
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.OpenParen);
+
+        // FIXME: Implement parsing of the spread (...) operator
+        while (TryParseAssignmentExpression(out IExpression? argument))
+        {
+            arguments.Add(argument!);
+
+            if (!_consumer.IsTokenOfType(TokenType.Comma))
+            {
+                break;
+            }
+
+            // NOTE: Trailing commas are allowed in formal parameters
+            _consumer.ConsumeTokenOfType(TokenType.Comma);
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
+
+        return true;
+    }
+
+    private bool IsArguments()
+    {
+        return _consumer.IsTokenOfType(TokenType.OpenParen);
+    }
+
+    // MemberExpression, https://tc39.es/ecma262/#prod-MemberExpression
+    private bool TryParseMemberExpression(out IExpression? parsedExpression)
+    {
+        // FIXME: Parse the rest of rules for MemberExpressions
+        if (TryParsePrimaryExpression(out parsedExpression))
+        {
+            return true;
+        }
+
+        parsedExpression = null;
+        return false;
     }
 
     // 13.2 Primary Expression, https://tc39.es/ecma262/#sec-primary-expression

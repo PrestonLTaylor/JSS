@@ -42,6 +42,8 @@ internal sealed class ParserTests
         { "1--", typeof(PostfixDecrementExpression) },
         { "++1", typeof(PrefixIncrementExpression) },
         { "--1", typeof(PrefixDecrementExpression) },
+        { "new 1", typeof(NewExpression) },
+        { "new 1(1)", typeof(NewExpression) },
         { "this", typeof(ThisExpression) },
         { "null", typeof(NullLiteral) },
     };
@@ -98,6 +100,7 @@ internal sealed class ParserTests
         { "typeof typeof 1", typeof(TypeOfExpression) },
         { "~~1", typeof(BitwiseNotExpression) },
         { "!!1", typeof(LogicalNotExpression) },
+        { "new new 1(1)", typeof(NewExpression) },
     };
 
     [TestCaseSource(nameof(nestedExpressionStatementToTypeTestCases))]
