@@ -120,6 +120,11 @@ internal sealed class Parser
             statement = ParseReturnStatement();
             return true;
         }
+        if (IsSwitchStatement())
+        {
+            statement = ParseSwitchStatement();
+            return true;
+        }
         if (IsThrowStatement())
         {
             statement = ParseThrowStatement();
@@ -179,6 +184,17 @@ internal sealed class Parser
 
         parsedExpression = null;
         return false;
+    }
+
+    private IExpression ParseExpression()
+    {
+        if (!TryParseExpression(out IExpression? expression))
+        {
+            // FIXME: Throw a SyntaxError
+            throw new InvalidOperationException();
+        }
+
+        return expression!;
     }
 
     // AssignmentExpression, https://tc39.es/ecma262/#prod-AssignmentExpression
@@ -1335,6 +1351,89 @@ internal sealed class Parser
         // Don't parse an expression if there is a line terminator after the return
         TryParseExpression(out IExpression? returnExpression);
         return new ReturnStatement(returnExpression);
+    }
+
+    // 14.12 The switch Statement, https://tc39.es/ecma262/#sec-switch-statement
+    public bool IsSwitchStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.Switch);
+    }
+
+    private SwitchStatement ParseSwitchStatement()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Switch); 
+        _consumer.ConsumeTokenOfType(TokenType.OpenParen);
+
+        var switchExpression = ParseExpression();
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
+        _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
+
+        List<CaseBlock> caseBlocks = new();
+        ParseCaseBlocks(caseBlocks);
+
+        var defaultBlock = ParseDefaultCase();
+
+        ParseCaseBlocks(caseBlocks);
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
+
+        return new SwitchStatement(switchExpression, caseBlocks, defaultBlock);
+    }
+
+    private void ParseCaseBlocks(List<CaseBlock> caseBlocks)
+    {
+        while (IsCaseBlock())
+        {
+            caseBlocks.Add(ParseCaseBlock());
+        }
+    }
+
+    private bool IsCaseBlock()
+    {
+        return _consumer.IsTokenOfType(TokenType.Case);
+    }
+
+    private CaseBlock ParseCaseBlock()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Case);
+
+        var caseExpression = ParseExpression();
+
+        _consumer.ConsumeTokenOfType(TokenType.Colon);
+
+        var caseStatements = ParseSwitchCaseStatementList();
+
+        return new CaseBlock(caseExpression, caseStatements);
+    }
+
+    private DefaultBlock? ParseDefaultCase()
+    {
+        if (!IsDefaultCase()) return null;
+
+        _consumer.ConsumeTokenOfType(TokenType.Default);
+        _consumer.ConsumeTokenOfType(TokenType.Colon);
+
+        var caseStatements = ParseSwitchCaseStatementList();
+
+        return new DefaultBlock(caseStatements);
+    }
+    
+    private bool IsDefaultCase()
+    {
+        return _consumer.IsTokenOfType(TokenType.Default);
+    }
+
+    private List<INode> ParseSwitchCaseStatementList()
+    {
+        return ParseStatementListWhile(() =>
+        {
+            return _consumer.Peek().type switch
+            {
+                TokenType.Case or TokenType.Default or TokenType.ClosedBrace => false,
+                _ => true,
+            };
+        });
     }
 
     // 14.14 The throw Statement, https://tc39.es/ecma262/#sec-throw-statement

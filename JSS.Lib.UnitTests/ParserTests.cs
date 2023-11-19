@@ -833,6 +833,107 @@ internal sealed class ParserTests
         Assert.That(returnStatement.ReturnExpression, Is.InstanceOf(expectedExpressionType));
     }
 
+    // Tests for 14.12 The switch Statement, https://tc39.es/ecma262/#sec-switch-statement
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsSwitchStatement_WithEmptyCaseBlock_WhenProvidingSwitch_WithEmptyCaseBlock(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"switch ({expression}) {{ }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var switchStatement = rootNodes[0] as SwitchStatement;
+        Assert.That(switchStatement, Is.Not.Null);
+        Assert.That(switchStatement.SwitchExpression, Is.InstanceOf(expectedExpressionType));
+        Assert.That(switchStatement.CaseBlocks, Is.Empty);
+        Assert.That(switchStatement.DefaultCase, Is.Null);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsSwitchStatement_WithADefaultCase_WhenProvidingSwitch_WithADefaultCase(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"switch ({expression}) {{ default: {expression} }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var switchStatement = rootNodes[0] as SwitchStatement;
+        Assert.That(switchStatement, Is.Not.Null);
+        Assert.That(switchStatement.SwitchExpression, Is.InstanceOf(expectedExpressionType));
+        Assert.That(switchStatement.CaseBlocks, Is.Empty);
+        Assert.That(switchStatement.DefaultCase, Is.Not.Null);
+
+        var defaultCase = switchStatement.DefaultCase!.Value;
+        Assert.That(defaultCase.StatementList, Has.Count.EqualTo(1));
+
+        var defaultCaseStatement = defaultCase.StatementList[0] as ExpressionStatement;
+        Assert.That(defaultCaseStatement, Is.Not.Null);
+        Assert.That(defaultCaseStatement.Expression, Is.InstanceOf(expectedExpressionType));
+    }
+
+    [TestCaseSource(nameof(expressionStatementToTypeTestCases))]
+    public void Parse_ReturnsSwitchStatement_WithACaseBlock_WhenProvidingSwitch_WithACaseBlock(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"switch ({expression}) {{ case {expression}: {expression} }}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var switchStatement = rootNodes[0] as SwitchStatement;
+        Assert.That(switchStatement, Is.Not.Null);
+        Assert.That(switchStatement.SwitchExpression, Is.InstanceOf(expectedExpressionType));
+        Assert.That(switchStatement.DefaultCase, Is.Null);
+        Assert.That(switchStatement.CaseBlocks, Has.Count.EqualTo(1));
+
+        var caseBlock = switchStatement.CaseBlocks[0];
+        Assert.That(caseBlock.CaseExpression, Is.InstanceOf(expectedExpressionType));
+        Assert.That(caseBlock.StatementList, Has.Count.EqualTo(1));
+
+        var caseStatement = caseBlock.StatementList[0] as ExpressionStatement;
+        Assert.That(caseStatement, Is.Not.Null);
+        Assert.That(caseStatement.Expression, Is.InstanceOf(expectedExpressionType));
+    }
+
+    public void Parse_ReturnsSwitchStatement_WithADefaultAndCaseBlocks_WhenProvidingSwitch_WithADefaultAndCaseBlocks()
+    {
+        // Arrange
+        var parser = new Parser("switch (1) { case 2: 3 default: 4 case 5: 6");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.RootNodes;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var switchStatement = rootNodes[0] as SwitchStatement;
+        Assert.That(switchStatement, Is.Not.Null);
+        Assert.That(switchStatement.SwitchExpression, Is.Not.Null);
+        Assert.That(switchStatement.DefaultCase, Is.Not.Null);
+        Assert.That(switchStatement.CaseBlocks, Has.Count.EqualTo(2));
+    }
+    
     // Tests for 14.14 The throw Statement, https://tc39.es/ecma262/#sec-throw-statement
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
     public void Parse_ReturnsThrowStatement_WhenProvidingThrow(KeyValuePair<string, Type> expressionToExpectedType)
