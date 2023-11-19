@@ -224,14 +224,13 @@ internal sealed class Parser
     // LogicalORExpression, https://tc39.es/ecma262/#prod-LogicalORExpression
     private bool TryParseLogicalOrExpression(out IExpression? parsedExpression)
     {
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         if (!TryParseLogicalAndExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
         }
 
-        // If we don't have an ||, that means we've reached the end of the expression and lhs is the fully parsed expression
+        // NOTE: If we don't have an ||, that means we've reached the end of the expression and lhs is the fully parsed expression
         if (!_consumer.IsTokenOfType(TokenType.Or))
         {
             parsedExpression = lhs;
@@ -241,7 +240,7 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.Or);
 
         // FIXME: Throw a SyntaxError instead
-        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseLogicalOrExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = new LogicalOrExpression(lhs!, rhs!);
         return true;
@@ -250,14 +249,13 @@ internal sealed class Parser
     // LogicalANDExpression, https://tc39.es/ecma262/#prod-LogicalANDExpression
     private bool TryParseLogicalAndExpression(out IExpression? parsedExpression)
     {
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         if (!TryParseBitwiseORExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
         }
 
-        // If we don't have an &&, that means we've reached the end of the expression and lhs is the fully parsed expression
+        // NOTE: If we don't have an &&, that means we've reached the end of the expression and lhs is the fully parsed expression
         if (!_consumer.IsTokenOfType(TokenType.And))
         {
             parsedExpression = lhs;
@@ -267,7 +265,7 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.And);
 
         // FIXME: Throw a SyntaxError instead
-        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseLogicalAndExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = new LogicalAndExpression(lhs!, rhs!);
         return true;
@@ -276,14 +274,13 @@ internal sealed class Parser
     // BitwiseORExpression, https://tc39.es/ecma262/#prod-BitwiseORExpression
     private bool TryParseBitwiseORExpression(out IExpression? parsedExpression)
     {
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         if (!TryParseBitwiseXORExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
         }
 
-        // If we don't have an |, that means we've reached the end of the expression and lhs is the fully parsed expression
+        // NOTE: If we don't have an |, that means we've reached the end of the expression and lhs is the fully parsed expression
         if (!_consumer.IsTokenOfType(TokenType.BitwiseOr))
         {
             parsedExpression = lhs;
@@ -293,7 +290,7 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.BitwiseOr);
 
         // FIXME: Throw a SyntaxError instead
-        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseBitwiseORExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = new BitwiseOrExpression(lhs!, rhs!);
         return true;
@@ -302,14 +299,13 @@ internal sealed class Parser
     // BitwiseXORExpression, https://tc39.es/ecma262/#prod-BitwiseXORExpression
     private bool TryParseBitwiseXORExpression(out IExpression? parsedExpression)
     {
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         if (!TryParseBitwiseAndExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
         }
 
-        // If we don't have an |, that means we've reached the end of the expression and lhs is the fully parsed expression
+        // NOTE: If we don't have an ^, that means we've reached the end of the expression and lhs is the fully parsed expression
         if (!_consumer.IsTokenOfType(TokenType.BitwiseXor))
         {
             parsedExpression = lhs;
@@ -319,7 +315,7 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.BitwiseXor);
 
         // FIXME: Throw a SyntaxError instead
-        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseBitwiseXORExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = new BitwiseXorExpression(lhs!, rhs!);
         return true;
@@ -328,14 +324,13 @@ internal sealed class Parser
     // BitwiseANDExpression, https://tc39.es/ecma262/#prod-BitwiseANDExpression
     private bool TryParseBitwiseAndExpression(out IExpression? parsedExpression)
     {
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         if (!TryParseEqualityExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
         }
 
-        // If we don't have an |, that means we've reached the end of the expression and lhs is the fully parsed expression
+        // NOTE: If we don't have an &, that means we've reached the end of the expression and lhs is the fully parsed expression
         if (!_consumer.IsTokenOfType(TokenType.BitwiseAnd))
         {
             parsedExpression = lhs;
@@ -345,7 +340,7 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.BitwiseAnd);
 
         // FIXME: Throw a SyntaxError instead
-        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseBitwiseAndExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = new BitwiseAndExpression(lhs!, rhs!);
         return true;
@@ -361,7 +356,7 @@ internal sealed class Parser
             return false;
         }
 
-        // If we don't have an equality operator, that means we've reached the end of the expression and lhs is the fully parsed expression
+        // NOTE: If we don't have an equality operator, that means we've reached the end of the expression and lhs is the fully parsed expression
         if (!IsEqualityOperator())
         {
             parsedExpression = lhs;
@@ -371,7 +366,7 @@ internal sealed class Parser
         var equalityToken = _consumer.Consume();
 
         // FIXME: Throw a SyntaxError instead
-        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseEqualityExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = CreateEqualityExpression(lhs!, rhs!, equalityToken);
         return true;
@@ -403,14 +398,13 @@ internal sealed class Parser
     {
         // FIXME: The RelationalOperator in has special logic for parsing in Note 2, handle this rule
         // FIXME: PrivateIdentifiers are parsed here using the in keyword, have a case to handle this rule
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         if (!TryParseBitwiseShiftExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
         }
 
-        // If we don't have a relational operator, that means we've reached the end of the expression and lhs is the fully parsed expression
+        // NOTE: If we don't have a relational operator, that means we've reached the end of the expression and lhs is the fully parsed expression
         if (!IsRelationalOperator())
         {
             parsedExpression = lhs;
@@ -420,7 +414,7 @@ internal sealed class Parser
         var relationalToken = _consumer.Consume();
 
         // FIXME: Throw a SyntaxError instead
-        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseRelationalExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = CreateRelationalOperator(lhs!, rhs!, relationalToken);
         return true;
@@ -453,14 +447,13 @@ internal sealed class Parser
     // 13.9 Bitwise Shift Operators, https://tc39.es/ecma262/#sec-bitwise-shift-operators 
     private bool TryParseBitwiseShiftExpression(out IExpression? parsedExpression)
     {
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         if (!TryParseAdditiveExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
         }
 
-        // If we don't have a bitwise shift operator, that means we've reached the end of the expression and lhs is the fully parsed expression
+        // NOTE: If we don't have a bitwise shift operator, that means we've reached the end of the expression and lhs is the fully parsed expression
         if (!IsBitwiseShiftOperator())
         {
             parsedExpression = lhs;
@@ -470,7 +463,7 @@ internal sealed class Parser
         var shiftToken = _consumer.Consume();
 
         // FIXME: Throw a SyntaxError instead
-        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseBitwiseShiftExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = CreateBitwiseShiftOperator(lhs!, rhs!, shiftToken);
         return true;
@@ -499,14 +492,13 @@ internal sealed class Parser
     // 13.8 Additive Operators, https://tc39.es/ecma262/#sec-additive-operators 
     private bool TryParseAdditiveExpression(out IExpression? parsedExpression)
     {
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         if (!TryParseMultiplicativeExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
         }
 
-        // If we don't have a additive operator, that means we've reached the end of the expression and lhs is the fully parsed expression
+        // NOTE: If we don't have a additive operator, that means we've reached the end of the expression and lhs is the fully parsed expression
         if (!IsAdditiveOperator())
         {
             parsedExpression = lhs;
@@ -516,7 +508,7 @@ internal sealed class Parser
         var additiveToken = _consumer.Consume();
 
         // FIXME: Throw a SyntaxError instead
-        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseAdditiveExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = CreateAdditiveOperator(lhs!, rhs!, additiveToken);
         return true;
@@ -544,14 +536,13 @@ internal sealed class Parser
     // 13.7 Multiplicative Operators, https://tc39.es/ecma262/#sec-multiplicative-operators 
     private bool TryParseMultiplicativeExpression(out IExpression? parsedExpression)
     {
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
         if (!TryParseExponentiationExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
         }
 
-        // If we don't have a multiplicative operator, that means we've reached the end of the expression and lhs is the fully parsed expression
+        // NOTE: If we don't have a multiplicative operator, that means we've reached the end of the expression and lhs is the fully parsed expression
         if (!IsMultiplicativeOperator())
         {
             parsedExpression = lhs;
@@ -561,7 +552,7 @@ internal sealed class Parser
         var multiplicativeToken = _consumer.Consume();
 
         // FIXME: Throw a SyntaxError instead
-        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseMultiplicativeExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = CreateMultiplicativeOperator(lhs!, rhs!, multiplicativeToken);
         return true;
@@ -590,13 +581,14 @@ internal sealed class Parser
     // 13.6 Exponentiation Operator, https://tc39.es/ecma262/#sec-exp-operator
     private bool TryParseExponentiationExpression(out IExpression? parsedExpression)
     {
+        // FIXME: Unary expressions are the same precedence as exponentiation, parse according to the spec
         if (!TryParseUnaryExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
         }
 
-        // If we don't have a multiplicative operator, that means we've reached the end of the expression and lhs is the fully parsed expression
+        // NOTE: If we don't have a **, that means we've reached the end of the expression and lhs is the fully parsed expression
         if (!IsExponentiationOperator())
         {
             parsedExpression = lhs;
@@ -606,8 +598,7 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.Exponentiation);
 
         // FIXME: Throw a SyntaxError instead
-        // FIXME: This doesn't recursively decend and parse "nested" logical expressions correctly
-        if (!TryParseExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseExponentiationExpression(out IExpression? rhs)) throw new InvalidOperationException();
 
         parsedExpression = new ExponentiationExpression(lhs!, rhs!);
         return true;
