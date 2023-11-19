@@ -785,8 +785,9 @@ internal sealed class Parser
             throw new InvalidOperationException();
         }
 
-        // NOTE: This rule is technically in MemberExpression, however it is simpilier to have it here
-        TryParseArguments(out List<IExpression> newArguments);
+        // NOTE: This rule is duplicated in MemberExpression, however it is simpilier to have it
+        List<IExpression> newArguments = new();
+        TryParseArguments(newArguments);
 
         parsedExpression = new NewExpression(innerNewExpression!, newArguments);
         return true;
@@ -812,9 +813,8 @@ internal sealed class Parser
     }
 
     // Arguments, https://tc39.es/ecma262/#prod-Arguments
-    private bool TryParseArguments(out List<IExpression> arguments)
+    private bool TryParseArguments(List<IExpression> arguments)
     {
-        arguments = new List<IExpression>();
         if (!IsArguments())
         {
             return false;
@@ -858,9 +858,42 @@ internal sealed class Parser
         {
             return true;
         }
+        // NOTE: This is repeated in NewExpression, however this makes parsing simplier to do
+        if (TryParseNewWithArgumentsExpression(out parsedExpression))
+        {
+            return true;
+        }
 
         parsedExpression = null;
         return false;
+    }
+
+    private bool TryParseNewWithArgumentsExpression(out IExpression? parsedExpression)
+    {
+        if (!IsNewExpression())
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.New);
+
+        // FIXME: Replace TryParses when required with a normal Parse function across the parser
+        if(!TryParseMemberExpression(out IExpression? innerExpression))
+        {
+            // TODO: Throw a SyntaxError
+            throw new InvalidOperationException();
+        }
+
+        List<IExpression> newArguments = new();
+        if (!TryParseArguments(newArguments))
+        {
+            // TODO: Throw a SyntaxError
+            throw new InvalidOperationException();
+        }
+
+        parsedExpression = new NewExpression(innerExpression!, newArguments);
+        return true;
     }
 
     private bool IsComputedProperty()
