@@ -187,6 +187,18 @@ internal sealed class ParserTests
         Assert.That(booleanLiteral.Value, Is.EqualTo(true));
     }
 
+    [Test]
+    public void Parse_ThrowsInvalidOperationException_WhenProvidingExponentiationExpression_WithUnaryExpressionAsLhs()
+    {
+        // Arrange
+        var parser = new Parser("!1 ** 2");
+
+        // Act
+
+        // Assert
+        Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
+    }
+
     static private readonly Dictionary<string, double> numericLiteralToValueTestCases = new()
     {
         { "0", 0.0 }, { "1", 1.0 }, { "123", 123.0 }, { "1234567890", 1234567890.0 }

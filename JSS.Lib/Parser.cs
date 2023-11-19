@@ -1,6 +1,5 @@
 ﻿using JSS.Lib.AST;
 using JSS.Lib.AST.Literal;
-using System.Reflection.Metadata.Ecma335;
 
 namespace JSS.Lib;
 
@@ -581,8 +580,14 @@ internal sealed class Parser
     // 13.6 Exponentiation Operator, https://tc39.es/ecma262/#sec-exp-operator
     private bool TryParseExponentiationExpression(out IExpression? parsedExpression)
     {
-        // FIXME: Unary expressions are the same precedence as exponentiation, parse according to the spec
-        if (!TryParseUnaryExpression(out IExpression? lhs))
+        // FIXME: This is a bit janky
+        if (IsUnaryOperator() && TryParseUnaryExpression(out parsedExpression))
+        {
+            // FIXME: Throw a specific SyntaxError for a unary expression as the lhs of an exponentiation expression
+            if (IsExponentiationOperator()) throw new InvalidOperationException();
+            return true;
+        }
+        if (!TryParseUpdateExpression(out IExpression? lhs))
         {
             parsedExpression = null;
             return false;
