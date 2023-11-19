@@ -45,6 +45,7 @@ internal sealed class ParserTests
         { "new 1", typeof(NewExpression) },
         { "new 1(1)", typeof(NewExpression) },
         { "this", typeof(ThisExpression) },
+        { "(this)", typeof(ThisExpression) },
         { "null", typeof(NullLiteral) },
     };
 
@@ -101,6 +102,7 @@ internal sealed class ParserTests
         { "~~1", typeof(BitwiseNotExpression) },
         { "!!1", typeof(LogicalNotExpression) },
         { "new new 1(1)", typeof(NewExpression) },
+        { "((this))", typeof(ThisExpression) },
     };
 
     [TestCaseSource(nameof(nestedExpressionStatementToTypeTestCases))]

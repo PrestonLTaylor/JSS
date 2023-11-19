@@ -877,9 +877,36 @@ internal sealed class Parser
             parsedExpression = ParseStringLiteral();
             return true;
         }
+        if (IsParenthesizedExpression())
+        {
+            parsedExpression = ParseParenthesizedExpression();
+            return true;
+        }
 
         parsedExpression = null;
         return false;
+    }
+
+    // ParenthesizedExpression, https://tc39.es/ecma262/#prod-ParenthesizedExpression
+    private bool IsParenthesizedExpression()
+    {
+        return _consumer.IsTokenOfType(TokenType.OpenParen);
+    }
+
+    private IExpression ParseParenthesizedExpression()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.OpenParen);
+
+        if (!TryParseExpression(out IExpression? parsedExpression))
+        {
+            // FIXME: Throw a SyntaxError
+            throw new InvalidOperationException();
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
+
+        // FIXME: This expression might have to be wrapped if needed in the AST according to the spec
+        return parsedExpression!;
     }
 
     // 13.2.1 The this Keyword, https://tc39.es/ecma262/#sec-this-keyword
