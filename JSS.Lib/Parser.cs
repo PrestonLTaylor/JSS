@@ -81,9 +81,8 @@ internal sealed class Parser
             statement = ParseEmptyStatement();
             return true;
         }
-        if (TryParseExpression(out IExpression? parsedExpression))
+        if (TryParseExpressionStatement(out statement))
         {
-            statement = new ExpressionStatement(parsedExpression!);
             return true;
         }
         if (IsIfStatement())
@@ -1102,6 +1101,37 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.SemiColon);
         // FIXME: Have a "global" EmptyStatement, so we don't have multiple redunant empty statements
         return new EmptyStatement();
+    }
+
+    // 14.5 Expression Statement, https://tc39.es/ecma262/#prod-ExpressionStatement
+    private bool TryParseExpressionStatement(out INode? parsedExpressionStatement)
+    {
+        if (IsAmbigiousForExpressionStatement())
+        {
+            parsedExpressionStatement = null;
+            return false;
+        }
+
+        if (!TryParseExpression(out IExpression? expression))
+        {
+            parsedExpressionStatement = null;
+            return false;
+        }
+
+        parsedExpressionStatement = new ExpressionStatement(expression!);
+        return true;
+    }
+
+    private bool IsAmbigiousForExpressionStatement()
+    {
+        return _consumer.CanConsume() && _consumer.Peek().type switch
+        {
+            TokenType.OpenBrace or TokenType.Function or TokenType.Class => true,
+            // FIXME: Check for async function
+            // FIXME: This is a bit janky
+            TokenType.Let => _consumer.CanConsume(1) && _consumer.Peek(1).type == TokenType.OpenSquare,
+            _ => false,
+        };
     }
 
     // 14.6 The if Statement, https://tc39.es/ecma262/#sec-if-statement
