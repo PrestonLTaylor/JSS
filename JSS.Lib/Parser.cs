@@ -785,7 +785,7 @@ internal sealed class Parser
             throw new InvalidOperationException();
         }
 
-        // FIXME/NOTE: This rule is technically in MemberExpression, however it is simpilier to have it here
+        // NOTE: This rule is technically in MemberExpression, however it is simpilier to have it here
         TryParseArguments(out List<IExpression> newArguments);
 
         parsedExpression = new NewExpression(innerNewExpression!, newArguments);
@@ -854,9 +854,75 @@ internal sealed class Parser
         {
             return true;
         }
+        if (TryParseSuperExpression(out parsedExpression))
+        {
+            return true;
+        }
 
         parsedExpression = null;
         return false;
+    }
+
+    private bool IsComputedProperty()
+    {
+        return _consumer.IsTokenOfType(TokenType.OpenSquare);
+    }
+
+    private bool IsProperty()
+    {
+        return _consumer.IsTokenOfType(TokenType.Dot);
+    }
+
+    // SuperProperty, https://tc39.es/ecma262/#prod-SuperProperty
+    private bool TryParseSuperExpression(out IExpression? parsedExpression)
+    {
+        if (!IsSuperExpression())
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        _consumer.ConsumeTokenOfType(TokenType.Super);
+
+        if (IsComputedProperty())
+        {
+            parsedExpression = ParseSuperComputedPropertyExpression();
+            return true;
+        }
+        if (IsProperty())
+        {
+            parsedExpression = ParseSuperPropertyExpression();
+            return true;
+        }
+
+        parsedExpression = null;
+        return false;
+    }
+
+    private bool IsSuperExpression()
+    {
+        return _consumer.IsTokenOfType(TokenType.Super);
+    }
+
+    private SuperComputedPropertyExpression ParseSuperComputedPropertyExpression()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.OpenSquare);
+
+        var computedProperty = ParseExpression();
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedSquare);
+
+        return new SuperComputedPropertyExpression(computedProperty);
+    }
+
+    private SuperPropertyExpression ParseSuperPropertyExpression()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Dot);
+
+        // FIXME: This should be any valid identifier string including reserved words etc.
+        var identifier = ParseIdentifier();
+
+        return new SuperPropertyExpression(identifier.Name);
     }
 
     // 13.2 Primary Expression, https://tc39.es/ecma262/#sec-primary-expression

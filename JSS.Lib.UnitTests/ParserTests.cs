@@ -44,6 +44,8 @@ internal sealed class ParserTests
         { "--1", typeof(PrefixDecrementExpression) },
         { "new 1", typeof(NewExpression) },
         { "new 1(1)", typeof(NewExpression) },
+        { "super.a", typeof(SuperPropertyExpression) },
+        { "super[1]", typeof(SuperComputedPropertyExpression) },
         { "this", typeof(ThisExpression) },
         { "(this)", typeof(ThisExpression) },
         { "null", typeof(NullLiteral) },
