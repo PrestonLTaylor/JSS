@@ -813,6 +813,11 @@ internal sealed class Parser
     }
 
     // Arguments, https://tc39.es/ecma262/#prod-Arguments
+    private bool IsArguments()
+    {
+        return _consumer.IsTokenOfType(TokenType.OpenParen);
+    }
+
     private bool TryParseArguments(List<IExpression> arguments)
     {
         if (!IsArguments())
@@ -841,9 +846,16 @@ internal sealed class Parser
         return true;
     }
 
-    private bool IsArguments()
+    private List<IExpression> ParseArguments()
     {
-        return _consumer.IsTokenOfType(TokenType.OpenParen);
+        List<IExpression> arguments = new();
+        if (TryParseArguments(arguments))
+        {
+            return arguments;
+        }
+
+        // FIXME: Throw a SyntaxError
+        throw new InvalidOperationException();
     }
 
     // MemberExpression, https://tc39.es/ecma262/#prod-MemberExpression
@@ -921,6 +933,11 @@ internal sealed class Parser
         {
             return ParsePropertyExpression(lhs);
         }
+        // FIXME: Parse SuperCalls and ImportCalls
+        if (IsCall())
+        {
+            return ParseCallExpression(lhs);
+        }
 
         return lhs;
     }
@@ -958,6 +975,18 @@ internal sealed class Parser
 
         var newLhs = new PropertyExpression(lhs, rhs.Name);
 
+        return ParseOuterMemberExpression(newLhs);
+    }
+
+    private bool IsCall()
+    {
+        return IsArguments();
+    }
+
+    private IExpression ParseCallExpression(IExpression lhs)
+    {
+        var arguments = ParseArguments();
+        var newLhs = new CallExpression(lhs, arguments);
         return ParseOuterMemberExpression(newLhs);
     }
 
