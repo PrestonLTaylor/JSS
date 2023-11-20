@@ -5,7 +5,7 @@ namespace JSS.Lib.UnitTests;
 
 internal sealed class ParserTests
 {
-    static private readonly Dictionary<string, Type> expressionStatementToTypeTestCases = new()
+    static private readonly Dictionary<string, Type> expressionToExpectedTypeTestCases = new()
     {
         { "1 || 2", typeof(LogicalOrExpression) },
         { "1 && 2", typeof(LogicalAndExpression) },
@@ -55,7 +55,7 @@ internal sealed class ParserTests
     };
 
     // Tests for Expression, https://tc39.es/ecma262/#prod-Expression
-    [TestCaseSource(nameof(expressionStatementToTypeTestCases))]
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
     public void Parse_ReturnsExpressionStatement_WithExpectedType_WhenProvidedExpessionStatement(KeyValuePair<string, Type> expressionStatementToType)
     {
         // Arrange
@@ -323,16 +323,6 @@ internal sealed class ParserTests
         Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
     }
 
-    static private readonly Dictionary<string, Type> initializerToExpectedTypeTestCases = new()
-    {
-        { "''", typeof(StringLiteral) },
-        { "1", typeof(NumericLiteral) },
-        { "false", typeof(BooleanLiteral) },
-        { "null", typeof(NullLiteral) },
-        { "otherIdentifier", typeof(Identifier) },
-        { "this", typeof(ThisExpression) },
-    };
-
     // Tests for 14.3.1 Let and Const Declarations, https://tc39.es/ecma262/#sec-let-and-const-declarations
     [Test]
     public void Parse_ReturnsLetDeclaration_WithNoInitializer_WhenProvidingLetDeclaration_WithNoInitializer()
@@ -354,7 +344,7 @@ internal sealed class ParserTests
         Assert.That(letDeclaration.Initializer, Is.Null);
     }
 
-    [TestCaseSource(nameof(initializerToExpectedTypeTestCases))]
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
     public void Parse_ReturnsLetDeclaration_WhenProvidingLetDeclaration(KeyValuePair<string, Type> initializerToExpectedType)
     {
         // Arrange
@@ -376,7 +366,7 @@ internal sealed class ParserTests
         Assert.That(letDeclaration.Initializer, Is.InstanceOf(expectedInitializerType));
     }
 
-    [TestCaseSource(nameof(initializerToExpectedTypeTestCases))]
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
     public void Parse_ReturnsConstDeclaration_WhenProvidingConstDeclaration(KeyValuePair<string, Type> initializerToExpectedType)
     {
         // Arrange
@@ -431,7 +421,7 @@ internal sealed class ParserTests
         Assert.That(varStatement.Initializer, Is.Null);
     }
 
-    [TestCaseSource(nameof(initializerToExpectedTypeTestCases))]
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
     public void Parse_ReturnsVarStatement_WhenProvidingVarStatement(KeyValuePair<string, Type> initializerToExpectedType)
     {
         // Arrange
@@ -470,16 +460,6 @@ internal sealed class ParserTests
         var emptyStatement = rootNodes[0] as EmptyStatement;
         Assert.That(emptyStatement, Is.Not.Null);
     }
-
-    static private readonly Dictionary<string, Type> expressionToExpectedTypeTestCases = new()
-    {
-        { "''", typeof(StringLiteral) },
-        { "1", typeof(NumericLiteral) },
-        { "false", typeof(BooleanLiteral) },
-        { "null", typeof(NullLiteral) },
-        { "otherIdentifier", typeof(Identifier) },
-        { "this", typeof(ThisExpression) },
-    };
 
     // Tests for 14.6 The if Statement, https://tc39.es/ecma262/#sec-if-statement
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -893,7 +873,7 @@ internal sealed class ParserTests
         Assert.That(defaultCaseStatement.Expression, Is.InstanceOf(expectedExpressionType));
     }
 
-    [TestCaseSource(nameof(expressionStatementToTypeTestCases))]
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
     public void Parse_ReturnsSwitchStatement_WithACaseBlock_WhenProvidingSwitch_WithACaseBlock(KeyValuePair<string, Type> expressionToExpectedType)
     {
         // Arrange
