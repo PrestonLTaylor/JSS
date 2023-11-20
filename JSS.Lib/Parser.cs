@@ -1279,8 +1279,7 @@ internal sealed class Parser
 
     private INode ParseInitializer()
     {
-        // FIXME: Parse according to the spec: https://tc39.es/ecma262/#prod-Initializer
-        if (TryParseExpression(out IExpression? parsedExpression))
+        if (TryParseAssignmentExpression(out IExpression? parsedExpression))
         {
             return parsedExpression!;
         }
