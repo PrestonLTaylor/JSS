@@ -46,6 +46,8 @@ internal sealed class ParserTests
         { "new 1(1)", typeof(NewExpression) },
         { "super.a", typeof(SuperPropertyExpression) },
         { "super[1]", typeof(SuperComputedPropertyExpression) },
+        { "a.b", typeof(PropertyExpression) },
+        { "a[1]", typeof(ComputedPropertyExpression) },
         { "this", typeof(ThisExpression) },
         { "(this)", typeof(ThisExpression) },
         { "null", typeof(NullLiteral) },
@@ -104,6 +106,8 @@ internal sealed class ParserTests
         { "~~1", typeof(BitwiseNotExpression) },
         { "!!1", typeof(LogicalNotExpression) },
         { "new new 1(1)", typeof(NewExpression) },
+        { "a.b.c", typeof(PropertyExpression) },
+        { "a[1][2]", typeof(ComputedPropertyExpression) },
         { "((this))", typeof(ThisExpression) },
     };
 

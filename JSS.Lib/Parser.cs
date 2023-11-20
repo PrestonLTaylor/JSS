@@ -850,6 +850,20 @@ internal sealed class Parser
     private bool TryParseMemberExpression(out IExpression? parsedExpression)
     {
         // FIXME: Parse the rest of rules for MemberExpressions
+        if (!TryParseInnerMemberExpression(out IExpression? lhs))
+        {
+            parsedExpression = null;
+            return false;
+        }
+
+        parsedExpression = ParseOuterMemberExpression(lhs!);
+        return true;
+    }
+
+    private bool TryParseInnerMemberExpression(out IExpression? parsedExpression)
+    {
+        // NOTE: This is the base case for the recursive member expression definition
+        // FIXME: Parse the rest of the inner rules for MemberExpressions
         if (TryParsePrimaryExpression(out parsedExpression))
         {
             return true;
@@ -896,14 +910,55 @@ internal sealed class Parser
         return true;
     }
 
+    private IExpression ParseOuterMemberExpression(IExpression lhs)
+    {
+        // FIXME: Parse TemplateLiterals property expressions
+        if (IsComputedProperty())
+        {
+            return ParseComputedPropertyExpression(lhs);
+        }
+        if (IsProperty())
+        {
+            return ParsePropertyExpression(lhs);
+        }
+
+        return lhs;
+    }
+
     private bool IsComputedProperty()
     {
         return _consumer.IsTokenOfType(TokenType.OpenSquare);
     }
 
+    private IExpression ParseComputedPropertyExpression(IExpression lhs)
+    {
+        _consumer.ConsumeTokenOfType(TokenType.OpenSquare);
+
+        var rhs = ParseExpression();
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedSquare);
+
+        var newLhs = new ComputedPropertyExpression(lhs, rhs);
+
+        return ParseOuterMemberExpression(newLhs);
+    }
+
     private bool IsProperty()
     {
         return _consumer.IsTokenOfType(TokenType.Dot);
+    }
+
+    private IExpression ParsePropertyExpression(IExpression lhs)
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Dot);
+
+        // FIXME: Handle private identifiers
+        // FIXME: This should be any valid identifier string including reserved words etc.
+        var rhs = ParseIdentifier();
+
+        var newLhs = new PropertyExpression(lhs, rhs.Name);
+
+        return ParseOuterMemberExpression(newLhs);
     }
 
     // SuperProperty, https://tc39.es/ecma262/#prod-SuperProperty
