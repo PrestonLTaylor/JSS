@@ -30,9 +30,8 @@ internal sealed class TokenConsumer
 
     public Token ConsumeTokenOfType(TokenType type)
     {
-        // FIXME: Throw SyntaxErrors
-        if (!CanConsume()) throw new InvalidOperationException();
-        if (!IsTokenOfType(type)) throw new InvalidOperationException();
+        if (!CanConsume()) ErrorHelper.ThrowSyntaxError(ErrorType.UnexpectedEOF);
+        if (!IsTokenOfType(type)) ErrorHelper.ThrowSyntaxError(ErrorType.UnexpectedToken, Peek().data);
         return Consume();
     }
 }

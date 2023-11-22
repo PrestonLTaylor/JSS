@@ -49,7 +49,7 @@ internal sealed class Parser
             return declaration!;
         }
 
-        throw new NotImplementedException();
+        return ThrowUnexpectedTokenSyntaxError<INode>()!;
     }
 
     // Statement, https://tc39.es/ecma262/#prod-Statement
@@ -60,8 +60,7 @@ internal sealed class Parser
             return statement!;
         }
 
-        // FIXME: Change to SyntaxError when we have full statement parsing
-        throw new NotImplementedException();
+        return ThrowUnexpectedTokenSyntaxError<INode>()!;
     }
 
     private bool TryParseStatement(out INode? statement)
@@ -190,8 +189,7 @@ internal sealed class Parser
     {
         if (!TryParseExpression(out IExpression? expression))
         {
-            // FIXME: Throw a SyntaxError
-            throw new InvalidOperationException();
+            return ThrowUnexpectedTokenSyntaxError<IExpression>()!;
         }
 
         return expression!;
@@ -253,8 +251,7 @@ internal sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.Or);
 
-        // FIXME: Throw a SyntaxError instead
-        if (!TryParseLogicalOrExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseLogicalOrExpression(out IExpression? rhs)) ThrowUnexpectedTokenSyntaxError<bool>(); 
 
         parsedExpression = new LogicalOrExpression(lhs!, rhs!);
         return true;
@@ -278,8 +275,7 @@ internal sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.And);
 
-        // FIXME: Throw a SyntaxError instead
-        if (!TryParseLogicalAndExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseLogicalAndExpression(out IExpression? rhs)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         parsedExpression = new LogicalAndExpression(lhs!, rhs!);
         return true;
@@ -303,8 +299,7 @@ internal sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.BitwiseOr);
 
-        // FIXME: Throw a SyntaxError instead
-        if (!TryParseBitwiseORExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseBitwiseORExpression(out IExpression? rhs)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         parsedExpression = new BitwiseOrExpression(lhs!, rhs!);
         return true;
@@ -328,8 +323,7 @@ internal sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.BitwiseXor);
 
-        // FIXME: Throw a SyntaxError instead
-        if (!TryParseBitwiseXORExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseBitwiseXORExpression(out IExpression? rhs)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         parsedExpression = new BitwiseXorExpression(lhs!, rhs!);
         return true;
@@ -353,8 +347,7 @@ internal sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.BitwiseAnd);
 
-        // FIXME: Throw a SyntaxError instead
-        if (!TryParseBitwiseAndExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseBitwiseAndExpression(out IExpression? rhs)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         parsedExpression = new BitwiseAndExpression(lhs!, rhs!);
         return true;
@@ -379,8 +372,7 @@ internal sealed class Parser
 
         var equalityToken = _consumer.Consume();
 
-        // FIXME: Throw a SyntaxError instead
-        if (!TryParseEqualityExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseEqualityExpression(out IExpression? rhs)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         parsedExpression = CreateEqualityExpression(lhs!, rhs!, equalityToken);
         return true;
@@ -427,8 +419,7 @@ internal sealed class Parser
 
         var relationalToken = _consumer.Consume();
 
-        // FIXME: Throw a SyntaxError instead
-        if (!TryParseRelationalExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseRelationalExpression(out IExpression? rhs)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         parsedExpression = CreateRelationalOperator(lhs!, rhs!, relationalToken);
         return true;
@@ -476,8 +467,7 @@ internal sealed class Parser
 
         var shiftToken = _consumer.Consume();
 
-        // FIXME: Throw a SyntaxError instead
-        if (!TryParseBitwiseShiftExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseBitwiseShiftExpression(out IExpression? rhs)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         parsedExpression = CreateBitwiseShiftOperator(lhs!, rhs!, shiftToken);
         return true;
@@ -521,8 +511,7 @@ internal sealed class Parser
 
         var additiveToken = _consumer.Consume();
 
-        // FIXME: Throw a SyntaxError instead
-        if (!TryParseAdditiveExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseAdditiveExpression(out IExpression? rhs)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         parsedExpression = CreateAdditiveOperator(lhs!, rhs!, additiveToken);
         return true;
@@ -565,8 +554,7 @@ internal sealed class Parser
 
         var multiplicativeToken = _consumer.Consume();
 
-        // FIXME: Throw a SyntaxError instead
-        if (!TryParseMultiplicativeExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseMultiplicativeExpression(out IExpression? rhs)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         parsedExpression = CreateMultiplicativeOperator(lhs!, rhs!, multiplicativeToken);
         return true;
@@ -598,8 +586,7 @@ internal sealed class Parser
         // FIXME: This is a bit janky
         if (IsUnaryOperator() && TryParseUnaryExpression(out parsedExpression))
         {
-            // FIXME: Throw a specific SyntaxError for a unary expression as the lhs of an exponentiation expression
-            if (IsExponentiationOperator()) throw new InvalidOperationException();
+            if (IsExponentiationOperator()) ErrorHelper.ThrowSyntaxError(ErrorType.UnaryLHSOfExponentiation);
             return true;
         }
         if (!TryParseUpdateExpression(out IExpression? lhs))
@@ -617,8 +604,7 @@ internal sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.Exponentiation);
 
-        // FIXME: Throw a SyntaxError instead
-        if (!TryParseExponentiationExpression(out IExpression? rhs)) throw new InvalidOperationException();
+        if (!TryParseExponentiationExpression(out IExpression? rhs)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         parsedExpression = new ExponentiationExpression(lhs!, rhs!);
         return true;
@@ -639,11 +625,7 @@ internal sealed class Parser
         }
 
         var unaryToken = _consumer.Consume();
-        if (!TryParseUnaryExpression(out IExpression? innerExpression))
-        {
-            // FIXME: Throw a SyntaxError
-            throw new InvalidOperationException();
-        }
+        if (!TryParseUnaryExpression(out IExpression? innerExpression)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         parsedExpression = CreateUnaryExpression(innerExpression!, unaryToken);
         return true;
@@ -708,11 +690,7 @@ internal sealed class Parser
         }
 
         var prefixUpdateToken = _consumer.Consume();
-        if (!TryParseUnaryExpression(out IExpression? innerExpression))
-        {
-            // FIXME: Throw a SyntaxError
-            throw new InvalidOperationException();
-        }
+        if (!TryParseUnaryExpression(out IExpression? innerExpression)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         parsedExpression = CreatePrefixUpdateExpression(innerExpression!, prefixUpdateToken);
         return true;
@@ -778,12 +756,8 @@ internal sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.New);
 
-        if (!TryParseInnerNewExpression(out IExpression? innerNewExpression))
-        {
-            // FIXME: Throw a SyntaxError
-            // NOTE: This happens when there is a new without a member expression at the end of the new chain
-            throw new InvalidOperationException();
-        }
+        // NOTE: This happens when there is a new without a member expression at the end of the new chain
+        if (!TryParseInnerNewExpression(out IExpression? innerNewExpression)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         // NOTE: This rule is duplicated in MemberExpression, however it is simpilier to have it
         List<IExpression> newArguments = new();
@@ -854,8 +828,8 @@ internal sealed class Parser
             return arguments;
         }
 
-        // FIXME: Throw a SyntaxError
-        throw new InvalidOperationException();
+        // FIXME: Fixs this janky way of throwing errors
+        return ThrowUnexpectedTokenSyntaxError<List<IExpression>>()!;
     }
 
     // MemberExpression, https://tc39.es/ecma262/#prod-MemberExpression
@@ -905,18 +879,10 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.New);
 
         // FIXME: Replace TryParses when required with a normal Parse function across the parser
-        if(!TryParseMemberExpression(out IExpression? innerExpression))
-        {
-            // TODO: Throw a SyntaxError
-            throw new InvalidOperationException();
-        }
+        if (!TryParseMemberExpression(out IExpression? innerExpression)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         List<IExpression> newArguments = new();
-        if (!TryParseArguments(newArguments))
-        {
-            // TODO: Throw a SyntaxError
-            throw new InvalidOperationException();
-        }
+        if (!TryParseArguments(newArguments)) ThrowUnexpectedTokenSyntaxError<bool>();
 
         parsedExpression = new NewExpression(innerExpression!, newArguments);
         return true;
@@ -1095,11 +1061,7 @@ internal sealed class Parser
     {
         _consumer.ConsumeTokenOfType(TokenType.OpenParen);
 
-        if (!TryParseExpression(out IExpression? parsedExpression))
-        {
-            // FIXME: Throw a SyntaxError
-            throw new InvalidOperationException();
-        }
+        if (!TryParseExpression(out IExpression? parsedExpression)) ThrowUnexpectedTokenSyntaxError<IExpression>();
 
         _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
 
@@ -1194,7 +1156,6 @@ internal sealed class Parser
 
         var blockNodes = ParseStatementListWhile(() => _consumer.CanConsume() && !_consumer.IsTokenOfType(TokenType.ClosedBrace));
 
-        // FIXME: Throw a SyntaxError if we encounter a Block without a closed brace
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
         return new Block(blockNodes);
@@ -1212,7 +1173,6 @@ internal sealed class Parser
 
         // FIXME: If let is being used as an identifier or as a var declaration then we parse it as such instead of throwing
         // FIXME: Allow await/yield to be used as an indentifier when specified in the spec
-        // FIXME: Throw a SyntaxError instead of throwing (also have a specific error if the next token is let as specified in the spec)
         var identifierToken = _consumer.ConsumeTokenOfType(TokenType.Identifier);
 
         // FIXME: We should allow parsing multiple bindings in a single let declaration
@@ -1236,15 +1196,10 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.Const);
 
         // FIXME: Allow await/yield to be used as an indentifier when specified in the spec
-        // FIXME: Throw a SyntaxError instead of throwing (also have a specific error if the next token is let as specified in the spec)
         var identifierToken = _consumer.ConsumeTokenOfType(TokenType.Identifier);
 
         // FIXME: We should allow parsing multiple bindings in a single const declaration
-        if (!_consumer.IsTokenOfType(TokenType.Assignment))
-        {
-            // FIXME: Throw a SyntaxError
-            throw new InvalidOperationException();
-        }
+        if (!_consumer.IsTokenOfType(TokenType.Assignment)) ErrorHelper.ThrowSyntaxError(ErrorType.ConstWithoutInitializer);
 
         _consumer.ConsumeTokenOfType(TokenType.Assignment);
         var initializer = ParseInitializer();
@@ -1263,7 +1218,6 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.Var);
 
         // FIXME: Allow let/await/yield to be used as an indentifier when specified in the spec
-        // FIXME: Throw a SyntaxError instead of throwing
         var identifierToken = _consumer.ConsumeTokenOfType(TokenType.Identifier);
 
         // FIXME: We should allow parsing multiple bindings in a single var statement 
@@ -1284,8 +1238,7 @@ internal sealed class Parser
             return parsedExpression!;
         }
 
-        // FIXME: Throw a SyntaxError instead
-        throw new InvalidOperationException();
+        return ThrowUnexpectedTokenSyntaxError<INode>()!;
     }
 
     // 14.4 Empty Statement, https://tc39.es/ecma262/#sec-empty-statement
@@ -1345,11 +1298,7 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.OpenParen);
 
         IExpression? ifExpression;
-        if (!TryParseExpression(out ifExpression))
-        {
-            // FIXME: Throw a SyntaxError
-            throw new InvalidOperationException();
-        }
+        if (!TryParseExpression(out ifExpression)) ThrowUnexpectedTokenSyntaxError<IfStatement>();
 
         _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
 
@@ -1386,10 +1335,7 @@ internal sealed class Parser
         var iterationStatement = ParseStatement();
 
         IExpression? whileExpression;
-        if (!TryParseWhileExpression(out whileExpression))
-        {
-            throw new InvalidOperationException();
-        }
+        if (!TryParseWhileExpression(out whileExpression)) ThrowUnexpectedTokenSyntaxError<DoWhileStatement>();
 
         return new DoWhileStatement(whileExpression!, iterationStatement);
     }
@@ -1403,10 +1349,7 @@ internal sealed class Parser
     private WhileStatement ParseWhileStatement()
     {
         IExpression? whileExpression;
-        if (!TryParseWhileExpression(out whileExpression))
-        {
-            throw new InvalidOperationException();
-        }
+        if (!TryParseWhileExpression(out whileExpression)) ThrowUnexpectedTokenSyntaxError<WhileStatement>();
 
         var iterationStatement = ParseStatement();
 
@@ -1634,11 +1577,8 @@ internal sealed class Parser
         {
             return new ThrowStatement(throwExpression!);
         }
-        else
-        {
-            // FIXME: Throw a SyntaxError
-            throw new InvalidOperationException();
-        }
+
+        return ThrowUnexpectedTokenSyntaxError<ThrowStatement>()!;
     }
 
     // 14.15 The try Statement, https://tc39.es/ecma262/#sec-try-statement
@@ -1656,11 +1596,7 @@ internal sealed class Parser
         var didParseCatch = TryParseCatchBlock(out Block? catchBlock, out Identifier? catchParameter);
         var didParseFinally = TryParseFinallyBlock(out Block? finallyBlock);
 
-        if (!didParseCatch && !didParseFinally)
-        {
-            // FIXME: Throw SyntaxError
-            throw new InvalidOperationException();
-        }
+        if (!didParseCatch && !didParseFinally) ErrorHelper.ThrowSyntaxError(ErrorType.TryWithoutCatchOrFinally);
 
         return new TryStatement(tryBlock, catchBlock, catchParameter, finallyBlock);
     }
@@ -1774,7 +1710,6 @@ internal sealed class Parser
 
         var body = ParseFunctionBody();
 
-        // FIXME: Throw SyntaxError if no closed brace
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
         return new FunctionDeclaration(identifier.Name, parameters, body);
@@ -1872,8 +1807,7 @@ internal sealed class Parser
             return identifier.data[1..];
         }
 
-        // FIXME: Throw SyntaxError
-        throw new InvalidOperationException();
+        return ThrowUnexpectedTokenSyntaxError<string>()!;
     }
 
     private bool IsClassMethod()
@@ -1896,5 +1830,18 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
         return new MethodDeclaration(memberIdentifier, parameters, body, isPrivate);
+    }
+
+    // NOTE: We need to return a null for functions that return a value
+    public T? ThrowUnexpectedTokenSyntaxError<T>()
+    {
+        if (_consumer.CanConsume())
+        {
+            var unexpectedToken = _consumer.Peek();
+            ErrorHelper.ThrowSyntaxError(ErrorType.UnexpectedToken, unexpectedToken.data);
+        }
+
+        ErrorHelper.ThrowSyntaxError(ErrorType.UnexpectedEOF);
+        return default;
     }
 }

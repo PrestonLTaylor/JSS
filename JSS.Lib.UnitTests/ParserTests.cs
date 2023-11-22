@@ -197,18 +197,6 @@ internal sealed class ParserTests
         Assert.That(booleanLiteral.Value, Is.EqualTo(true));
     }
 
-    [Test]
-    public void Parse_ThrowsInvalidOperationException_WhenProvidingExponentiationExpression_WithUnaryExpressionAsLhs()
-    {
-        // Arrange
-        var parser = new Parser("!1 ** 2");
-
-        // Act
-
-        // Assert
-        Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
-    }
-
     static private readonly Dictionary<string, double> numericLiteralToValueTestCases = new()
     {
         { "0", 0.0 }, { "1", 1.0 }, { "123", 123.0 }, { "1234567890", 1234567890.0 }
@@ -311,18 +299,6 @@ internal sealed class ParserTests
         Assert.That(blockNodes[0], Is.InstanceOf<ExpressionStatement>());
     }
 
-    [Test]
-    public void Parse_ThrowsInvalidOperationException_WhenProvidingABlock_WithoutAClosingBrace()
-    {
-        // Arrange
-        var parser = new Parser("{");
-
-        // Act
-
-        // Assert
-        Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
-    }
-
     // Tests for 14.3.1 Let and Const Declarations, https://tc39.es/ecma262/#sec-let-and-const-declarations
     [Test]
     public void Parse_ReturnsLetDeclaration_WithNoInitializer_WhenProvidingLetDeclaration_WithNoInitializer()
@@ -386,18 +362,6 @@ internal sealed class ParserTests
         Assert.That(constDeclaration, Is.Not.Null);
         Assert.That(constDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
         Assert.That(constDeclaration.Initializer, Is.InstanceOf(expectedInitializerType));
-    }
-
-    [Test]
-    public void Parse_ThrowsInvalidOperationException_WhenProvidingConstDeclartion_WithNoInitializer()
-    {
-        // Arrange
-        var parser = new Parser("const a");
-
-        // Act
-
-        // Assert
-        Assert.That(parser.Parse, Throws.Exception.TypeOf<InvalidOperationException>());
     }
 
     // Tests for 14.3.2 Variable Statement, https://tc39.es/ecma262/#sec-variable-statement
@@ -506,18 +470,6 @@ internal sealed class ParserTests
         Assert.That(ifStatement.ElseCaseStatement, Is.Not.Null);
     }
 
-    [Test]
-    public void Parse_ThrowsInvalidOperationException_WhenProvidingIf_WithoutIfExpression()
-    {
-        // Arrange
-        var parser = new Parser("if { }");
-
-        // Act
-
-        // Assert
-        Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
-    }
-
     // Tests for 14.7 Iteration Statements, https://tc39.es/ecma262/#sec-iteration-statements
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
     public void Parse_ReturnsDoWhileStatement_WhenProvidingDoWhile(KeyValuePair<string, Type> expressionToExpectedType)
@@ -540,18 +492,6 @@ internal sealed class ParserTests
         Assert.That(doWhileStatement.IterationStatement, Is.Not.Null);
     }
 
-    [Test]
-    public void Parse_ThrowsInvalidOperationException_WhenProvidingDoWhile_WithNoExpression()
-    {
-        // Arrange
-        var parser = new Parser("do { } while");
-
-        // Act
-
-        // Assert
-        Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
-    }
-
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
     public void Parse_ReturnsWhileStatement_WhenProvidingWhile(KeyValuePair<string, Type> expressionToExpectedType)
     {
@@ -571,18 +511,6 @@ internal sealed class ParserTests
         Assert.That(whileStatement, Is.Not.Null);
         Assert.That(whileStatement.WhileExpression, Is.InstanceOf(expectedExpressionType));
         Assert.That(whileStatement.IterationStatement, Is.Not.Null);
-    }
-
-    [Test]
-    public void Parse_ThrowsInvalidOperationException_WhenProvidingWhile_WithNoExpression()
-    {
-        // Arrange
-        var parser = new Parser("while { }");
-
-        // Act
-
-        // Assert
-        Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -943,18 +871,6 @@ internal sealed class ParserTests
         Assert.That(throwStatement.ThrowExpression, Is.InstanceOf(expectedExpressionType));
     }
 
-    [Test]
-    public void Parse_ThrowsInvalidOperationException_WhenProvidingThrow_WithNoExpression()
-    {
-        // Arrange
-        var parser = new Parser("throw");
-
-        // Act
-
-        // Assert
-        Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
-    }
-
     // Tests for 14.15 The try Statement, https://tc39.es/ecma262/#sec-try-statement
     [Test]
     public void Parse_ReturnsTryStatement_WithParameterlessCatch_WhenProvidingTry_WithParameterlessCatch()
@@ -1064,18 +980,6 @@ internal sealed class ParserTests
         Assert.That(tryStatement.CatchParameter, Is.Not.Null);
         Assert.That(tryStatement.CatchParameter!.Name, Is.EqualTo(expectedCatchIdentifier));
         Assert.That(tryStatement.FinallyBlock, Is.Not.Null);
-    }
-
-    [Test]
-    public void Parse_ThrowsInvalidOperationException_WhenProvidingTry_WithoutCatchOrFinally()
-    {
-        // Arrange
-        var parser = new Parser("try { }");
-
-        // Act
-        
-        // Assert
-        Assert.That(parser.Parse, Throws.InstanceOf<InvalidOperationException>());
     }
 
     // Tests for 14.16 The debugger Statement, https://tc39.es/ecma262/#sec-debugger-statement
@@ -1316,5 +1220,132 @@ internal sealed class ParserTests
         Assert.That(staticPrivateMethod.Parameters, Is.Empty);
         Assert.That(staticPrivateMethod.Body, Is.Empty);
         Assert.That(staticPrivateMethod.IsPrivate, Is.True);
+    }
+
+    // Tests for SyntaxErrors
+    // FIXME: More test cases where ConsumeTokenOfType is used
+    static private readonly Dictionary<string, string> unexpectedTokenTestCases = new()
+    {
+        {"", "}"},
+        {"1||", "}"},
+        {"1&&", "}"},
+        {"1|", "}"},
+        {"1^", "}"},
+        {"1&", "}"},
+        {"1==", "}"},
+        {"1===", "}"},
+        {"1!=", "}"},
+        {"1!==", "}"},
+        {"1<", "}"},
+        {"1>", "}"},
+        {"1<=", "}"},
+        {"1>=", "}"},
+        {"1 instanceof", "}"},
+        {"1 in", "}"},
+        {"1<<", "}"},
+        {"1>>", "}"},
+        {"1>>>", "}"},
+        {"1+", "}"},
+        {"1-", "}"},
+        {"1*", "}"},
+        {"1/", "}"},
+        {"1%", "}"},
+        {"1**", "}"},
+        {"++", "}"},
+        {"--", "}"},
+        {"new", "}"},
+        {"new a(", "}"},
+        {"a(", "}"},
+        {"(", "}"},
+        {"const a =", "}"},
+        {"if (", "}"},
+        {"if", "}"},
+        {"while (", "}"},
+        {"while", "}"},
+        {"do", "}"},
+        {"do { } while", "}"},
+        {"do { } while (", "}"},
+        {"class", "}"},
+        {"class a {", "1"},
+    };
+
+    [TestCaseSource(nameof(unexpectedTokenTestCases))]
+    public void Parse_ThrowsUnexpectedTokenSyntaxErorr_WhenProvidingAnUnexpectedToken(KeyValuePair<string, string> validToInvalidTestCase)
+    {
+        // Arrange
+        var parser = new Parser($"{validToInvalidTestCase.Key}{validToInvalidTestCase.Value}");
+        var expectedException = ErrorHelper.CreateSyntaxError(ErrorType.UnexpectedToken, validToInvalidTestCase.Value);
+
+        // Act
+
+        // Assert
+        AssertThatSyntaxErrorMatchesExpected(parser, expectedException);
+    }
+
+    static private readonly List<string> unexpectedEofTestCases = new()
+    {
+        "throw",
+        "{",
+        "(",
+        "do",
+        "do { } while",
+    };
+
+    [TestCaseSource(nameof(unexpectedEofTestCases))]
+    public void Parse_ThrowsUnexpectedEOFSyntaxError_WhenProvidingInput_WithUnexpectedEOF(string testCase)
+    {
+        // Arrange
+        var parser = new Parser(testCase);
+        var expectedException = ErrorHelper.CreateSyntaxError(ErrorType.UnexpectedEOF);
+
+        // Act
+
+        // Assert
+        AssertThatSyntaxErrorMatchesExpected(parser, expectedException);
+    }
+
+    [Test]
+    public void Parse_ThrowsUnaryLHSOfExponentiationSyntaxError_WhenProvidingUnaryLHS_OfExponentiationExpression()
+    {
+        // Arrange
+        var parser = new Parser("!1**2");
+        var expectedException = ErrorHelper.CreateSyntaxError(ErrorType.UnaryLHSOfExponentiation);
+
+        // Act
+
+        // Assert
+        AssertThatSyntaxErrorMatchesExpected(parser, expectedException);
+    }
+
+    [Test]
+    public void Parse_ThrowsConstWithoutInitializerSyntaxError_WhenConstDeclaration_WithoutInitializerSyntaxError()
+    {
+        // Arrange
+        var parser = new Parser("const a");
+        var expectedException = ErrorHelper.CreateSyntaxError(ErrorType.ConstWithoutInitializer);
+
+        // Act
+
+        // Assert
+        AssertThatSyntaxErrorMatchesExpected(parser, expectedException);
+    }
+
+    [Test]
+    public void Parse_ThrowsTryWithoutCatchOrFianllySyntaxError_WhenProvidingTryWithoutCatchOrFianlly()
+    {
+        // Arrange
+        var parser = new Parser("try { }");
+        var expectedException = ErrorHelper.CreateSyntaxError(ErrorType.TryWithoutCatchOrFinally);
+
+        // Act
+
+        // Assert
+        AssertThatSyntaxErrorMatchesExpected(parser, expectedException);
+    }
+
+    private void AssertThatSyntaxErrorMatchesExpected(Parser parser, SyntaxErrorException expectedException)
+    {
+        var actualException = Assert.Throws<SyntaxErrorException>(() => parser.Parse());
+        Assert.That(actualException.Message, Is.EqualTo(expectedException.Message));
     }
 }
