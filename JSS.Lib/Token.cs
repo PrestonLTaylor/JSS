@@ -47,6 +47,7 @@ internal enum TokenType
     While,
     With,
     Yield,
+    Let,
 
     // https://tc39.es/ecma262/#prod-Punctuator
     OptionalChaining,
@@ -73,6 +74,7 @@ internal enum TokenType
     Modulo,
     Exponentiation,
     Increment,
+    Decrement,
     LeftShift,
     RightShift,
     UnsignedRightShift,

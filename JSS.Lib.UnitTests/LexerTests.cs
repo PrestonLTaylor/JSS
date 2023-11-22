@@ -388,6 +388,8 @@ internal sealed class LexerTests
             { "while", TokenType.While },
             { "with", TokenType.With },
             { "yield", TokenType.Yield },
+            // NOTE: let isnt a reserved words but it's easier to treat it like one
+            { "let", TokenType.Let },
         };
 
     [TestCaseSource(nameof(reservedWordToTypeTestCases))]
@@ -397,6 +399,22 @@ internal sealed class LexerTests
         var keywordString = keywordToExpectedTokenType.Key;
         var expectedTokenType = keywordToExpectedTokenType.Value;
         var lexer = new Lexer(keywordString);
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        Assert.That(tokens, Has.Count.EqualTo(1));
+        AssertThatTokenIs(tokens[0], expectedTokenType, keywordString);
+    }
+
+    [TestCaseSource(nameof(reservedWordToTypeTestCases))]
+    public void Lex_ReturnsExpectedKeywordToken_WhenProvidingKeyword_WithExtraWhitespaceAfter(KeyValuePair<string, TokenType> keywordToExpectedTokenType)
+    {
+        // Arrange
+        var keywordString = keywordToExpectedTokenType.Key;
+        var expectedTokenType = keywordToExpectedTokenType.Value;
+        var lexer = new Lexer($"{keywordString} ");
 
         // Act
         var tokens = lexer.Lex().ToList();
@@ -428,6 +446,7 @@ internal sealed class LexerTests
         { "**", TokenType.Exponentiation },
         { "*=", TokenType.MultiplyAssignment },
         { "++", TokenType.Increment },
+        { "--", TokenType.Decrement },
         { "+=", TokenType.PlusAssignment },
         { "-=", TokenType.MinusAssignment },
         { "<<", TokenType.LeftShift },
