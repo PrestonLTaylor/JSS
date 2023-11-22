@@ -243,7 +243,7 @@ internal sealed class Parser
         }
 
         // NOTE: If we don't have an ||, that means we've reached the end of the expression and lhs is the fully parsed expression
-        if (!_consumer.IsTokenOfType(TokenType.Or))
+        if (!IsLogicalOrOperator())
         {
             parsedExpression = lhs;
             return true;
@@ -257,6 +257,11 @@ internal sealed class Parser
         return true;
     }
 
+    private bool IsLogicalOrOperator()
+    {
+        return _consumer.IsTokenOfType(TokenType.Or);
+    }
+
     // LogicalANDExpression, https://tc39.es/ecma262/#prod-LogicalANDExpression
     private bool TryParseLogicalAndExpression(out IExpression? parsedExpression)
     {
@@ -267,7 +272,7 @@ internal sealed class Parser
         }
 
         // NOTE: If we don't have an &&, that means we've reached the end of the expression and lhs is the fully parsed expression
-        if (!_consumer.IsTokenOfType(TokenType.And))
+        if (!IsLogicalAndOperator())
         {
             parsedExpression = lhs;
             return true;
@@ -281,6 +286,11 @@ internal sealed class Parser
         return true;
     }
 
+    private bool IsLogicalAndOperator()
+    {
+        return _consumer.IsTokenOfType(TokenType.And);
+    }
+
     // BitwiseORExpression, https://tc39.es/ecma262/#prod-BitwiseORExpression
     private bool TryParseBitwiseORExpression(out IExpression? parsedExpression)
     {
@@ -291,7 +301,7 @@ internal sealed class Parser
         }
 
         // NOTE: If we don't have an |, that means we've reached the end of the expression and lhs is the fully parsed expression
-        if (!_consumer.IsTokenOfType(TokenType.BitwiseOr))
+        if (!IsBitwiseOrOperator())
         {
             parsedExpression = lhs;
             return true;
@@ -305,6 +315,11 @@ internal sealed class Parser
         return true;
     }
 
+    private bool IsBitwiseOrOperator()
+    {
+        return _consumer.IsTokenOfType(TokenType.BitwiseOr);
+    }
+
     // BitwiseXORExpression, https://tc39.es/ecma262/#prod-BitwiseXORExpression
     private bool TryParseBitwiseXORExpression(out IExpression? parsedExpression)
     {
@@ -315,7 +330,7 @@ internal sealed class Parser
         }
 
         // NOTE: If we don't have an ^, that means we've reached the end of the expression and lhs is the fully parsed expression
-        if (!_consumer.IsTokenOfType(TokenType.BitwiseXor))
+        if (!IsBitwiseXorOperator())
         {
             parsedExpression = lhs;
             return true;
@@ -329,6 +344,11 @@ internal sealed class Parser
         return true;
     }
 
+    private bool IsBitwiseXorOperator()
+    {
+        return _consumer.IsTokenOfType(TokenType.BitwiseXor);
+    }
+
     // BitwiseANDExpression, https://tc39.es/ecma262/#prod-BitwiseANDExpression
     private bool TryParseBitwiseAndExpression(out IExpression? parsedExpression)
     {
@@ -339,7 +359,7 @@ internal sealed class Parser
         }
 
         // NOTE: If we don't have an &, that means we've reached the end of the expression and lhs is the fully parsed expression
-        if (!_consumer.IsTokenOfType(TokenType.BitwiseAnd))
+        if (!IsBitwiseAndOperator())
         {
             parsedExpression = lhs;
             return true;
@@ -351,6 +371,11 @@ internal sealed class Parser
 
         parsedExpression = new BitwiseAndExpression(lhs!, rhs!);
         return true;
+    }
+
+    private bool IsBitwiseAndOperator()
+    {
+        return _consumer.IsTokenOfType(TokenType.BitwiseAnd);
     }
 
     // 13.11 Equality Operators, https://tc39.es/ecma262/#sec-equality-operators
@@ -846,6 +871,16 @@ internal sealed class Parser
         return true;
     }
 
+    private IExpression ParseMemberExpression()
+    {
+        if (TryParseMemberExpression(out IExpression? parsedExpression))
+        {
+            return parsedExpression!;
+        }
+
+        return ThrowUnexpectedTokenSyntaxError<IExpression>()!;
+    }
+
     private bool TryParseInnerMemberExpression(out IExpression? parsedExpression)
     {
         // NOTE: This is the base case for the recursive member expression definition
@@ -878,13 +913,11 @@ internal sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.New);
 
-        // FIXME: Replace TryParses when required with a normal Parse function across the parser
-        if (!TryParseMemberExpression(out IExpression? innerExpression)) ThrowUnexpectedTokenSyntaxError<bool>();
+        var innerExpression = ParseMemberExpression();
 
-        List<IExpression> newArguments = new();
-        if (!TryParseArguments(newArguments)) ThrowUnexpectedTokenSyntaxError<bool>();
+        List<IExpression> newArguments = ParseArguments();
 
-        parsedExpression = new NewExpression(innerExpression!, newArguments);
+        parsedExpression = new NewExpression(innerExpression, newArguments);
         return true;
     }
 
@@ -1061,7 +1094,7 @@ internal sealed class Parser
     {
         _consumer.ConsumeTokenOfType(TokenType.OpenParen);
 
-        if (!TryParseExpression(out IExpression? parsedExpression)) ThrowUnexpectedTokenSyntaxError<IExpression>();
+        var parsedExpression = ParseExpression();
 
         _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
 
@@ -1177,9 +1210,8 @@ internal sealed class Parser
 
         // FIXME: We should allow parsing multiple bindings in a single let declaration
         INode? initializer = null;
-        if (_consumer.IsTokenOfType(TokenType.Assignment))
+        if (IsInitializer())
         {
-            _consumer.ConsumeTokenOfType(TokenType.Assignment);
             initializer = ParseInitializer();
         }
 
@@ -1201,7 +1233,6 @@ internal sealed class Parser
         // FIXME: We should allow parsing multiple bindings in a single const declaration
         if (!_consumer.IsTokenOfType(TokenType.Assignment)) ErrorHelper.ThrowSyntaxError(ErrorType.ConstWithoutInitializer);
 
-        _consumer.ConsumeTokenOfType(TokenType.Assignment);
         var initializer = ParseInitializer();
 
         return new ConstDeclaration(identifierToken.data, initializer);
@@ -1222,17 +1253,23 @@ internal sealed class Parser
 
         // FIXME: We should allow parsing multiple bindings in a single var statement 
         INode? initializer = null;
-        if (_consumer.IsTokenOfType(TokenType.Assignment))
+        if (IsInitializer())
         {
-            _consumer.ConsumeTokenOfType(TokenType.Assignment);
             initializer = ParseInitializer();
         }
 
         return new VarStatement(identifierToken.data, initializer);
     }
 
+    private bool IsInitializer()
+    {
+        return _consumer.IsTokenOfType(TokenType.Assignment);
+    }
+
     private INode ParseInitializer()
     {
+        _consumer.ConsumeTokenOfType(TokenType.Assignment);
+
         if (TryParseAssignmentExpression(out IExpression? parsedExpression))
         {
             return parsedExpression!;
@@ -1297,15 +1334,14 @@ internal sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.If);
         _consumer.ConsumeTokenOfType(TokenType.OpenParen);
 
-        IExpression? ifExpression;
-        if (!TryParseExpression(out ifExpression)) ThrowUnexpectedTokenSyntaxError<IfStatement>();
+        var ifExpression = ParseExpression();
 
         _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
 
         var ifCaseStatement = ParseStatement();
         TryParseElseStatement(out INode? elseCaseStatement);
 
-        return new IfStatement(ifExpression!, ifCaseStatement, elseCaseStatement);
+        return new IfStatement(ifExpression, ifCaseStatement, elseCaseStatement);
     }
 
     private bool TryParseElseStatement(out INode? elseCaseStatement)
@@ -1398,7 +1434,6 @@ internal sealed class Parser
 
     private bool TryParseForInitializationExpression(out INode? initializationExpression)
     {
-        // FIXME: This seems a bit clunky
         if (TryParseExpression(out IExpression? expression))
         {
             initializationExpression = expression;
@@ -1573,12 +1608,9 @@ internal sealed class Parser
 
         // FIXME: throw [no LineTerminator here] Expression[+In, ?Yield, ?Await] ;
         // Don't parse an expression if there is a line terminator after the return
-        if (TryParseExpression(out IExpression? throwExpression))
-        {
-            return new ThrowStatement(throwExpression!);
-        }
+        var throwExpression = ParseExpression();
 
-        return ThrowUnexpectedTokenSyntaxError<ThrowStatement>()!;
+        return new ThrowStatement(throwExpression);
     }
 
     // 14.15 The try Statement, https://tc39.es/ecma262/#sec-try-statement
