@@ -10,7 +10,6 @@ internal sealed class ComputedPropertyExpression : IExpression
     }
 
     // FIXME: 13.3.2.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-property-accessors-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression Lhs { get; }
     public IExpression Rhs { get; }

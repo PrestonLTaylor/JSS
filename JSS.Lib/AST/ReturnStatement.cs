@@ -9,7 +9,6 @@ internal sealed class ReturnStatement : INode
     }
 
     // FIXME: 14.10.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-return-statement-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression? ReturnExpression { get; }
 }

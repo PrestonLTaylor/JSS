@@ -10,7 +10,6 @@ internal sealed class DoWhileStatement : INode
     }
 
     // FIXME: 14.7.2.2 Runtime Semantics: DoWhileLoopEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-dowhileloopevaluation
-    public void Execute() { }
 
     public IExpression WhileExpression { get; }
     public INode IterationStatement { get; }

@@ -65,7 +65,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -123,7 +123,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -142,7 +142,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -163,7 +163,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -184,7 +184,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -212,7 +212,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -245,7 +245,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -267,7 +267,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -286,7 +286,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -309,7 +309,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -331,7 +331,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -353,7 +353,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -374,7 +374,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -396,7 +396,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -416,7 +416,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -436,7 +436,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -458,7 +458,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -481,7 +481,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -502,7 +502,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -523,7 +523,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -544,7 +544,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -566,7 +566,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -591,7 +591,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -616,7 +616,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -642,7 +642,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -661,7 +661,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -681,7 +681,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -700,7 +700,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -719,7 +719,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -739,7 +739,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -760,7 +760,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -782,7 +782,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -811,7 +811,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -838,7 +838,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -861,7 +861,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -880,7 +880,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -903,7 +903,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -925,7 +925,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -946,7 +946,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -968,7 +968,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -991,7 +991,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1010,7 +1010,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1033,7 +1033,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1059,7 +1059,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1084,7 +1084,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1108,7 +1108,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1139,7 +1139,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1170,7 +1170,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1201,7 +1201,7 @@ internal sealed class ParserTests
 
         // Act
         var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));

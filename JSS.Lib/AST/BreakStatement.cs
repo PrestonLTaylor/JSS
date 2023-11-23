@@ -9,7 +9,6 @@ internal sealed class BreakStatement : INode
     }
 
     // FIXME: 14.9.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-break-statement-runtime-semantics-evaluation
-    public void Execute() { }
 
     public Identifier? Label { get; }
 }

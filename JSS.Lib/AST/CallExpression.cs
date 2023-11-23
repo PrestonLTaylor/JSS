@@ -10,7 +10,6 @@ internal sealed class CallExpression : IExpression
     }
 
     // FIXME: 13.3.6.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-function-calls-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression Lhs { get; }
     public IReadOnlyList<IExpression> Arguments { get; }

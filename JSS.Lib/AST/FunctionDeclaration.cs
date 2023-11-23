@@ -12,7 +12,6 @@ internal sealed class FunctionDeclaration : INode
     }
 
     // FIXME: 15.2.6 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-function-definitions-runtime-semantics-evaluation
-    public void Execute() { }
 
     public string Identifier { get; }
     public IReadOnlyList<Identifier> Parameters { get; }

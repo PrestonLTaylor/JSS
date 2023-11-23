@@ -9,7 +9,6 @@ internal sealed class ThrowStatement : INode
     }
 
     // FIXME: 14.14.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-throw-statement-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression ThrowExpression { get; }
 }

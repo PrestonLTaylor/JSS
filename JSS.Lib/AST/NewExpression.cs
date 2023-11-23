@@ -10,7 +10,6 @@ internal sealed class NewExpression : IExpression
     }
 
     // FIXME: 13.3.5.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-new-operator-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression Expression { get; }
     public IReadOnlyList<IExpression> Arguments { get; }

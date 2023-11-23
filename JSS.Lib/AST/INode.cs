@@ -1,7 +1,8 @@
-﻿namespace JSS.Lib.AST;
+﻿using JSS.Lib.Execution;
 
-internal interface INode
+namespace JSS.Lib.AST;
+
+internal abstract class INode
 {
-    // FIXME: Execute should return a JS Value
-    public void Execute();
+    virtual public Completion Evaluate(VM vm) { throw new NotImplementedException(); }
 }

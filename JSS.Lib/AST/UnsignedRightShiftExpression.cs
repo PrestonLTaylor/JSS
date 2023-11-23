@@ -10,7 +10,6 @@ internal sealed class UnsignedRightShiftExpression : IExpression
     }
 
     // FIXME: 13.9.3.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-unsigned-right-shift-operator-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression Lhs { get; }
     public IExpression Rhs { get; }

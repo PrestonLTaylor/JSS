@@ -1,5 +1,5 @@
 ﻿namespace JSS.Lib.AST;
 
-internal interface IExpression : INode
+internal abstract class IExpression : INode
 {
 }

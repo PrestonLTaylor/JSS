@@ -10,7 +10,6 @@ internal sealed class BitwiseXorExpression : IExpression
     }
 
     // FIXME: 13.12.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-binary-bitwise-operators-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression Lhs { get; }
     public IExpression Rhs { get; }

@@ -9,7 +9,6 @@ internal sealed class PostfixDecrementExpression : IExpression
     }
 
     // FIXME: 13.4.3.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-postfix-decrement-operator-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression Expression { get; }
 }

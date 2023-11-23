@@ -12,7 +12,6 @@ internal sealed class TryStatement : INode
     }
 
     // 14.15.3 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-try-statement-runtime-semantics-evaluation
-    public void Execute() { }
 
     public Block TryBlock { get; }
     public Block? CatchBlock { get; }

@@ -9,7 +9,6 @@ internal sealed class ContinueStatement : INode
     }
 
     // FIXME: 14.8.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-continue-statement-runtime-semantics-evaluation
-    public void Execute() { }
 
     public Identifier? Label { get; }
 }

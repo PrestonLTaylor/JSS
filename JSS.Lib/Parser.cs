@@ -1,5 +1,6 @@
 ﻿using JSS.Lib.AST;
 using JSS.Lib.AST.Literal;
+using JSS.Lib.Execution;
 
 namespace JSS.Lib;
 
@@ -13,9 +14,9 @@ internal sealed class Parser
         _consumer = new TokenConsumer(lexer.Lex().ToList());
     }
 
-    public Program Parse()
+    public Script Parse()
     {
-        return new Program(ParseScript());
+        return new Script(ParseScript());
     }
 
     // 16.1 Scripts, https://tc39.es/ecma262/#sec-scripts

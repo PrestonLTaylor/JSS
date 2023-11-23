@@ -10,7 +10,6 @@ internal sealed class WhileStatement : INode
     }
 
     // FIXME: 14.7.3.2 Runtime Semantics: WhileLoopEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-whileloopevaluation
-    public void Execute() { }
 
     public IExpression WhileExpression { get; }
     public INode IterationStatement { get; }

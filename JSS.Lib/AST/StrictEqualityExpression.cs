@@ -10,7 +10,7 @@ internal sealed class StrictEqualityExpression : IExpression
     }
 
     // FIXME: 13.11.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-equality-operators-runtime-semantics-evaluation
-    public void Execute() { }
+    public void Evaluate() { }
 
     public IExpression Lhs { get; }
     public IExpression Rhs { get; }

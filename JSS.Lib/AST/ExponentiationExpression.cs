@@ -10,7 +10,6 @@ internal sealed class ExponentiationExpression : IExpression
     }
 
     // FIXME: 13.6.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-exp-operator-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression Lhs { get; }
     public IExpression Rhs { get; }

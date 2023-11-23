@@ -2,6 +2,7 @@
 
 namespace JSS.Lib.AST.Literal;
 
+// 13.2.3 Literals
 internal sealed class NumericLiteral : IExpression
 {
     public NumericLiteral(double value)
@@ -9,7 +10,7 @@ internal sealed class NumericLiteral : IExpression
         _value = new Number { Value = value };
     }
 
-    public void Execute() { }
+    // FIXME: 13.2.3.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-literals-runtime-semantics-evaluation
 
     public double Value
     {

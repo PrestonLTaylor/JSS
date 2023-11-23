@@ -33,7 +33,6 @@ internal sealed class SwitchStatement : INode
     }
 
     // FIXME: 14.12.4 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-switch-statement-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression SwitchExpression { get; }
     public IReadOnlyList<CaseBlock> CaseBlocks { get; }

@@ -10,7 +10,6 @@ internal sealed class LetDeclaration : INode
     }
 
     // FIXME: 14.3.1.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-let-and-const-declarations-runtime-semantics-evaluation
-    public void Execute() { }
 
     public string Identifier { get; }
 

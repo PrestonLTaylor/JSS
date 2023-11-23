@@ -10,7 +10,6 @@ internal sealed class SubtractionExpression : IExpression
     }
 
     // FIXME: 13.8.2.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-subtraction-operator-minus-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression Lhs { get; }
     public IExpression Rhs { get; }

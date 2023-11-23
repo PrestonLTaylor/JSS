@@ -10,7 +10,6 @@ internal sealed class LogicalOrExpression : IExpression
     }
 
     // FIXME: 13.13.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-binary-logical-operators-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression Lhs { get; }
     public IExpression Rhs { get; }

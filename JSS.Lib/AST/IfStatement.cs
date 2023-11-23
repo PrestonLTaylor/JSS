@@ -11,7 +11,6 @@ internal sealed class IfStatement : INode
     }
 
     // FIXME: 14.6.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-if-statement-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression IfExpression { get; }
     public INode IfCaseStatement { get; }

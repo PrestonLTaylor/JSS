@@ -10,7 +10,6 @@ internal sealed class LeftShiftExpression : IExpression
     }
 
     // FIXME: 13.9.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-left-shift-operator-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression Lhs { get; }
     public IExpression Rhs { get; }

@@ -10,7 +10,6 @@ internal sealed class LessThanEqualsExpression : IExpression
     }
 
     // FIXME: 13.10.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-relational-operators-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression Lhs { get; }
     public IExpression Rhs { get; }

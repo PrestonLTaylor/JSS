@@ -9,7 +9,6 @@ internal sealed class Block : INode
     }
 
     // FIXME: 14.2.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-block-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IReadOnlyList<INode> Nodes { get; }
 }

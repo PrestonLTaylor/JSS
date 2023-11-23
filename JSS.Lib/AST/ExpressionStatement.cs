@@ -9,7 +9,6 @@ internal sealed class ExpressionStatement : INode
     }
 
     // FIXME: 14.5.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-expression-statement-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression Expression { get; }
 }

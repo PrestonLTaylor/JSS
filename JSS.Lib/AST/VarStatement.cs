@@ -10,7 +10,6 @@ internal sealed class VarStatement : INode
     }
 
     // FIXME: 14.3.2.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-variable-statement-runtime-semantics-evaluation
-    public void Execute() { }
 
     public string Identifier { get; }
 

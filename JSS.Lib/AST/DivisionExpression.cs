@@ -10,7 +10,6 @@ internal sealed class DivisionExpression : IExpression
     }
 
     // FIXME: 13.7.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-multiplicative-operators-runtime-semantics-evaluation
-    public void Execute() { }
 
     public IExpression Lhs { get; }
     public IExpression Rhs { get; }
