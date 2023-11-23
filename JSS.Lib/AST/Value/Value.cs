@@ -37,4 +37,43 @@ internal abstract class Value
         // 2. Return input.
         return Completion.NormalCompletion(this);
     }
+
+    // 7.1.17 ToString ( argument ), https://tc39.es/ecma262/#sec-tostring
+    public Completion ToStringJS()
+    {
+        // 1. If argument is a String, return argument.
+        if (IsString()) return Completion.NormalCompletion(this);
+
+        // FIXME: 2. If argument is a Symbol, throw a TypeError exception.
+
+        // FIXME: 3. If argument is undefined, return "undefined".
+
+        // 4. If argument is null, return "null".
+        if (IsNull()) return Completion.NormalCompletion(new String("null"));
+
+        // 5. If argument is true, return "true".
+        // 6. If argument is false, return "false".
+        if (IsBoolean())
+        {
+            var boolean = this as Boolean;
+            var asString = new String(boolean!.Value ? "true" : "false");
+            return Completion.NormalCompletion(asString);
+        }
+
+        // FIXME: Follow the spec instead of using C#'s ToString
+        // 7. If argument is a Number, return Number::toString(argument, 10).
+        if (IsNumber())
+        {
+            var number = this as Number;
+            var asString = new String(number!.Value.ToString());
+            return Completion.NormalCompletion(asString);
+        }
+
+        // FIXME: 8. If argument is a BigInt, return BigInt::toString(argument, 10).
+        // FIXME: 9. Assert: argument is an Object.
+        // FIXME: 10. Let primValue be ? ToPrimitive(argument, STRING).
+        // FIXME: 11. Assert: primValue is not an Object.
+        // FIXME: 12. Return ? ToString(primValue).
+        throw new NotImplementedException();
+    }
 }
