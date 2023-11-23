@@ -38,6 +38,18 @@ internal abstract class Value
         return Completion.NormalCompletion(this);
     }
 
+    // 7.1.3 ToNumeric ( value ), https://tc39.es/ecma262/#sec-tonumeric
+    public Completion ToNumeric(VM vm)
+    {
+        // 1. Let primValue be ? ToPrimitive(value, FIXME: NUMBER).
+        var primValue = ToPrimitive();
+
+        // FIXME: 2. If primValue is a BigInt, return primValue.
+
+        // 3. Return ? ToNumber(primValue).
+        return ToNumber(vm);
+    }
+
     // 7.1.4 ToNumber ( argument ), https://tc39.es/ecma262/#sec-tonumber
     public Completion ToNumber(VM vm)
     {

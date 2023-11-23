@@ -94,4 +94,21 @@ internal sealed class AbstractOperationTests
         Assert.That(numberValue, Is.Not.Null);
         Assert.That(numberValue.Value, Is.EqualTo(expectedNumber));
     }
+
+    [TestCaseSource(nameof(valueToExpectedNumberTestCases))]
+    public void ToNumeric_ReturnsNormalCompletion_WithExpectedNumber_WhenProvidingValue(Value testCase, double expectedNumber)
+    {
+        // Arrange
+        var vm = new VM();
+
+        // Act
+        var asNumeric = testCase.ToNumeric(vm);
+
+        // Assert
+        Assert.That(asNumeric.IsNormalCompletion(), Is.True);
+
+        var numberValue = asNumeric.Value as Number;
+        Assert.That(numberValue, Is.Not.Null);
+        Assert.That(numberValue.Value, Is.EqualTo(expectedNumber));
+    }
 }
