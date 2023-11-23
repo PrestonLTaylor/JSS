@@ -9,11 +9,11 @@ internal sealed class AbstractOperationTests
     static private readonly List<Value> toPrimitiveIdentityTestCases = new()
     {
         new Null(),
-        new Boolean { Value = false },
-        new Boolean { Value = true },
-        new Number { Value = 0.0 },
-        new Number { Value = 1.0 },
-        new Number { Value = 123456789.0 },
+        new Boolean(false),
+        new Boolean(true),
+        new Number(0.0),
+        new Number(1.0),
+        new Number(123456789.0),
         new String(""),
         new String("'"),
         new String("\""),
@@ -37,11 +37,11 @@ internal sealed class AbstractOperationTests
     static private readonly object[] valueToExpectedStringTestCases =
     {
         new object[] { new Null(), "null" },
-        new object[] { new Boolean { Value = false }, "false" },
-        new object[] { new Boolean { Value = true }, "true" },
-        new object[] { new Number { Value = 0.0 }, 0.0.ToString() },
-        new object[] { new Number { Value = 1.0 }, 1.0.ToString() },
-        new object[] { new Number { Value = 123456789.0 }, 123456789.0.ToString() },
+        new object[] { new Boolean(false), "false" },
+        new object[] { new Boolean(true), "true" },
+        new object[] { new Number(0.0), 0.0.ToString() },
+        new object[] { new Number(1.0), 1.0.ToString() },
+        new object[] { new Number(123456789.0), 123456789.0.ToString() },
         new object[] { new String(""), "" },
         new object[] { new String("'"), "'" },
         new object[] { new String("\""), "\"" },
