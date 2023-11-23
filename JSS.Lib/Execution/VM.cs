@@ -7,4 +7,5 @@ internal sealed class VM
 {
     public Value Null { get; } = new Null();
     public Value Undefined { get; } = new Undefined();
+    public Value NaN { get; } = new Number(double.NaN);
 }

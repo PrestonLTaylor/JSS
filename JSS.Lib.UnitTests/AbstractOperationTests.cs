@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.AST.Value;
+using JSS.Lib.Execution;
 using Boolean = JSS.Lib.AST.Value.Boolean;
 using String = JSS.Lib.AST.Value.String;
 
@@ -62,5 +63,35 @@ internal sealed class AbstractOperationTests
         var stringValue = asString.Value as String;
         Assert.That(stringValue, Is.Not.Null);
         Assert.That(stringValue.Value, Is.EqualTo(expectedString));
+    }
+
+    static private readonly object[] valueToExpectedNumberTestCases = new object[]
+    {
+        new object[] { new Null(), 0.0 },
+        new object[] { new Boolean(false), 0.0 },
+        new object[] { new Boolean(true), 1.0 },
+        new object[] { new Number(0.0), 0.0 },
+        new object[] { new Number(1.0), 1.0 },
+        new object[] { new Number(123456789.0), 123456789.0 },
+        new object[] { new String("0.0"), 0.0 },
+        new object[] { new String("1.0"), 1.0 },
+        new object[] { new String("This is a string literal"), double.NaN },
+    };
+
+    [TestCaseSource(nameof(valueToExpectedNumberTestCases))]
+    public void ToNumber_ReturnsNormalCompletion_WithExpectedNumber_WhenProvidingValue(Value testCase, double expectedNumber)
+    {
+        // Arrange
+        var vm = new VM();
+
+        // Act
+        var asNumber = testCase.ToNumber(vm);
+
+        // Assert
+        Assert.That(asNumber.IsNormalCompletion(), Is.True);
+
+        var numberValue = asNumber.Value as Number;
+        Assert.That(numberValue, Is.Not.Null);
+        Assert.That(numberValue.Value, Is.EqualTo(expectedNumber));
     }
 }

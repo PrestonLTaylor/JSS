@@ -38,6 +38,50 @@ internal abstract class Value
         return Completion.NormalCompletion(this);
     }
 
+    // 7.1.4 ToNumber ( argument ), https://tc39.es/ecma262/#sec-tonumber
+    public Completion ToNumber(VM vm)
+    {
+        // 1. If argument is a Number, return argument.
+        if (IsNumber()) return Completion.NormalCompletion(this);
+
+        // FIXME: 2. If argument is either a Symbol or a BigInt, throw a TypeError exception.
+
+        // FIXME: 3. If argument is undefined, return NaN.
+
+        // 4. If argument is either null or false, return FIXME: +0𝔽.
+        if (IsNull()) return Completion.NormalCompletion(new Number(0.0));
+
+        if (IsBoolean())
+        {
+            // 5. If argument is true, return 1𝔽.
+            var boolean = this as Boolean;
+            var asNumber = new Number(boolean!.Value ? 1.0 : 0.0);
+            return Completion.NormalCompletion(asNumber);
+        }
+
+        // FIXME: Implement StringToNumber instead of using double.Parse
+        // 6. If argument is a String, return StringToNumber(argument).
+        if (IsString())
+        {
+            try
+            {
+                var asString = this as String;
+                var asNumber = new Number(double.Parse(asString!.Value));
+                return Completion.NormalCompletion(asNumber);
+            }
+            catch (Exception)
+            {
+                return Completion.NormalCompletion(vm.NaN);
+            }
+        }
+
+        // FIXME: 7. Assert: argument is an Object.
+        // FIXME: 8. Let primValue be ? ToPrimitive(argument, NUMBER).
+        // FIXME: 9. Assert: primValue is not an Object.
+        // 10. Return ? ToNumber(primValue).
+        throw new NotImplementedException();
+    }
+
     // 7.1.17 ToString ( argument ), https://tc39.es/ecma262/#sec-tostring
     public Completion ToStringJS()
     {
