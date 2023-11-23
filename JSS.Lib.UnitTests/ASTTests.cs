@@ -1,8 +1,8 @@
-﻿using JSS.Lib.AST.Value;
+﻿using JSS.Lib.AST.Values;
 using JSS.Lib.AST.Literal;
 using JSS.Lib.Execution;
-using Boolean = JSS.Lib.AST.Value.Boolean;
-using String = JSS.Lib.AST.Value.String;
+using Boolean = JSS.Lib.AST.Values.Boolean;
+using String = JSS.Lib.AST.Values.String;
 
 namespace JSS.Lib.UnitTests;
 

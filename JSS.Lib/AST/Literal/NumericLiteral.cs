@@ -1,4 +1,4 @@
-﻿using JSS.Lib.AST.Value;
+﻿using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
 
 namespace JSS.Lib.AST.Literal;

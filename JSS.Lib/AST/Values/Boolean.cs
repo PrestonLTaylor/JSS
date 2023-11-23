@@ -1,4 +1,4 @@
-﻿namespace JSS.Lib.AST.Value;
+﻿namespace JSS.Lib.AST.Values;
 
 internal sealed class Boolean : Value
 {
