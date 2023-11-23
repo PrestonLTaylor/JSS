@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.AST.Value;
+using JSS.Lib.Execution;
 
 namespace JSS.Lib.AST.Literal;
 
@@ -10,7 +11,12 @@ internal sealed class NumericLiteral : IExpression
         _value = new Number { Value = value };
     }
 
-    // FIXME: 13.2.3.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-literals-runtime-semantics-evaluation
+    // 13.2.3.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-literals-runtime-semantics-evaluation
+    override public Completion Evaluate(VM _)
+    {
+        // 1. Return the NumericValue of NumericLiteral as defined in 12.9.3.
+        return Completion.NormalCompletion(_value);
+    }
 
     public double Value
     {
