@@ -1,4 +1,5 @@
-﻿using JSS.Lib.AST.Values;
+﻿using JSS.Lib.AST;
+using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
 using Boolean = JSS.Lib.AST.Values.Boolean;
 using String = JSS.Lib.AST.Values.String;
@@ -110,5 +111,62 @@ internal sealed class AbstractOperationTests
         var numberValue = asNumeric.Value as Number;
         Assert.That(numberValue, Is.Not.Null);
         Assert.That(numberValue.Value, Is.EqualTo(expectedNumber));
+    }
+
+    static private readonly object[] unaryMinusValueToExpectedNumberTestCases = new object[]
+    {
+        new object[] { new Number(1.0), -1.0 },
+        new object[] { new Number(-1.0), 1.0 },
+        new object[] { new Number(double.NaN), double.NaN },
+    };
+
+    [TestCaseSource(nameof(unaryMinusValueToExpectedNumberTestCases))]
+    public void UnaryMinus_ReturnsExpectedNumber_WhenProvidingValue(Number testCase, double expectedNumber)
+    {
+        // Arrange
+
+        // Act
+        var result = Number.UnaryMinus(testCase);
+
+        // Assert
+        Assert.That(result?.Value, Is.EqualTo(expectedNumber));
+    }
+
+    // FIXME: Individual test cases for the underlying abstract operations in ApplyStringOrNumericBinaryOperator 
+    // FIXME: More test case coverage
+    static private readonly object[] binaryExpressionToExpectedValueTestCases =
+    {
+        // String Concatination tests
+        new object[] { new String("lhs"), BinaryOpType.Add, new String("rhs"), new String("lhsrhs") },
+        new object[] { new String(""), BinaryOpType.Add, new Number(1.0), new String("1") },
+        new object[] { new Number(1.0), BinaryOpType.Add, new String(""), new String("1") },
+
+        // Numeric tests
+        new object[] { new Number(1.0), BinaryOpType.Exponentiate, new Number(1.0), new Number(1.0) },
+        new object[] { new Number(1.0), BinaryOpType.Multiply, new Number(1.0), new Number(1.0) },
+        new object[] { new Number(1.0), BinaryOpType.Divide, new Number(1.0), new Number(1.0) },
+        new object[] { new Number(1.0), BinaryOpType.Remainder, new Number(1.0), new Number(0.0) },
+        new object[] { new Number(1.0), BinaryOpType.Add, new Number(1.0), new Number(2.0) },
+        new object[] { new Number(1.0), BinaryOpType.Subtract, new Number(1.0), new Number(0.0) },
+        new object[] { new Number(1.0), BinaryOpType.LeftShift, new Number(1.0), new Number(2.0) },
+        new object[] { new Number(1.0), BinaryOpType.SignedRightShift, new Number(1.0), new Number(0.0) },
+        new object[] { new Number(1.0), BinaryOpType.UnsignedRightShift, new Number(1.0), new Number(0.0) },
+        new object[] { new Number(1.0), BinaryOpType.BitwiseAND, new Number(1.0), new Number(1.0) },
+        new object[] { new Number(1.0), BinaryOpType.BitwiseXOR, new Number(1.0), new Number(0.0) },
+        new object[] { new Number(1.0), BinaryOpType.BitwiseOR, new Number(1.0), new Number(1.0) },
+    };
+
+    [TestCaseSource(nameof(binaryExpressionToExpectedValueTestCases))]
+    public void ApplyStringOrNumericBinaryOperator_ReturnsNormalCompletion_WithExpectedValue(Value lhs, BinaryOpType op, Value rhs, Value expectedValue)
+    {
+        // Arrange
+        var vm = new VM();
+
+        // Act
+        var result = IExpression.ApplyStringOrNumericBinaryOperator(vm, lhs, op, rhs);
+
+        // Assert
+        Assert.That(result.IsNormalCompletion(), Is.True);
+        Assert.That(result.Value, Is.EqualTo(expectedValue));
     }
 }
