@@ -145,27 +145,6 @@ internal sealed class ASTTests
         Assert.That(completion.Value, Is.EqualTo(expectedValue));
     }
 
-    static private readonly object[] normalCompletionSubtractionTestCases =
-    {
-        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(0.0) },
-        new object[] { new NumericLiteral(1.0), new NumericLiteral(-1.0), new Number(2.0) },
-    };
-
-    [TestCaseSource(nameof(normalCompletionSubtractionTestCases))]
-    public void SubtractionExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
-    {
-        // Arrange
-        var vm = new VM();
-        var subtractionExpression = new SubtractionExpression(lhs, rhs);
-
-        // Act
-        var completion = subtractionExpression.Evaluate(vm);
-
-        // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
-    }
-
     static private readonly object[] normalCompletionBitwiseAndTestCases =
     {
         new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(1.0) },
@@ -173,7 +152,7 @@ internal sealed class ASTTests
     };
 
     [TestCaseSource(nameof(normalCompletionBitwiseAndTestCases))]
-    public void BitwiseAnd_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
+    public void BitwiseAndExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
         var vm = new VM();
@@ -194,7 +173,7 @@ internal sealed class ASTTests
     };
 
     [TestCaseSource(nameof(normalCompletionBitwiseOrTestCases))]
-    public void BitwiseOr_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
+    public void BitwiseOrExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
         var vm = new VM();
@@ -215,7 +194,7 @@ internal sealed class ASTTests
     };
 
     [TestCaseSource(nameof(normalCompletionBitwiseXorTestCases))]
-    public void BitwiseXor_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
+    public void BitwiseXorExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
         var vm = new VM();
@@ -223,6 +202,48 @@ internal sealed class ASTTests
 
         // Act
         var completion = bitwiseXorExpression.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsNormalCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+    }
+
+    static private readonly object[] normalCompletionDivisionTestCases =
+    {
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(1.0) },
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(-1.0), new Number(-1.0) },
+    };
+
+    [TestCaseSource(nameof(normalCompletionDivisionTestCases))]
+    public void DivisionExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
+    {
+        // Arrange
+        var vm = new VM();
+        var divisionExpression = new DivisionExpression(lhs, rhs);
+
+        // Act
+        var completion = divisionExpression.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsNormalCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+    }
+
+    static private readonly object[] normalCompletionSubtractionTestCases =
+    {
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(0.0) },
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(-1.0), new Number(2.0) },
+    };
+
+    [TestCaseSource(nameof(normalCompletionSubtractionTestCases))]
+    public void SubtractionExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
+    {
+        // Arrange
+        var vm = new VM();
+        var subtractionExpression = new SubtractionExpression(lhs, rhs);
+
+        // Act
+        var completion = subtractionExpression.Evaluate(vm);
 
         // Assert
         Assert.That(completion.IsNormalCompletion(), Is.True);
