@@ -271,6 +271,27 @@ internal sealed class ASTTests
         Assert.That(completion.Value, Is.EqualTo(expectedValue));
     }
 
+    static private readonly object[] normalCompletionModuloTestCases =
+    {
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(0.0) },
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(-1.0), new Number(0.0) },
+    };
+
+    [TestCaseSource(nameof(normalCompletionModuloTestCases))]
+    public void ModuloExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
+    {
+        // Arrange
+        var vm = new VM();
+        var moduloExpression = new ModuloExpression(lhs, rhs);
+
+        // Act
+        var completion = moduloExpression.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsNormalCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+    }
+
     static private readonly object[] normalCompletionSubtractionTestCases =
     {
         new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(0.0) },
