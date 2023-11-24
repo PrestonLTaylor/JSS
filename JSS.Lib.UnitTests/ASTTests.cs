@@ -144,4 +144,26 @@ internal sealed class ASTTests
         Assert.That(completion.IsNormalCompletion(), Is.True);
         Assert.That(completion.Value, Is.EqualTo(expectedValue));
     }
+
+    // FIXME: More test case coverage
+    static private readonly object[] normalCompletionSubtractionTestCases =
+    {
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(0.0) },
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(-1.0), new Number(2.0) },
+    };
+
+    [TestCaseSource(nameof(normalCompletionSubtractionTestCases))]
+    public void SubtractionExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
+    {
+        // Arrange
+        var vm = new VM();
+        var subtractionExpression = new SubtractionExpression(lhs, rhs);
+
+        // Act
+        var completion = subtractionExpression.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsNormalCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+    }
 }
