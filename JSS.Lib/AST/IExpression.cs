@@ -101,4 +101,23 @@ internal abstract class IExpression : INode
         var result = operation((lnum.Value as Number)!, (rnum.Value as Number)!);
         return Completion.NormalCompletion(result);
     }
+
+    // 13.15.4 EvaluateStringOrNumericBinaryExpression ( leftOperand, opText, rightOperand )
+    static public Completion EvaluateStringOrNumericBinaryExpression(VM vm, IExpression lhs, BinaryOpType op, IExpression rhs)
+    {
+        // 1.Let lref be ? Evaluation of leftOperand.
+        var lref = lhs.Evaluate(vm);
+        if (lref.IsAbruptCompletion()) return lref;
+
+        // FIXME: 2. Let lval be ? GetValue(lref).
+
+        // 3. Let rref be ? Evaluation of rightOperand.
+        var rref = rhs.Evaluate(vm);
+        if (rref.IsAbruptCompletion()) return rref;
+
+        // FIXME: 4. Let rval be ? GetValue(rref).
+
+        // 5. Return ? ApplyStringOrNumericBinaryOperator(lval, opText, rval).
+        return ApplyStringOrNumericBinaryOperator(vm, lref.Value!, op, rref.Value!);
+    }
 }

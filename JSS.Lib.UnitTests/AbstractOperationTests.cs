@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.AST;
+using JSS.Lib.AST.Literal;
 using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
 using Boolean = JSS.Lib.AST.Values.Boolean;
@@ -164,6 +165,42 @@ internal sealed class AbstractOperationTests
 
         // Act
         var result = IExpression.ApplyStringOrNumericBinaryOperator(vm, lhs, op, rhs);
+
+        // Assert
+        Assert.That(result.IsNormalCompletion(), Is.True);
+        Assert.That(result.Value, Is.EqualTo(expectedValue));
+    }
+
+    static private readonly object[] binaryAstExpressionToExpectedValueTestCases =
+    {
+        // String Concatination tests
+        new object[] { new StringLiteral("lhs"), BinaryOpType.Add, new StringLiteral("rhs"), new String("lhsrhs") },
+        new object[] { new StringLiteral(""), BinaryOpType.Add, new NumericLiteral(1.0), new String("1") },
+        new object[] { new NumericLiteral(1.0), BinaryOpType.Add, new StringLiteral(""), new String("1") },
+
+        // Numeric tests
+        new object[] { new NumericLiteral(1.0), BinaryOpType.Exponentiate, new NumericLiteral(1.0), new Number(1.0) },
+        new object[] { new NumericLiteral(1.0), BinaryOpType.Multiply, new NumericLiteral(1.0), new Number(1.0) },
+        new object[] { new NumericLiteral(1.0), BinaryOpType.Divide, new NumericLiteral(1.0), new Number(1.0) },
+        new object[] { new NumericLiteral(1.0), BinaryOpType.Remainder, new NumericLiteral(1.0), new Number(0.0) },
+        new object[] { new NumericLiteral(1.0), BinaryOpType.Add, new NumericLiteral(1.0), new Number(2.0) },
+        new object[] { new NumericLiteral(1.0), BinaryOpType.Subtract, new NumericLiteral(1.0), new Number(0.0) },
+        new object[] { new NumericLiteral(1.0), BinaryOpType.LeftShift, new NumericLiteral(1.0), new Number(2.0) },
+        new object[] { new NumericLiteral(1.0), BinaryOpType.SignedRightShift, new NumericLiteral(1.0), new Number(0.0) },
+        new object[] { new NumericLiteral(1.0), BinaryOpType.UnsignedRightShift, new NumericLiteral(1.0), new Number(0.0) },
+        new object[] { new NumericLiteral(1.0), BinaryOpType.BitwiseAND, new NumericLiteral(1.0), new Number(1.0) },
+        new object[] { new NumericLiteral(1.0), BinaryOpType.BitwiseXOR, new NumericLiteral(1.0), new Number(0.0) },
+        new object[] { new NumericLiteral(1.0), BinaryOpType.BitwiseOR, new NumericLiteral(1.0), new Number(1.0) },
+    };
+
+    [TestCaseSource(nameof(binaryAstExpressionToExpectedValueTestCases))]
+    public void EvaluateStringOrNumericBinaryExpression_ReturnsNormalCompletion_WithExpectedValue(IExpression lhs, BinaryOpType op, IExpression rhs, Value expectedValue)
+    {
+        // Arrange
+        var vm = new VM();
+
+        // Act
+        var result = IExpression.EvaluateStringOrNumericBinaryExpression(vm, lhs, op, rhs);
 
         // Assert
         Assert.That(result.IsNormalCompletion(), Is.True);
