@@ -117,7 +117,7 @@ internal sealed class ASTTests
         Assert.That(stringValue.Value, Is.EqualTo(testCase));
     }
 
-    // FIXME: More test case coverage
+    // FIXME: More test case coverage for binary expressions
     static private readonly object[] normalCompletionAdditionTestCases =
     {
         // String Concatination tests
@@ -145,7 +145,6 @@ internal sealed class ASTTests
         Assert.That(completion.Value, Is.EqualTo(expectedValue));
     }
 
-    // FIXME: More test case coverage
     static private readonly object[] normalCompletionSubtractionTestCases =
     {
         new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(0.0) },
@@ -161,6 +160,69 @@ internal sealed class ASTTests
 
         // Act
         var completion = subtractionExpression.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsNormalCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+    }
+
+    static private readonly object[] normalCompletionBitwiseAndTestCases =
+    {
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(1.0) },
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(-1.0), new Number(1.0) },
+    };
+
+    [TestCaseSource(nameof(normalCompletionBitwiseAndTestCases))]
+    public void BitwiseAnd_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
+    {
+        // Arrange
+        var vm = new VM();
+        var bitwiseAndExpression = new BitwiseAndExpression(lhs, rhs);
+
+        // Act
+        var completion = bitwiseAndExpression.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsNormalCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+    }
+
+    static private readonly object[] normalCompletionBitwiseOrTestCases =
+    {
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(1.0) },
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(-1.0), new Number(-1.0) },
+    };
+
+    [TestCaseSource(nameof(normalCompletionBitwiseOrTestCases))]
+    public void BitwiseOr_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
+    {
+        // Arrange
+        var vm = new VM();
+        var bitwiseOrExpression = new BitwiseOrExpression(lhs, rhs);
+
+        // Act
+        var completion = bitwiseOrExpression.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsNormalCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+    }
+
+    static private readonly object[] normalCompletionBitwiseXorTestCases =
+    {
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(0.0) },
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(-1.0), new Number(-2.0) },
+    };
+
+    [TestCaseSource(nameof(normalCompletionBitwiseXorTestCases))]
+    public void BitwiseXor_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
+    {
+        // Arrange
+        var vm = new VM();
+        var bitwiseXorExpression = new BitwiseXorExpression(lhs, rhs);
+
+        // Act
+        var completion = bitwiseXorExpression.Evaluate(vm);
 
         // Assert
         Assert.That(completion.IsNormalCompletion(), Is.True);
