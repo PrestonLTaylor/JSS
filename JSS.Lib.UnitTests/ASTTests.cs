@@ -3,6 +3,7 @@ using JSS.Lib.AST.Literal;
 using JSS.Lib.Execution;
 using Boolean = JSS.Lib.AST.Values.Boolean;
 using String = JSS.Lib.AST.Values.String;
+using JSS.Lib.AST;
 
 namespace JSS.Lib.UnitTests;
 
@@ -114,5 +115,33 @@ internal sealed class ASTTests
         var stringValue = completion.Value as String;
         Assert.That(stringValue, Is.Not.Null);
         Assert.That(stringValue.Value, Is.EqualTo(testCase));
+    }
+
+    // FIXME: More test case coverage
+    static private readonly object[] normalCompletionAdditionTestCases =
+    {
+        // String Concatination tests
+        new object[] { new StringLiteral("lhs"), new StringLiteral("rhs"), new String("lhsrhs") },
+        new object[] { new StringLiteral(""), new NumericLiteral(1.0), new String("1") },
+        new object[] { new NumericLiteral(1.0), new StringLiteral(""), new String("1") },
+
+        // Numeric tests
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(2.0) },
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(-1.0), new Number(0.0) },
+    };
+
+    [TestCaseSource(nameof(normalCompletionAdditionTestCases))]
+    public void AdditionExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
+    {
+        // Arrange
+        var vm = new VM();
+        var additionExpression = new AdditionExpression(lhs, rhs);
+
+        // Act
+        var completion = additionExpression.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsNormalCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(expectedValue));
     }
 }
