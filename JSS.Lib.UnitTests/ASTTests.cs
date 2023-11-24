@@ -250,6 +250,27 @@ internal sealed class ASTTests
         Assert.That(completion.Value, Is.EqualTo(expectedValue));
     }
 
+    static private readonly object[] normalCompletionLeftShiftTestCases =
+    {
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(2.0) },
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(-1.0), new Number(-2147483648.0) },
+    };
+
+    [TestCaseSource(nameof(normalCompletionLeftShiftTestCases))]
+    public void LeftShiftExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
+    {
+        // Arrange
+        var vm = new VM();
+        var leftShiftExpression = new LeftShiftExpression(lhs, rhs);
+
+        // Act
+        var completion = leftShiftExpression.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsNormalCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+    }
+
     static private readonly object[] normalCompletionSubtractionTestCases =
     {
         new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(0.0) },
