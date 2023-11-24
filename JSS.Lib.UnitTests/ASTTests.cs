@@ -229,6 +229,27 @@ internal sealed class ASTTests
         Assert.That(completion.Value, Is.EqualTo(expectedValue));
     }
 
+    static private readonly object[] normalCompletionExponentiationTestCases =
+    {
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(1.0) },
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(-1.0), new Number(1.0) },
+    };
+
+    [TestCaseSource(nameof(normalCompletionExponentiationTestCases))]
+    public void ExponentiationExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
+    {
+        // Arrange
+        var vm = new VM();
+        var exponentiationExpression = new ExponentiationExpression(lhs, rhs);
+
+        // Act
+        var completion = exponentiationExpression.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsNormalCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+    }
+
     static private readonly object[] normalCompletionSubtractionTestCases =
     {
         new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(0.0) },
