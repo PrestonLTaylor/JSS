@@ -1,4 +1,6 @@
-﻿namespace JSS.Lib.AST;
+﻿using JSS.Lib.Execution;
+
+namespace JSS.Lib.AST;
 
 // 13.9.2 The Signed Right Shift Operator ( >> ), https://tc39.es/ecma262/#sec-signed-right-shift-operator
 internal sealed class RightShiftExpression : IExpression
@@ -9,7 +11,12 @@ internal sealed class RightShiftExpression : IExpression
         Rhs = rhs;
     }
 
-    // FIXME: 13.9.2.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-signed-right-shift-operator-runtime-semantics-evaluation
+    // 13.9.2.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-signed-right-shift-operator-runtime-semantics-evaluation
+    override public Completion Evaluate(VM vm)
+    {
+        // 1. Return ? EvaluateStringOrNumericBinaryExpression(ShiftExpression, >>, AdditiveExpression).
+        return EvaluateStringOrNumericBinaryExpression(vm, Lhs, BinaryOpType.SignedRightShift, Rhs);
+    }
 
     public IExpression Lhs { get; }
     public IExpression Rhs { get; }
