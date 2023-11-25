@@ -20,13 +20,13 @@ internal sealed class Parser
     }
 
     // 16.1 Scripts, https://tc39.es/ecma262/#sec-scripts
-    private List<INode> ParseScript()
+    private StatementList ParseScript()
     {
         return ParseStatementListWhile(() => _consumer.CanConsume());
     }
 
     // StatementList, https://tc39.es/ecma262/#prod-StatementList
-    private List<INode> ParseStatementListWhile(Func<bool> shouldParse)
+    private StatementList ParseStatementListWhile(Func<bool> shouldParse)
     {
         List<INode> nodes = new();
 
@@ -35,7 +35,7 @@ internal sealed class Parser
             nodes.Add(ParseStatementListItem());
         }
 
-        return nodes;
+        return new StatementList(nodes);
     }
 
     // StatementListItem, https://tc39.es/ecma262/#prod-StatementListItem
@@ -1188,11 +1188,11 @@ internal sealed class Parser
     {
         _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
 
-        var blockNodes = ParseStatementListWhile(() => _consumer.CanConsume() && !_consumer.IsTokenOfType(TokenType.ClosedBrace));
+        var statementList = ParseStatementListWhile(() => _consumer.CanConsume() && !_consumer.IsTokenOfType(TokenType.ClosedBrace));
 
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
-        return new Block(blockNodes);
+        return new Block(statementList);
     }
 
     // 14.3.1 Let and Const Declarations, https://tc39.es/ecma262/#sec-let-and-const-declarations
@@ -1585,7 +1585,7 @@ internal sealed class Parser
         return _consumer.IsTokenOfType(TokenType.Default);
     }
 
-    private List<INode> ParseSwitchCaseStatementList()
+    private StatementList ParseSwitchCaseStatementList()
     {
         return ParseStatementListWhile(() =>
         {
@@ -1748,7 +1748,7 @@ internal sealed class Parser
         return new FunctionDeclaration(identifier.Name, parameters, body);
     }
 
-    private List<INode> ParseFunctionBody()
+    private StatementList ParseFunctionBody()
     {
         return ParseStatementListWhile(() => _consumer.CanConsume() && !_consumer.IsTokenOfType(TokenType.ClosedBrace));
     }

@@ -4,7 +4,7 @@
 internal sealed class FunctionDeclaration : INode
 {
     // FIXME: Early errors for parameters having the same name, https://tc39.es/ecma262/#sec-function-definitions-static-semantics-early-errors
-    public FunctionDeclaration(string identifier, List<Identifier> parameters, List<INode> body)
+    public FunctionDeclaration(string identifier, List<Identifier> parameters, StatementList body)
     {
         Identifier = identifier;
         Parameters = parameters;
@@ -15,5 +15,5 @@ internal sealed class FunctionDeclaration : INode
 
     public string Identifier { get; }
     public IReadOnlyList<Identifier> Parameters { get; }
-    public IReadOnlyList<INode> Body { get; }
+    public StatementList Body { get; }
 }

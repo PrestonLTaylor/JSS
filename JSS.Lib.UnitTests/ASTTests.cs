@@ -375,5 +375,4 @@ internal sealed class ASTTests
         Assert.That(completion.IsNormalCompletion(), Is.True);
         Assert.That(completion.Value, Is.EqualTo(expectedValue));
     }
-
 }

@@ -274,7 +274,7 @@ internal sealed class ParserTests
 
         var block = rootNodes[0] as Block;
         Assert.That(block, Is.Not.Null);
-        Assert.That(block.Nodes, Is.Empty);
+        Assert.That(block.Statements.Statements, Is.Empty);
     }
 
     // FIXME: Make test cases for a variety of statements/declarations
@@ -294,7 +294,7 @@ internal sealed class ParserTests
         var block = rootNodes[0] as Block;
         Assert.That(block, Is.Not.Null);
 
-        var blockNodes = block.Nodes;
+        var blockNodes = block.Statements.Statements;
         Assert.That(blockNodes, Has.Count.EqualTo(1));
         Assert.That(blockNodes[0], Is.InstanceOf<ExpressionStatement>());
     }
@@ -1019,7 +1019,7 @@ internal sealed class ParserTests
         Assert.That(functionDeclaration, Is.Not.Null);
         Assert.That(functionDeclaration.Identifier, Is.EqualTo(expectedFunctionIdentifier));
         Assert.That(functionDeclaration.Parameters, Is.Empty);
-        Assert.That(functionDeclaration.Body, Is.Empty);
+        Assert.That(functionDeclaration.Body.Statements, Is.Empty);
     }
 
     [Test]
@@ -1041,7 +1041,7 @@ internal sealed class ParserTests
         var functionDeclaration = rootNodes[0] as FunctionDeclaration;
         Assert.That(functionDeclaration, Is.Not.Null);
         Assert.That(functionDeclaration.Identifier, Is.EqualTo(expectedFunctionIdentifier));
-        Assert.That(functionDeclaration.Body, Is.Empty);
+        Assert.That(functionDeclaration.Body.Statements, Is.Empty);
 
         var parameters  = functionDeclaration.Parameters;
         Assert.That(parameters, Has.Count.EqualTo(2));
@@ -1067,7 +1067,7 @@ internal sealed class ParserTests
         var functionDeclaration = rootNodes[0] as FunctionDeclaration;
         Assert.That(functionDeclaration, Is.Not.Null);
         Assert.That(functionDeclaration.Identifier, Is.EqualTo(expectedFunctionIdentifier));
-        Assert.That(functionDeclaration.Body, Is.Empty);
+        Assert.That(functionDeclaration.Body.Statements, Is.Empty);
 
         var parameters = functionDeclaration.Parameters;
         Assert.That(parameters, Has.Count.EqualTo(1));
@@ -1125,7 +1125,7 @@ internal sealed class ParserTests
         var publicMethod = classDeclaration.Methods[0];
         Assert.That(publicMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
         Assert.That(publicMethod.Parameters, Is.Empty);
-        Assert.That(publicMethod.Body, Is.Empty);
+        Assert.That(publicMethod.Body.Statements, Is.Empty);
         Assert.That(publicMethod.IsPrivate, Is.False);
     }
 
@@ -1156,7 +1156,7 @@ internal sealed class ParserTests
         var privateMethod = classDeclaration.Methods[0];
         Assert.That(privateMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
         Assert.That(privateMethod.Parameters, Is.Empty);
-        Assert.That(privateMethod.Body, Is.Empty);
+        Assert.That(privateMethod.Body.Statements, Is.Empty);
         Assert.That(privateMethod.IsPrivate, Is.True);
     }
 
@@ -1187,7 +1187,7 @@ internal sealed class ParserTests
         var staticPublicMethod = classDeclaration.StaticMethods[0];
         Assert.That(staticPublicMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
         Assert.That(staticPublicMethod.Parameters, Is.Empty);
-        Assert.That(staticPublicMethod.Body, Is.Empty);
+        Assert.That(staticPublicMethod.Body.Statements, Is.Empty);
         Assert.That(staticPublicMethod.IsPrivate, Is.False);
     }
 
@@ -1218,7 +1218,7 @@ internal sealed class ParserTests
         var staticPrivateMethod = classDeclaration.StaticMethods[0];
         Assert.That(staticPrivateMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
         Assert.That(staticPrivateMethod.Parameters, Is.Empty);
-        Assert.That(staticPrivateMethod.Body, Is.Empty);
+        Assert.That(staticPrivateMethod.Body.Statements, Is.Empty);
         Assert.That(staticPrivateMethod.IsPrivate, Is.True);
     }
 

@@ -2,24 +2,32 @@
 
 internal readonly struct CaseBlock
 {
-    public CaseBlock(IExpression caseExpression, IReadOnlyList<INode> statementList)
+    public CaseBlock(IExpression caseExpression, StatementList statements)
     {
         CaseExpression = caseExpression;
-        StatementList = statementList;
+        _statements = statements;
     }
 
     public IExpression CaseExpression { get; }
-    public IReadOnlyList<INode> StatementList { get; }
+    public IReadOnlyList<INode> StatementList 
+    { 
+        get { return _statements.Statements; } 
+    }
+    private readonly StatementList _statements;
 }
 
 internal readonly struct DefaultBlock
 {
-    public DefaultBlock(IReadOnlyList<INode> statementList)
+    public DefaultBlock(StatementList statements)
     {
-        StatementList = statementList;
+        _statements = statements;
     }
 
-    public IReadOnlyList<INode> StatementList { get; }
+    public IReadOnlyList<INode> StatementList 
+    { 
+        get { return _statements.Statements; } 
+    }
+    private readonly StatementList _statements;
 }
 
 // 14.12 The switch Statement, https://tc39.es/ecma262/#sec-switch-statement

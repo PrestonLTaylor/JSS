@@ -5,11 +5,11 @@ namespace JSS.Lib.Execution;
 // 16.1.4 Script Records, https://tc39.es/ecma262/#sec-script-records 
 internal sealed class Script
 {
-    public Script(List<INode> rootNodes)
+    public Script(StatementList statementList)
     {
         VM = new();
         Realm = new();
-        ScriptCode = rootNodes;
+        _statementList = statementList;
     }
 
     // 16.1.6 ScriptEvaluation ( scriptRecord ), https://tc39.es/ecma262/#sec-runtime-semantics-scriptevaluation
@@ -35,7 +35,7 @@ internal sealed class Script
 
         // FIXME: 13. If result.[[Type]] is NORMAL, then
         // a. Set result to Completion(Evaluation of script).
-        var result = Evaluate();
+        var result = _statementList.Evaluate(VM);
 
         // b. If result.[[Type]] is NORMAL and result.[[Value]] is EMPTY, then
         if (result.IsNormalCompletion() && result.IsValueEmpty())
@@ -52,35 +52,12 @@ internal sealed class Script
         return result;
     }
 
-    // 14.2.2 Runtime Semantics: Evaluation, StatementList, https://tc39.es/ecma262/#sec-block-runtime-semantics-evaluation
-    private Completion Evaluate()
-    {
-        // FIXME: This is not quite how it's laid out in the spec
-        // 1. Let sl be ? Evaluation of StatementList.
-        Completion completion = Completion.NormalCompletion();
-
-        foreach (var node in ScriptCode)
-        {
-            // 2. Let s be Completion(Evaluation of StatementListItem).
-            var s = node.Evaluate(VM);
-
-            // 3. Return ? UpdateEmpty(s, sl).
-            s.UpdateEmpty(completion.Value);
-            completion = s;
-
-            // FIXME: Maybe find a more eliquant way to do ReturnIfAbrupt
-            if (completion.IsAbruptCompletion())
-            {
-                return completion;
-            }
-        }
-
-        return completion;
-    }
-
     public VM VM { get; }
     public Realm Realm { get; }
-    // FIXME: We should probably have a StatementList class
-    public IReadOnlyList<INode> ScriptCode { get; }
+    public IReadOnlyList<INode> ScriptCode
+    {
+        get { return _statementList.Statements; }
+    }
+    private readonly StatementList _statementList;
     // FIXME: LoadedModules
 }
