@@ -103,7 +103,41 @@ internal sealed class ASTTests
         // NOTE: This assert makes sure we use the vm's global null value
         Assert.That(completion.Value, Is.SameAs(script.VM.Null));
     }
- 
+
+    [Test]
+    public void BreakStatement_Evaluate_ReturnsBreakCompletion_WithNoTarget_WhenProvidingBreak_WithNoTarget()
+    {
+        // Arrange
+        var vm = new VM();
+        var breakStatement = new BreakStatement(null);
+
+        // Act
+        var completion = breakStatement.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsBreakCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(vm.Empty));
+        Assert.That(completion.Target, Is.Empty);
+    }
+
+    [Test]
+    public void BreakStatement_Evaluate_ReturnsBreakCompletion_WithTarget_WhenProvidingBreak_WithTarget()
+    {
+        // Arrange
+        const string expectedTarget = "target";
+        var vm = new VM();
+        var identifier = new Identifier(expectedTarget);
+        var breakStatement = new BreakStatement(identifier);
+
+        // Act
+        var completion = breakStatement.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsBreakCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(vm.Empty));
+        Assert.That(completion.Target, Is.EqualTo(expectedTarget));
+    }
+
     // FIXME: Replace these manual ast tests with the astTestCases array when we can parse more numbers
     static private readonly object[] normalCompletionBitwiseAndTestCases =
     {
