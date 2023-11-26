@@ -38,7 +38,7 @@ internal sealed class Completion
     public void UpdateEmpty(Value? value)
     {
         // 1. Assert: If completionRecord.[[Type]] is either RETURN or THROW, then completionRecord.[[Value]] is not EMPTY.
-        Debug.Assert((IsReturnCompletion() || IsThrowCompletion()) && !IsValueEmpty());
+        Debug.Assert(!(IsReturnCompletion() || IsThrowCompletion()) || !IsValueEmpty());
 
         // 2. If completionRecord.[[Value]] is not EMPTY, return ? completionRecord.
         if (!IsValueEmpty()) return;
