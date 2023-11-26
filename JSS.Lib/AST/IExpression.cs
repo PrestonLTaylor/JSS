@@ -37,14 +37,14 @@ internal abstract class IExpression : INode
             if (rprim.IsAbruptCompletion()) return rprim;
 
             // c. If lprim is a String or rprim is a String, then
-            if (lprim.Value!.IsString() || rprim.Value!.IsString())
+            if (lprim.Value.IsString() || rprim.Value.IsString())
             {
                 // i. Let lstr be ? ToString(lprim).
-                var lstr = lprim.Value!.ToStringJS();
+                var lstr = lprim.Value.ToStringJS();
                 if (lstr.IsAbruptCompletion()) return lstr;
 
                 // ii. Let rstr be ? ToString(rprim).
-                var rstr = rprim.Value!.ToStringJS();
+                var rstr = rprim.Value.ToStringJS();
                 if (rstr.IsAbruptCompletion()) return rstr;
 
                 // iii. Return the string-concatenation of lstr and rstr.
@@ -55,10 +55,10 @@ internal abstract class IExpression : INode
             }
 
             // d. Set lval to lprim.
-            lval = lprim.Value!;
+            lval = lprim.Value;
 
             // e. Set rval to rprim.
-            rval = rprim.Value!;
+            rval = rprim.Value;
         }
 
         // 2. NOTE: At this point, it must be a numeric operation.
@@ -118,6 +118,6 @@ internal abstract class IExpression : INode
         // FIXME: 4. Let rval be ? GetValue(rref).
 
         // 5. Return ? ApplyStringOrNumericBinaryOperator(lval, opText, rval).
-        return ApplyStringOrNumericBinaryOperator(vm, lref.Value!, op, rref.Value!);
+        return ApplyStringOrNumericBinaryOperator(vm, lref.Value, op, rref.Value);
     }
 }

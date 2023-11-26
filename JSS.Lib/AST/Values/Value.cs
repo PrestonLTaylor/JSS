@@ -6,6 +6,7 @@ namespace JSS.Lib.AST.Values;
 // 6.1 ECMAScript Language Types, https://tc39.es/ecma262/#sec-ecmascript-language-types
 internal abstract class Value
 {
+    virtual public bool IsEmpty() { return false; }
     virtual public bool IsUndefined() { return false; }
     virtual public bool IsNull() { return false; }
     virtual public bool IsBoolean() { return false; }
@@ -48,7 +49,7 @@ internal abstract class Value
         // FIXME: 2. If primValue is a BigInt, return primValue.
 
         // 3. Return ? ToNumber(primValue).
-        return primValue.Value!.ToNumber(vm);
+        return primValue.Value.ToNumber(vm);
     }
 
     // 7.1.4 ToNumber ( argument ), https://tc39.es/ecma262/#sec-tonumber

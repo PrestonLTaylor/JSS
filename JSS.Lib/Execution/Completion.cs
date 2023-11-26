@@ -15,7 +15,7 @@ internal enum CompletionType
 // 6.2.4 The Completion Record Specification Type, https://tc39.es/ecma262/#sec-completion-record-specification-type
 internal sealed class Completion
 {
-    public Completion(CompletionType type, Value? value, string target)
+    public Completion(CompletionType type, Value value, string target)
     {
         Type = type;
         Value = value;
@@ -23,7 +23,7 @@ internal sealed class Completion
     }
 
     // 6.2.4.1 NormalCompletion ( value ), https://tc39.es/ecma262/#sec-normalcompletion
-    static public Completion NormalCompletion(Value? value = null)
+    static public Completion NormalCompletion(Value value)
     {
         return new Completion(CompletionType.Normal, value, "");
     }
@@ -35,7 +35,7 @@ internal sealed class Completion
     }
 
     // 6.2.4.3 UpdateEmpty ( completionRecord, value ), https://tc39.es/ecma262/#sec-updateempty
-    public void UpdateEmpty(Value? value)
+    public void UpdateEmpty(Value value)
     {
         // 1. Assert: If completionRecord.[[Type]] is either RETURN or THROW, then completionRecord.[[Value]] is not EMPTY.
         Debug.Assert(!(IsReturnCompletion() || IsThrowCompletion()) || !IsValueEmpty());
@@ -54,9 +54,9 @@ internal sealed class Completion
     public bool IsThrowCompletion() { return Type == CompletionType.Throw; }
     public bool IsAbruptCompletion() { return !IsNormalCompletion(); }
 
-    public bool IsValueEmpty() {  return Value == null; }
+    public bool IsValueEmpty() {  return Value.IsEmpty(); }
 
     public CompletionType Type { get; }
-    public Value? Value { get; private set; }
+    public Value Value { get; private set; }
     public string Target { get; }
 }

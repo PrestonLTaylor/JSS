@@ -13,9 +13,8 @@ internal sealed class StatementList : INode
     // 14.2.2 Runtime Semantics: Evaluation, StatementList, https://tc39.es/ecma262/#sec-block-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
-        // FIXME: This technically should be initially EMPTY, but for now this is fine
         // 1. Let sl be ? Evaluation of StatementList.
-        Completion completion = Completion.NormalCompletion();
+        Completion completion = Completion.NormalCompletion(vm.Empty);
         foreach (var statement in Statements)
         {
             // 2. Let s be Completion(Evaluation of StatementListItem).
