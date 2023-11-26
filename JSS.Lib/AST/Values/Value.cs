@@ -43,11 +43,12 @@ internal abstract class Value
     {
         // 1. Let primValue be ? ToPrimitive(value, FIXME: NUMBER).
         var primValue = ToPrimitive();
+        if (primValue.IsAbruptCompletion()) { return primValue; }
 
         // FIXME: 2. If primValue is a BigInt, return primValue.
 
         // 3. Return ? ToNumber(primValue).
-        return ToNumber(vm);
+        return primValue.Value!.ToNumber(vm);
     }
 
     // 7.1.4 ToNumber ( argument ), https://tc39.es/ecma262/#sec-tonumber
