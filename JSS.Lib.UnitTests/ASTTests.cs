@@ -40,6 +40,14 @@ internal sealed class ASTTests
 
         // Tests for an empty statement
         new object[] { ";", Completion.NormalCompletion(new Undefined()) },
+
+        // Tests for a block
+        new object[] { "{ }", Completion.NormalCompletion(new Undefined()) },
+        new object[] { "{ true }", Completion.NormalCompletion(new Boolean(true)) },
+        new object[] { "{ 1 }", Completion.NormalCompletion(new Number(1)) },
+        new object[] { "{ \"string\" }", Completion.NormalCompletion(new String("string")) },
+        new object[] { "{ 1 + 1 }", Completion.NormalCompletion(new Number(2)) },
+        new object[] { "{ true ; }", Completion.NormalCompletion(new Boolean(true)) },
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
