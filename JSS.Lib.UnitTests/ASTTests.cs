@@ -37,6 +37,9 @@ internal sealed class ASTTests
         // Tests for addition
         CreateAdditionTestCase(1, 1, 2),
         CreateAdditionTestCase(1, 0, 1),
+
+        // Tests for an empty statement
+        new object[] { ";", Completion.NormalCompletion(new Undefined()) },
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
