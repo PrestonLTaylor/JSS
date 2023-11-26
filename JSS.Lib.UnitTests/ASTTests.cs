@@ -138,6 +138,40 @@ internal sealed class ASTTests
         Assert.That(completion.Target, Is.EqualTo(expectedTarget));
     }
 
+    [Test]
+    public void ContinueStatement_Evaluate_ReturnsContinueCompletion_WithNoTarget_WhenProvidingContinue_WithNoTarget()
+    {
+        // Arrange
+        var vm = new VM();
+        var continueStatement = new ContinueStatement(null);
+
+        // Act
+        var completion = continueStatement.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsContinueCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(vm.Empty));
+        Assert.That(completion.Target, Is.Empty);
+    }
+
+    [Test]
+    public void ContinueStatement_Evaluate_ReturnsContinueCompletion_WithTarget_WhenProvidingContinue_WithTarget()
+    {
+        // Arrange
+        const string expectedTarget = "target";
+        var vm = new VM();
+        var identifier = new Identifier(expectedTarget);
+        var continueStatement = new ContinueStatement(identifier);
+
+        // Act
+        var completion = continueStatement.Evaluate(vm);
+
+        // Assert
+        Assert.That(completion.IsContinueCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(vm.Empty));
+        Assert.That(completion.Target, Is.EqualTo(expectedTarget));
+    }
+
     // FIXME: Replace these manual ast tests with the astTestCases array when we can parse more numbers
     static private readonly object[] normalCompletionBitwiseAndTestCases =
     {
