@@ -7,144 +7,93 @@ using JSS.Lib.AST;
 
 namespace JSS.Lib.UnitTests;
 
+// NOTE: These aren't traditional unit tests, as the units of work are based on the spec instead of code.
+// However, if we can trust our parser then they are close to traditional unit tests.
 internal sealed class ASTTests
 {
-    [Test]
-    public void BooleanLiteral_Evaluate_ReturnsNormalCompletion_WithFalseValue_WhenProvidingFalse()
+    // FIXME: In general we need more varied test cases for a lot of specific parts of the langauge
+    static private readonly object[] astTestCases =
+    {
+        // Tests for Literals
+        CreateBooleanLiteralTestCase(false),
+        CreateBooleanLiteralTestCase(true),
+
+        // FIXME: More numeric test cases when we can parse more numbers
+        CreateNumericLiteralTestCase(0),
+        CreateNumericLiteralTestCase(1),
+        CreateNumericLiteralTestCase(123),
+        CreateNumericLiteralTestCase(1234567890),
+
+        // FIXME: More string test cases when we can parse more strings (e.g. escape sequences)
+        CreateStringLiteralTestCase("this is a string value"),
+        CreateStringLiteralTestCase("\"", '\''),
+        CreateStringLiteralTestCase("'"),
+
+        // Tests for string concatination
+        CreateStringConcatinationTestCase("\"lhs\"", "\"rhs\"", "lhsrhs"),
+        CreateStringConcatinationTestCase("\"\"", "1", "1"),
+        CreateStringConcatinationTestCase("1", "\"\"", "1"),
+
+        // Tests for addition
+        CreateAdditionTestCase(1, 1, 2),
+        CreateAdditionTestCase(1, 0, 1),
+    };
+
+    static private object[] CreateBooleanLiteralTestCase(bool value)
+    {
+        return new object[] { value ? "true" : "false", Completion.NormalCompletion(new Boolean(value)) };
+    }
+
+    static private object[] CreateNumericLiteralTestCase(double value)
+    {
+        return new object[] { value.ToString(), Completion.NormalCompletion(new Number(value)) };
+    }
+
+    static private object[] CreateStringLiteralTestCase(string value, char quote = '"')
+    {
+        return new object[] { $"{quote}{value}{quote}", Completion.NormalCompletion(new String(value)) };
+    }
+
+    static private object[] CreateStringConcatinationTestCase(string lhs, string rhs, string expected)
+    {
+        return new object[] { $"{lhs} + {rhs}", Completion.NormalCompletion(new String(expected)) };
+    }
+
+    static private object[] CreateAdditionTestCase(double lhs, double rhs, double expected)
+    {
+        return new object[] { $"{lhs} + {rhs}", Completion.NormalCompletion(new Number(expected)) };
+    }
+
+    [TestCaseSource(nameof(astTestCases))]
+    public void ScriptEvaluation_ReturnsExpectedCompletionAndValue(string testCase, Completion expectedCompletion)
     {
         // Arrange
-        var vm = new VM();
-        var booleanLiteral = new BooleanLiteral(false);
+        var script = ParseScript(testCase);
 
         // Act
-        var completion = booleanLiteral.Evaluate(vm);
+        var actualCompletion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-
-        var booleanValue = completion.Value as Boolean;
-        Assert.That(booleanValue, Is.Not.Null);
-        Assert.That(booleanValue.Value, Is.False);
+        Assert.That(actualCompletion, Is.EqualTo(expectedCompletion));
     }
 
     [Test]
-    public void BooleanLiteral_Evaluate_ReturnsNormalCompletion_WithTrueValue_WhenProvidingTrue()
+    public void NullLiteral_Evalute_ReturnsNormalCompletion_WithGlobalVMNullValue()
     {
         // Arrange
-        var vm = new VM();
-        var booleanLiteral = new BooleanLiteral(true);
+        var script = ParseScript("null");
 
         // Act
-        var completion = booleanLiteral.Evaluate(vm);
-
-        // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-
-        var booleanValue = completion.Value as Boolean;
-        Assert.That(booleanValue, Is.Not.Null);
-        Assert.That(booleanValue.Value, Is.True);
-    }
-
-    [Test]
-    public void NullLiteral_Evalute_ReturnsNormalCompletion_WithNullValue()
-    {
-        // Arrange
-        var vm = new VM();
-        var nullLiteral = new NullLiteral();
-        
-        // Act
-        var completion = nullLiteral.Evaluate(vm);
+        var completion = script.ScriptEvaluation();
 
         // Assert
         Assert.That(completion.IsNormalCompletion(), Is.True);
 
         // NOTE: This assert makes sure we use the vm's global null value
-        Assert.That(completion.Value, Is.SameAs(vm.Null));
+        Assert.That(completion.Value, Is.SameAs(script.VM.Null));
     }
-
-    // FIXME: More test cases when we parse more numbers
-    static private readonly List<double> numericLiteralTestCases = new()
-    {
-        0.0, 
-        1.0, 
-        123.0, 
-        1234567890.0,
-    };
-
-    [TestCaseSource(nameof(numericLiteralTestCases))]
-    public void NumericLiteral_Evaluate_ReturnsNormalCompletion_WithExpectedNumber(double testCase)
-    {
-        // Arrange
-        var vm = new VM();
-        var numericLiteral = new NumericLiteral(testCase);
-
-        // Act
-        var completion = numericLiteral.Evaluate(vm);
-
-        // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-
-        var numberValue = completion.Value as Number;
-        Assert.That(numberValue, Is.Not.Null);
-        Assert.That(numberValue.Value, Is.EqualTo(testCase));
-    }
-
-    // FIXME: More test cases when we parse more strings
-    static private readonly List<string> stringLiteralTestCases = new()
-    {
-        "this is a string literal",
-        "\"'\"", 
-        "'",
-        "'\"'", 
-        "\"",
-    };
-
-    [TestCaseSource(nameof(stringLiteralTestCases))]
-    public void StringLiteral_Evaluate_ReturnsNormalCompletion_WithExpectedString(string testCase)
-    {
-        // Arrange
-        var vm = new VM();
-        var stringLiteral = new StringLiteral(testCase);
-        
-        // Act
-        var completion = stringLiteral.Evaluate(vm);
-
-        // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-
-        var stringValue = completion.Value as String;
-        Assert.That(stringValue, Is.Not.Null);
-        Assert.That(stringValue.Value, Is.EqualTo(testCase));
-    }
-
-    // FIXME: More test case coverage for binary expressions
-    static private readonly object[] normalCompletionAdditionTestCases =
-    {
-        // String Concatination tests
-        new object[] { new StringLiteral("lhs"), new StringLiteral("rhs"), new String("lhsrhs") },
-        new object[] { new StringLiteral(""), new NumericLiteral(1.0), new String("1") },
-        new object[] { new NumericLiteral(1.0), new StringLiteral(""), new String("1") },
-
-        // Numeric tests
-        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(2.0) },
-        new object[] { new NumericLiteral(1.0), new NumericLiteral(-1.0), new Number(0.0) },
-    };
-
-    [TestCaseSource(nameof(normalCompletionAdditionTestCases))]
-    public void AdditionExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
-    {
-        // Arrange
-        var vm = new VM();
-        var additionExpression = new AdditionExpression(lhs, rhs);
-
-        // Act
-        var completion = additionExpression.Evaluate(vm);
-
-        // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
-    }
-
+ 
+    // FIXME: Replace these manual ast tests with the astTestCases array when we can parse more numbers
     static private readonly object[] normalCompletionBitwiseAndTestCases =
     {
         new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(1.0) },
@@ -374,5 +323,10 @@ internal sealed class ASTTests
         // Assert
         Assert.That(completion.IsNormalCompletion(), Is.True);
         Assert.That(completion.Value, Is.EqualTo(expectedValue));
+    }
+
+    private Script ParseScript(string script)
+    {
+        return new Parser(script).Parse();
     }
 }

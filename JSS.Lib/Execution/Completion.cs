@@ -22,6 +22,18 @@ internal sealed class Completion
         Target = target;
     }
 
+    override public bool Equals(object? obj)
+    {
+        if (obj is not Completion completion) { return false; }
+
+        return Type == completion.Type && Value.Equals(completion.Value) && Target == completion.Target;
+    }
+
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(Type, Value, Target);
+    }
+
     // 6.2.4.1 NormalCompletion ( value ), https://tc39.es/ecma262/#sec-normalcompletion
     static public Completion NormalCompletion(Value value)
     {
