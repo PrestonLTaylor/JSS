@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.Execution;
+using System.Runtime.Intrinsics.X86;
 
 namespace JSS.Lib.AST.Values;
 
@@ -15,6 +16,24 @@ internal abstract class Value
     virtual public bool IsNumber() { return false; }
     virtual public bool IsBigInt() { return false; }
     virtual public bool IsObject() { return false; }
+
+    // 6.2.5.5 GetValue ( V ), https://tc39.es/ecma262/#sec-getvalue
+    public Completion GetValue()
+    {
+        // 1. If V is not a Reference Record, return V.
+        return Completion.NormalCompletion(this);
+
+        // FIXME: 2. If IsUnresolvableReference(V) is true, throw a ReferenceError exception.
+        // FIXME: 3. If IsPropertyReference(V) is true, then
+        // FIXME: a. Let baseObj be ? ToObject(V.[[Base]]).
+        // FIXME: b. If IsPrivateReference(V) is true, then
+        // FIXME: i. Return ? PrivateGet(baseObj, V.[[ReferencedName]]).
+        // FIXME: c. Return ? baseObj.[[Get]](V.[[ReferencedName]], GetThisValue(V)).
+        // FIXME: 4. Else,
+        // FIXME: a. Let base be V.[[Base]].
+        // FIXME: b. Assert: base is an Environment Record.
+        // FIXME: c. Return ? base.GetBindingValue(V.[[ReferencedName]], V.[[Strict]]) (see 9.1).
+    }
 
     // 7.1.1 ToPrimitive ( input FIXME: [ , preferredType ] ), https://tc39.es/ecma262/#sec-toprimitive
     public Completion ToPrimitive()

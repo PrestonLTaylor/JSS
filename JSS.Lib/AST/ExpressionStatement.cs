@@ -15,9 +15,10 @@ internal sealed class ExpressionStatement : INode
     {
         // 1. Let exprRef be ? Evaluation of Expression.
         var exprRef = Expression.Evaluate(vm);
+        if (exprRef.IsAbruptCompletion()) return exprRef;
 
-        // FIXME: 2. Return ? GetValue(exprRef).
-        return exprRef;
+        // 2. Return ? GetValue(exprRef).
+        return exprRef.Value.GetValue();
     }
 
     public IExpression Expression { get; }

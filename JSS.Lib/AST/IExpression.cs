@@ -109,15 +109,19 @@ internal abstract class IExpression : INode
         var lref = lhs.Evaluate(vm);
         if (lref.IsAbruptCompletion()) return lref;
 
-        // FIXME: 2. Let lval be ? GetValue(lref).
+        // 2. Let lval be ? GetValue(lref).
+        var lval = lref.Value.GetValue();
+        if (lval.IsAbruptCompletion()) return lval;
 
         // 3. Let rref be ? Evaluation of rightOperand.
         var rref = rhs.Evaluate(vm);
         if (rref.IsAbruptCompletion()) return rref;
 
-        // FIXME: 4. Let rval be ? GetValue(rref).
+        // 4. Let rval be ? GetValue(rref).
+        var rval = rref.Value.GetValue();
+        if (rval.IsAbruptCompletion()) return rval;
 
         // 5. Return ? ApplyStringOrNumericBinaryOperator(lval, opText, rval).
-        return ApplyStringOrNumericBinaryOperator(vm, lref.Value, op, rref.Value);
+        return ApplyStringOrNumericBinaryOperator(vm, lval.Value, op, rval.Value);
     }
 }
