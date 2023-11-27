@@ -7,7 +7,8 @@ internal sealed class String : Value
         Value = value;
     }
 
-    public override bool IsString() { return true; }
+    override public bool IsString() { return true; }
+    override public ValueType Type() { return ValueType.String; }
 
     override public bool Equals(object? obj)
     {

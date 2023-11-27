@@ -3,6 +3,7 @@
 internal sealed class Undefined : Value
 {
     override public bool IsUndefined() { return true; }
+    override public ValueType Type() { return ValueType.Undefined; }
 
     override public bool Equals(object? obj)
     {

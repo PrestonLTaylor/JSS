@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-namespace JSS.Lib.AST.Values;
+﻿namespace JSS.Lib.AST.Values;
 
 internal sealed class Number : Value
 {
@@ -10,6 +8,7 @@ internal sealed class Number : Value
     }
 
     public override bool IsNumber() { return true; }
+    override public ValueType Type() { return ValueType.Number; }
 
     override public bool Equals(object? obj)
     {
@@ -214,6 +213,34 @@ internal sealed class Number : Value
 
         // 11. If ℝ(x) < ℝ(y), return true. Otherwise, return false.
         return new Boolean(x.Value < y.Value);
+    }
+
+    // 6.1.6.1.13 Number::equal ( x, y )
+    static public Boolean Equal(Number x, Number y)
+    {
+        // 1. If x is NaN, return false.
+        if (double.IsNaN(x.Value))
+        {
+            return new Boolean(false);
+        }
+
+        // 2. If y is NaN, return false.
+        if (double.IsNaN(y.Value))
+        {
+            return new Boolean(false);
+        }
+
+        // 3. If x is y, return true.
+        if (x.Value == y.Value)
+        {
+            return new Boolean(true);
+        }
+
+        // FIXME: 4. If x is +0𝔽 and y is -0𝔽, return true.
+        // FIXME: 5. If x is -0𝔽 and y is +0𝔽, return true.
+
+        // 6. Return false.
+        return new Boolean(false);
     }
 
     internal enum BitwiseOp

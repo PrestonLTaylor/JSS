@@ -3,6 +3,7 @@
 internal sealed class Null : Value
 {
     public override bool IsNull() { return true; }
+    override public ValueType Type() { return ValueType.Null; }
 
     override public bool Equals(object? obj)
     {

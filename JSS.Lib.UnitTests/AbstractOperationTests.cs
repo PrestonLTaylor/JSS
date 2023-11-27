@@ -266,4 +266,37 @@ internal sealed class AbstractOperationTests
         // Assert
         Assert.That(result, Is.EqualTo(expectedValue));
     }
+
+    // FIXME: Tests for Number::equal and SameValueNonNumber
+    static private readonly object[] isStrictlyEqualLhsAndRhsToExpectedResultTestCase =
+    {
+        new object[] { new Null(), new Undefined(), false },
+        new object[] { new Undefined(), new Null(), false },
+        new object[] { new Undefined(), new Number(1), false },
+        new object[] { new Undefined(), new String("1"), false },
+        new object[] { new Number(1), new String("1"), false },
+        new object[] { new String("1"), new Number(1), false },
+        new object[] { new String("1"), new String("2"), false },
+        new object[] { new Number(1), new Number(2), false },
+        new object[] { new Boolean(false), new Boolean(true), false },
+        new object[] { new Undefined(), new Undefined(), true },
+        new object[] { new Null(), new Null(), true },
+        new object[] { new Boolean(false), new Boolean(false), true },
+        new object[] { new Boolean(true), new Boolean(true), true },
+        new object[] { new String("1"), new String("1"), true },
+        new object[] { new Number(1), new Number(1), true },
+    };
+
+    [TestCaseSource(nameof(isStrictlyEqualLhsAndRhsToExpectedResultTestCase))]
+    public void IsStrictlyEqual_ReturnsBoolean_WithExpectedResult(Value lhs, Value rhs, bool expectedResult)
+    {
+        // Arrange
+        var expectedValue = new Boolean(expectedResult);
+
+        // Act
+        var result = Value.IsStrictlyEqual(lhs, rhs);
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expectedValue));
+    }
 }

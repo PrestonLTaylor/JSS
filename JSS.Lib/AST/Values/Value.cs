@@ -1,8 +1,20 @@
 ﻿using JSS.Lib.Execution;
-using System.Runtime.Intrinsics.X86;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Diagnostics;
+using System.Security.Principal;
 
 namespace JSS.Lib.AST.Values;
+
+internal enum ValueType
+{
+    Undefined,
+    Null,
+    Boolean,
+    String,
+    Symbol,
+    Number,
+    BigInt,
+    Object
+}
 
 // FIXME: This is a very inefficient way of storing JS values.
 // 6.1 ECMAScript Language Types, https://tc39.es/ecma262/#sec-ecmascript-language-types
@@ -17,6 +29,8 @@ internal abstract class Value
     virtual public bool IsNumber() { return false; }
     virtual public bool IsBigInt() { return false; }
     virtual public bool IsObject() { return false; }
+
+    abstract public ValueType Type();
 
     // 6.2.5.5 GetValue ( V ), https://tc39.es/ecma262/#sec-getvalue
     public Completion GetValue()
@@ -194,6 +208,44 @@ internal abstract class Value
         throw new NotImplementedException();
     }
 
+    // 7.2.12 SameValueNonNumber( x, y ), https://tc39.es/ecma262/#sec-samevaluenonnumber
+    static public Boolean SameValueNonNumber(Value x, Value y)
+    {
+        // 1. Assert: Type(x) is Type(y).
+        Debug.Assert(x.Type().Equals(y.Type()));
+
+        // 2. If x is either null or undefined, return true.
+        if (x.IsNull() || x.IsUndefined())
+        {
+            return new Boolean(true);
+        }
+
+        // FIXME: 3. If x is a BigInt, then
+        // FIXME: a. Return BigInt::equal(x, y).
+
+        // 4. If x is a String, then
+        if (x.IsString())
+        {
+            // a. If x and y have the same length and the same code units in the same positions, return true; otherwise, return false.
+            var xAsString = (x as String)!.Value;
+            var yAsString = (y as String)!.Value;
+            return new Boolean(xAsString == yAsString);
+        }
+
+        // 5. If x is a Boolean, then
+        if (x.IsBoolean())
+        {
+            // 6. If x and y are both true or both false, return true; otherwise, return false.
+            var xAsBoolean = (x as Boolean)!.Value;
+            var yAsBoolean = (y as Boolean)!.Value;
+            return new Boolean(xAsBoolean == yAsBoolean);
+        }
+
+        // FIXME: 6. NOTE: All other ECMAScript language values are compared by identity.
+        // FIXME: 7. If x is y, return true; otherwise, return false.
+        throw new NotImplementedException();
+    }
+
     // 7.2.13 IsLessThan ( x, y, LeftFirst )
     static public Completion IsLessThan(VM vm, Value x, Value y, bool leftFirst)
     {
@@ -287,7 +339,7 @@ internal abstract class Value
         // i. If nx is a Number, then
         // 1. Return Number::lessThan(nx, ny).
         var result = Number.LessThan((nx.Value as Number)!, (ny.Value as Number)!);
-        return Completion.NormalCompletion(result); 
+        return Completion.NormalCompletion(result);
 
         // FIXME: ii. Else,
         // FIXME: 1. Assert: nx is a BigInt.
@@ -297,5 +349,25 @@ internal abstract class Value
         // FIXME: i. If nx is -∞𝔽 or ny is +∞𝔽, return true.
         // FIXME: j. If nx is +∞𝔽 or ny is -∞𝔽, return false.
         // FIXME: k. If ℝ(nx) < ℝ(ny), return true; otherwise return false.
+    }
+
+    // 7.2.15 IsStrictlyEqual ( x, y ), https://tc39.es/ecma262/#sec-isstrictlyequal
+    static public Boolean IsStrictlyEqual(Value x, Value y)
+    {
+        // 1. If Type(x) is not Type(y), return false.
+        if (!x.Type().Equals(y.Type()))
+        {
+            return new Boolean(false);
+        }
+
+        // 2. If x is a Number, then
+        if (x.IsNumber())
+        {
+            // a. Return Number::equal(x, y).
+            return Number.Equal((x as Number)!, (y as Number)!);
+        }
+
+        // 3. Return SameValueNonNumber(x, y).
+        return SameValueNonNumber(x, y);
     }
 }

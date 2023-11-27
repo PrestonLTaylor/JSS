@@ -8,6 +8,7 @@ internal sealed class Boolean : Value
     }
 
     override public bool IsBoolean() { return true; }
+    override public ValueType Type() { return ValueType.Boolean; }
 
     override public bool Equals(object? obj)
     {
