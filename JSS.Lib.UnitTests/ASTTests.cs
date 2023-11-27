@@ -97,6 +97,18 @@ internal sealed class ASTTests
         CreateLogicalNOTTestCase(EscapeString(""), true),
         CreateLogicalNOTTestCase(EscapeString("a"), false),
         CreateLogicalNOTTestCase("1", false),
+
+        // Tests for LogicalAND
+        CreateLogicalANDTestCase("false", "false", new Boolean(false)),
+        CreateLogicalANDTestCase("true", "false", new Boolean(false)),
+        CreateLogicalANDTestCase("false", "true", new Boolean(false)),
+        CreateLogicalANDTestCase("true", "true", new Boolean(true)),
+        CreateLogicalANDTestCase("0", "true", new Number(0)),
+        CreateLogicalANDTestCase("true", "0", new Number(0)),
+        CreateLogicalANDTestCase(EscapeString(""), "true", new String("")),
+        CreateLogicalANDTestCase("true", EscapeString(""), new String("")),
+        CreateLogicalANDTestCase(EscapeString("a"), EscapeString("a"), new String("a")),
+        CreateLogicalANDTestCase("1", "1", new Number(1)),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -147,6 +159,11 @@ internal sealed class ASTTests
     static private object[] CreateLogicalNOTTestCase(string value, bool expected)
     {
         return new object[] { $"!{value}", Completion.NormalCompletion(new Boolean(expected)) };
+    }
+
+    static private object[] CreateLogicalANDTestCase(string lhs, string rhs, Value expected)
+    {
+        return new object[] { $"{lhs} && {rhs}", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
