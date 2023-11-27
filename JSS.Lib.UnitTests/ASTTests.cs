@@ -121,6 +121,17 @@ internal sealed class ASTTests
         CreateLogicalORTestCase("true", EscapeString(""), new Boolean(true)),
         CreateLogicalORTestCase(EscapeString("a"), EscapeString("a"), new String("a")),
         CreateLogicalORTestCase("1", "1", new Number(1)),
+
+        // Tests for LooseEquality
+        CreateLooselyEqualTestCase("1", EscapeString("1"), true),
+        CreateLooselyEqualTestCase(EscapeString("1"), "1", true),
+        CreateLooselyEqualTestCase(EscapeString("1"), EscapeString("2"), false),
+        CreateLooselyEqualTestCase("false", "true", false),
+        CreateLooselyEqualTestCase("null", "null", true),
+        CreateLooselyEqualTestCase("false", "false", true),
+        CreateLooselyEqualTestCase("true", "true", true),
+        CreateLooselyEqualTestCase(EscapeString("1"), EscapeString("1"), true),
+        CreateLooselyEqualTestCase("1", "1", true),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -181,6 +192,11 @@ internal sealed class ASTTests
     static private object[] CreateLogicalORTestCase(string lhs, string rhs, Value expected)
     {
         return new object[] { $"{lhs} || {rhs}", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateLooselyEqualTestCase(string lhs, string rhs, bool expected)
+    {
+        return new object[] { $"{lhs} == {rhs}", Completion.NormalCompletion(new Boolean(expected)) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
