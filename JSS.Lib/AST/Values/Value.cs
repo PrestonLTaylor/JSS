@@ -59,6 +59,45 @@ internal abstract class Value
         return Completion.NormalCompletion(this);
     }
 
+    // 7.1.2 ToBoolean ( argument ), https://tc39.es/ecma262/#sec-toboolean
+    public Boolean ToBoolean()
+    {
+        // 1. If argument is a Boolean, return argument.
+        if (IsBoolean())
+        {
+            return (this as Boolean)!;
+        }
+
+        // 2. If argument is one of undefined, null, +0𝔽, -0𝔽, NaN, 0ℤ, or the empty String, return false.
+        if (IsUndefined() || IsNull())
+        {
+            return new Boolean(false);
+        }
+
+        if (IsNumber())
+        {
+            var asNumber = (this as Number)!.Value;
+            if (asNumber == 0 || double.IsNaN(asNumber))
+            {
+                return new Boolean(false);
+            }
+        }
+
+        if (IsString())
+        {
+            var asString = (this as String)!.Value;
+            if (asString.Length == 0)
+            {
+                return new Boolean(false);
+            }
+        }
+
+        // 3. NOTE: This step is replaced in section B.3.6.1.
+
+        // 4. Return true.
+        return new Boolean(true);
+    }
+
     // 7.1.3 ToNumeric ( value ), https://tc39.es/ecma262/#sec-tonumeric
     public Completion ToNumeric(VM vm)
     {

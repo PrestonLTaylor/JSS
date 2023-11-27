@@ -238,4 +238,32 @@ internal sealed class AbstractOperationTests
 
         Assert.That(completion.Value, Is.EqualTo(expectedValue));
     }
+
+    static private readonly object[] toBooleanValueToExpectedResultTestCase =
+    {
+        new object[] { new Boolean(false), false },
+        new object[] { new Boolean(true), true },
+
+        new object[] { new Undefined(), false },
+        new object[] { new Null(), false },
+        new object[] { new Number(0), false },
+        new object[] { new Number(double.NaN), false },
+        new object[] { new String(""), false },
+
+        new object[] { new String("a"), true },
+        new object[] { new Number(1), true },
+    };
+
+    [TestCaseSource(nameof(toBooleanValueToExpectedResultTestCase))]
+    public void ToBoolean_ReturnsBoolean_WithExpectedResult(Value testCase, bool expectedResult)
+    {
+        // Arrange
+        var expectedValue = new Boolean(expectedResult);
+
+        // Act
+        var result = testCase.ToBoolean();
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expectedValue));
+    }
 }
