@@ -30,9 +30,9 @@ internal sealed class ASTTests
         CreateStringLiteralTestCase("'"),
 
         // Tests for string concatination
-        CreateStringConcatinationTestCase("\"lhs\"", "\"rhs\"", "lhsrhs"),
-        CreateStringConcatinationTestCase("\"\"", "1", "1"),
-        CreateStringConcatinationTestCase("1", "\"\"", "1"),
+        CreateStringConcatinationTestCase(EscapeString("lhs"), EscapeString("rhs"), "lhsrhs"),
+        CreateStringConcatinationTestCase(EscapeString(""), "1", "1"),
+        CreateStringConcatinationTestCase("1", EscapeString(""), "1"),
 
         // Tests for addition
         CreateAdditionTestCase(1, 1, 2),
@@ -45,9 +45,19 @@ internal sealed class ASTTests
         new object[] { "{ }", Completion.NormalCompletion(new Undefined()) },
         new object[] { "{ true }", Completion.NormalCompletion(new Boolean(true)) },
         new object[] { "{ 1 }", Completion.NormalCompletion(new Number(1)) },
-        new object[] { "{ \"string\" }", Completion.NormalCompletion(new String("string")) },
+        new object[] { $"{{ {EscapeString("string")} }}", Completion.NormalCompletion(new String("string")) },
         new object[] { "{ 1 + 1 }", Completion.NormalCompletion(new Number(2)) },
         new object[] { "{ true ; }", Completion.NormalCompletion(new Boolean(true)) },
+
+        // Tests for GreaterThanEquals
+        CreateGreaterThanEqualsTestCase(EscapeString("a"), EscapeString("b"), false),
+        CreateGreaterThanEqualsTestCase(EscapeString("a"), EscapeString("bc"), false),
+        CreateGreaterThanEqualsTestCase(EscapeString("aaa"), EscapeString("aaa"), true),
+        CreateGreaterThanEqualsTestCase(EscapeString("aaaa"), EscapeString("aaa"), true),
+        CreateGreaterThanEqualsTestCase(EscapeString("aaa"), EscapeString("aaaa"), false),
+        CreateGreaterThanEqualsTestCase("0", "0", true),
+        CreateGreaterThanEqualsTestCase("0", "1", false),
+        CreateGreaterThanEqualsTestCase("1", "0", true),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -62,7 +72,7 @@ internal sealed class ASTTests
 
     static private object[] CreateStringLiteralTestCase(string value, char quote = '"')
     {
-        return new object[] { $"{quote}{value}{quote}", Completion.NormalCompletion(new String(value)) };
+        return new object[] { EscapeString(value, quote), Completion.NormalCompletion(new String(value)) };
     }
 
     static private object[] CreateStringConcatinationTestCase(string lhs, string rhs, string expected)
@@ -73,6 +83,11 @@ internal sealed class ASTTests
     static private object[] CreateAdditionTestCase(double lhs, double rhs, double expected)
     {
         return new object[] { $"{lhs} + {rhs}", Completion.NormalCompletion(new Number(expected)) };
+    }
+
+    static private object[] CreateGreaterThanEqualsTestCase(string lhs, string rhs, bool expected)
+    {
+        return new object[] { $"{lhs} >= {rhs}", Completion.NormalCompletion(new Boolean(expected)) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
@@ -404,7 +419,12 @@ internal sealed class ASTTests
         Assert.That(completion.Value, Is.EqualTo(expectedValue));
     }
 
-    private Script ParseScript(string script)
+    static private string EscapeString(string toEscape, char quote = '"')
+    {
+        return $"{quote}{toEscape}{quote}";
+    }
+
+    static private Script ParseScript(string script)
     {
         return new Parser(script).Parse();
     }
