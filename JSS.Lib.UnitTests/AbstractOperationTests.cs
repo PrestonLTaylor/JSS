@@ -206,4 +206,36 @@ internal sealed class AbstractOperationTests
         Assert.That(result.IsNormalCompletion(), Is.True);
         Assert.That(result.Value, Is.EqualTo(expectedValue));
     }
+
+    // FIXME: Tests for Number::lessThan
+    static private readonly object[] isLessThanLhsAndRhsToExpectedResultTestCases =
+    {
+        new object[] { new String("a"), new String("b"), true },
+        new object[] { new String("a"), new String("bc"), true },
+        new object[] { new String("b"), new String("a"), false },
+        new object[] { new String("aaa"), new String("aaa"), false },
+        new object[] { new String("aaaa"), new String("aaa"), false },
+        new object[] { new String("aaa"), new String("aaaa"), true },
+
+        new object[] { new Number(0), new Number(0), false },
+        new object[] { new Number(0), new Number(1), true },
+        new object[] { new Number(1), new Number(0), false },
+    };
+
+    [TestCaseSource(nameof(isLessThanLhsAndRhsToExpectedResultTestCases))]
+    public void IsLessThan_ReturnsNormalCompletion_WithExpectedResult(Value lhs, Value rhs, bool expectedResult)
+    {
+        // Arrange
+        var vm = new VM();
+        var expectedValue = new Boolean(expectedResult);
+
+        // Act
+        // NOTE: leftFirst has no visiable side effect in these tests
+        var completion = Value.IsLessThan(vm, lhs, rhs, false);
+
+        // Assert
+        Assert.That(completion.IsNormalCompletion(), Is.True);
+
+        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+    }
 }

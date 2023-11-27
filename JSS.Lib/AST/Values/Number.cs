@@ -1,4 +1,6 @@
-﻿namespace JSS.Lib.AST.Values;
+﻿using System.ComponentModel;
+
+namespace JSS.Lib.AST.Values;
 
 internal sealed class Number : Value
 {
@@ -194,6 +196,24 @@ internal sealed class Number : Value
 
         var result = (int)x.Value >>> (int)y.Value;
         return new Number(result);
+    }
+
+    // 6.1.6.1.12 Number::lessThan(x, y), https://tc39.es/ecma262/#sec-numeric-types-number-lessThan
+    static public Value LessThan(Number x, Number y)
+    {
+        // FIXME: 1. If x is NaN, return undefined.
+        // FIXME: 2. If y is NaN, return undefined.
+        // FIXME: 3. If x is y, return false.
+        // FIXME: 4. If x is +0𝔽 and y is -0𝔽, return false.
+        // FIXME: 5. If x is -0𝔽 and y is +0𝔽, return false.
+        // FIXME: 6. If x is +∞𝔽, return false.
+        // FIXME: 7. If y is +∞𝔽, return true.
+        // FIXME: 8. If y is -∞𝔽, return false.
+        // FIXME: 9. If x is -∞𝔽, return true.
+        // FIXME: 10. Assert: x and y are finite.
+
+        // 11. If ℝ(x) < ℝ(y), return true. Otherwise, return false.
+        return new Boolean(x.Value < y.Value);
     }
 
     internal enum BitwiseOp

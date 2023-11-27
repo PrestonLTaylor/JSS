@@ -1,5 +1,6 @@
 ﻿using JSS.Lib.Execution;
 using System.Runtime.Intrinsics.X86;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace JSS.Lib.AST.Values;
 
@@ -152,5 +153,110 @@ internal abstract class Value
         // FIXME: 11. Assert: primValue is not an Object.
         // FIXME: 12. Return ? ToString(primValue).
         throw new NotImplementedException();
+    }
+
+    // 7.2.13 IsLessThan ( x, y, LeftFirst )
+    static public Completion IsLessThan(VM vm, Value x, Value y, bool leftFirst)
+    {
+        Completion px;
+        Completion py;
+
+        // 1. If LeftFirst is true, then
+        if (leftFirst)
+        {
+            // a. Let px be ? ToPrimitive(x, FIXME: NUMBER).
+            px = x.ToPrimitive();
+            if (px.IsAbruptCompletion()) return px;
+
+            // b. Let py be ? ToPrimitive(y, FIXME: NUMBER).
+            py = y.ToPrimitive();
+            if (py.IsAbruptCompletion()) return py;
+        }
+        // 2. Else,
+        else
+        {
+            // a. NOTE: The order of evaluation needs to be reversed to preserve left to right evaluation.
+
+            // b. Let py be ? ToPrimitive(y, FIXME: NUMBER).
+            py = y.ToPrimitive();
+            if (py.IsAbruptCompletion()) return py;
+
+            // c. Let px be ? ToPrimitive(x, FIXME: NUMBER).
+            px = x.ToPrimitive();
+            if (px.IsAbruptCompletion()) return px;
+        }
+
+        // 3. If px is a String and py is a String, then
+        if (px.Value.IsString() && py.Value.IsString())
+        {
+            // a. Let lx be the length of px.
+            var pxAsString = (px.Value as String)!;
+            var lx = pxAsString!.Value.Length;
+
+            // b. Let ly be the length of py.
+            var pyAsString = (py.Value as String)!;
+            var ly = pyAsString!.Value.Length;
+
+            // c. For each integer i such that 0 ≤ i < min(lx, ly), in ascending order, do
+            for (int i = 0; i < Math.Min(lx, ly); ++i)
+            {
+                // i. Let cx be the numeric value of the code unit at index i within px.
+                var cx = pxAsString.Value[i];
+
+                // ii. Let cy be the numeric value of the code unit at index i within py.
+                var cy = pyAsString.Value[i];
+
+                // iii. If cx < cy, return true.
+                if (cx < cy)
+                {
+                    return Completion.NormalCompletion(new Boolean(true));
+                }
+
+                // iv. If cx > cy, return false.
+                if (cx > cy)
+                {
+                    return Completion.NormalCompletion(new Boolean(false));
+                }
+            }
+
+            // d. If lx < ly, return true. Otherwise, return false.
+            return Completion.NormalCompletion(new Boolean(lx < ly));
+        }
+
+        // 4. Else,
+        // FIXME: a. If px is a BigInt and py is a String, then
+        // FIXME: i. Let ny be StringToBigInt(py).
+        // FIXME: ii. If ny is undefined, return undefined.
+        // FIXME: iii. Return BigInt::lessThan(px, ny).
+        // FIXME: b. If px is a String and py is a BigInt, then
+        // FIXME: i. Let nx be StringToBigInt(px).
+        // FIXME: ii. If nx is undefined, return undefined.
+        // FIXME: iii. Return BigInt::lessThan(nx, py).
+
+        // c. NOTE: Because px and py are primitive values, evaluation order is not important.
+
+        // d. Let nx be ? ToNumeric(px).
+        var nx = px.Value.ToNumeric(vm);
+        if (nx.IsAbruptCompletion()) return nx;
+
+        // e. Let ny be ? ToNumeric(py).
+        var ny = py.Value.ToNumeric(vm);
+        if (ny.IsAbruptCompletion()) return ny;
+
+        // FIXME: f. If Type(nx) is Type(ny), then
+
+        // i. If nx is a Number, then
+        // 1. Return Number::lessThan(nx, ny).
+        var result = Number.LessThan((nx.Value as Number)!, (ny.Value as Number)!);
+        return Completion.NormalCompletion(result); 
+
+        // FIXME: ii. Else,
+        // FIXME: 1. Assert: nx is a BigInt.
+        // FIXME: 2. Return BigInt::lessThan(nx, ny).
+        // FIXME: g. Assert: nx is a BigInt and ny is a Number, or nx is a Number and ny is a BigInt.
+        // FIXME: h. If nx or ny is NaN, return undefined.
+        // FIXME: i. If nx is -∞𝔽 or ny is +∞𝔽, return true.
+        // FIXME: j. If nx is +∞𝔽 or ny is -∞𝔽, return false.
+        // FIXME: k. If ℝ(nx) < ℝ(ny), return true; otherwise return false.
     }
 }
