@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.Execution;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Security.Principal;
 
@@ -349,6 +350,91 @@ internal abstract class Value
         // FIXME: i. If nx is -∞𝔽 or ny is +∞𝔽, return true.
         // FIXME: j. If nx is +∞𝔽 or ny is -∞𝔽, return false.
         // FIXME: k. If ℝ(nx) < ℝ(ny), return true; otherwise return false.
+    }
+
+    // 7.2.14 IsLooselyEqual ( x, y ), https://tc39.es/ecma262/#sec-islooselyequal
+    static public Completion IsLooselyEqual(VM vm, Value x, Value y)
+    {
+        // 1. If Type(x) is Type(y), then
+        if (x.Type().Equals(y.Type()))
+        {
+            // a. Return IsStrictlyEqual(x, y).
+            return Completion.NormalCompletion(IsStrictlyEqual(x, y));
+        }
+
+        // 2. If x is null and y is undefined, return true.
+        if (x.IsNull() && y.IsUndefined())
+        {
+            return Completion.NormalCompletion(new Boolean(true));
+        }
+
+        // 3. If x is undefined and y is null, return true.
+        if (x.IsUndefined() && y.IsNull())
+        {
+            return Completion.NormalCompletion(new Boolean(true));
+        }
+
+        // 4. NOTE: This step is replaced in section B.3.6.2.
+
+        // 5. If x is a Number and y is a String, return ! IsLooselyEqual(x, ! ToNumber(y)).
+        if (x.IsNumber() && y.IsString())
+        {
+            // FIXME: Maybe a MUST-like function for the asserts
+            var yAsNumber = y.ToNumber(vm);
+            Debug.Assert(yAsNumber.IsNormalCompletion());
+
+            var result = IsLooselyEqual(vm, x, yAsNumber.Value);
+            Debug.Assert(result.IsNormalCompletion());
+            return result;
+        }
+
+        // 6. If x is a String and y is a Number, return ! IsLooselyEqual(! ToNumber(x), y).
+        if (x.IsString() && y.IsNumber())
+        {
+            var xAsNumber = x.ToNumber(vm);
+            Debug.Assert(xAsNumber.IsNormalCompletion());
+
+            var result = IsLooselyEqual(vm, xAsNumber.Value, y);
+            Debug.Assert(result.IsNormalCompletion());
+            return result;
+        }
+
+        // FIXME: 7. If x is a BigInt and y is a String, then
+        // FIXME: a. Let n be StringToBigInt(y).
+        // FIXME: b. If n is undefined, return false.
+        // FIXME: c. Return ! IsLooselyEqual(x, n).
+        // FIXME: 8. If x is a String and y is a BigInt, return !IsLooselyEqual(y, x).
+
+        // 9. If x is a Boolean, return !IsLooselyEqual(!ToNumber(x), y).
+        if (x.IsBoolean())
+        {
+            var xAsNumber = x.ToNumber(vm);
+            Debug.Assert(xAsNumber.IsNormalCompletion());
+
+            var result = IsLooselyEqual(vm, xAsNumber.Value, y);
+            Debug.Assert(result.IsNormalCompletion());
+            return result;
+        }
+
+        // 10. If y is a Boolean, return !IsLooselyEqual(x, !ToNumber(y)).
+        if (y.IsBoolean())
+        {
+            var yAsNumber = y.ToNumber(vm);
+            Debug.Assert(yAsNumber.IsNormalCompletion());
+
+            var result = IsLooselyEqual(vm, x, yAsNumber.Value);
+            Debug.Assert(result.IsNormalCompletion());
+            return result;
+        }
+
+        // FIXME: 11. If x is either a String, a Number, a BigInt, or a Symbol and y is an Object, return !IsLooselyEqual(x, ? ToPrimitive(y)).
+        // FIXME: 12. If x is an Object and y is either a String, a Number, a BigInt, or a Symbol, return !IsLooselyEqual(? ToPrimitive(x), y).
+        // FIXME: 13. If x is a BigInt and y is a Number, or if x is a Number and y is a BigInt, then
+        // FIXME: a. If x is not finite or y is not finite, return false.
+        // FIXME: b. If ℝ(x) = ℝ(y), return true; otherwise return false.
+
+        // 14. Return false.
+        return Completion.NormalCompletion(new Boolean(false));
     }
 
     // 7.2.15 IsStrictlyEqual ( x, y ), https://tc39.es/ecma262/#sec-isstrictlyequal

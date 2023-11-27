@@ -299,4 +299,39 @@ internal sealed class AbstractOperationTests
         // Assert
         Assert.That(result, Is.EqualTo(expectedValue));
     }
+
+    static private readonly object[] isLooselyEqualLhsAndRhsToExpectedResultTestCase =
+    {
+        new object[] { new Null(), new Undefined(), true },
+        new object[] { new Undefined(), new Null(), true },
+        new object[] { new Undefined(), new Number(1), false },
+        new object[] { new Undefined(), new String("1"), false },
+        new object[] { new Number(1), new String("1"), true },
+        new object[] { new String("1"), new Number(1), true },
+        new object[] { new String("1"), new String("2"), false },
+        new object[] { new Number(1), new Number(2), false },
+        new object[] { new Boolean(false), new Boolean(true), false },
+        new object[] { new Undefined(), new Undefined(), true },
+        new object[] { new Null(), new Null(), true },
+        new object[] { new Boolean(false), new Boolean(false), true },
+        new object[] { new Boolean(true), new Boolean(true), true },
+        new object[] { new String("1"), new String("1"), true },
+        new object[] { new Number(1), new Number(1), true },
+    };
+
+    [TestCaseSource(nameof(isLooselyEqualLhsAndRhsToExpectedResultTestCase))]
+    public void IsLooselyEqual_ReturnsNormalCompletion_WithExpectedResult(Value lhs, Value rhs, bool expectedResult)
+    {
+        // Arrange
+        var vm = new VM();
+        var expectedValue = new Boolean(expectedResult);
+
+        // Act
+        var completion = Value.IsLooselyEqual(vm, lhs, rhs);
+
+        // Assert
+        Assert.That(completion.IsNormalCompletion(), Is.True);
+
+        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+    }
 }
