@@ -68,6 +68,16 @@ internal sealed class ASTTests
         CreateGreaterThanTestCase("0", "0", false),
         CreateGreaterThanTestCase("0", "1", false),
         CreateGreaterThanTestCase("1", "0", true),
+
+        // Tests for LessThanEquals
+        CreateLessThanEqualsTestCase(EscapeString("a"), EscapeString("b"), true),
+        CreateLessThanEqualsTestCase(EscapeString("a"), EscapeString("bc"), true),
+        CreateLessThanEqualsTestCase(EscapeString("aaa"), EscapeString("aaa"), true),
+        CreateLessThanEqualsTestCase(EscapeString("aaaa"), EscapeString("aaa"), false),
+        CreateLessThanEqualsTestCase(EscapeString("aaa"), EscapeString("aaaa"), true),
+        CreateLessThanEqualsTestCase("0", "0", true),
+        CreateLessThanEqualsTestCase("0", "1", true),
+        CreateLessThanEqualsTestCase("1", "0", false),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -103,6 +113,11 @@ internal sealed class ASTTests
     static private object[] CreateGreaterThanTestCase(string lhs, string rhs, bool expected)
     {
         return new object[] { $"{lhs} > {rhs}", Completion.NormalCompletion(new Boolean(expected)) };
+    }
+
+    static private object[] CreateLessThanEqualsTestCase(string lhs, string rhs, bool expected)
+    {
+        return new object[] { $"{lhs} <= {rhs}", Completion.NormalCompletion(new Boolean(expected)) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
