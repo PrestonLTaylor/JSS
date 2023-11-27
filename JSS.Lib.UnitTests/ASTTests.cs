@@ -109,6 +109,18 @@ internal sealed class ASTTests
         CreateLogicalANDTestCase("true", EscapeString(""), new String("")),
         CreateLogicalANDTestCase(EscapeString("a"), EscapeString("a"), new String("a")),
         CreateLogicalANDTestCase("1", "1", new Number(1)),
+
+        // Tests for LogicalOR
+        CreateLogicalORTestCase("false", "false", new Boolean(false)),
+        CreateLogicalORTestCase("true", "false", new Boolean(true)),
+        CreateLogicalORTestCase("false", "true", new Boolean(true)),
+        CreateLogicalORTestCase("true", "true", new Boolean(true)),
+        CreateLogicalORTestCase("0", "true", new Boolean(true)),
+        CreateLogicalORTestCase("true", "0", new Boolean(true)),
+        CreateLogicalORTestCase(EscapeString(""), "true", new Boolean(true)),
+        CreateLogicalORTestCase("true", EscapeString(""), new Boolean(true)),
+        CreateLogicalORTestCase(EscapeString("a"), EscapeString("a"), new String("a")),
+        CreateLogicalORTestCase("1", "1", new Number(1)),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -164,6 +176,11 @@ internal sealed class ASTTests
     static private object[] CreateLogicalANDTestCase(string lhs, string rhs, Value expected)
     {
         return new object[] { $"{lhs} && {rhs}", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateLogicalORTestCase(string lhs, string rhs, Value expected)
+    {
+        return new object[] { $"{lhs} || {rhs}", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
