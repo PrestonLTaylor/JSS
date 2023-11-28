@@ -1,4 +1,6 @@
-﻿namespace JSS.Lib.AST;
+﻿using JSS.Lib.Execution;
+
+namespace JSS.Lib.AST;
 
 // 13.5.2 The void Operator, https://tc39.es/ecma262/#sec-void-operator
 internal sealed class VoidExpression : IExpression
@@ -8,7 +10,20 @@ internal sealed class VoidExpression : IExpression
         Expression = expression;
     }
 
-    // FIXME: 13.5.2.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-void-operator-runtime-semantics-evaluation
+    // 13.5.2.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-void-operator-runtime-semantics-evaluation
+    public override Completion Evaluate(VM vm)
+    {
+        // 1. Let expr be ? Evaluation of UnaryExpression.
+        var expr = Expression.Evaluate(vm);
+        if (expr.IsAbruptCompletion()) return expr;
+
+        // 2. Perform ? GetValue(expr).
+        var value = expr.Value.GetValue();
+        if (value.IsAbruptCompletion()) return value;
+
+        // 3. Return undefined.
+        return Completion.NormalCompletion(vm.Undefined);
+    }
 
     public IExpression Expression { get; }
 }

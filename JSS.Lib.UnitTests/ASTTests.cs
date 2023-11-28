@@ -179,6 +179,13 @@ internal sealed class ASTTests
         CreateThrowTestCase("true", new Boolean(true)),
         CreateThrowTestCase("1", new Number(1)),
         CreateThrowTestCase(EscapeString("1"), new String("1")),
+
+        // Tests for void
+        CreateVoidTestCase("null"),
+        CreateVoidTestCase("false"),
+        CreateVoidTestCase("true"),
+        CreateVoidTestCase("1"),
+        CreateVoidTestCase(EscapeString("1")),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -269,6 +276,11 @@ internal sealed class ASTTests
     static private object[] CreateThrowTestCase(string value, Value expected)
     {
         return new object[] { $"throw {value}", Completion.ThrowCompletion(expected) };
+    }
+
+    static private object[] CreateVoidTestCase(string value)
+    {
+        return new object[] { $"void {value}", Completion.NormalCompletion(new Undefined()) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
