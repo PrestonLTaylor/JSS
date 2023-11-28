@@ -165,6 +165,13 @@ internal sealed class ASTTests
         CreateStrictInequalTestCase("true", "true", false),
         CreateStrictInequalTestCase(EscapeString("1"), EscapeString("1"), false),
         CreateStrictInequalTestCase("1", "1", false),
+
+        // Tests for Return
+        CreateReturnTestCase("null", new Null()),
+        CreateReturnTestCase("false", new Boolean(false)),
+        CreateReturnTestCase("true", new Boolean(true)),
+        CreateReturnTestCase("1", new Number(1)),
+        CreateReturnTestCase(EscapeString("1"), new String("1")),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -245,6 +252,11 @@ internal sealed class ASTTests
     static private object[] CreateStrictInequalTestCase(string lhs, string rhs, bool expected)
     {
         return new object[] { $"{lhs} !== {rhs}", Completion.NormalCompletion(new Boolean(expected)) };
+    }
+
+    static private object[] CreateReturnTestCase(string value, Value expected)
+    {
+        return new object[] { $"return {value}", Completion.ReturnCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]

@@ -56,6 +56,11 @@ internal sealed class Completion
         return new Completion(CompletionType.Continue, value, target);
     }
 
+    static public Completion ReturnCompletion(Value value)
+    {
+        return new Completion(CompletionType.Return, value, "");
+    }
+
     // 6.2.4.3 UpdateEmpty ( completionRecord, value ), https://tc39.es/ecma262/#sec-updateempty
     public void UpdateEmpty(Value value)
     {
