@@ -1,4 +1,6 @@
-﻿namespace JSS.Lib.AST.Values;
+﻿using System.Diagnostics;
+
+namespace JSS.Lib.AST.Values;
 
 internal sealed class Number : Value
 {
@@ -29,6 +31,17 @@ internal sealed class Number : Value
 
         // 2. Return the result of negating x; that is, compute a Number with the same magnitude but opposite sign.
         return new Number(-x.Value);
+    }
+
+    // 6.1.6.1.2 Number::bitwiseNOT ( x ), https://tc39.es/ecma262/#sec-numeric-types-number-bitwiseNOT
+    static public Number BitwiseNOT(Number x)
+    {
+        // FIXME: 1. Let oldValue be ! ToInt32(x).
+
+        // 2. Return the result of applying bitwise complement to oldValue.
+        // The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
+        var result = ~(int)x.Value;
+        return new Number(result);
     }
 
     // 6.1.6.1.3 Number::exponentiate ( base, exponent ), https://tc39.es/ecma262/#sec-numeric-types-number-exponentiate

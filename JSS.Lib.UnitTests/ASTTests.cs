@@ -229,6 +229,11 @@ internal sealed class ASTTests
         CreateForTestCase("", "false", "", "false", new Undefined()),
         CreateForTestCase("", "false", "", "1", new Undefined()),
         CreateForTestCase("", "false", "", EscapeString("a"), new Undefined()),
+
+        // Tests for BitwiseNOT
+        CreateBitwiseNOTTestCase(1, -2),
+        CreateBitwiseNOTTestCase(2, -3),
+        CreateBitwiseNOTTestCase(2147483648, 2147483647),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -369,6 +374,11 @@ internal sealed class ASTTests
     static private object[] CreateForTestCase(string initialization, string test, string increment, string statement,  Value expected)
     {
         return new object[] { $"for ({initialization}; {test}; {increment}) {{ {statement} }}", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateBitwiseNOTTestCase(double value, double expected)
+    {
+        return new object[] { $"~{value}", Completion.NormalCompletion(new Number(expected)) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
