@@ -1,5 +1,6 @@
 ﻿using JSS.Lib.AST.Values;
 using System.Diagnostics;
+using Boolean = JSS.Lib.AST.Values.Boolean;
 
 namespace JSS.Lib.Execution;
 
@@ -72,6 +73,33 @@ internal sealed class Completion
 
         // 3. Return Completion Record { [[Type]]: completionRecord.[[Type]], [[Value]]: value, [[Target]]: completionRecord.[[Target]] }.
         Value = value;
+    }
+
+    // 14.7.1.1 LoopContinues ( completion, FIXME: labelSet ), https://tc39.es/ecma262/#sec-loopcontinues
+    public Boolean LoopContinues()
+    {
+        // 1. If completion.[[Type]] is NORMAL, return true.
+        if (IsNormalCompletion())
+        {
+            return new Boolean(true);
+        }
+
+        // 2. If completion.[[Type]] is not CONTINUE, return false.
+        if (!IsContinueCompletion())
+        {
+            return new Boolean(false);
+        }
+
+        // 3. If completion.[[Target]] is EMPTY, return true.
+        if (Target.Length == 0)
+        {
+            return new Boolean(true);
+        }
+
+        // FIXME: 4. If labelSet contains completion.[[Target]], return true.
+
+        // 5. Return false.
+        return new Boolean(false);
     }
 
     public bool IsNormalCompletion() { return Type == CompletionType.Normal; }

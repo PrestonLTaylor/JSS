@@ -239,7 +239,7 @@ internal sealed class AbstractOperationTests
         Assert.That(completion.Value, Is.EqualTo(expectedValue));
     }
 
-    static private readonly object[] toBooleanValueToExpectedResultTestCase =
+    static private readonly object[] toBooleanValueToExpectedResultTestCases =
     {
         new object[] { new Boolean(false), false },
         new object[] { new Boolean(true), true },
@@ -254,7 +254,7 @@ internal sealed class AbstractOperationTests
         new object[] { new Number(1), true },
     };
 
-    [TestCaseSource(nameof(toBooleanValueToExpectedResultTestCase))]
+    [TestCaseSource(nameof(toBooleanValueToExpectedResultTestCases))]
     public void ToBoolean_ReturnsBoolean_WithExpectedResult(Value testCase, bool expectedResult)
     {
         // Arrange
@@ -268,7 +268,7 @@ internal sealed class AbstractOperationTests
     }
 
     // FIXME: Tests for Number::equal and SameValueNonNumber
-    static private readonly object[] isStrictlyEqualLhsAndRhsToExpectedResultTestCase =
+    static private readonly object[] isStrictlyEqualLhsAndRhsToExpectedResultTestCases =
     {
         new object[] { new Null(), new Undefined(), false },
         new object[] { new Undefined(), new Null(), false },
@@ -287,7 +287,7 @@ internal sealed class AbstractOperationTests
         new object[] { new Number(1), new Number(1), true },
     };
 
-    [TestCaseSource(nameof(isStrictlyEqualLhsAndRhsToExpectedResultTestCase))]
+    [TestCaseSource(nameof(isStrictlyEqualLhsAndRhsToExpectedResultTestCases))]
     public void IsStrictlyEqual_ReturnsBoolean_WithExpectedResult(Value lhs, Value rhs, bool expectedResult)
     {
         // Arrange
@@ -300,7 +300,7 @@ internal sealed class AbstractOperationTests
         Assert.That(result, Is.EqualTo(expectedValue));
     }
 
-    static private readonly object[] isLooselyEqualLhsAndRhsToExpectedResultTestCase =
+    static private readonly object[] isLooselyEqualLhsAndRhsToExpectedResultTestCases =
     {
         new object[] { new Null(), new Undefined(), true },
         new object[] { new Undefined(), new Null(), true },
@@ -319,7 +319,7 @@ internal sealed class AbstractOperationTests
         new object[] { new Number(1), new Number(1), true },
     };
 
-    [TestCaseSource(nameof(isLooselyEqualLhsAndRhsToExpectedResultTestCase))]
+    [TestCaseSource(nameof(isLooselyEqualLhsAndRhsToExpectedResultTestCases))]
     public void IsLooselyEqual_ReturnsNormalCompletion_WithExpectedResult(Value lhs, Value rhs, bool expectedResult)
     {
         // Arrange
@@ -333,5 +333,27 @@ internal sealed class AbstractOperationTests
         Assert.That(completion.IsNormalCompletion(), Is.True);
 
         Assert.That(completion.Value, Is.EqualTo(expectedValue));
+    }
+
+    static private readonly object[] loopContinuesValueToExpectedResultTestCases =
+    {
+        new object[] { Completion.NormalCompletion(new Undefined()), true },
+        new object[] { Completion.ThrowCompletion(new Undefined()), false },
+        new object[] { Completion.BreakCompletion(new Undefined(), ""), false },
+        new object[] { Completion.ReturnCompletion(new Undefined()), false },
+        new object[] { Completion.ContinueCompletion(new Undefined(), ""), true },
+    };
+
+    [TestCaseSource(nameof(loopContinuesValueToExpectedResultTestCases))]
+    public void LoopContinues_ReturnsExpectedBoolean_WhenProvidedCompletion(Completion completion, bool expectedResult)
+    {
+        // Arrange
+        var expectedValue = new Boolean(expectedResult);
+
+        // Act
+        var result = completion.LoopContinues();
+
+        // Assert
+        Assert.That(result, Is.EqualTo(expectedValue));
     }
 }
