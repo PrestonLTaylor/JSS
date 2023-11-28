@@ -192,6 +192,13 @@ internal sealed class ASTTests
         CreateTypeOfTestCase(EscapeString("a"), "string"),
         CreateTypeOfTestCase("true", "boolean"),
         CreateTypeOfTestCase("1", "number"),
+
+        // Tests for UnaryMinus
+        CreateUnaryMinusTestCase("1", -1),
+        CreateUnaryMinusTestCase("null", 0),
+        CreateUnaryMinusTestCase("false", 0),
+        CreateUnaryMinusTestCase("true", -1),
+        CreateUnaryMinusTestCase(EscapeString("1"), -1),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -292,6 +299,11 @@ internal sealed class ASTTests
     static private object[] CreateTypeOfTestCase(string value, string expected)
     {
         return new object[] { $"typeof {value}", Completion.NormalCompletion(new String(expected)) };
+    }
+
+    static private object[] CreateUnaryMinusTestCase(string value, double expected)
+    {
+        return new object[] { $"-{value}", Completion.NormalCompletion(new Number(expected)) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
