@@ -206,6 +206,17 @@ internal sealed class ASTTests
         CreateUnaryPlusTestCase("false", 0),
         CreateUnaryPlusTestCase("true", 1),
         CreateUnaryPlusTestCase(EscapeString("1"), 1),
+
+        // FIXME: More iteration test cases when we have variables
+        // Tests for DoWhileLoop
+        CreateNormalDoWhileTestCase("false", "null", new Null()),
+        CreateNormalDoWhileTestCase("false", "false", new Boolean(false)),
+        CreateNormalDoWhileTestCase("false", "1", new Number(1)),
+        CreateNormalDoWhileTestCase("false", EscapeString("a"), new String("a")),
+        CreateNormalDoWhileTestCase("false", "continue", new Undefined()),
+        CreateBreakDoWhileTestCase("false", "break", new Undefined()),
+        CreateReturnDoWhileTestCase("false", "return null", new Null()),
+        CreateThrowDoWhileTestCase("false", "throw null", new Null()),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -316,6 +327,26 @@ internal sealed class ASTTests
     static private object[] CreateUnaryPlusTestCase(string value, double expected)
     {
         return new object[] { $"+{value}", Completion.NormalCompletion(new Number(expected)) };
+    }
+
+    static private object[] CreateNormalDoWhileTestCase(string expression, string statement, Value expected)
+    {
+        return new object[] { $"do {{ {statement} }} while ({expression})", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateBreakDoWhileTestCase(string expression, string statement, Value expected)
+    {
+        return new object[] { $"do {{ {statement} }} while ({expression})", Completion.BreakCompletion(expected, "") };
+    }
+
+    static private object[] CreateReturnDoWhileTestCase(string expression, string statement, Value expected)
+    {
+        return new object[] { $"do {{ {statement} }} while ({expression})", Completion.ReturnCompletion(expected) };
+    }
+
+    static private object[] CreateThrowDoWhileTestCase(string expression, string statement, Value expected)
+    {
+        return new object[] { $"do {{ {statement} }} while ({expression})", Completion.ThrowCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
