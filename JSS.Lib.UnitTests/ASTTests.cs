@@ -217,6 +217,12 @@ internal sealed class ASTTests
         CreateBreakDoWhileTestCase("false", "break", new Undefined()),
         CreateReturnDoWhileTestCase("false", "return null", new Null()),
         CreateThrowDoWhileTestCase("false", "throw null", new Null()),
+
+        // Tests for WhileLoop
+        CreateWhileTestCase("false", "null", new Undefined()),
+        CreateWhileTestCase("false", "false", new Undefined()),
+        CreateWhileTestCase("false", "1", new Undefined()),
+        CreateWhileTestCase("false", EscapeString("a"), new Undefined()),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -347,6 +353,11 @@ internal sealed class ASTTests
     static private object[] CreateThrowDoWhileTestCase(string expression, string statement, Value expected)
     {
         return new object[] { $"do {{ {statement} }} while ({expression})", Completion.ThrowCompletion(expected) };
+    }
+
+    static private object[] CreateWhileTestCase(string expression, string statement, Value expected)
+    {
+        return new object[] { $"while ({expression}) {{ {statement} }}", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
