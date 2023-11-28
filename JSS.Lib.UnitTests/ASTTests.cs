@@ -186,6 +186,12 @@ internal sealed class ASTTests
         CreateVoidTestCase("true"),
         CreateVoidTestCase("1"),
         CreateVoidTestCase(EscapeString("1")),
+
+        // Tests for typeof
+        CreateTypeOfTestCase("null", "object"),
+        CreateTypeOfTestCase(EscapeString("a"), "string"),
+        CreateTypeOfTestCase("true", "boolean"),
+        CreateTypeOfTestCase("1", "number"),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -281,6 +287,11 @@ internal sealed class ASTTests
     static private object[] CreateVoidTestCase(string value)
     {
         return new object[] { $"void {value}", Completion.NormalCompletion(new Undefined()) };
+    }
+
+    static private object[] CreateTypeOfTestCase(string value, string expected)
+    {
+        return new object[] { $"typeof {value}", Completion.NormalCompletion(new String(expected)) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
