@@ -223,6 +223,12 @@ internal sealed class ASTTests
         CreateWhileTestCase("false", "false", new Undefined()),
         CreateWhileTestCase("false", "1", new Undefined()),
         CreateWhileTestCase("false", EscapeString("a"), new Undefined()),
+
+        // Tests for ForLoop with Initialization Expression
+        CreateForTestCase("", "false", "", "null", new Undefined()),
+        CreateForTestCase("", "false", "", "false", new Undefined()),
+        CreateForTestCase("", "false", "", "1", new Undefined()),
+        CreateForTestCase("", "false", "", EscapeString("a"), new Undefined()),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -358,6 +364,11 @@ internal sealed class ASTTests
     static private object[] CreateWhileTestCase(string expression, string statement, Value expected)
     {
         return new object[] { $"while ({expression}) {{ {statement} }}", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateForTestCase(string initialization, string test, string increment, string statement,  Value expected)
+    {
+        return new object[] { $"for ({initialization}; {test}; {increment}) {{ {statement} }}", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
