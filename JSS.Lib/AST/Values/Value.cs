@@ -22,6 +22,7 @@ internal enum ValueType
 internal abstract class Value
 {
     virtual public bool IsEmpty() { return false; }
+    virtual public bool IsReference() { return false; }
     virtual public bool IsUndefined() { return false; }
     virtual public bool IsNull() { return false; }
     virtual public bool IsBoolean() { return false; }
