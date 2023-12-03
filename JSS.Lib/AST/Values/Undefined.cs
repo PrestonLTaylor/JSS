@@ -1,5 +1,6 @@
 ﻿namespace JSS.Lib.AST.Values;
 
+// FIXME: Should inherit from Object
 internal sealed class Undefined : Value
 {
     override public bool IsUndefined() { return true; }

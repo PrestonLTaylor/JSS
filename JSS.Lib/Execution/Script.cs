@@ -7,8 +7,8 @@ internal sealed class Script
 {
     public Script(StatementList statementList)
     {
-        VM = new();
         Realm = new();
+        VM = new(Realm);
         _statementList = statementList;
     }
 

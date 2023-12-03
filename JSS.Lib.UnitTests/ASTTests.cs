@@ -414,7 +414,8 @@ internal sealed class ASTTests
     public void BreakStatement_Evaluate_ReturnsBreakCompletion_WithNoTarget_WhenProvidingBreak_WithNoTarget()
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var breakStatement = new BreakStatement(null);
 
         // Act
@@ -431,7 +432,8 @@ internal sealed class ASTTests
     {
         // Arrange
         const string expectedTarget = "target";
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var identifier = new Identifier(expectedTarget);
         var breakStatement = new BreakStatement(identifier);
 
@@ -448,7 +450,8 @@ internal sealed class ASTTests
     public void ContinueStatement_Evaluate_ReturnsContinueCompletion_WithNoTarget_WhenProvidingContinue_WithNoTarget()
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var continueStatement = new ContinueStatement(null);
 
         // Act
@@ -465,7 +468,8 @@ internal sealed class ASTTests
     {
         // Arrange
         const string expectedTarget = "target";
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var identifier = new Identifier(expectedTarget);
         var continueStatement = new ContinueStatement(identifier);
 
@@ -489,7 +493,8 @@ internal sealed class ASTTests
     public void BitwiseAndExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var bitwiseAndExpression = new BitwiseAndExpression(lhs, rhs);
 
         // Act
@@ -510,7 +515,8 @@ internal sealed class ASTTests
     public void BitwiseOrExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var bitwiseOrExpression = new BitwiseOrExpression(lhs, rhs);
 
         // Act
@@ -531,7 +537,8 @@ internal sealed class ASTTests
     public void BitwiseXorExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var bitwiseXorExpression = new BitwiseXorExpression(lhs, rhs);
 
         // Act
@@ -552,7 +559,8 @@ internal sealed class ASTTests
     public void DivisionExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var divisionExpression = new DivisionExpression(lhs, rhs);
 
         // Act
@@ -573,7 +581,8 @@ internal sealed class ASTTests
     public void ExponentiationExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var exponentiationExpression = new ExponentiationExpression(lhs, rhs);
 
         // Act
@@ -594,7 +603,8 @@ internal sealed class ASTTests
     public void LeftShiftExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var leftShiftExpression = new LeftShiftExpression(lhs, rhs);
 
         // Act
@@ -615,7 +625,8 @@ internal sealed class ASTTests
     public void ModuloExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var moduloExpression = new ModuloExpression(lhs, rhs);
 
         // Act
@@ -636,7 +647,8 @@ internal sealed class ASTTests
     public void MultiplicationExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var multiplicationExpression = new MultiplicationExpression(lhs, rhs);
 
         // Act
@@ -657,7 +669,8 @@ internal sealed class ASTTests
     public void RightShiftExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var rightShiftExpression = new RightShiftExpression(lhs, rhs);
 
         // Act
@@ -678,7 +691,8 @@ internal sealed class ASTTests
     public void SubtractionExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var subtractionExpression = new SubtractionExpression(lhs, rhs);
 
         // Act
@@ -699,7 +713,8 @@ internal sealed class ASTTests
     public void UnsignedRightShiftExpression_Evaluate_ReturnsNormalCompletion_WithExpectedResult(IExpression lhs, IExpression rhs, Value expectedValue)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var unsignedRightShiftExpression = new UnsignedRightShiftExpression(lhs, rhs);
 
         // Act

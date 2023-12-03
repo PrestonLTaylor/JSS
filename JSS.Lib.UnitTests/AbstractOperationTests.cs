@@ -84,7 +84,8 @@ internal sealed class AbstractOperationTests
     public void ToNumber_ReturnsNormalCompletion_WithExpectedNumber_WhenProvidingValue(Value testCase, double expectedNumber)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
 
         // Act
         var asNumber = testCase.ToNumber(vm);
@@ -101,7 +102,8 @@ internal sealed class AbstractOperationTests
     public void ToNumeric_ReturnsNormalCompletion_WithExpectedNumber_WhenProvidingValue(Value testCase, double expectedNumber)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
 
         // Act
         var asNumeric = testCase.ToNumeric(vm);
@@ -161,7 +163,8 @@ internal sealed class AbstractOperationTests
     public void ApplyStringOrNumericBinaryOperator_ReturnsNormalCompletion_WithExpectedValue(Value lhs, BinaryOpType op, Value rhs, Value expectedValue)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
 
         // Act
         var result = IExpression.ApplyStringOrNumericBinaryOperator(vm, lhs, op, rhs);
@@ -197,7 +200,8 @@ internal sealed class AbstractOperationTests
     public void EvaluateStringOrNumericBinaryExpression_ReturnsNormalCompletion_WithExpectedValue(IExpression lhs, BinaryOpType op, IExpression rhs, Value expectedValue)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
 
         // Act
         var result = IExpression.EvaluateStringOrNumericBinaryExpression(vm, lhs, op, rhs);
@@ -226,7 +230,8 @@ internal sealed class AbstractOperationTests
     public void IsLessThan_ReturnsNormalCompletion_WithExpectedResult(Value lhs, Value rhs, bool expectedResult)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var expectedValue = new Boolean(expectedResult);
 
         // Act
@@ -323,7 +328,8 @@ internal sealed class AbstractOperationTests
     public void IsLooselyEqual_ReturnsNormalCompletion_WithExpectedResult(Value lhs, Value rhs, bool expectedResult)
     {
         // Arrange
-        var vm = new VM();
+        var realm = new Realm();
+        var vm = new VM(realm);
         var expectedValue = new Boolean(expectedResult);
 
         // Act

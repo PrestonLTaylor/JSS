@@ -50,6 +50,54 @@ internal abstract class Value
         // FIXME: c. Return ? base.GetBindingValue(V.[[ReferencedName]], V.[[Strict]]) (see 9.1).
     }
 
+    // 6.2.5.6 PutValue( V, W ), https://tc39.es/ecma262/#sec-putvalue
+    public Completion PutValue(VM vm, Value W)
+    {
+        // 1. If V is not a Reference Record, throw a ReferenceError exception.
+        if (!IsReference())
+        {
+            // FIXME: Throw an actual ReferenceError object
+            return Completion.ThrowCompletion(new String("Tried to put a value into a non-reference."));
+        }
+
+        var reference = (this as Reference)!;
+
+        // 2. If IsUnresolvableReference(V) is true, then
+        if (reference.IsUnresolvableReference())
+        {
+            // FIXME: a. If V.[[Strict]] is true, throw a ReferenceError exception.
+
+            // b. Let globalObj be GetGlobalObject().
+            var globalObj = Realm.GetGlobalObject(vm);
+
+            // c. Perform ? Set(globalObj, V.[[ReferencedName]], W, false).
+            var setResult = Object.Set(vm, globalObj, reference.ReferencedName, W, false);
+            if (setResult.IsAbruptCompletion()) return setResult;
+
+            // d. Return UNUSED.
+            return Completion.NormalCompletion(vm.Empty);
+        }
+        // FIXME: 3.If IsPropertyReference(V) is true, then
+        // FIXME: a. Let baseObj be? ToObject(V.[[Base]]).
+        // FIXME: b. If IsPrivateReference(V) is true, then
+        // FIXME: i. Return ? PrivateSet(baseObj, V.[[ReferencedName]], W).
+        // FIXME: c. Let succeeded be? baseObj.[[Set]](V.[[ReferencedName]], W, GetThisValue(V)).
+        // FIXME: d. If succeeded is false and V.[[Strict]] is true, throw a TypeError exception.
+        // FIXME: e. Return UNUSED.
+        // 4. Else,
+        else
+        {
+            // a. Let base be V.[[Base]].
+            var @base = reference.Base!;
+
+            // FIXME: Implement the assert when base can be an object
+            // b. Assert: base is an Environment Record.
+
+            // c. Return ? base.SetMutableBinding(V.[[ReferencedName]], W, FIXME: V.[[Strict]]) (see 9.1).
+            return @base.SetMutableBinding(reference.ReferencedName, W, false);
+        }
+    }
+
     // 7.1.1 ToPrimitive ( input FIXME: [ , preferredType ] ), https://tc39.es/ecma262/#sec-toprimitive
     public Completion ToPrimitive()
     {

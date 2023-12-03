@@ -34,7 +34,7 @@ internal sealed class Object : Value
     static public Completion Set(VM vm, Object O, string P, Value V, bool Throw)
     {
         // 1. Let success be ? O.[[Set]](P, V, O).
-        var success = O.Set(vm, P, V, O);
+        var success = O.Set(P, V, O);
         if (success.IsAbruptCompletion()) return success;
 
         // FIXME: Throw an actual TypeError object
@@ -50,20 +50,20 @@ internal sealed class Object : Value
     }
 
     // 10.1.9 [[Set]] ( P, V, Receiver ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-set-p-v-receiver
-    public Completion Set(VM vm, string P, Value V, Object receiver)
+    public Completion Set(string P, Value V, Object receiver)
     {
         // 1. Return ? OrdinarySet(O, P, V, Receiver).
-        return OrdinarySet(vm, this, P, V, receiver);
+        return OrdinarySet(this, P, V, receiver);
     }
 
     // 10.1.9.1 OrdinarySet ( O, P, V, Receiver ), https://tc39.es/ecma262/#sec-ordinaryset
-    static public Completion OrdinarySet(VM vm, Object O, string P, Value V, Object receiver)
+    static public Completion OrdinarySet(Object O, string P, Value V, Object receiver)
     {
         // FIXME: 1. Let ownDesc be ? O.[[GetOwnProperty]](P).
-        // FIXME: 2.Return ? OrdinarySetWithOwnDescriptor(O, P, V, Receiver, ownDesc).
+        // FIXME: 2. Return ? OrdinarySetWithOwnDescriptor(O, P, V, Receiver, ownDesc).
         var property = receiver.DataProperties[P];
         property.Value = V;
-        return Completion.NormalCompletion(vm.Empty);
+        return Completion.NormalCompletion(new Boolean(true));
     }
 
     // FIXME: Accessor Attributes

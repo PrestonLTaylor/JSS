@@ -25,6 +25,13 @@ internal class Reference : Value
         return new Reference(@base, referencedName, thisValue);
     }
 
+    // 6.2.5.2 IsUnresolvableReference ( V ), https://tc39.es/ecma262/#sec-isunresolvablereference
+    public bool IsUnresolvableReference()
+    {
+        // 1. If V.[[Base]] is UNRESOLVABLE, return true; otherwise return false.
+        return Base is null;
+    }
+
     // FIXME: Base can have a ECMAScript language value
     public Environment? Base { get; }
 
