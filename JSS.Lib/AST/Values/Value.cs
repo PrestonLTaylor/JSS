@@ -36,18 +36,34 @@ internal abstract class Value
     public Completion GetValue()
     {
         // 1. If V is not a Reference Record, return V.
-        return Completion.NormalCompletion(this);
+        if (!IsReference())
+        {
+            return Completion.NormalCompletion(this);
+        }
 
-        // FIXME: 2. If IsUnresolvableReference(V) is true, throw a ReferenceError exception.
+        // FIXME: Throw an ReferenceError Object
+        // 2. If IsUnresolvableReference(V) is true, throw a ReferenceError exception.
+        var asReference = (this as Reference)!;
+        if (asReference.IsUnresolvableReference())
+        {
+            return Completion.ThrowCompletion(new String($"{asReference.ReferencedName} is not defined"));
+        }
+
         // FIXME: 3. If IsPropertyReference(V) is true, then
         // FIXME: a. Let baseObj be ? ToObject(V.[[Base]]).
         // FIXME: b. If IsPrivateReference(V) is true, then
         // FIXME: i. Return ? PrivateGet(baseObj, V.[[ReferencedName]]).
         // FIXME: c. Return ? baseObj.[[Get]](V.[[ReferencedName]], GetThisValue(V)).
         // FIXME: 4. Else,
-        // FIXME: a. Let base be V.[[Base]].
-        // FIXME: b. Assert: base is an Environment Record.
-        // FIXME: c. Return ? base.GetBindingValue(V.[[ReferencedName]], V.[[Strict]]) (see 9.1).
+
+        // a. Let base be V.[[Base]].
+        var @base = asReference.Base!;
+
+        // FIXME: Assert when base can be an environment record
+        // b. Assert: base is an Environment Record.
+
+        // c. Return ? base.GetBindingValue(V.[[ReferencedName]], FIXME: V.[[Strict]]) (see 9.1).
+        return @base.GetBindingValue(asReference.ReferencedName, false);
     }
 
     // 6.2.5.6 PutValue( V, W ), https://tc39.es/ecma262/#sec-putvalue
