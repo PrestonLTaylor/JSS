@@ -1,8 +1,12 @@
 ﻿namespace JSS.Lib.AST.Values;
 
-// FIXME: Should inherit from Object
-internal sealed class Undefined : Value
+internal sealed class Undefined : Object 
 {
+    public Undefined() : base(null)
+    {
+    }
+
+    override public bool IsObject() { return false; }
     override public bool IsUndefined() { return true; }
     override public ValueType Type() { return ValueType.Undefined; }
 

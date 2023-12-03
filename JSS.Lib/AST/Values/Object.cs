@@ -19,7 +19,7 @@ internal struct Property
 }
 
 // 6.1.7 The Object Type, https://tc39.es/ecma262/#sec-object-type
-internal sealed class Object : Value
+internal class Object : Value
 {
     public Object(Object? prototype)
     {
