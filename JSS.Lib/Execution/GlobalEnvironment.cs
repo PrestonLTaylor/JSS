@@ -41,9 +41,9 @@ internal sealed class GlobalEnvironment : Environment
         // 2. If ! DclRec.HasBinding(N) is true, return true.
         if (DeclarativeRecord.HasBinding(N)) { return true; }
 
-        // FIXME: 3. Let ObjRec be envRec.[[ObjectRecord]].
-        // FIXME: 4. Return ? ObjRec.HasBinding(N).
-        return false;
+        // 3. Let ObjRec be envRec.[[ObjectRecord]].
+        // 4. Return ? ObjRec.HasBinding(N).
+        return ObjectRecord.HasBinding(N);
     }
 
     public ObjectEnvironment ObjectRecord { get; }
