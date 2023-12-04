@@ -10,9 +10,20 @@ internal sealed class VM
         Realm = realm;
     }
 
+    public void PushExecutionContext(ExecutionContext context)
+    {
+        _executionContextStack.Push(context);
+    }
+
+    public void PopExecutionContext()
+    {
+        _executionContextStack.Pop();
+    }
+
     public Realm Realm { get; }
     public Empty Empty { get; } = new Empty();
     public Null Null { get; } = new Null();
     public Undefined Undefined { get; } = new Undefined();
     public Number NaN { get; } = new Number(double.NaN);
+    private Stack<ExecutionContext> _executionContextStack = new();
 }

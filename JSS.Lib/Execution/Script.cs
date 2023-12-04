@@ -7,8 +7,10 @@ internal sealed class Script
 {
     public Script(StatementList statementList)
     {
-        Realm = new();
-        VM = new(Realm);
+        // FIXME: Handle throw completions
+        Realm.InitializeHostDefinedRealm(out VM vm);
+        VM = vm;
+        Realm = vm.Realm;
         _statementList = statementList;
     }
 
