@@ -199,13 +199,53 @@ internal sealed class Parser
     // AssignmentExpression, https://tc39.es/ecma262/#prod-AssignmentExpression
     private bool TryParseAssignmentExpression(out IExpression? parsedExpression)
     {
-        if (TryParseConditionalExpression(out parsedExpression))
+        if (!TryParseConditionalExpression(out IExpression? lhs))
         {
+            parsedExpression = null;
+            return false;
+        }
+
+        // FIXME: Use this early error rule https://tc39.es/ecma262/#sec-static-semantics-assignmenttargettype
+        if (!IsLeftHandSideExpressionNode(lhs!) || !TryParseRhsOfAssignmentExpression(lhs!, out parsedExpression))
+        {
+            parsedExpression = lhs;
+        }
+
+        return true;
+    }
+
+    private bool IsLeftHandSideExpressionNode(IExpression expression)
+    {
+        return expression is Identifier or PropertyExpression or ComputedPropertyExpression or SuperPropertyExpression or SuperComputedPropertyExpression;
+    }
+
+    private bool TryParseRhsOfAssignmentExpression(IExpression lhs, out IExpression? parsedExpression)
+    {
+        if (IsBasicAssignmentOperator())
+        {
+            parsedExpression = ParseBasicAssignmentExpression(lhs);
             return true;
         }
 
         parsedExpression = null;
         return false;
+    }
+
+    private bool IsBasicAssignmentOperator()
+    {
+        return _consumer.IsTokenOfType(TokenType.Assignment);
+    }
+
+    private IExpression ParseBasicAssignmentExpression(IExpression lhs)
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Assignment);
+
+        if (!TryParseAssignmentExpression(out IExpression? rhs))
+        {
+            ThrowUnexpectedTokenSyntaxError<IExpression>();
+        }
+
+        return new BasicAssignmentExpression(lhs, rhs!);
     }
 
     // ConditionalExpression, https://tc39.es/ecma262/#prod-ConditionalExpression
