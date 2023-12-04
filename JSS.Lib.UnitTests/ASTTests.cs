@@ -239,6 +239,13 @@ internal sealed class ASTTests
         CreateThrowingIdentifierTestCase("a"),
         CreateThrowingIdentifierTestCase("falsey"),
         CreateThrowingIdentifierTestCase("truey"),
+
+        // Tests for VarStatement
+        CreateVarStatementTestCase("a", "null", new Null()),
+        CreateVarStatementTestCase("a", "false", new Boolean(false)),
+        CreateVarStatementTestCase("a", "true", new Boolean(true)),
+        CreateVarStatementTestCase("a", "1", new Number(1)),
+        CreateVarStatementTestCase("a", EscapeString("1"), new String("1")),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -389,6 +396,11 @@ internal sealed class ASTTests
     static private object[] CreateThrowingIdentifierTestCase(string identifier)
     {
         return new object[] { identifier, Completion.ThrowCompletion(new String($"{identifier} is not defined")) };
+    }
+
+    static private object[] CreateVarStatementTestCase(string identifier, string initializer, Value expected)
+    {
+        return new object[] { $"var {identifier} = {initializer}; {identifier}", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]

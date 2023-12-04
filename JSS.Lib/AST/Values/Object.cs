@@ -123,8 +123,16 @@ internal class Object : Value
     {
         // FIXME: 1. Let ownDesc be ? O.[[GetOwnProperty]](P).
         // FIXME: 2. Return ? OrdinarySetWithOwnDescriptor(O, P, V, Receiver, ownDesc).
-        var property = receiver.DataProperties[P];
-        property.Value = V;
+        if (receiver.DataProperties.ContainsKey(P))
+        {
+            var property = receiver.DataProperties[P];
+            property.Value = V;
+        }
+        else
+        {
+            receiver.DataProperties[P] = new Property(V, new Attributes(true, false, false));
+        }
+
         return Completion.NormalCompletion(new Boolean(true));
     }
 
