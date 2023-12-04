@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.Execution;
+using System.Diagnostics.Metrics;
 
 namespace JSS.Lib.AST.Values;
 
@@ -29,6 +30,13 @@ internal class Object : Value
 
     override public bool IsObject() { return true; }
     override public ValueType Type() {  return ValueType.Object; }
+
+    // 7.3.2 Get ( O, P ), https://tc39.es/ecma262/#sec-get-o-p
+    static public Completion Get(Object O, string P)
+    {
+        // 1. Return ? O.[[Get]](P, O).
+        return O.Get(P, O);
+    }
 
     // 7.3.4 Set ( O, P, V, Throw ), https://tc39.es/ecma262/#sec-set-o-p-v-throw
     static public Completion Set(VM vm, Object O, string P, Value V, bool Throw)
@@ -76,6 +84,31 @@ internal class Object : Value
         // FIXME: 4. If parent is not null, then
         // FIXME: a. Return ? parent.[[HasProperty]](P).
         // FIXME: 5. Return false.
+    }
+
+    // 10.1.8 [[Get]] ( P, Receiver ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-get-p-receiver
+    public Completion Get(string P, Object receiver)
+    {
+        // 1. Return ? OrdinaryGet(O, P, Receiver).
+        return OrdinaryGet(this, P, receiver);
+    }
+
+    // 10.1.8.1 OrdinaryGet ( O, P, Receiver ), https://tc39.es/ecma262/#sec-ordinaryget
+    static public Completion OrdinaryGet(Object O, string P, Object receiver)
+    {
+        // FIXME: 1. Let desc be ? O.[[GetOwnProperty]](P).
+        // FIXME: 2. If desc is undefined, then
+        // FIXME: a. Let parent be ? O.[[GetPrototypeOf]]().
+        // FIXME: b. If parent is null, return undefined.
+        // FIXME: c. Return ? parent.[[Get]](P, Receiver).
+
+        // FIXME: 3. If IsDataDescriptor(desc) is true, return desc.[[Value]].
+        return Completion.NormalCompletion(O.DataProperties[P].Value);
+
+        // FIXME: 4. Assert: IsAccessorDescriptor(desc) is true.
+        // FIXME: 5. Let getter be desc.[[Get]].
+        // FIXME: 6. If getter is undefined, return undefined.
+        // FIXME: 7. Return ? Call(getter, Receiver).
     }
 
     // 10.1.9 [[Set]] ( P, V, Receiver ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-set-p-v-receiver
