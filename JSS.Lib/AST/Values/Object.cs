@@ -49,6 +49,35 @@ internal class Object : Value
         return Completion.NormalCompletion(vm.Empty);
     }
 
+    // 7.3.12 HasProperty ( O, P ), https://tc39.es/ecma262/#sec-hasproperty
+    static public Completion HasProperty(Object O, string P)
+    {
+        // 1. Return ? O.[[HasProperty]](P).
+        return O.HasProperty(P);
+    }
+
+    // 10.1.7 [[HasProperty]] ( P ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-hasproperty-p
+    public Completion HasProperty(string P)
+    {
+        // 1. Return ? OrdinaryHasProperty(O, P).
+        return OrdinaryHasProperty(this, P);
+    }
+
+    // 10.1.7.1 OrdinaryHasProperty ( O, P ), https://tc39.es/ecma262/#sec-ordinaryhasproperty
+    public Completion OrdinaryHasProperty(Object O, string P)
+    {
+        // FIXME: 1. Let hasOwn be ? O.[[GetOwnProperty]](P).
+        var hasOwn = DataProperties.ContainsKey(P);
+
+        // FIXME: 2. If hasOwn is not undefined, return true.
+        return Completion.NormalCompletion(new Boolean(hasOwn));
+
+        // FIXME: 3. Let parent be ? O.[[GetPrototypeOf]]().
+        // FIXME: 4. If parent is not null, then
+        // FIXME: a. Return ? parent.[[HasProperty]](P).
+        // FIXME: 5. Return false.
+    }
+
     // 10.1.9 [[Set]] ( P, V, Receiver ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-set-p-v-receiver
     public Completion Set(string P, Value V, Object receiver)
     {
