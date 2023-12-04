@@ -1,5 +1,6 @@
 ﻿using Boolean = JSS.Lib.AST.Values.Boolean;
 using Object = JSS.Lib.AST.Values.Object;
+using String = JSS.Lib.AST.Values.String;
 
 namespace JSS.Lib.Execution;
 
@@ -41,6 +42,26 @@ internal sealed class ObjectEnvironment : Environment
         // FIXME: a. Let blocked be ToBoolean(? Get(unscopables, N)).
         // FIXME: b. If blocked is true, return false.
         // FIXME: 7. Return true.
+    }
+
+    // 9.1.1.2.6 GetBindingValue ( N, S ), https://tc39.es/ecma262/#sec-object-environment-records-getbindingvalue-n-s
+    override public Completion GetBindingValue(string N, bool S)
+    {
+        // 1. Let bindingObject be envRec.[[BindingObject]].
+        // 2. Let value be ? HasProperty(bindingObject, N).
+        var value = BindingObject.HasProperty(N);
+        if (value.IsAbruptCompletion()) return value;
+
+        // 3. If value is false, then
+        var asBoolean = (value.Value as Boolean)!;
+        if (!asBoolean.Value)
+        {
+            // FIXME: a. If S is false, return undefined; otherwise throw a ReferenceError exception.
+            return Completion.ThrowCompletion(new String($"{N} is not defined."));
+        }
+
+        // 4. Return ? Get(bindingObject, N).
+        return Object.Get(BindingObject, N);
     }
 
     public Object BindingObject { get; }

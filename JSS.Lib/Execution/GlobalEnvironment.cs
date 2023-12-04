@@ -46,6 +46,22 @@ internal sealed class GlobalEnvironment : Environment
         return ObjectRecord.HasBinding(N);
     }
 
+    // 9.1.1.4.6 GetBindingValue ( N, S ), https://tc39.es/ecma262/#sec-global-environment-records-getbindingvalue-n-s
+    override public Completion GetBindingValue(string N, bool S)
+    {
+        // 1. Let DclRec be envRec.[[DeclarativeRecord]].
+        // 2. If ! DclRec.HasBinding(N) is true, then
+        if (DeclarativeRecord.HasBinding(N))
+        {
+            // a. Return ? DclRec.GetBindingValue(N, S).
+            return DeclarativeRecord.GetBindingValue(N, S);
+        }
+
+        // 3. Let ObjRec be envRec.[[ObjectRecord]].
+        // 4. Return ? ObjRec.GetBindingValue(N, S).
+        return ObjectRecord.GetBindingValue(N, S);
+    }
+
     public ObjectEnvironment ObjectRecord { get; }
     public Object GlobalThisValue { get; }
     public DeclarativeEnvironment DeclarativeRecord { get; }
