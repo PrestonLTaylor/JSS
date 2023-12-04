@@ -11,7 +11,7 @@ internal sealed class ScriptExecutionContext : ExecutionContext
     {
         // 1. If env is not present or env is undefined, then
         // FIXME: a. Set env to the running execution context's LexicalEnvironment.
-        env ??= GlobalEnvironment;
+        env ??= vm.CurrentExecutionContext.Realm.GlobalEnv;
 
         // NOTE: This Assert is implicit
         // 2. Assert: env is an Environment Record.
@@ -22,8 +22,6 @@ internal sealed class ScriptExecutionContext : ExecutionContext
         // 4. Return ? GetIdentifierReference(env, name, strict).
         return Environment.GetIdentifierReference(vm, env, name);
     }
-
-    static public GlobalEnvironment GlobalEnvironment { get; } = new(new(null), new(null));
 
     // FIXME: LexicalEnvironment
 

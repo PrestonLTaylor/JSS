@@ -25,5 +25,14 @@ internal sealed class VM
     public Null Null { get; } = new Null();
     public Undefined Undefined { get; } = new Undefined();
     public Number NaN { get; } = new Number(double.NaN);
+
+    public ExecutionContext CurrentExecutionContext
+    {
+        get
+        {
+            return _executionContextStack.Peek();
+        }
+    }
+
     private Stack<ExecutionContext> _executionContextStack = new();
 }
