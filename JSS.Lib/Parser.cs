@@ -226,6 +226,11 @@ internal sealed class Parser
             parsedExpression = ParseBasicAssignmentExpression(lhs);
             return true;
         }
+        if (IsLogicalAndAssignmentOperator())
+        {
+            parsedExpression = ParseLogicalAndAssignmentExpression(lhs);
+            return true;
+        }
 
         parsedExpression = null;
         return false;
@@ -246,6 +251,23 @@ internal sealed class Parser
         }
 
         return new BasicAssignmentExpression(lhs, rhs!);
+    }
+
+    private bool IsLogicalAndAssignmentOperator()
+    {
+        return _consumer.IsTokenOfType(TokenType.AndAssignment);
+    }
+
+    private IExpression ParseLogicalAndAssignmentExpression(IExpression lhs)
+    {
+        _consumer.ConsumeTokenOfType(TokenType.AndAssignment);
+
+        if (!TryParseAssignmentExpression(out IExpression? rhs))
+        {
+            ThrowUnexpectedTokenSyntaxError<IExpression>();
+        }
+
+        return new LogicalAndAssignmentExpression(lhs, rhs!);
     }
 
     // ConditionalExpression, https://tc39.es/ecma262/#prod-ConditionalExpression

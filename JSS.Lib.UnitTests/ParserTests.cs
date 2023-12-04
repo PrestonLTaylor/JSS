@@ -1252,6 +1252,35 @@ internal sealed class ParserTests
         Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
     }
 
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsLogicalAndAssignmentExpression_WhenProvidingLogicalAndAssignmentExpression(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        const string expectedIdentifier = "identifier";
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"{expectedIdentifier} &&= {expression}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var assignmentExpression = expressionStatement.Expression as LogicalAndAssignmentExpression;
+        Assert.That(assignmentExpression, Is.Not.Null);
+
+        var identifier = assignmentExpression.Lhs as Identifier;
+        Assert.That(identifier, Is.Not.Null);
+        Assert.That(identifier.Name, Is.EqualTo(expectedIdentifier));
+
+        Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
+    }
+
     // Tests for SyntaxErrors
     // FIXME: More test cases where ConsumeTokenOfType is used
     static private readonly Dictionary<string, string> unexpectedTokenTestCases = new()
@@ -1329,6 +1358,7 @@ internal sealed class ParserTests
         {"class a { b(c) ", "}"},
         {"a ", "}"},
         {"a =", "}"},
+        {"a &&=", "}"},
     };
 
     [TestCaseSource(nameof(unexpectedTokenTestCases))]
@@ -1420,6 +1450,7 @@ internal sealed class ParserTests
         "class a { b(c ",
         "class a { b(c) ",
         "a =",
+        "a &&=",
     };
 
     [TestCaseSource(nameof(unexpectedEofTestCases))]
