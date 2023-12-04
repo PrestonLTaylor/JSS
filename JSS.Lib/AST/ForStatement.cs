@@ -1,4 +1,5 @@
-﻿using JSS.Lib.Execution;
+﻿using JSS.Lib.AST.Values;
+using JSS.Lib.Execution;
 
 namespace JSS.Lib.AST;
 
@@ -58,7 +59,7 @@ internal sealed class ForStatement : INode
     private Completion ForBodyEvaluation(VM vm)
     {
         // 1. Let V be undefined.
-        var V = vm.Undefined;
+        var V = (Value)vm.Undefined;
 
         // FIXME: 2. Perform ? CreatePerIterationEnvironment(perIterationBindings).
 

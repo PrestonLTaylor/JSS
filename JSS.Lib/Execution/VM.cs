@@ -11,8 +11,8 @@ internal sealed class VM
     }
 
     public Realm Realm { get; }
-    public Value Empty { get; } = new Empty();
-    public Value Null { get; } = new Null();
-    public Value Undefined { get; } = new Undefined();
-    public Value NaN { get; } = new Number(double.NaN);
+    public Empty Empty { get; } = new Empty();
+    public Null Null { get; } = new Null();
+    public Undefined Undefined { get; } = new Undefined();
+    public Number NaN { get; } = new Number(double.NaN);
 }

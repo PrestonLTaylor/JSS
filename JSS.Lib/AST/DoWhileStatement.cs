@@ -16,7 +16,7 @@ internal sealed class DoWhileStatement : INode
     override public Completion Evaluate(VM vm)
     {
         // 1. Let V be undefined.
-        var V = vm.Undefined;
+        var V = (Value)vm.Undefined;
 
         // 2. Repeat,
         while (true)

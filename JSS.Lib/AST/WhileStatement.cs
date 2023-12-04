@@ -1,4 +1,6 @@
-﻿using JSS.Lib.Execution;
+﻿using JSS.Lib.AST.Values;
+
+using JSS.Lib.Execution;
 
 namespace JSS.Lib.AST;
 
@@ -15,7 +17,7 @@ internal sealed class WhileStatement : INode
     override public Completion Evaluate(VM vm)
     {
         // 1.Let V be undefined.
-        var V = vm.Undefined;
+        var V = (Value)vm.Undefined;
 
         // 2.Repeat,
         while (true)
