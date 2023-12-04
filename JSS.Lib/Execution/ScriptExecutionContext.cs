@@ -23,7 +23,7 @@ internal sealed class ScriptExecutionContext : ExecutionContext
         return Environment.GetIdentifierReference(vm, env, name);
     }
 
-    static public GlobalEnvironment GlobalEnvironment { get; } = new();
+    static public GlobalEnvironment GlobalEnvironment { get; } = new(new(null), new(null));
 
     // FIXME: LexicalEnvironment
 

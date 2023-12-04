@@ -3,8 +3,9 @@
 // 9.1.1.1 Declarative Environment Records, https://tc39.es/ecma262/#sec-declarative-environment-records
 internal sealed class DeclarativeEnvironment : Environment
 {
-    public DeclarativeEnvironment(Environment outerEnv) : base(outerEnv)
+    public DeclarativeEnvironment(Environment? outerEnv)
     {
+        OuterEnv = outerEnv;
     }
 
     // 9.1.1.1.1 HasBinding ( N ), https://tc39.es/ecma262/#sec-declarative-environment-records

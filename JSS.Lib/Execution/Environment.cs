@@ -5,11 +5,6 @@ namespace JSS.Lib.Execution;
 // 9.1 Environment Records, https://tc39.es/ecma262/#sec-environment-records
 internal abstract class Environment
 {
-    public Environment(Environment? outerEnv)
-    {
-        OuterEnv = outerEnv;
-    }
-
     // Abstract Methods of Environment Records, https://tc39.es/ecma262/#table-abstract-methods-of-environment-records
     virtual public bool HasBinding(string N) { throw new NotImplementedException(); }
     virtual public Completion CreateMutableBinding(string N, bool D) { throw new NotImplementedException(); }
@@ -52,5 +47,5 @@ internal abstract class Environment
         }
     }
 
-    public Environment? OuterEnv { get; }
+    public Environment? OuterEnv { get; protected set; }
 }
