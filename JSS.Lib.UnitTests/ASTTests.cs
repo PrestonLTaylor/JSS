@@ -234,6 +234,11 @@ internal sealed class ASTTests
         CreateBitwiseNOTTestCase(1, -2),
         CreateBitwiseNOTTestCase(2, -3),
         CreateBitwiseNOTTestCase(2147483648, 2147483647),
+
+        // Tests for Identifier
+        CreateThrowingIdentifierTestCase("a"),
+        CreateThrowingIdentifierTestCase("falsey"),
+        CreateThrowingIdentifierTestCase("truey"),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -379,6 +384,11 @@ internal sealed class ASTTests
     static private object[] CreateBitwiseNOTTestCase(double value, double expected)
     {
         return new object[] { $"~{value}", Completion.NormalCompletion(new Number(expected)) };
+    }
+
+    static private object[] CreateThrowingIdentifierTestCase(string identifier)
+    {
+        return new object[] { identifier, Completion.ThrowCompletion(new String($"{identifier} is not defined")) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
