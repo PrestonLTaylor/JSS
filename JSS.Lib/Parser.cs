@@ -241,6 +241,11 @@ internal sealed class Parser
             parsedExpression = ParseNullCoalescingAssignmentExpression(lhs);
             return true;
         }
+        if (IsBinaryOpAssignmentOperator())
+        {
+            parsedExpression = ParseBinaryOpAssignmentExpression(lhs);
+            return true;
+        }
 
         parsedExpression = null;
         return false;
@@ -312,6 +317,51 @@ internal sealed class Parser
         }
 
         return new NullCoalescingAssignmentExpression(lhs, rhs!);
+    }
+
+    private bool IsBinaryOpAssignmentOperator()
+    {
+        return _consumer.CanConsume() && _consumer.Peek().type switch
+        {
+            TokenType.ExponentiationAssignment or TokenType.MultiplyAssignment or TokenType.DivisionAssignment 
+                or TokenType.ModuloAssignment or TokenType.PlusAssignment or TokenType.MinusAssignment or TokenType.LeftShiftAssignment
+                or TokenType.RightShiftAssignment or TokenType.UnsignedRightShiftAssignment or TokenType.BitwiseAndAssignment
+                or TokenType.BitwiseXorAssignment or TokenType.BitwiseOrAssignment => true,
+            _ => false,
+        };
+    }
+
+    private IExpression ParseBinaryOpAssignmentExpression(IExpression lhs)
+    {
+        var binaryOpToken = _consumer.Consume();
+        var binaryOpType = BinaryOpTokenToBinaryOpType(binaryOpToken);
+
+        if (!TryParseAssignmentExpression(out IExpression? rhs))
+        {
+            ThrowUnexpectedTokenSyntaxError<IExpression>();
+        }
+
+        return new BinaryOpAssignmentExpression(lhs, binaryOpType, rhs!);
+    }
+
+    private BinaryOpType BinaryOpTokenToBinaryOpType(Token binaryOp)
+    {
+        return binaryOp.type switch
+        {
+            TokenType.ExponentiationAssignment => BinaryOpType.Exponentiate, 
+            TokenType.MultiplyAssignment => BinaryOpType.Multiply,
+            TokenType.DivisionAssignment => BinaryOpType.Divide,
+            TokenType.ModuloAssignment => BinaryOpType.Remainder,
+            TokenType.PlusAssignment => BinaryOpType.Add,
+            TokenType.MinusAssignment => BinaryOpType.Subtract,
+            TokenType.LeftShiftAssignment => BinaryOpType.LeftShift,
+            TokenType.RightShiftAssignment => BinaryOpType.SignedRightShift,
+            TokenType.UnsignedRightShiftAssignment => BinaryOpType.UnsignedRightShift,
+            TokenType.BitwiseAndAssignment => BinaryOpType.BitwiseAND,
+            TokenType.BitwiseXorAssignment => BinaryOpType.BitwiseXOR,
+            TokenType.BitwiseOrAssignment => BinaryOpType.BitwiseOR,
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to get a binary op type with a token of type {binaryOp.type}"),
+        };
     }
 
     // ConditionalExpression, https://tc39.es/ecma262/#prod-ConditionalExpression

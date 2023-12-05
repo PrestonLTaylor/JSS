@@ -1339,6 +1339,108 @@ internal sealed class ParserTests
         Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
     }
 
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithExponentiationBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "**=", BinaryOpType.Exponentiate);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithMultiplyBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "*=", BinaryOpType.Multiply);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithDivideBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "/=", BinaryOpType.Divide);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithRemainderBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "%=", BinaryOpType.Remainder);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithAddBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "+=", BinaryOpType.Add);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithSubtractBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "-=", BinaryOpType.Subtract);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithLeftShiftBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "<<=", BinaryOpType.LeftShift);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithSignedRightShiftBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, ">>=", BinaryOpType.SignedRightShift);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithUnsignedRightShiftBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, ">>>=", BinaryOpType.UnsignedRightShift);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithBitwiseANDBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "&=", BinaryOpType.BitwiseAND);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithBitwiseXORBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "^=", BinaryOpType.BitwiseXOR);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithBitwiseORBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "|=", BinaryOpType.BitwiseOR);
+    }
+
+    private void Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(KeyValuePair<string, Type> expressionToExpectedType, string binaryOp, BinaryOpType expectedOp)
+    {
+        // Arrange
+        const string expectedIdentifier = "identifier";
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"{expectedIdentifier} {binaryOp} {expression}");
+
+        // Act
+        var parsedProgram = parser.Parse();
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var assignmentExpression = expressionStatement.Expression as BinaryOpAssignmentExpression;
+        Assert.That(assignmentExpression, Is.Not.Null);
+
+        var identifier = assignmentExpression.Lhs as Identifier;
+        Assert.That(identifier, Is.Not.Null);
+        Assert.That(identifier.Name, Is.EqualTo(expectedIdentifier));
+
+        Assert.That(assignmentExpression.Op, Is.EqualTo(expectedOp));
+
+        Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
+    }
+
     // Tests for SyntaxErrors
     // FIXME: More test cases where ConsumeTokenOfType is used
     static private readonly Dictionary<string, string> unexpectedTokenTestCases = new()
@@ -1419,6 +1521,18 @@ internal sealed class ParserTests
         {"a &&=", "}"},
         {"a ||=", "}"},
         {"a ??=", "}"},
+        {"a **=", "}"},
+        {"a *=", "}"},
+        {"a /=", "}"},
+        {"a %=", "}"},
+        {"a +=", "}"},
+        {"a -=", "}"},
+        {"a <<=", "}"},
+        {"a >>=", "}"},
+        {"a >>>=", "}"},
+        {"a &=", "}"},
+        {"a ^=", "}"},
+        {"a |=", "}"},
     };
 
     [TestCaseSource(nameof(unexpectedTokenTestCases))]
@@ -1513,6 +1627,18 @@ internal sealed class ParserTests
         "a &&=",
         "a ||=",
         "a ??=",
+        "a **=",
+        "a *=",
+        "a /=",
+        "a %=",
+        "a +=",
+        "a -=",
+        "a <<=",
+        "a >>=",
+        "a >>>=",
+        "a &=",
+        "a ^=",
+        "a |=",
     };
 
     [TestCaseSource(nameof(unexpectedEofTestCases))]
