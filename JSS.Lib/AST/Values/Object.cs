@@ -1,5 +1,4 @@
 ﻿using JSS.Lib.Execution;
-using System.Diagnostics.Metrics;
 
 namespace JSS.Lib.AST.Values;
 
@@ -7,7 +6,7 @@ namespace JSS.Lib.AST.Values;
 // FIXME: [[Value]], [[Get]] [[Set]]
 internal sealed record Attributes(bool Writable, bool Enumerable, bool Configurable);
 
-internal struct Property
+internal sealed class Property
 {
     public Property(Value value, Attributes attributes)
     {
@@ -65,7 +64,7 @@ internal class Object : Value
     }
 
     // 10.1.7 [[HasProperty]] ( P ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-hasproperty-p
-    public Completion HasProperty(string P)
+    private Completion HasProperty(string P)
     {
         // 1. Return ? OrdinaryHasProperty(O, P).
         return OrdinaryHasProperty(this, P);
@@ -87,7 +86,7 @@ internal class Object : Value
     }
 
     // 10.1.8 [[Get]] ( P, Receiver ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-get-p-receiver
-    public Completion Get(string P, Object receiver)
+    private Completion Get(string P, Object receiver)
     {
         // 1. Return ? OrdinaryGet(O, P, Receiver).
         return OrdinaryGet(this, P, receiver);
@@ -112,7 +111,7 @@ internal class Object : Value
     }
 
     // 10.1.9 [[Set]] ( P, V, Receiver ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-set-p-v-receiver
-    public Completion Set(string P, Value V, Object receiver)
+    private Completion Set(string P, Value V, Object receiver)
     {
         // 1. Return ? OrdinarySet(O, P, V, Receiver).
         return OrdinarySet(this, P, V, receiver);

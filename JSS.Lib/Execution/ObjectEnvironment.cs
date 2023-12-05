@@ -1,4 +1,5 @@
-﻿using Boolean = JSS.Lib.AST.Values.Boolean;
+﻿using JSS.Lib.AST.Values;
+using Boolean = JSS.Lib.AST.Values.Boolean;
 using Object = JSS.Lib.AST.Values.Object;
 using String = JSS.Lib.AST.Values.String;
 
@@ -31,7 +32,7 @@ internal sealed class ObjectEnvironment : Environment
 
         // FIXME: Handle AbruptCompletions
         // 2. Let foundBinding be ? HasProperty(bindingObject, N).
-        var foundBinding = (bindingObject.HasProperty(N).Value as Boolean)!;
+        var foundBinding = (Object.HasProperty(bindingObject, N).Value as Boolean)!;
 
         // 3. If foundBinding is false, return false.
         return foundBinding.Value;
@@ -44,12 +45,36 @@ internal sealed class ObjectEnvironment : Environment
         // FIXME: 7. Return true.
     }
 
+    // 9.1.1.2.5 SetMutableBinding ( N, V, S ), https://tc39.es/ecma262/#sec-object-environment-records-getbindingvalue-n-s
+    override public Completion SetMutableBinding(VM vm, string N, Value V, bool S)
+    {
+        // 1. Let bindingObject be envRec.[[BindingObject]].
+        // 2. Let stillExists be ? HasProperty(bindingObject, N).
+        var stillExists = Object.HasProperty(BindingObject, N);
+        if (stillExists.IsAbruptCompletion()) return stillExists;
+
+        // 3. If stillExists is false and S is true, throw a ReferenceError exception.
+        var asBoolean = (stillExists.Value as Boolean)!;
+        if (!asBoolean.Value && S)
+        {
+            // FIXME: Throw a ReferenceError object
+            return Completion.ThrowCompletion(new String($"{N} is not defined"));
+        }
+
+        // 4. Perform ? Set(bindingObject, N, V, S).
+        var setResult = Object.Set(vm, BindingObject, N, V, S);
+        if (setResult.IsAbruptCompletion()) return setResult;
+
+        // 5. Return UNUSED.
+        return Completion.NormalCompletion(vm.Empty);
+    }
+
     // 9.1.1.2.6 GetBindingValue ( N, S ), https://tc39.es/ecma262/#sec-object-environment-records-getbindingvalue-n-s
     override public Completion GetBindingValue(string N, bool S)
     {
         // 1. Let bindingObject be envRec.[[BindingObject]].
         // 2. Let value be ? HasProperty(bindingObject, N).
-        var value = BindingObject.HasProperty(N);
+        var value = Object.HasProperty(BindingObject, N);
         if (value.IsAbruptCompletion()) return value;
 
         // 3. If value is false, then

@@ -110,7 +110,7 @@ internal abstract class Value
             // b. Assert: base is an Environment Record.
 
             // c. Return ? base.SetMutableBinding(V.[[ReferencedName]], W, FIXME: V.[[Strict]]) (see 9.1).
-            return @base.SetMutableBinding(reference.ReferencedName, W, false);
+            return @base.SetMutableBinding(vm, reference.ReferencedName, W, false);
         }
     }
 

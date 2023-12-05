@@ -2,6 +2,6 @@
 
 namespace JSS.Lib.Execution;
 
-internal sealed record Binding(Value Value, bool Mutable)
+internal record struct Binding(Value Value, bool Mutable)
 {
 }

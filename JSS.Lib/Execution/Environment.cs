@@ -10,7 +10,7 @@ internal abstract class Environment
     virtual public Completion CreateMutableBinding(string N, bool D) { throw new NotImplementedException(); }
     virtual public Completion CreateImmutableBinding(string N, bool S) { throw new NotImplementedException(); }
     virtual public Completion InitializeBinding(string N, Value V) { throw new NotImplementedException(); }
-    virtual public Completion SetMutableBinding(string N, Value V, bool S) { throw new NotImplementedException(); }
+    virtual public Completion SetMutableBinding(VM vm, string N, Value V, bool S) { throw new NotImplementedException(); }
     virtual public Completion GetBindingValue(string N, bool S) { throw new NotImplementedException(); }
     virtual public Completion DeleteBinding(string N) { throw new NotImplementedException(); }
     virtual public bool HasThisBinding() { throw new NotImplementedException(); }
