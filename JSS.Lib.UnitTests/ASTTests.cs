@@ -277,6 +277,18 @@ internal sealed class ASTTests
         CreateLogicalOrAssignmentExpressionTestCase("a", "true", "true", new Boolean(true)),
         CreateLogicalOrAssignmentExpressionTestCase("a", "true", "1", new Boolean(true)),
         CreateLogicalOrAssignmentExpressionTestCase("a", "true", EscapeString("1"), new Boolean(true)),
+
+        // Tests for LogicalOrAssignmentExpression
+        CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "null", new Null()),
+        CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "false", new Boolean(false)),
+        CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "true", new Boolean(true)),
+        CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "1", new Number(1)),
+        CreateNullCoalescingAssignmentExpressionTestCase("a", "null", EscapeString("1"), new String("1")),
+        CreateNullCoalescingAssignmentExpressionTestCase("a", "false", "null", new Boolean(false)),
+        CreateNullCoalescingAssignmentExpressionTestCase("a", "false", "false", new Boolean(false)),
+        CreateNullCoalescingAssignmentExpressionTestCase("a", "false", "true", new Boolean(false)),
+        CreateNullCoalescingAssignmentExpressionTestCase("a", "false", "1", new Boolean(false)),
+        CreateNullCoalescingAssignmentExpressionTestCase("a", "false", EscapeString("1"), new Boolean(false)),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -447,6 +459,11 @@ internal sealed class ASTTests
     static private object[] CreateLogicalOrAssignmentExpressionTestCase(string identifier, string initializer, string rhs, Value expected)
     {
         return new object[] { $"var {identifier} = {initializer}; {identifier} ||= {rhs}", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateNullCoalescingAssignmentExpressionTestCase(string identifier, string initializer, string rhs, Value expected)
+    {
+        return new object[] { $"var {identifier} = {initializer}; {identifier} ??= {rhs}", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
