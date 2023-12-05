@@ -289,6 +289,21 @@ internal sealed class ASTTests
         CreateNullCoalescingAssignmentExpressionTestCase("a", "false", "true", new Boolean(false)),
         CreateNullCoalescingAssignmentExpressionTestCase("a", "false", "1", new Boolean(false)),
         CreateNullCoalescingAssignmentExpressionTestCase("a", "false", EscapeString("1"), new Boolean(false)),
+
+        // Tests for BinaryOpAssignmentExpression
+        CreateBinaryOpAssignmentExpressionTestCase("a", EscapeString("a"), "+", EscapeString("b"), new String("ab")),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "**", "3", new Number(8)),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "*", "3", new Number(6)),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "6", "/", "3", new Number(2)),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "%", "3", new Number(2)),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "+", "3", new Number(5)),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "-", "3", new Number(-1)),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "<<", "3", new Number(16)),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", ">>", "3", new Number(0)),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", ">>>", "3", new Number(0)),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "&", "3", new Number(2)),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "^", "3", new Number(1)),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "|", "3", new Number(3)),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -464,6 +479,11 @@ internal sealed class ASTTests
     static private object[] CreateNullCoalescingAssignmentExpressionTestCase(string identifier, string initializer, string rhs, Value expected)
     {
         return new object[] { $"var {identifier} = {initializer}; {identifier} ??= {rhs}", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateBinaryOpAssignmentExpressionTestCase(string identifier, string initializer, string op, string rhs, Value expected)
+    {
+        return new object[] { $"var {identifier} = {initializer}; {identifier} {op}= {rhs}", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
