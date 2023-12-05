@@ -253,6 +253,18 @@ internal sealed class ASTTests
         CreateBasicAssignmentExpressionTestCase("a", "true", new Boolean(true)),
         CreateBasicAssignmentExpressionTestCase("a", "1", new Number(1)),
         CreateBasicAssignmentExpressionTestCase("a", EscapeString("1"), new String("1")),
+
+        // Tests for BasicAssignmentExpression
+        CreateLogicalAndAssignmentExpressionTestCase("a", "true", "null", new Null()),
+        CreateLogicalAndAssignmentExpressionTestCase("a", "true", "false", new Boolean(false)),
+        CreateLogicalAndAssignmentExpressionTestCase("a", "true", "true", new Boolean(true)),
+        CreateLogicalAndAssignmentExpressionTestCase("a", "true", "1", new Number(1)),
+        CreateLogicalAndAssignmentExpressionTestCase("a", "true", EscapeString("1"), new String("1")),
+        CreateLogicalAndAssignmentExpressionTestCase("a", "false", "null", new Boolean(false)),
+        CreateLogicalAndAssignmentExpressionTestCase("a", "false", "false", new Boolean(false)),
+        CreateLogicalAndAssignmentExpressionTestCase("a", "false", "true", new Boolean(false)),
+        CreateLogicalAndAssignmentExpressionTestCase("a", "false", "1", new Boolean(false)),
+        CreateLogicalAndAssignmentExpressionTestCase("a", "false", EscapeString("1"), new Boolean(false)),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -413,6 +425,11 @@ internal sealed class ASTTests
     static private object[] CreateBasicAssignmentExpressionTestCase(string identifier, string rhs, Value expected)
     {
         return new object[] { $"{identifier} = {rhs}", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateLogicalAndAssignmentExpressionTestCase(string identifier, string initializer, string rhs, Value expected)
+    {
+        return new object[] { $"var {identifier} = {initializer}; {identifier} &&= {rhs}", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
