@@ -254,7 +254,7 @@ internal sealed class ASTTests
         CreateBasicAssignmentExpressionTestCase("a", "1", new Number(1)),
         CreateBasicAssignmentExpressionTestCase("a", EscapeString("1"), new String("1")),
 
-        // Tests for BasicAssignmentExpression
+        // Tests for LogicalAndAssignmentExpression
         CreateLogicalAndAssignmentExpressionTestCase("a", "true", "null", new Null()),
         CreateLogicalAndAssignmentExpressionTestCase("a", "true", "false", new Boolean(false)),
         CreateLogicalAndAssignmentExpressionTestCase("a", "true", "true", new Boolean(true)),
@@ -265,6 +265,18 @@ internal sealed class ASTTests
         CreateLogicalAndAssignmentExpressionTestCase("a", "false", "true", new Boolean(false)),
         CreateLogicalAndAssignmentExpressionTestCase("a", "false", "1", new Boolean(false)),
         CreateLogicalAndAssignmentExpressionTestCase("a", "false", EscapeString("1"), new Boolean(false)),
+
+        // Tests for LogicalOrAssignmentExpression
+        CreateLogicalOrAssignmentExpressionTestCase("a", "false", "null", new Null()),
+        CreateLogicalOrAssignmentExpressionTestCase("a", "false", "false", new Boolean(false)),
+        CreateLogicalOrAssignmentExpressionTestCase("a", "false", "true", new Boolean(true)),
+        CreateLogicalOrAssignmentExpressionTestCase("a", "false", "1", new Number(1)),
+        CreateLogicalOrAssignmentExpressionTestCase("a", "false", EscapeString("1"), new String("1")),
+        CreateLogicalOrAssignmentExpressionTestCase("a", "true", "null", new Boolean(true)),
+        CreateLogicalOrAssignmentExpressionTestCase("a", "true", "false", new Boolean(true)),
+        CreateLogicalOrAssignmentExpressionTestCase("a", "true", "true", new Boolean(true)),
+        CreateLogicalOrAssignmentExpressionTestCase("a", "true", "1", new Boolean(true)),
+        CreateLogicalOrAssignmentExpressionTestCase("a", "true", EscapeString("1"), new Boolean(true)),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -430,6 +442,11 @@ internal sealed class ASTTests
     static private object[] CreateLogicalAndAssignmentExpressionTestCase(string identifier, string initializer, string rhs, Value expected)
     {
         return new object[] { $"var {identifier} = {initializer}; {identifier} &&= {rhs}", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateLogicalOrAssignmentExpressionTestCase(string identifier, string initializer, string rhs, Value expected)
+    {
+        return new object[] { $"var {identifier} = {initializer}; {identifier} ||= {rhs}", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
