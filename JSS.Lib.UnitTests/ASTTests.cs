@@ -246,6 +246,13 @@ internal sealed class ASTTests
         CreateVarStatementTestCase("a", "true", new Boolean(true)),
         CreateVarStatementTestCase("a", "1", new Number(1)),
         CreateVarStatementTestCase("a", EscapeString("1"), new String("1")),
+
+        // Tests for BasicAssignmentExpression
+        CreateBasicAssignmentExpressionTestCase("a", "null", new Null()),
+        CreateBasicAssignmentExpressionTestCase("a", "false", new Boolean(false)),
+        CreateBasicAssignmentExpressionTestCase("a", "true", new Boolean(true)),
+        CreateBasicAssignmentExpressionTestCase("a", "1", new Number(1)),
+        CreateBasicAssignmentExpressionTestCase("a", EscapeString("1"), new String("1")),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -401,6 +408,11 @@ internal sealed class ASTTests
     static private object[] CreateVarStatementTestCase(string identifier, string initializer, Value expected)
     {
         return new object[] { $"var {identifier} = {initializer}; {identifier}", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateBasicAssignmentExpressionTestCase(string identifier, string rhs, Value expected)
+    {
+        return new object[] { $"{identifier} = {rhs}", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
