@@ -329,6 +329,14 @@ internal sealed class ASTTests
         CreateTryStatementTestCase("throw 1", "throw 2", "3", new Number(2), CompletionType.Throw),
         CreateTryStatementTestCase("throw 1", "throw 2", "throw 3", new Number(3), CompletionType.Throw),
         CreateTryStatementTestCase("1", "2", "throw 3", new Number(3), CompletionType.Throw),
+
+        // Tests for PostfixDecrementExpression
+        CreatePostfixDecrementExpressionTestCase("null", new Number(0)),
+        CreatePostfixDecrementExpressionTestCase("false", new Number(0)),
+        CreatePostfixDecrementExpressionTestCase("true", new Number(1)),
+        CreatePostfixDecrementExpressionTestCase("1", new Number(1)),
+        CreatePostfixDecrementExpressionTestCase(EscapeString("a"), new Number(double.NaN)),
+        CreatePostfixDecrementExpressionTestCase(EscapeString("1"), new Number(1)),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -524,6 +532,11 @@ internal sealed class ASTTests
         }
 
         return new object[] { testCode, new Completion(type, expected, "") };
+    }
+
+    static private object[] CreatePostfixDecrementExpressionTestCase(string initializer, Value expected)
+    {
+        return new object[] { $"var identifier = {initializer}; identifier--", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
