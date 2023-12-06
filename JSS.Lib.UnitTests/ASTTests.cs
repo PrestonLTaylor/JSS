@@ -304,6 +304,31 @@ internal sealed class ASTTests
         CreateBinaryOpAssignmentExpressionTestCase("a", "2", "&", "3", new Number(2)),
         CreateBinaryOpAssignmentExpressionTestCase("a", "2", "^", "3", new Number(1)),
         CreateBinaryOpAssignmentExpressionTestCase("a", "2", "|", "3", new Number(3)),
+
+        // Tests for empty TryStatement blocks
+        CreateTryStatementTestCase("", "", null, new Undefined(), CompletionType.Normal),
+        CreateTryStatementTestCase("", null, "", new Undefined(), CompletionType.Normal),
+        CreateTryStatementTestCase("", "", "", new Undefined(), CompletionType.Normal),
+
+        // Tests for TryStatements with only catch 
+        CreateTryStatementTestCase("1", "2", null, new Number(1), CompletionType.Normal),
+        CreateTryStatementTestCase("throw 1", "2", null, new Number(2), CompletionType.Normal),
+        CreateTryStatementTestCase("1", "throw 2", null, new Number(1), CompletionType.Normal),
+        CreateTryStatementTestCase("throw 1", "throw 2", null, new Number(2), CompletionType.Throw),
+
+        // Tests for TryStatements with only finally
+        CreateTryStatementTestCase("1", null, "2", new Number(1), CompletionType.Normal),
+        CreateTryStatementTestCase("throw 1", null, "2", new Number(1), CompletionType.Throw),
+        CreateTryStatementTestCase("1", null, "throw 2", new Number(2), CompletionType.Throw),
+        CreateTryStatementTestCase("throw 1", null, "throw 2", new Number(2), CompletionType.Throw),
+
+        // Tests for TryStatements with catcha and finally
+        CreateTryStatementTestCase("1", "2", "3", new Number(1), CompletionType.Normal),
+        CreateTryStatementTestCase("throw 1", "2", "3", new Number(2), CompletionType.Normal),
+        CreateTryStatementTestCase("1", "throw 2", "3", new Number(1), CompletionType.Normal),
+        CreateTryStatementTestCase("throw 1", "throw 2", "3", new Number(2), CompletionType.Throw),
+        CreateTryStatementTestCase("throw 1", "throw 2", "throw 3", new Number(3), CompletionType.Throw),
+        CreateTryStatementTestCase("1", "2", "throw 3", new Number(3), CompletionType.Throw),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -484,6 +509,21 @@ internal sealed class ASTTests
     static private object[] CreateBinaryOpAssignmentExpressionTestCase(string identifier, string initializer, string op, string rhs, Value expected)
     {
         return new object[] { $"var {identifier} = {initializer}; {identifier} {op}= {rhs}", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateTryStatementTestCase(string tryCode, string? catchCode, string? finallyCode, Value expected, CompletionType type)
+    {
+        string testCode = $"try {{ {tryCode} }} ";
+        if (catchCode is not null)
+        {
+            testCode += $"catch {{ {catchCode} }}";
+        }
+        if (finallyCode is not null)
+        {
+            testCode += $"finally {{ {finallyCode} }}";
+        }
+
+        return new object[] { testCode, new Completion(type, expected, "") };
     }
 
     [TestCaseSource(nameof(astTestCases))]
