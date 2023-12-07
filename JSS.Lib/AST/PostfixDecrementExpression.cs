@@ -1,5 +1,6 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
+using System.Diagnostics;
 
 namespace JSS.Lib.AST;
 
@@ -36,7 +37,9 @@ internal sealed class PostfixDecrementExpression : IExpression
         // 4. Else,
         else
         {
-            // FIXME: a. Assert: oldValue is a BigInt.
+            // a. Assert: oldValue is a BigInt.
+            Debug.Assert(oldValue.Value.IsBigInt());
+
             // FIXME: b. Let newValue be BigInt::subtract(oldValue, 1ℤ).
             throw new NotImplementedException();
         }
