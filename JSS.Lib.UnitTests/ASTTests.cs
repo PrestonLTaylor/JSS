@@ -345,6 +345,14 @@ internal sealed class ASTTests
         CreatePrefixDecrementExpressionTestCase("1", new Number(0)),
         CreatePrefixDecrementExpressionTestCase(EscapeString("a"), new Number(double.NaN)),
         CreatePrefixDecrementExpressionTestCase(EscapeString("1"), new Number(0)),
+
+        // Tests for PostfixIncrementExpression
+        CreatePostfixIncrementExpressionTestCase("null", new Number(0)),
+        CreatePostfixIncrementExpressionTestCase("false", new Number(0)),
+        CreatePostfixIncrementExpressionTestCase("true", new Number(1)),
+        CreatePostfixIncrementExpressionTestCase("1", new Number(1)),
+        CreatePostfixIncrementExpressionTestCase(EscapeString("a"), new Number(double.NaN)),
+        CreatePostfixIncrementExpressionTestCase(EscapeString("1"), new Number(1)),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -550,6 +558,11 @@ internal sealed class ASTTests
     static private object[] CreatePrefixDecrementExpressionTestCase(string initializer, Value expected)
     {
         return new object[] { $"var identifier = {initializer}; --identifier", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreatePostfixIncrementExpressionTestCase(string initializer, Value expected)
+    {
+        return new object[] { $"var identifier = {initializer}; identifier++", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
