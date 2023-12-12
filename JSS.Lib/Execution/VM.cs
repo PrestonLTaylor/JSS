@@ -20,6 +20,11 @@ internal sealed class VM
         _executionContextStack.Pop();
     }
 
+    public bool HasExecutionContext()
+    {
+        return _executionContextStack.Count > 0;
+    }
+
     public Realm Realm { get; }
     public Empty Empty { get; } = new Empty();
     public Null Null { get; } = new Null();

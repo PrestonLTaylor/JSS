@@ -23,9 +23,7 @@ internal sealed class ScriptExecutionContext : ExecutionContext
         return Environment.GetIdentifierReference(vm, env, name);
     }
 
-    // FIXME: LexicalEnvironment
-
-    // FIXME: VariableEnvironment 
-
-    // FIXME: PrivateEnvironment 
+    public Environment? LexicalEnvironment { get; set; }
+    public Environment? VariableEnvironment { get; set; }
+    public Environment? PrivateEnvironment { get; set; }
 }
