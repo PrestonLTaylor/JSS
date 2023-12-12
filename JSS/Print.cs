@@ -8,20 +8,34 @@ namespace JSS.CLI;
 
 internal sealed class Print
 {
-    static public string PrintCompletion(Completion completion)
+    static public void PrintCompletion(Completion completion)
+    {
+        var completionAsString = CompletionToString(completion);
+        if (completion.IsAbruptCompletion())
+        {
+            SetToErrorColors();
+        }
+        Console.ForegroundColor = ConsoleColor.White;
+
+        Console.Write(completionAsString);
+
+        Console.ResetColor();
+    }
+
+    static private string CompletionToString(Completion completion)
     {
         if (completion.IsThrowCompletion())
         {
             // FIXME: Print the exception type
-            return $"Uncaught {PrintValue(completion.Value)}";
+            return $"Uncaught {ValueToString(completion.Value)}";
         }
         else
         {
-            return PrintValue(completion.Value);
+            return ValueToString(completion.Value);
         }
     }
 
-    static public string PrintValue(Value value)
+    static private string ValueToString(Value value)
     {
         if (value.IsEmpty())
         {
@@ -54,7 +68,14 @@ internal sealed class Print
         return value.Type().ToString();
     }
 
-    static public string PrintException(Exception e)
+    static public void PrintException(Exception e)
+    {
+        SetToErrorColors();
+        Console.Write(ExceptionToString(e));
+        Console.ResetColor();
+    }
+
+    static private string ExceptionToString(Exception e)
     {
         if (e is SyntaxErrorException)
         {
@@ -64,5 +85,11 @@ internal sealed class Print
         {
             return $"Internal Error: {e.Message}";
         }
+    }
+
+    static private void SetToErrorColors()
+    {
+        Console.BackgroundColor = ConsoleColor.Red;
+        Console.ForegroundColor = ConsoleColor.White;
     }
 }
