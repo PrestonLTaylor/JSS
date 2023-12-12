@@ -5,10 +5,8 @@ namespace JSS.Lib.Execution;
 // 16.1.4 Script Records, https://tc39.es/ecma262/#sec-script-records 
 internal sealed class Script
 {
-    public Script(StatementList statementList)
+    public Script(VM vm, StatementList statementList)
     {
-        // FIXME: Handle throw completions
-        Realm.InitializeHostDefinedRealm(out VM vm);
         VM = vm;
         Realm = vm.Realm;
         _statementList = statementList;

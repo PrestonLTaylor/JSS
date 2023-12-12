@@ -1,5 +1,6 @@
 ﻿using JSS.Lib.AST;
 using JSS.Lib.AST.Literal;
+using JSS.Lib.Execution;
 
 namespace JSS.Lib.UnitTests;
 
@@ -64,7 +65,7 @@ internal sealed class ParserTests
         var parser = new Parser(expressionStatement);
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -122,7 +123,7 @@ internal sealed class ParserTests
         var parser = new Parser(expressionStatement);
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -141,7 +142,7 @@ internal sealed class ParserTests
         var parser = new Parser(identifierString);
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -162,7 +163,7 @@ internal sealed class ParserTests
         var parser = new Parser("false");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -183,7 +184,7 @@ internal sealed class ParserTests
         var parser = new Parser("true");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -211,7 +212,7 @@ internal sealed class ParserTests
         var parser = new Parser(numericLiteral);
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -244,7 +245,7 @@ internal sealed class ParserTests
         var parser = new Parser(stringLiteral);
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -266,7 +267,7 @@ internal sealed class ParserTests
         var parser = new Parser("{}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -285,7 +286,7 @@ internal sealed class ParserTests
         var parser = new Parser("{ 0 }");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -308,7 +309,7 @@ internal sealed class ParserTests
         var parser = new Parser($"let {expectedIdentifier}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -330,7 +331,7 @@ internal sealed class ParserTests
         var parser = new Parser($"let {expectedIdentifier} = {initializer}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -352,7 +353,7 @@ internal sealed class ParserTests
         var parser = new Parser($"const {expectedIdentifier} = {initializer}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -373,7 +374,7 @@ internal sealed class ParserTests
         var parser = new Parser($"var {expectedIdentifier}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -395,7 +396,7 @@ internal sealed class ParserTests
         var parser = new Parser($"var {expectedIdentifier} = {initializer}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -415,7 +416,7 @@ internal sealed class ParserTests
         var parser = new Parser(";");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -435,7 +436,7 @@ internal sealed class ParserTests
         var parser = new Parser($"if ({expression}) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -457,7 +458,7 @@ internal sealed class ParserTests
         var parser = new Parser($"if ({expression}) {{ }} else {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -480,7 +481,7 @@ internal sealed class ParserTests
         var parser = new Parser($"do {{ }} while ({expression})");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -501,7 +502,7 @@ internal sealed class ParserTests
         var parser = new Parser($"while ({expression}) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -522,7 +523,7 @@ internal sealed class ParserTests
         var parser = new Parser($"for ({expression}; {expression}; {expression}) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -543,7 +544,7 @@ internal sealed class ParserTests
         var parser = new Parser($"for (;;) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -565,7 +566,7 @@ internal sealed class ParserTests
         var parser = new Parser($"for (var {expectedIdentifier};;) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -590,7 +591,7 @@ internal sealed class ParserTests
         var parser = new Parser($"for (let {expectedIdentifier};;) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -615,7 +616,7 @@ internal sealed class ParserTests
         var parser = new Parser($"for (const {expectedIdentifier} = 0;;) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -641,7 +642,7 @@ internal sealed class ParserTests
         var parser = new Parser($"continue {expectedLabel}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -660,7 +661,7 @@ internal sealed class ParserTests
         var parser = new Parser("continue");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -680,7 +681,7 @@ internal sealed class ParserTests
         var parser = new Parser($"break {expectedLabel}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -699,7 +700,7 @@ internal sealed class ParserTests
         var parser = new Parser("break");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -718,7 +719,7 @@ internal sealed class ParserTests
         var parser = new Parser("return");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -738,7 +739,7 @@ internal sealed class ParserTests
         var parser = new Parser($"return {expression}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -759,7 +760,7 @@ internal sealed class ParserTests
         var parser = new Parser($"switch ({expression}) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -781,7 +782,7 @@ internal sealed class ParserTests
         var parser = new Parser($"switch ({expression}) {{ default: {expression} }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -810,7 +811,7 @@ internal sealed class ParserTests
         var parser = new Parser($"switch ({expression}) {{ case {expression}: {expression} }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -837,7 +838,7 @@ internal sealed class ParserTests
         var parser = new Parser("switch (1) { case 2: 3 default: 4 case 5: 6");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -860,7 +861,7 @@ internal sealed class ParserTests
         var parser = new Parser($"throw {expression}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -879,7 +880,7 @@ internal sealed class ParserTests
         var parser = new Parser("try { } catch { }");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -902,7 +903,7 @@ internal sealed class ParserTests
         var parser = new Parser($"try {{ }} catch ({expectedCatchIdentifier}) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -924,7 +925,7 @@ internal sealed class ParserTests
         var parser = new Parser("try { } finally { }");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -945,7 +946,7 @@ internal sealed class ParserTests
         var parser = new Parser("try { } catch { } finally { }");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -967,7 +968,7 @@ internal sealed class ParserTests
         var parser = new Parser($"try {{ }} catch ({expectedCatchIdentifier}) {{ }} finally {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -990,7 +991,7 @@ internal sealed class ParserTests
         var parser = new Parser("debugger");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1009,7 +1010,7 @@ internal sealed class ParserTests
         var parser = new Parser($"function {expectedFunctionIdentifier}() {{}}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1032,7 +1033,7 @@ internal sealed class ParserTests
         var parser = new Parser($"function {expectedFunctionIdentifier}({expectedFirstParameterIdentifier}, {expectedSecondParameterIdentifier}) {{}}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1058,7 +1059,7 @@ internal sealed class ParserTests
         var parser = new Parser($"function {expectedFunctionIdentifier}({expectedParameterIdentifier},) {{}}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1083,7 +1084,7 @@ internal sealed class ParserTests
         var parser = new Parser($"class {expectedIdentifier} {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1107,7 +1108,7 @@ internal sealed class ParserTests
         var parser = new Parser($"class {expectedIdentifier} {{ {expectedMethodIdentifier}() {{ }} }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1138,7 +1139,7 @@ internal sealed class ParserTests
         var parser = new Parser($"class {expectedIdentifier} {{ #{expectedMethodIdentifier}() {{ }} }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1169,7 +1170,7 @@ internal sealed class ParserTests
         var parser = new Parser($"class {expectedIdentifier} {{ static {expectedMethodIdentifier}() {{ }} }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1200,7 +1201,7 @@ internal sealed class ParserTests
         var parser = new Parser($"class {expectedIdentifier} {{ static #{expectedMethodIdentifier}() {{ }} }}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1233,7 +1234,7 @@ internal sealed class ParserTests
         var parser = new Parser($"{expectedIdentifier} = {expression}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1262,7 +1263,7 @@ internal sealed class ParserTests
         var parser = new Parser($"{expectedIdentifier} &&= {expression}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1291,7 +1292,7 @@ internal sealed class ParserTests
         var parser = new Parser($"{expectedIdentifier} ||= {expression}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1320,7 +1321,7 @@ internal sealed class ParserTests
         var parser = new Parser($"{expectedIdentifier} ??= {expression}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1420,7 +1421,7 @@ internal sealed class ParserTests
         var parser = new Parser($"{expectedIdentifier} {binaryOp} {expression}");
 
         // Act
-        var parsedProgram = parser.Parse();
+        var parsedProgram = ParseScript(parser);
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
@@ -1695,7 +1696,18 @@ internal sealed class ParserTests
 
     private void AssertThatSyntaxErrorMatchesExpected(Parser parser, SyntaxErrorException expectedException)
     {
-        var actualException = Assert.Throws<SyntaxErrorException>(() => parser.Parse());
+        var actualException = Assert.Throws<SyntaxErrorException>(() => ParseScript(parser));
         Assert.That(actualException.Message, Is.EqualTo(expectedException.Message));
+    }
+
+    static private Script ParseScript(Parser parser)
+    {
+        var completion = Realm.InitializeHostDefinedRealm(out VM vm);
+        if (completion.IsAbruptCompletion())
+        {
+            Assert.Fail("Failed to initialize host defined realm");
+        }
+
+        return parser.Parse(vm);
     }
 }

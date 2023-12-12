@@ -14,9 +14,18 @@ internal sealed class Parser
         _consumer = new TokenConsumer(lexer.Lex().ToList());
     }
 
-    public Script Parse()
+    // NOTE: sourceText is provided in the constructor, the VM holds the realm and we don't use hostDefined right now
+    // 16.1.5 ParseScript ( sourceText, realm, hostDefined ), https://tc39.es/ecma262/#sec-parse-script
+    public Script Parse(VM vm)
     {
-        return new Script(ParseScript());
+        // 1. Let script be ParseText(sourceText, Script).
+        var script = ParseScript();
+
+        // NOTE: This step is handled as C# exceptions
+        // 2. If script is a List of errors, return script.
+
+        // 3. Return Script Record { [[Realm]]: realm, [[ECMAScriptCode]]: script, [[LoadedModules]]: « », [[HostDefined]]: hostDefined }.
+        return new Script(vm, script);
     }
 
     // 16.1 Scripts, https://tc39.es/ecma262/#sec-scripts

@@ -929,6 +929,12 @@ internal sealed class ASTTests
 
     static private Script ParseScript(string script)
     {
-        return new Parser(script).Parse();
+        var completion = Realm.InitializeHostDefinedRealm(out VM vm);
+        if (completion.IsAbruptCompletion())
+        {
+            Assert.Fail("Failed to initialize host defined realm");
+        }
+
+        return new Parser(script).Parse(vm);
     }
 }
