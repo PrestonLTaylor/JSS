@@ -10,8 +10,15 @@ internal sealed class ScriptExecutionContext : ExecutionContext
     static public Completion ResolveBinding(VM vm, string name, Environment? env = null)
     {
         // 1. If env is not present or env is undefined, then
-        // FIXME: a. Set env to the running execution context's LexicalEnvironment.
-        env ??= vm.CurrentExecutionContext.Realm.GlobalEnv;
+        if (env is null)
+        {
+            // NOTE: As we want to access the LexicalEnvironment there is an implicit assertion that
+            // the execution context is a ScriptExecutionContext (as that's the only context that has a
+            // lexical environment in the code base currently)
+            // a. Set env to the running execution context's LexicalEnvironment.
+            var scriptExecutionContext = (vm.CurrentExecutionContext as ScriptExecutionContext)!;
+            env = scriptExecutionContext.LexicalEnvironment;
+        }
 
         // NOTE: This Assert is implicit
         // 2. Assert: env is an Environment Record.
