@@ -45,6 +45,17 @@ internal sealed class ObjectEnvironment : Environment
         // FIXME: 7. Return true.
     }
 
+    // 9.1.1.2.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-object-environment-records-initializebinding-n-v
+    override public Completion InitializeBinding(VM vm, string N, Value V)
+    {
+        // 1. Perform ? envRec.SetMutableBinding(N, V, false).
+        var setResult = SetMutableBinding(vm, N, V, false);
+        if (setResult.IsAbruptCompletion()) return setResult;
+
+        // 2. Return UNUSED.
+        return Completion.NormalCompletion(vm.Empty);
+    }
+
     // 9.1.1.2.5 SetMutableBinding ( N, V, S ), https://tc39.es/ecma262/#sec-object-environment-records-getbindingvalue-n-s
     override public Completion SetMutableBinding(VM vm, string N, Value V, bool S)
     {

@@ -18,12 +18,27 @@ internal sealed class DeclarativeEnvironment : Environment
         // 3. Return env.
     }
 
-    // 9.1.1.1.1 HasBinding ( N ), https://tc39.es/ecma262/#sec-declarative-environment-records
+    // 9.1.1.1.1 HasBinding ( N ), https://tc39.es/ecma262/#sec-declarative-environment-records-hasbinding-n
     override public bool HasBinding(string N)
     {
         // 1. If envRec has a binding for N, return true.
         // 2. Return false.
         return _identifierToBinding.ContainsKey(N);
+    }
+
+    // 9.1.1.1.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-declarative-environment-records-initializebinding-n-v
+    public override Completion InitializeBinding(VM vm, string N, Value V)
+    {
+        // FIXME: 1. Assert: envRec must have an uninitialized binding for N.
+
+        // 2. Set the bound value for N in envRec to V.
+        var binding = _identifierToBinding[N];
+        binding.Value = V;
+
+        // FIXME: 3. Record that the binding for N in envRec has been initialized.
+
+        // 4. Return unused.
+        return Completion.NormalCompletion(vm.Empty);
     }
 
     // 9.1.1.1.5 SetMutableBinding ( N, V, S ), https://tc39.es/ecma262/#sec-declarative-environment-records-getbindingvalue-n-s

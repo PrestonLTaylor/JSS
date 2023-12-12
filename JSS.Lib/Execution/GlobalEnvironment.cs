@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
+using System.Diagnostics;
 using Object = JSS.Lib.AST.Values.Object;
 
 namespace JSS.Lib.Execution;
@@ -45,6 +46,25 @@ internal sealed class GlobalEnvironment : Environment
         // 3. Let ObjRec be envRec.[[ObjectRecord]].
         // 4. Return ? ObjRec.HasBinding(N).
         return ObjectRecord.HasBinding(N);
+    }
+
+    // 9.1.1.4.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-global-environment-records-initializebinding-n-v
+    override public Completion InitializeBinding(VM vm, string N, Value V)
+    {
+        // 1. Let DclRec be envRec.[[DeclarativeRecord]].
+        // 2. If ! DclRec.HasBinding(N) is true, then
+        if (DeclarativeRecord.HasBinding(N))
+        {
+            // a. Return ! DclRec.InitializeBinding(N, V).
+            return DeclarativeRecord.InitializeBinding(vm, N, V);
+        }
+
+        // 3. Assert: If the binding exists, it must be in the Object Environment Record.
+        Debug.Assert(ObjectRecord.HasBinding(N));
+
+        // 4. Let ObjRec be envRec.[[ObjectRecord]].
+        // 5. Return ? ObjRec.InitializeBinding(N, V).
+        return ObjectRecord.InitializeBinding(vm, N, V);
     }
 
     // 9.1.1.4.5 SetMutableBinding ( N, V, S ), https://tc39.es/ecma262/#sec-global-environment-records-setmutablebinding-n-v-s
