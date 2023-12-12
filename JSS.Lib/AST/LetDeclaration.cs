@@ -1,7 +1,7 @@
 ﻿namespace JSS.Lib.AST;
 
 // 14.3.1 Let and Const Declarations, https://tc39.es/ecma262/#sec-let-and-const-declarations
-internal sealed class LetDeclaration : INode
+internal sealed class LetDeclaration : Declaration
 {
     public LetDeclaration(string identifier, INode? initializer)
     {

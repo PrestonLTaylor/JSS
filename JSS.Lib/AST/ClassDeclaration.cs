@@ -1,7 +1,7 @@
 ﻿namespace JSS.Lib.AST;
 
 // 15.7 Class Definitions, https://tc39.es/ecma262/#sec-class-definitions
-internal sealed class ClassDeclaration : INode
+internal sealed class ClassDeclaration : Declaration
 {
     public ClassDeclaration(string identifier, List<MethodDeclaration> methods, List<MethodDeclaration> staticMethods, List<FieldDeclaration> fields,
         List<FieldDeclaration> staticFields)
