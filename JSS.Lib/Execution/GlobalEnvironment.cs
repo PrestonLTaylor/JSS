@@ -136,6 +136,26 @@ internal sealed class GlobalEnvironment : Environment
         return Completion.NormalCompletion(new Boolean(true));
     }
 
+    // 9.1.1.4.16 CanDeclareGlobalFunction ( N ), https://tc39.es/ecma262/#sec-candeclareglobalfunction
+    public Completion CanDeclareGlobalFunction(string N)
+    {
+        // 1. Let ObjRec be envRec.[[ObjectRecord]].
+        // 2. Let globalObject be ObjRec.[[BindingObject]].
+        var globalObject = ObjectRecord.BindingObject;
+
+        // 3. Let existingProp be ? globalObject.[[GetOwnProperty]](N).
+        var existingProp = globalObject.GetOwnProperty(N);
+        if (existingProp.IsAbruptCompletion()) return existingProp;
+
+        // 4. If existingProp is undefined, FIXME: return ? IsExtensible(globalObject).
+        if (existingProp.Value.IsUndefined()) return Completion.NormalCompletion(new Boolean(true));
+
+        // FIXME: 5. If existingProp.[[Configurable]] is true, return true.
+        // FIXME: 6. If IsDataDescriptor(existingProp) is true and existingProp has attribute values { [[Writable]]: true, [[Enumerable]]: true }, return true.
+        // 7. Return false.
+        return Completion.NormalCompletion(new Boolean(false));
+    }
+
     public ObjectEnvironment ObjectRecord { get; }
     public Object GlobalThisValue { get; }
     public DeclarativeEnvironment DeclarativeRecord { get; }
