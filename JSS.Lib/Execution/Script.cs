@@ -81,6 +81,13 @@ internal sealed class Script
         return _statementList.TopLevelVarDeclaredNames();
     }
 
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    private List<INode> VarScopedDeclarations()
+    {
+        // 1. Return TopLevelVarScopedDeclarations of StatementList.
+        return _statementList.TopLevelVarScopedDeclarations();
+    }
+
     public VM VM { get; }
     public Realm Realm { get; }
     public IReadOnlyList<INode> ScriptCode

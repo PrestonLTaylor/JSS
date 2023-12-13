@@ -26,6 +26,22 @@ internal sealed class IfStatement : INode
         return names;
     }
 
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    override public List<INode> VarScopedDeclarations()
+    {
+        // 1. Let declarations1 be VarScopedDeclarations of the first Statement.
+        var declarations = IfCaseStatement.VarScopedDeclarations();
+
+        // 2. Let declarations2 be VarScopedDeclarations of the second Statement.
+        if (ElseCaseStatement is not null)
+        {
+            declarations.AddRange(ElseCaseStatement.VarScopedDeclarations());
+        }
+
+        // 3. Return the list-concatenation of declarations1 and declarations2.
+        return declarations;
+    }
+
     // FIXME: 14.6.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-if-statement-runtime-semantics-evaluation
 
     public IExpression IfExpression { get; }

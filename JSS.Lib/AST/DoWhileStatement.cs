@@ -19,6 +19,13 @@ internal sealed class DoWhileStatement : INode
         return IterationStatement.VarDeclaredNames();
     }
 
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    override public List<INode> VarScopedDeclarations()
+    {
+        // 1. Return the VarScopedDeclarations of Statement.
+        return IterationStatement.VarScopedDeclarations();
+    }
+
     // 14.7.2.2 Runtime Semantics: DoWhileLoopEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-dowhileloopevaluation
     override public Completion Evaluate(VM vm)
     {

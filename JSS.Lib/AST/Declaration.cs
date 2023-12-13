@@ -9,6 +9,13 @@ internal class Declaration : INode
         return BoundNames();
     }
 
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    override public List<INode> VarScopedDeclarations()
+    {
+        // 1. Return a new empty List.
+        return new List<INode>();
+    }
+
     // 8.2.8 Static Semantics: TopLevelLexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-toplevellexicallydeclarednames
     override public List<string> TopLevelLexicallyDeclaredNames()
     {
@@ -35,6 +42,21 @@ internal class Declaration : INode
 
         // 2. Return a new empty List.
         return new List<string>();
+    }
+
+    // 8.2.11 Static Semantics: TopLevelVarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-toplevelvarscopeddeclarations
+    override public List<INode> TopLevelVarScopedDeclarations()
+    {
+        // 1. If Declaration is Declaration : HoistableDeclaration , then
+        if (IsHoistableDeclaration())
+        {
+            // a. Let declaration be DeclarationPart of HoistableDeclaration.
+            // b. Return « declaration ».
+            return new List<INode> { this };
+        }
+
+        // 2. Return a new empty List.
+        return new List<INode>();
     }
 
     private bool IsHoistableDeclaration()

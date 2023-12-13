@@ -47,6 +47,39 @@ internal sealed class TryStatement : INode
         return FinallyBlock?.VarDeclaredNames() ?? new();
     }
 
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    override public List<INode> VarScopedDeclarations()
+    {
+        // 1. Let declarations1 be VarScopedDeclarations of Block.
+        List<INode> declarations = new();
+        declarations.AddRange(VarScopedDeclarationsOfBlock());
+
+        // 2. Let declarations2 be VarScopedDeclarations of Catch.
+        declarations.AddRange(VarScopedDeclarationsOfCatch());
+
+        // 3. Let declarations3 be VarScopedDeclarations of Finally.
+        declarations.AddRange(VarScopedDeclarationsOfFinally());
+
+        // 4. Return the list-concatenation of declarations1, declarations2, and declarations3.
+        return declarations;
+    }
+
+    private List<INode> VarScopedDeclarationsOfBlock()
+    {
+        return TryBlock.VarScopedDeclarations();
+    }
+
+    private List<INode> VarScopedDeclarationsOfCatch()
+    {
+        // 1. Return the VarDeclaredNames of Block.
+        return CatchBlock?.VarScopedDeclarations() ?? new();
+    }
+
+    private List<INode> VarScopedDeclarationsOfFinally()
+    {
+        return FinallyBlock?.VarScopedDeclarations() ?? new();
+    }
+
     // 14.15.2 Runtime Semantics: CatchClauseEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-catchclauseevaluation
     private Completion CatchClauseEvaluation(VM vm, Value thrownValue)
     {

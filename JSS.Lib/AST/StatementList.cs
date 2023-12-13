@@ -64,6 +64,22 @@ internal sealed class StatementList : INode
         return names;
     }
 
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    override public List<INode> VarScopedDeclarations()
+    {
+        // 1. Let declarations1 be VarScopedDeclarations of StatementList.
+        // 2. Let declarations2 be VarScopedDeclarations of StatementListItem.
+        List<INode> declarations = new();
+
+        foreach (var statement in Statements)
+        {
+            declarations.AddRange(statement.VarScopedDeclarations());
+        }
+
+        // 3. Return the list-concatenation of declarations1 and declarations2.
+        return declarations;
+    }
+
     // 8.2.8 Static Semantics: TopLevelLexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-toplevellexicallydeclarednames
     override public List<string> TopLevelLexicallyDeclaredNames()
     {
@@ -93,6 +109,21 @@ internal sealed class StatementList : INode
 
         // 3. Return the list-concatenation of names1 and names2.
         return names;
+    }
+
+    // 8.2.11 Static Semantics: TopLevelVarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-toplevelvarscopeddeclarations
+    override public List<INode> TopLevelVarScopedDeclarations()
+    {
+        // 1. Let declarations1 be TopLevelVarScopedDeclarations of StatementList.
+        // 2. Let declarations2 be TopLevelVarScopedDeclarations of StatementListItem.
+        List<INode> declarations = new();
+        foreach (var statement in Statements)
+        {
+            declarations.AddRange(statement.TopLevelVarScopedDeclarations());
+        }
+
+        // 3. Return the list-concatenation of declarations1 and declarations2.
+        return declarations;
     }
 
     public IReadOnlyList<INode> Statements { get; }

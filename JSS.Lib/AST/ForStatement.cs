@@ -31,6 +31,23 @@ internal sealed class ForStatement : INode
         return names;
     }
 
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    override public List<INode> VarScopedDeclarations()
+    {
+        // 1. Let declarations1 be VarScopedDeclarations of VariableDeclarationList.
+        List<INode> declarations = new();
+        if (InitializationExpression is VarStatement)
+        {
+            declarations.AddRange(InitializationExpression.VarScopedDeclarations());
+        }
+
+        // 2. Let declarations2 be VarScopedDeclarations of Statement.
+        declarations.AddRange(IterationStatement.VarScopedDeclarations());
+
+        // 3. Return the list-concatenation of declarations1 and declarations2.
+        return declarations;
+    }
+
     // 14.7.4.2 Runtime Semantics: ForLoopEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-forloopevaluation
     override public Completion Evaluate(VM vm)
     {

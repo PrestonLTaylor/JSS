@@ -42,5 +42,12 @@ internal sealed class Block : INode
         return new List<string>();
     }
 
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    override public List<INode> VarScopedDeclarations()
+    {
+        // 1. Return a new empty List.
+        return new List<INode>();
+    }
+
     public StatementList Statements { get; }
 }

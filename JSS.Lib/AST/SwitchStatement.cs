@@ -24,6 +24,14 @@ internal readonly struct CaseBlock
         return _statements.VarDeclaredNames();
     }
 
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    public List<INode> VarScopedDeclarations()
+    {
+        // 1. If the StatementList is present, return the VarScopedDeclarations of StatementList.
+        // 2. Return a new empty List.
+        return _statements.VarScopedDeclarations();
+    }
+
     public IExpression CaseExpression { get; }
     public IReadOnlyList<INode> StatementList 
     { 
@@ -53,6 +61,14 @@ internal readonly struct DefaultBlock
         // 1. If the StatementList is present, return the VarDeclaredNames of StatementList.
         // 2. Return a new empty List.
         return _statements.VarDeclaredNames();
+    }
+
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    public List<INode> VarScopedDeclarations()
+    {
+        // 1. If the StatementList is present, return the VarScopedDeclarations of StatementList.
+        // 2. Return a new empty List.
+        return _statements.VarScopedDeclarations();
     }
 
     public IReadOnlyList<INode> StatementList 
@@ -119,6 +135,30 @@ internal sealed class SwitchStatement : INode
 
         // 6. Return the list-concatenation of names1, names2, and names3.
         return names;
+    }
+
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    override public List<INode> VarScopedDeclarations()
+    {
+        // 1. If the first CaseClauses is present, let declarations1 be the VarScopedDeclarations of the first CaseClauses.
+        // 2. Else, let declarations1 be a new empty List.
+        // 3. Let declarations2 be VarScopedDeclarations of DefaultClause.
+        // 4. If the second CaseClauses is present, let declarations3 be the VarScopedDeclarations of the second CaseClauses.
+        // 5. Else, let declarations3 be a new empty List.
+        List<INode> declarations = new();
+
+        foreach (var caseBlock in CaseBlocks)
+        {
+            declarations.AddRange(caseBlock.VarScopedDeclarations());
+        }
+
+        if (DefaultCase is not null)
+        {
+            declarations.AddRange(DefaultCase.Value.VarScopedDeclarations());
+        }
+
+        // 6. Return the list-concatenation of declarations1, declarations2, and declarations3.
+        return declarations;
     }
 
     // FIXME: 14.12.4 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-switch-statement-runtime-semantics-evaluation

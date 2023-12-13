@@ -26,6 +26,13 @@ internal sealed class VarStatement : INode
         return BoundNames();
     }
 
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    override public List<INode> VarScopedDeclarations()
+    {
+        // 1. Return « VariableDeclaration ».
+        return new List<INode> { this };
+    }
+
     // 14.3.2.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-variable-statement-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {

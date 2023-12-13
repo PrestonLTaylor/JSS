@@ -20,6 +20,13 @@ internal sealed class WhileStatement : INode
         return IterationStatement.VarDeclaredNames();
     }
 
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    override public List<INode> VarScopedDeclarations()
+    {
+        // 1. Return the VarScopedDeclarations of Statement.
+        return IterationStatement.VarScopedDeclarations();
+    }
+
     // 14.7.3.2 Runtime Semantics: WhileLoopEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-whileloopevaluation
     override public Completion Evaluate(VM vm)
     {
