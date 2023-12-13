@@ -108,6 +108,14 @@ internal sealed class GlobalEnvironment : Environment
         return VarNames.Contains(N);
     }
 
+    // 9.1.1.4.13 HasLexicalDeclaration ( N ), https://tc39.es/ecma262/#sec-haslexicaldeclaration
+    public bool HasLexicalDeclaration(string N)
+    {
+        // 1. Let DclRec be envRec.[[DeclarativeRecord]].
+        // 2. Return ! DclRec.HasBinding(N).
+        return DeclarativeRecord.HasBinding(N);
+    }
+
     public ObjectEnvironment ObjectRecord { get; }
     public Object GlobalThisValue { get; }
     public DeclarativeEnvironment DeclarativeRecord { get; }
