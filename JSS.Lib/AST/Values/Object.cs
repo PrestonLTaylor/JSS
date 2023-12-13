@@ -63,6 +63,38 @@ internal class Object : Value
         return O.HasProperty(P);
     }
 
+    // 10.1.5 [[GetOwnProperty]] ( P )
+    public Completion GetOwnProperty(string P)
+    {
+        // 1. Return OrdinaryGetOwnProperty(O, P).
+        return OrdinaryGetOwnProperty(this, P);
+    }
+
+    // 10.1.5.1 OrdinaryGetOwnProperty ( O, P ), https://tc39.es/ecma262/#sec-ordinarygetownproperty
+    private Completion OrdinaryGetOwnProperty(Object O, string P)
+    {
+        // 1. If O does not have an own property with key P, return undefined.
+        if (!O.DataProperties.ContainsKey(P))
+        {
+            // FIXME: Remove new Undefined()
+            return Completion.NormalCompletion(new Undefined());
+        }
+
+        // FIXME: 2. Let D be a newly created Property Descriptor with no fields.
+        // FIXME: 3. Let X be O's own property whose key is P.
+        // FIXME: 4. If X is a data property, then
+        // FIXME: a. Set D.[[Value]] to the value of X's [[Value]] attribute.
+        // FIXME: b. Set D.[[Writable]] to the value of X's [[Writable]] attribute.
+        // FIXME: 5. Else,
+        // FIXME: a. Assert: X is an accessor property.
+        // FIXME: b. Set D.[[Get]] to the value of X's [[Get]] attribute.
+        // FIXME: c. Set D.[[Set]] to the value of X's [[Set]] attribute.
+        // FIXME: 6. Set D.[[Enumerable]] to the value of X's [[Enumerable]] attribute.
+        // FIXME: 7. Set D.[[Configurable]] to the value of X's [[Configurable]] attribute.
+        // FIXME: 8. Return D.
+        return Completion.NormalCompletion(O.DataProperties[P].Value);
+    }
+
     // 10.1.7 [[HasProperty]] ( P ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-hasproperty-p
     private Completion HasProperty(string P)
     {
@@ -71,13 +103,14 @@ internal class Object : Value
     }
 
     // 10.1.7.1 OrdinaryHasProperty ( O, P ), https://tc39.es/ecma262/#sec-ordinaryhasproperty
-    public Completion OrdinaryHasProperty(Object O, string P)
+    static public Completion OrdinaryHasProperty(Object O, string P)
     {
-        // FIXME: 1. Let hasOwn be ? O.[[GetOwnProperty]](P).
-        var hasOwn = DataProperties.ContainsKey(P);
+        // 1. Let hasOwn be ? O.[[GetOwnProperty]](P).
+        var hasOwn = O.GetOwnProperty(P);
+        if (hasOwn.IsAbruptCompletion()) return hasOwn;
 
         // FIXME: 2. If hasOwn is not undefined, return true.
-        return Completion.NormalCompletion(new Boolean(hasOwn));
+        return Completion.NormalCompletion(new Boolean(!hasOwn.Value.IsUndefined()));
 
         // FIXME: 3. Let parent be ? O.[[GetPrototypeOf]]().
         // FIXME: 4. If parent is not null, then
