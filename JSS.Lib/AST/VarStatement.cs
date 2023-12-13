@@ -12,6 +12,13 @@ internal sealed class VarStatement : INode
         Initializer = initializer;
     }
 
+    // 8.2.1 Static Semantics: BoundNames, https://tc39.es/ecma262/#sec-static-semantics-boundnames
+    override public List<string> BoundNames()
+    {
+        // 1. Return the BoundNames of BindingIdentifier.
+        return new List<string> { Identifier };
+    }
+
     // 14.3.2.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-variable-statement-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
