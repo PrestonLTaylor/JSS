@@ -14,6 +14,23 @@ internal sealed class ForStatement : INode
         IterationStatement = iterationStatement;
     }
 
+    // 8.2.6 Static Semantics: VarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-vardeclarednames
+    override public List<string> VarDeclaredNames()
+    {
+        // 1. Let names1 be BoundNames of VariableDeclarationList.
+        List<string> names = new();
+        if (InitializationExpression is VarStatement)
+        {
+            names.AddRange(InitializationExpression.BoundNames());
+        }
+
+        // 2. Let names2 be VarDeclaredNames of Statement.
+        names.AddRange(IterationStatement.VarDeclaredNames());
+
+        // 3. Return the list-concatenation of names1 and names2.
+        return names;
+    }
+
     // 14.7.4.2 Runtime Semantics: ForLoopEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-forloopevaluation
     override public Completion Evaluate(VM vm)
     {

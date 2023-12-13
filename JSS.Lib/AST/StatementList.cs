@@ -49,6 +49,21 @@ internal sealed class StatementList : INode
         return lexicallyDeclaredNames;
     }
 
+    // 8.2.6 Static Semantics: VarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-vardeclarednames
+    override public List<string> VarDeclaredNames()
+    {
+        // 1. Let names1 be VarDeclaredNames of StatementList.
+        // 2. Let names2 be VarDeclaredNames of StatementListItem.
+        List<string> names = new();
+        foreach (var statement in Statements)
+        {
+            names.AddRange(statement.VarDeclaredNames());
+        }
+
+        // 3. Return the list-concatenation of names1 and names2.
+        return names;
+    }
+
     // 8.2.8 Static Semantics: TopLevelLexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-toplevellexicallydeclarednames
     override public List<string> TopLevelLexicallyDeclaredNames()
     {
@@ -58,6 +73,22 @@ internal sealed class StatementList : INode
         foreach (var statement in Statements)
         {
             names.AddRange(statement.TopLevelLexicallyDeclaredNames());
+        }
+
+        // 3. Return the list-concatenation of names1 and names2.
+        return names;
+    }
+
+    // 8.2.10 Static Semantics: TopLevelVarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-toplevelvardeclarednames
+    override public List<string> TopLevelVarDeclaredNames()
+    {
+        // 1. Let names1 be TopLevelVarDeclaredNames of StatementList.
+        // 2. Let names2 be TopLevelVarDeclaredNames of StatementListItem.
+        List<string> names = new();
+
+        foreach (var statement in Statements)
+        {
+            names.AddRange(statement.TopLevelVarDeclaredNames());
         }
 
         // 3. Return the list-concatenation of names1 and names2.

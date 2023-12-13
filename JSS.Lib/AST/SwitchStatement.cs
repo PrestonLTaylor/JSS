@@ -16,6 +16,14 @@ internal readonly struct CaseBlock
         return _statements.LexicallyDeclaredNames();
     }
 
+    // 8.2.6 Static Semantics: VarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-vardeclarednames
+    public List<string> VarDeclaredNames()
+    {
+        // 1. If the StatementList is present, return the VarDeclaredNames of StatementList.
+        // 2. Return a new empty List.
+        return _statements.VarDeclaredNames();
+    }
+
     public IExpression CaseExpression { get; }
     public IReadOnlyList<INode> StatementList 
     { 
@@ -37,6 +45,14 @@ internal readonly struct DefaultBlock
         // 1. If the StatementList is present, return the LexicallyDeclaredNames of StatementList.
         // 2. Return a new empty List.
         return _statements.LexicallyDeclaredNames();
+    }
+
+    // 8.2.6 Static Semantics: VarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-vardeclarednames
+    public List<string> VarDeclaredNames()
+    {
+        // 1. If the StatementList is present, return the VarDeclaredNames of StatementList.
+        // 2. Return a new empty List.
+        return _statements.VarDeclaredNames();
     }
 
     public IReadOnlyList<INode> StatementList 
@@ -75,6 +91,30 @@ internal sealed class SwitchStatement : INode
         if (DefaultCase is not null)
         {
             names.AddRange(DefaultCase.Value.LexicallyDeclaredNames());
+        }
+
+        // 6. Return the list-concatenation of names1, names2, and names3.
+        return names;
+    }
+
+    // 8.2.6 Static Semantics: VarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-vardeclarednames
+    override public List<string> VarDeclaredNames()
+    {
+        // 1. If the first CaseClauses is present, let names1 be the VarDeclaredNames of the first CaseClauses.
+        // 2. Else, let names1 be a new empty List.
+        // 3. Let names2 be VarDeclaredNames of DefaultClause.
+        // 4. If the second CaseClauses is present, let names3 be the VarDeclaredNames of the second CaseClauses.
+        // 5. Else, let names3 be a new empty List.
+        List<string> names = new();
+
+        foreach (var caseBlock in CaseBlocks)
+        {
+            names.AddRange(caseBlock.VarDeclaredNames());
+        }
+
+        if (DefaultCase is not null)
+        {
+            names.AddRange(DefaultCase.Value.VarDeclaredNames());
         }
 
         // 6. Return the list-concatenation of names1, names2, and names3.
