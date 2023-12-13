@@ -99,6 +99,15 @@ internal sealed class GlobalEnvironment : Environment
         return ObjectRecord.GetBindingValue(N, S);
     }
 
+    // 9.1.1.4.12 HasVarDeclaration ( N ), https://tc39.es/ecma262/#sec-hasvardeclaration
+    public bool HasVarDeclaration(string N)
+    {
+        // 1. Let varDeclaredNames be envRec.[[VarNames]].
+        // 2. If varDeclaredNames contains N, return true.
+        // 3. Return false.
+        return VarNames.Contains(N);
+    }
+
     public ObjectEnvironment ObjectRecord { get; }
     public Object GlobalThisValue { get; }
     public DeclarativeEnvironment DeclarativeRecord { get; }
