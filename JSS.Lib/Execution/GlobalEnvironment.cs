@@ -1,5 +1,6 @@
 ﻿using JSS.Lib.AST.Values;
 using System.Diagnostics;
+using Boolean = JSS.Lib.AST.Values.Boolean;
 using Object = JSS.Lib.AST.Values.Object;
 
 namespace JSS.Lib.Execution;
@@ -114,6 +115,25 @@ internal sealed class GlobalEnvironment : Environment
         // 1. Let DclRec be envRec.[[DeclarativeRecord]].
         // 2. Return ! DclRec.HasBinding(N).
         return DeclarativeRecord.HasBinding(N);
+    }
+
+    // 9.1.1.4.14 HasRestrictedGlobalProperty ( N ), https://tc39.es/ecma262/#sec-hasrestrictedglobalproperty
+    public Completion HasRestrictedGlobalProperty(string N)
+    {
+        // 1. Let ObjRec be envRec.[[ObjectRecord]].
+        // 2. Let globalObject be ObjRec.[[BindingObject]].
+        var globalObject = ObjectRecord.BindingObject;
+
+        // 3. Let existingProp be ? globalObject.[[GetOwnProperty]](N).
+        var existingProp = globalObject.GetOwnProperty(N);
+        if (existingProp.IsAbruptCompletion()) return existingProp;
+
+        // 4. If existingProp is undefined, return false.
+        if (existingProp.Value.IsUndefined()) return Completion.NormalCompletion(new Boolean(false));
+
+        // FIXME: 5. If existingProp.[[Configurable]] is true, return false.
+        // 6. Return true.
+        return Completion.NormalCompletion(new Boolean(true));
     }
 
     public ObjectEnvironment ObjectRecord { get; }
