@@ -9,4 +9,19 @@ internal abstract class INode
     // NOTE: If a Node doesn't override BoundNames, then it has no bound names
     // 8.2.1 Static Semantics: BoundNames, https://tc39.es/ecma262/#sec-static-semantics-boundnames
     virtual public List<string> BoundNames() { return new List<string>(); }
+
+    // 8.2.4 Static Semantics: LexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-lexicallydeclarednames
+    virtual public List<string> LexicallyDeclaredNames()
+    {
+        // FIXME: 1. If Statement is Statement : LabelledStatement, return LexicallyDeclaredNames of LabelledStatement.
+        // 2. Return a new empty List.
+        return new List<string>();
+    }
+
+    // 8.2.8 Static Semantics: TopLevelLexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-toplevellexicallydeclarednames
+    virtual public List<string> TopLevelLexicallyDeclaredNames()
+    {
+        // 1. Return a new empty List.
+        return new List<string>();
+    }
 }

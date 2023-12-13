@@ -67,6 +67,13 @@ internal sealed class Script
         return result;
     }
 
+    // 8.2.4 Static Semantics: LexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-lexicallydeclarednames
+    private List<string> LexicallyDeclaredNames()
+    {
+        // 1. Return TopLevelLexicallyDeclaredNames of StatementList.
+        return _statementList.TopLevelLexicallyDeclaredNames();
+    }
+
     public VM VM { get; }
     public Realm Realm { get; }
     public IReadOnlyList<INode> ScriptCode

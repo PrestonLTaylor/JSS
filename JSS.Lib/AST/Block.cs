@@ -28,5 +28,12 @@ internal sealed class Block : INode
         return blockValue;
     }
 
+    // 8.2.4 Static Semantics: LexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-lexicallydeclarednames
+    override public List<string> LexicallyDeclaredNames()
+    {
+        // 1. Return a new empty List.
+        return new List<string>();
+    }
+
     public StatementList Statements { get; }
 }

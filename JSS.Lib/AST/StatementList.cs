@@ -32,5 +32,37 @@ internal sealed class StatementList : INode
         return completion;
     }
 
+    // 8.2.4 Static Semantics: LexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-lexicallydeclarednames
+    override public List<string> LexicallyDeclaredNames()
+    {
+        List<string> lexicallyDeclaredNames = new();
+
+        // NOTE: This is the same as the list concatenation of each element's lexically declared names
+        // 1. Let names1 be LexicallyDeclaredNames of StatementList.
+        // 2. Let names2 be LexicallyDeclaredNames of StatementListItem.
+        foreach (var statement in Statements)
+        {
+            lexicallyDeclaredNames.AddRange(statement.LexicallyDeclaredNames());
+        }
+
+        // 3. Return the list-concatenation of names1 and names2.
+        return lexicallyDeclaredNames;
+    }
+
+    // 8.2.8 Static Semantics: TopLevelLexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-toplevellexicallydeclarednames
+    override public List<string> TopLevelLexicallyDeclaredNames()
+    {
+        // 1. Let names1 be TopLevelLexicallyDeclaredNames of StatementList.
+        // 2. Let names2 be TopLevelLexicallyDeclaredNames of StatementListItem.
+        List<string> names = new();
+        foreach (var statement in Statements)
+        {
+            names.AddRange(statement.TopLevelLexicallyDeclaredNames());
+        }
+
+        // 3. Return the list-concatenation of names1 and names2.
+        return names;
+    }
+
     public IReadOnlyList<INode> Statements { get; }
 }
