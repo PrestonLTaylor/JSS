@@ -1,6 +1,7 @@
 ﻿using JSS.Lib.AST.Values;
 using System.Diagnostics;
 using Boolean = JSS.Lib.AST.Values.Boolean;
+using String = JSS.Lib.AST.Values.String;
 using Object = JSS.Lib.AST.Values.Object;
 
 namespace JSS.Lib.Execution;
@@ -47,6 +48,19 @@ internal sealed class GlobalEnvironment : Environment
         // 3. Let ObjRec be envRec.[[ObjectRecord]].
         // 4. Return ? ObjRec.HasBinding(N).
         return ObjectRecord.HasBinding(N);
+    }
+
+    // 9.1.1.4.2 CreateMutableBinding ( N, D ), https://tc39.es/ecma262/#sec-global-environment-records-createimmutablebinding-n-s
+    override public Completion CreateMutableBinding(string N, bool D)
+    {
+        // 1. Let DclRec be envRec.[[DeclarativeRecord]].
+        // 2. If ! DclRec.HasBinding(N) is true, throw a TypeError exception.
+        if (DeclarativeRecord.HasBinding(N)) return Completion.ThrowCompletion(new String($"redeclaration of mutable binding {N}"));
+
+        // 3. Return ! DclRec.CreateMutableBinding(N, D).
+        var result = DeclarativeRecord.CreateMutableBinding(N, D);
+        Debug.Assert(result.IsNormalCompletion());
+        return result;
     }
 
     // 9.1.1.4.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-global-environment-records-initializebinding-n-v

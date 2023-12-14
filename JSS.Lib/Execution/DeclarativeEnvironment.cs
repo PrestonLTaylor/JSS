@@ -26,6 +26,21 @@ internal sealed class DeclarativeEnvironment : Environment
         return _identifierToBinding.ContainsKey(N);
     }
 
+    // 9.1.1.1.2 CreateMutableBinding ( N, D ), https://tc39.es/ecma262/#sec-declarative-environment-records-createmutablebinding-n-d
+    override public Completion CreateMutableBinding(string N, bool D)
+    {
+        // 1. Assert: envRec does not already have a binding for N.
+        Debug.Assert(!_identifierToBinding.ContainsKey(N));
+
+        // 2. Create a mutable binding in envRec for N and record that it is FIXME: uninitialized.
+        // FIXME: If D is true, record that the newly created binding may be deleted by a subsequent DeleteBinding call.
+        _identifierToBinding.Add(N, new Binding(new Undefined(), true));
+
+        // FIXME: new Empty()
+        // 3. Return unused.
+        return Completion.NormalCompletion(new Empty());
+    }
+
     // 9.1.1.1.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-declarative-environment-records-initializebinding-n-v
     public override Completion InitializeBinding(VM vm, string N, Value V)
     {
