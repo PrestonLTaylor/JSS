@@ -1,5 +1,7 @@
 ﻿using JSS.Lib.AST;
 using System.Diagnostics;
+using Boolean = JSS.Lib.AST.Values.Boolean;
+using String = JSS.Lib.AST.Values.String;
 
 namespace JSS.Lib.Execution;
 
@@ -42,11 +44,15 @@ internal sealed class Script
 
         // 11. Let script be scriptRecord.[[ECMAScriptCode]].
 
-        // FIXME: 12. Let result be Completion(GlobalDeclarationInstantiation(script, globalEnv)).
+        // 12. Let result be Completion(GlobalDeclarationInstantiation(script, globalEnv)).
+        var result = GlobalDeclarationInstantiation(globalEnv!);
 
-        // FIXME: 13. If result.[[Type]] is NORMAL, then
-        // a. Set result to Completion(Evaluation of script).
-        var result = _statementList.Evaluate(VM);
+        // 13. If result.[[Type]] is NORMAL, then
+        if (result.IsNormalCompletion())
+        {
+            // a. Set result to Completion(Evaluation of script).
+            result = _statementList.Evaluate(VM);
+        }
 
         // b. If result.[[Type]] is NORMAL and result.[[Value]] is EMPTY, then
         if (result.IsNormalCompletion() && result.IsValueEmpty())
@@ -65,6 +71,180 @@ internal sealed class Script
 
         // 17. Return ? result.
         return result;
+    }
+
+    // 16.1.7 GlobalDeclarationInstantiation ( script, env ), https://tc39.es/ecma262/#sec-globaldeclarationinstantiation
+    private Completion GlobalDeclarationInstantiation(GlobalEnvironment env)
+    {
+        // 1. Let lexNames be the LexicallyDeclaredNames of script.
+        var lexNames = LexicallyDeclaredNames();
+
+        // 2. Let varNames be the VarDeclaredNames of script.
+        var varNames = VarDeclaredNames();
+
+        // 3. For each element name of lexNames, do
+        foreach (var name in lexNames)
+        {
+            // FIXME: Throw SyntaxError Objects
+            // a. If env.HasVarDeclaration(name) is true, throw a SyntaxError exception.
+            if (env.HasVarDeclaration(name)) return Completion.ThrowCompletion(new String($"redeclaration of var {name}"));
+
+            // b. If env.HasLexicalDeclaration(name) is true, throw a SyntaxError exception.
+            if (env.HasLexicalDeclaration(name)) return Completion.ThrowCompletion(new String($"redeclaration of let {name}"));
+
+            // c. Let hasRestrictedGlobal be ? env.HasRestrictedGlobalProperty(name).
+            var hasRestrictedGlobal = env.HasRestrictedGlobalProperty(name);
+            if (hasRestrictedGlobal.IsAbruptCompletion()) return hasRestrictedGlobal;
+
+            // d. If hasRestrictedGlobal is true, throw a SyntaxError exception.
+            var asBoolean = (hasRestrictedGlobal.Value as Boolean)!;
+            if (asBoolean.Value) return Completion.ThrowCompletion(new String($"redeclaration of Unconfigurable {name}"));
+        }
+
+        // 4. For each element name of varNames, do
+        foreach (var name in varNames)
+        {
+            // a. If env.HasLexicalDeclaration(name) is true, throw a SyntaxError exception.
+            if (env.HasLexicalDeclaration(name)) return Completion.ThrowCompletion(new String($"redeclaration of let {name}"));
+        }
+
+        // 5. Let varDeclarations be the VarScopedDeclarations of script.
+        var varDeclarations = VarScopedDeclarations();
+
+        // 6. Let functionsToInitialize be a new empty List.
+        List<FunctionDeclaration> functionsToInitialize = new();
+
+        // 7. Let declaredFunctionNames be a new empty List.
+        List<string> declaredFunctionNames = new();
+
+        // 8. For each element d of varDeclarations, in reverse List order, do
+        for (var i = varDeclarations.Count - 1; i >= 0; --i)
+        {
+            var d = varDeclarations[i];
+
+            // a. If d is not either a VariableDeclaration, a ForBinding, or a BindingIdentifier, then
+            if (d is not VarStatement or Identifier)
+            {
+                // i. Assert: d is either a FunctionDeclaration, FIXME: a GeneratorDeclaration, an AsyncFunctionDeclaration, or an AsyncGeneratorDeclaration.
+                Debug.Assert(d is FunctionDeclaration);
+
+                // ii. NOTE: If there are multiple function declarations for the same name, the last declaration is used.
+
+                // iii. Let fn be the sole element of the BoundNames of d.
+                var fn = d.BoundNames().FirstOrDefault()!;
+
+                // iv. If declaredFunctionNames does not contain fn, then
+                if (!declaredFunctionNames.Contains(fn))
+                {
+                    // 1. Let fnDefinable be ? env.CanDeclareGlobalFunction(fn).
+                    var fnDefinable = env.CanDeclareGlobalFunction(fn);
+                    if (fnDefinable.IsAbruptCompletion()) return fnDefinable;
+
+                    // FIXME: Throw an actual TypeError Error
+                    // 2. If fnDefinable is false, throw a TypeError exception.
+                    var asBoolean = (fnDefinable.Value as Boolean)!;
+                    if (!asBoolean.Value) return Completion.ThrowCompletion(new String($"redeclaration of Unconfigurable function {fn}"));
+
+                    // 3. Append fn to declaredFunctionNames.
+                    declaredFunctionNames.Add(fn);
+
+                    // 4. Insert d as the first element of functionsToInitialize.
+                    functionsToInitialize.Insert(0, (d as FunctionDeclaration)!);
+                }
+            }
+        }
+
+        // 9. Let declaredVarNames be a new empty List.
+        List<string> declaredVarNames = new();
+
+        // 10. For each element d of varDeclarations, do
+        foreach (var d in varDeclarations)
+        {
+            // a. If d is either a VariableDeclaration, a ForBinding, or a BindingIdentifier, then
+            if (d is VarStatement or Identifier)
+            {
+                // i. For each String vn of the BoundNames of d, do
+                foreach (var vn in d.BoundNames())
+                {
+                    // 1. If declaredFunctionNames does not contain vn, then
+                    if (!declaredFunctionNames.Contains(vn))
+                    {
+                        // a. Let vnDefinable be ? env.CanDeclareGlobalVar(vn).
+                        var vnDefinable = env.CanDeclareGlobalVar(vn);
+                        if (vnDefinable.IsAbruptCompletion()) return vnDefinable;
+
+                        // b. If vnDefinable is false, throw a TypeError exception.
+                        var asBoolean = (vnDefinable.Value as Boolean)!;
+                        if (!asBoolean.Value) return Completion.ThrowCompletion(new String($"redeclaration of Unextensible var {vn}"));
+
+                        // c. If declaredVarNames does not contain vn, then
+                        if (!declaredVarNames.Contains(vn))
+                        {
+                            // i. Append vn to declaredVarNames.
+                            declaredVarNames.Add(vn);
+                        }
+                    }
+                }
+            }
+        }
+
+        // 11. NOTE: No abnormal terminations occur after this algorithm step if the global object is an ordinary object.However, if the global object is a Proxy exotic object it may exhibit behaviours that cause abnormal terminations in some of the following steps.
+        // 12. NOTE: Annex B.3.2.2 adds additional steps at this point.
+
+        // 13. Let lexDeclarations be the LexicallyScopedDeclarations of script.
+        List<INode> lexDeclarations = LexicallyScopedDeclarations();
+
+        // FIXME: 14. Let privateEnv be null.
+
+        // 15. For each element d of lexDeclarations, do
+        foreach (var d in lexDeclarations)
+        {
+            // a. NOTE: Lexically declared names are only instantiated here but not initialized.
+
+            // b. For each element dn of the BoundNames of d, do
+            foreach (var dn in d.BoundNames())
+            {
+                // i. If IsConstantDeclaration of d is true, then
+                if (d is ConstDeclaration)
+                {
+                    // 1. Perform ? env.CreateImmutableBinding(dn, true).
+                    var createResult = env.CreateImmutableBinding(dn, true);
+                    if (createResult.IsAbruptCompletion()) return createResult;
+                }
+                // ii. Else,
+                else
+                {
+                    // 1. Perform ? env.CreateMutableBinding(dn, false).
+                    var createResult = env.CreateMutableBinding(dn, false);
+                    if (createResult.IsAbruptCompletion()) return createResult;
+                }
+            }
+        }
+
+        // 16. For each Parse Node f of functionsToInitialize, do
+        foreach (var f in functionsToInitialize)
+        {
+            // a. Let fn be the sole element of the BoundNames of f.
+            var fn = f.BoundNames().FirstOrDefault()!;
+
+            // b. Let fo be InstantiateFunctionObject of f with arguments env FIXME: and privateEnv.
+            var fo = f.InstantiateFunctionObject(env);
+
+            // c. Perform ? env.CreateGlobalFunctionBinding(fn, fo, false).
+            var createResult = env.CreateGlobalFunctionBinding(fn, fo, false);
+            if (createResult.IsAbruptCompletion()) return createResult;
+        }
+
+        // 17. For each String vn of declaredVarNames, do
+        foreach (var vn in declaredVarNames)
+        {
+            // a. Perform ? env.CreateGlobalVarBinding(vn, false).
+            var createResult = env.CreateGlobalVarBinding(VM, vn, false);
+            if (createResult.IsAbruptCompletion()) return createResult;
+        }
+
+        // 18. Return UNUSUED.
+        return Completion.NormalCompletion(VM.Empty);
     }
 
     // 8.2.4 Static Semantics: LexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-lexicallydeclarednames
