@@ -200,6 +200,52 @@ internal sealed class GlobalEnvironment : Environment
         return Completion.NormalCompletion(new Boolean(false));
     }
 
+    // 9.1.1.4.18 CreateGlobalFunctionBinding ( N, V, D ), https://tc39.es/ecma262/#sec-createglobalfunctionbinding
+    public Completion CreateGlobalFunctionBinding(string N, Value V, bool D)
+    {
+        // 1. Let ObjRec be envRec.[[ObjectRecord]].
+        // 2. Let globalObject be ObjRec.[[BindingObject]].
+        var globalObject = ObjectRecord.BindingObject;
+
+        // 3. Let existingProp be ? globalObject.[[GetOwnProperty]](N).
+        var existingProp = globalObject.GetOwnProperty(N);
+        if (existingProp.IsAbruptCompletion()) return existingProp;
+
+        // 4. If existingProp is undefined FIXME: (or existingProp.[[Configurable]] is true), then
+        Property desc;
+        if (existingProp.Value.IsUndefined())
+        {
+            // a. Let desc be the PropertyDescriptor { [[Value]]: V, [[Writable]]: true, [[Enumerable]]: true, [[Configurable]]: D }.
+            desc = new Property(V, new(true, true, D));
+        }
+        // 5. Else,
+        else
+        {
+            // FIXME: Should have no attributes
+            // a. Let desc be the PropertyDescriptor { [[Value]]: V }.
+            desc = new Property(V, new(false, false, false));
+        }
+
+        // 6. Perform ? DefinePropertyOrThrow(globalObject, N, desc).
+        var defineResult = Object.DefinePropertyOrThrow(globalObject, N, desc);
+        if (defineResult.IsAbruptCompletion()) return defineResult;
+
+        // 7. Perform ? Set(globalObject, N, V, false).
+        var setResult = Object.Set(globalObject, N, V, false);
+        if (setResult.IsAbruptCompletion()) return setResult;
+
+        // 8. If envRec.[[VarNames]] does not contain N, then
+        if (!VarNames.Contains(N))
+        {
+            // a. Append N to envRec.[[VarNames]].
+            VarNames.Add(N);
+        }
+
+        // FIXME: new Empty()
+        // 9. Return unused.
+        return Completion.NormalCompletion(new Empty());
+    }
+
     public ObjectEnvironment ObjectRecord { get; }
     public Object GlobalThisValue { get; }
     public DeclarativeEnvironment DeclarativeRecord { get; }

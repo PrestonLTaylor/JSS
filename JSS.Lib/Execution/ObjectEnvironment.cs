@@ -73,7 +73,7 @@ internal sealed class ObjectEnvironment : Environment
         }
 
         // 4. Perform ? Set(bindingObject, N, V, S).
-        var setResult = Object.Set(vm, BindingObject, N, V, S);
+        var setResult = Object.Set(BindingObject, N, V, S);
         if (setResult.IsAbruptCompletion()) return setResult;
 
         // 5. Return UNUSED.

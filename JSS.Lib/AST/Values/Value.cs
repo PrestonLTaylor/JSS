@@ -87,7 +87,7 @@ internal abstract class Value
             var globalObj = Realm.GetGlobalObject(vm);
 
             // c. Perform ? Set(globalObj, V.[[ReferencedName]], W, false).
-            var setResult = Object.Set(vm, globalObj, reference.ReferencedName, W, false);
+            var setResult = Object.Set(globalObj, reference.ReferencedName, W, false);
             if (setResult.IsAbruptCompletion()) return setResult;
 
             // d. Return UNUSED.

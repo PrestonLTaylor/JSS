@@ -38,7 +38,7 @@ internal class Object : Value
     }
 
     // 7.3.4 Set ( O, P, V, Throw ), https://tc39.es/ecma262/#sec-set-o-p-v-throw
-    static public Completion Set(VM vm, Object O, string P, Value V, bool Throw)
+    static public Completion Set(Object O, string P, Value V, bool Throw)
     {
         // 1. Let success be ? O.[[Set]](P, V, O).
         var success = O.Set(P, V, O);
@@ -52,8 +52,9 @@ internal class Object : Value
             return Completion.ThrowCompletion(new String($"Failed to set {P}"));
         }
 
+        // FIXME: new Empty()
         // 3. Return UNUSED.
-        return Completion.NormalCompletion(vm.Empty);
+        return Completion.NormalCompletion(new Empty());
     }
 
     // 7.3.9 DefinePropertyOrThrow ( O, P, desc ), https://tc39.es/ecma262/#sec-definepropertyorthrow
