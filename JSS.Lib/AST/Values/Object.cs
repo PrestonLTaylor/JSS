@@ -63,6 +63,18 @@ internal class Object : Value
         return O.HasProperty(P);
     }
 
+    // 7.3.13 HasOwnProperty ( O, P ), https://tc39.es/ecma262/#sec-hasownproperty
+    static public Completion HasOwnProperty(Object O, string P)
+    {
+        // 1. Let desc be ? O.[[GetOwnProperty]](P).
+        var desc = O.GetOwnProperty(P);
+        if (desc.IsAbruptCompletion()) return desc;
+
+        // 2. If desc is undefined, return false.
+        // 3. Return true.
+        return Completion.NormalCompletion(new Boolean(!desc.Value.IsUndefined()));
+    }
+
     // 10.1.5 [[GetOwnProperty]] ( P )
     public Completion GetOwnProperty(string P)
     {
