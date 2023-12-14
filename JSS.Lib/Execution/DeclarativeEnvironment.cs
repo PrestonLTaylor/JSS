@@ -41,6 +41,21 @@ internal sealed class DeclarativeEnvironment : Environment
         return Completion.NormalCompletion(new Empty());
     }
 
+    // 9.1.1.1.3 CreateImmutableBinding ( N, S ), https://tc39.es/ecma262/#sec-declarative-environment-records-createimmutablebinding-n-s
+    override public Completion CreateImmutableBinding(string N, bool S)
+    {
+        // 1. Assert: envRec does not already have a binding for N.
+        Debug.Assert(!_identifierToBinding.ContainsKey(N));
+
+        // 2. Create an immutable binding in envRec for N and record that it is FIXME: uninitialized.
+        // FIXME: If S is true, record that the newly created binding is a strict binding.
+        _identifierToBinding.Add(N, new Binding(new Undefined(), false));
+
+        // FIXME: new Empty()
+        // 3. Return unused.
+        return Completion.NormalCompletion(new Empty());
+    }
+
     // 9.1.1.1.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-declarative-environment-records-initializebinding-n-v
     public override Completion InitializeBinding(VM vm, string N, Value V)
     {

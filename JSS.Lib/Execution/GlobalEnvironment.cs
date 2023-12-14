@@ -63,6 +63,17 @@ internal sealed class GlobalEnvironment : Environment
         return result;
     }
 
+    // 9.1.1.4.3 CreateImmutableBinding ( N, S ), https://tc39.es/ecma262/#sec-global-environment-records-createimmutablebinding-n-s
+    override public Completion CreateImmutableBinding(string N, bool S)
+    {
+        // 1. Let DclRec be envRec.[[DeclarativeRecord]].
+        // 2. If ! DclRec.HasBinding(N) is true, throw a TypeError exception.
+        if (DeclarativeRecord.HasBinding(N)) return Completion.ThrowCompletion(new String($"redeclaration of immutable binding {N}"));
+
+        // 3. Return ! DclRec.CreateImmutableBinding(N, S).
+        return DeclarativeRecord.CreateImmutableBinding(N, S);
+    }
+
     // 9.1.1.4.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-global-environment-records-initializebinding-n-v
     override public Completion InitializeBinding(VM vm, string N, Value V)
     {
