@@ -200,6 +200,43 @@ internal sealed class GlobalEnvironment : Environment
         return Completion.NormalCompletion(new Boolean(false));
     }
 
+    // 9.1.1.4.17 CreateGlobalVarBinding ( N, D ), https://tc39.es/ecma262/#sec-createglobalvarbinding
+    public Completion CreateGlobalVarBinding(VM vm, string N, bool D)
+    {
+        // 1. Let ObjRec be envRec.[[ObjectRecord]].
+        // 2. Let globalObject be ObjRec.[[BindingObject]].
+        var globalObject = ObjectRecord.BindingObject;
+
+        // 3. Let hasProperty be ? HasOwnProperty(globalObject, N).
+        var hasProperty = Object.HasOwnProperty(globalObject, N);
+        if (hasProperty.IsAbruptCompletion()) return hasProperty;
+
+        // FIXME: 4. Let extensible be ? IsExtensible(globalObject).
+        // 5. If hasProperty is false FIXME: (and extensible is true), then
+        var asBoolean = (hasProperty.Value as Boolean)!;
+        if (!asBoolean.Value)
+        {
+            // a. Perform ? ObjRec.CreateMutableBinding(N, D).
+            var createResult = ObjectRecord.CreateMutableBinding(N, D);
+            if (createResult.IsAbruptCompletion()) return createResult;
+
+            // FIXME: new Undefined()
+            // b. Perform ? ObjRec.InitializeBinding(N, undefined).
+            var initResult = ObjectRecord.InitializeBinding(vm, N, vm.Undefined);
+            if (initResult.IsAbruptCompletion()) return initResult;
+        }
+
+        // 6. If envRec.[[VarNames]] does not contain N, then
+        if (!VarNames.Contains(N))
+        {
+            // a. Append N to envRec.[[VarNames]].
+            VarNames.Add(N);
+        }
+
+        // 7. Return unused.
+        return Completion.NormalCompletion(vm.Empty);
+    }
+
     // 9.1.1.4.18 CreateGlobalFunctionBinding ( N, V, D ), https://tc39.es/ecma262/#sec-createglobalfunctionbinding
     public Completion CreateGlobalFunctionBinding(string N, Value V, bool D)
     {
