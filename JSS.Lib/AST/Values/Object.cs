@@ -56,6 +56,22 @@ internal class Object : Value
         return Completion.NormalCompletion(vm.Empty);
     }
 
+    // 7.3.9 DefinePropertyOrThrow ( O, P, desc ), https://tc39.es/ecma262/#sec-definepropertyorthrow
+    static public Completion DefinePropertyOrThrow(Object O, string P, Property desc)
+    {
+        // 1. Let success be ? O.[[DefineOwnProperty]](P, desc).
+        var success = O.DefineOwnProperty(P, desc);
+        if (success.IsAbruptCompletion()) return success;
+
+        // 2. If success is false, FIXME: throw a TypeError exception.
+        var asBoolean = (success.Value as Boolean)!;
+        if (!asBoolean.Value) return Completion.ThrowCompletion(new String($"Should not define property of name {P} with a value of {desc.Value}"));
+
+        // FIXME: new Empty()
+        // 3. Return unused.
+        return Completion.NormalCompletion(new Empty());
+    }
+
     // 7.3.12 HasProperty ( O, P ), https://tc39.es/ecma262/#sec-hasproperty
     static public Completion HasProperty(Object O, string P)
     {
@@ -105,6 +121,23 @@ internal class Object : Value
         // FIXME: 7. Set D.[[Configurable]] to the value of X's [[Configurable]] attribute.
         // FIXME: 8. Return D.
         return Completion.NormalCompletion(O.DataProperties[P].Value);
+    }
+
+    // 10.1.6 [[DefineOwnProperty]] ( P, Desc ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-defineownproperty-p-desc
+    public Completion DefineOwnProperty(string P, Property desc)
+    {
+        // 1. Return ? OrdinaryDefineOwnProperty(O, P, Desc).
+        return OrdinaryDefineOwnProperty(this, P, desc);
+    }
+
+    // 10.1.6.1 OrdinaryDefineOwnProperty ( O, P, Desc ), https://tc39.es/ecma262/#sec-ordinarydefineownproperty
+    static public Completion OrdinaryDefineOwnProperty(Object O, string P, Property desc)
+    {
+        // FIXME: 1. Let current be ? O.[[GetOwnProperty]](P).
+        // FIXME: 2. Let extensible be ? IsExtensible(O).
+        // FIXME: 3. Return ValidateAndApplyPropertyDescriptor(O, P, extensible, Desc, current).
+        O.DataProperties.Add(P, desc);
+        return Completion.NormalCompletion(new Boolean(true));
     }
 
     // 10.1.7 [[HasProperty]] ( P ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-hasproperty-p
