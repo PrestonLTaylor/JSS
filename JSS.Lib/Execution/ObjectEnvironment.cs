@@ -45,6 +45,20 @@ internal sealed class ObjectEnvironment : Environment
         // FIXME: 7. Return true.
     }
 
+    // 9.1.1.2.2 CreateMutableBinding ( N, D ), https://tc39.es/ecma262/#sec-object-environment-records-createmutablebinding-n-d
+    override public Completion CreateMutableBinding(string N, bool D)
+    {
+        // 1. Let bindingObject be envRec.[[BindingObject]].
+        // FIXME: new Undefined()
+        // 2. Perform ? DefinePropertyOrThrow(bindingObject, N, PropertyDescriptor { [[Value]]: undefined, [[Writable]]: true, [[Enumerable]]: true, [[Configurable]]: D }).
+        var defineResult = Object.DefinePropertyOrThrow(BindingObject, N, new Property(new Undefined(), new(true, true, D)));
+        if (defineResult.IsAbruptCompletion()) return defineResult;
+
+        // FIXME: new Empty()
+        // 3. Return UNUSED.
+        return Completion.NormalCompletion(new Empty());
+    }
+
     // 9.1.1.2.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-object-environment-records-initializebinding-n-v
     override public Completion InitializeBinding(VM vm, string N, Value V)
     {
