@@ -136,6 +136,25 @@ internal sealed class GlobalEnvironment : Environment
         return Completion.NormalCompletion(new Boolean(true));
     }
 
+    // 9.1.1.4.15 CanDeclareGlobalVar ( N ), https://tc39.es/ecma262/#sec-candeclareglobalvar
+    public Completion CanDeclareGlobalVar(string N)
+    {
+        // 1. Let ObjRec be envRec.[[ObjectRecord]].
+        // 2. Let globalObject be ObjRec.[[BindingObject]].
+        var globalObject = ObjectRecord.BindingObject;
+
+        // 3. Let hasProperty be ? HasOwnProperty(globalObject, N).
+        var hasProperty = Object.HasOwnProperty(globalObject, N);
+        if (hasProperty.IsAbruptCompletion()) return hasProperty;
+
+        // 4. If hasProperty is true, return true.
+        var asBoolean = (hasProperty.Value as Boolean)!;
+        if (asBoolean.Value) return Completion.NormalCompletion(new Boolean(true));
+
+        // FIXME: 5. Return ? IsExtensible(globalObject).
+        return Completion.NormalCompletion(new Boolean(true));
+    }
+
     // 9.1.1.4.16 CanDeclareGlobalFunction ( N ), https://tc39.es/ecma262/#sec-candeclareglobalfunction
     public Completion CanDeclareGlobalFunction(string N)
     {
