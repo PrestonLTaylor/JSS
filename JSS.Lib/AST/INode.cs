@@ -18,6 +18,14 @@ internal abstract class INode
         return new List<string>();
     }
 
+    // 8.2.5 Static Semantics: LexicallyScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-lexicallyscopeddeclarations
+    virtual public List<INode> LexicallyScopedDeclarations()
+    {
+        // 1. If Statement is Statement : LabelledStatement , return LexicallyScopedDeclarations of LabelledStatement.
+        // 2. Return a new empty List.
+        return new();
+    }
+
     // 8.2.6 Static Semantics: VarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-vardeclarednames
     virtual public List<string> VarDeclaredNames()
     {
@@ -37,6 +45,13 @@ internal abstract class INode
     {
         // 1. Return a new empty List.
         return new List<string>();
+    }
+
+    // 8.2.9 Static Semantics: TopLevelLexicallyScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-toplevellexicallyscopeddeclarations
+    virtual public List<INode> TopLevelLexicallyScopedDeclarations()
+    {
+        // 1. Return a new empty List.
+        return new();
     }
 
     // 8.2.10 Static Semantics: TopLevelVarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-toplevelvardeclarednames

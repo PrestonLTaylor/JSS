@@ -16,6 +16,14 @@ internal readonly struct CaseBlock
         return _statements.LexicallyDeclaredNames();
     }
 
+    // 8.2.5 Static Semantics: LexicallyScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-lexicallyscopeddeclarations
+    public List<INode> LexicallyScopedDeclarations()
+    {
+        // 1. If the StatementList is present, return the LexicallyScopedDeclarations of StatementList.
+        // 2. Return a new empty List.
+        return _statements.LexicallyScopedDeclarations();
+    }
+
     // 8.2.6 Static Semantics: VarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-vardeclarednames
     public List<string> VarDeclaredNames()
     {
@@ -53,6 +61,14 @@ internal readonly struct DefaultBlock
         // 1. If the StatementList is present, return the LexicallyDeclaredNames of StatementList.
         // 2. Return a new empty List.
         return _statements.LexicallyDeclaredNames();
+    }
+
+    // 8.2.5 Static Semantics: LexicallyScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-lexicallyscopeddeclarations
+    public List<INode> LexicallyScopedDeclarations()
+    {
+        // 1. If the StatementList is present, return the LexicallyScopedDeclarations of StatementList.
+        // 2. Return a new empty List.
+        return _statements.LexicallyScopedDeclarations();
     }
 
     // 8.2.6 Static Semantics: VarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-vardeclarednames
@@ -111,6 +127,30 @@ internal sealed class SwitchStatement : INode
 
         // 6. Return the list-concatenation of names1, names2, and names3.
         return names;
+    }
+
+    // 8.2.5 Static Semantics: LexicallyScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-lexicallyscopeddeclarations
+    override public List<INode> LexicallyScopedDeclarations()
+    {
+        // 1. If the first CaseClauses is present, let declarations1 be the LexicallyScopedDeclarations of the first CaseClauses.
+        // 2. Else, let declarations1 be a new empty List.
+        // 3. Let declarations2 be LexicallyScopedDeclarations of DefaultClause.
+        // 4. If the second CaseClauses is present, let declarations3 be the LexicallyScopedDeclarations of the second CaseClauses.
+        // 5. Else, let declarations3 be a new empty List.
+        List<INode> declarations = new();
+
+        foreach (var caseBlock in CaseBlocks)
+        {
+            declarations.AddRange(caseBlock.LexicallyScopedDeclarations());
+        }
+
+        if (DefaultCase is not null)
+        {
+            declarations.AddRange(DefaultCase.Value.LexicallyScopedDeclarations());
+        }
+
+        // 6. Return the list-concatenation of declarations1, declarations2, and declarations3.
+        return declarations;
     }
 
     // 8.2.6 Static Semantics: VarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-vardeclarednames

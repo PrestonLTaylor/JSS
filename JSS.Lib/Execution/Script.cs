@@ -74,6 +74,13 @@ internal sealed class Script
         return _statementList.TopLevelLexicallyDeclaredNames();
     }
 
+    // 8.2.5 Static Semantics: LexicallyScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-lexicallyscopeddeclarations
+    private List<INode> LexicallyScopedDeclarations()
+    {
+        // 1. Return TopLevelLexicallyScopedDeclarations of StatementList.
+        return _statementList.TopLevelLexicallyScopedDeclarations();
+    }
+
     // 8.2.6 Static Semantics: VarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-vardeclarednames
     private List<string> VarDeclaredNames()
     {
