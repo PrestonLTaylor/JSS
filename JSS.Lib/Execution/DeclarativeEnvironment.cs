@@ -64,6 +64,7 @@ internal sealed class DeclarativeEnvironment : Environment
         // 2. Set the bound value for N in envRec to V.
         var binding = _identifierToBinding[N];
         binding.Value = V;
+        _identifierToBinding[N] = binding;
 
         // FIXME: 3. Record that the binding for N in envRec has been initialized.
 

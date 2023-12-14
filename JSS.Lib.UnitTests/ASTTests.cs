@@ -361,6 +361,13 @@ internal sealed class ASTTests
         CreatePrefixIncrementExpressionTestCase("1", new Number(2)),
         CreatePrefixIncrementExpressionTestCase(EscapeString("a"), new Number(double.NaN)),
         CreatePrefixIncrementExpressionTestCase(EscapeString("1"), new Number(2)),
+
+        // Tests for VarStatement
+        CreateLetDeclarationTestCase("a", "null", new Null()),
+        CreateLetDeclarationTestCase("a", "false", new Boolean(false)),
+        CreateLetDeclarationTestCase("a", "true", new Boolean(true)),
+        CreateLetDeclarationTestCase("a", "1", new Number(1)),
+        CreateLetDeclarationTestCase("a", EscapeString("1"), new String("1")),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -576,6 +583,11 @@ internal sealed class ASTTests
     static private object[] CreatePrefixIncrementExpressionTestCase(string initializer, Value expected)
     {
         return new object[] { $"var identifier = {initializer}; ++identifier", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateLetDeclarationTestCase(string identifier, string initializer, Value expected)
+    {
+        return new object[] { $"let {identifier} = {initializer}; {identifier}", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
