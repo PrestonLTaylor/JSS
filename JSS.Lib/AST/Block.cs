@@ -13,15 +13,23 @@ internal sealed class Block : INode
     // 14.2.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-block-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
-        // FIXME: 1. Let oldEnv be the running execution context's LexicalEnvironment.
-        // FIXME: 2. Let blockEnv be NewDeclarativeEnvironment(oldEnv).
+        // 1. Let oldEnv be the running execution context's LexicalEnvironment.
+        var currentExecutionContext = (vm.CurrentExecutionContext as ScriptExecutionContext)!;
+        var oldEnv = currentExecutionContext.LexicalEnvironment;
+
+        // 2. Let blockEnv be NewDeclarativeEnvironment(oldEnv).
+        var blockEnv = new DeclarativeEnvironment(oldEnv);
+
         // FIXME: 3. Perform BlockDeclarationInstantiation(StatementList, blockEnv).
-        // FIXME: 4. Set the running execution context's LexicalEnvironment to blockEnv.
+
+        // 4. Set the running execution context's LexicalEnvironment to blockEnv.
+        currentExecutionContext.LexicalEnvironment = blockEnv;
 
         // 5. Let blockValue be Completion(Evaluation of StatementList).
         var blockValue = Statements.Evaluate(vm);
 
-        // FIXME: 6. Set the running execution context's LexicalEnvironment to oldEnv.
+        // 6. Set the running execution context's LexicalEnvironment to oldEnv.
+        currentExecutionContext.LexicalEnvironment = oldEnv;
 
         // 7. Return ? blockValue.
         return blockValue;
