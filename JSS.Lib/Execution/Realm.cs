@@ -16,8 +16,8 @@ internal sealed class Realm
         // 3. Set realmRec.[[AgentSignifier]] to AgentSignifier(). 
         Agent = Agent.AgentSignifier();
 
-        // FIXME: 4. Set realmRec.[[GlobalObject]] to undefined.
-        GlobalObject = new(null);
+        // 4. Set realmRec.[[GlobalObject]] to undefined.
+        GlobalObject = Undefined.The;
 
         // FIXME: 5. Set realmRec.[[GlobalEnv]] to undefined.
         GlobalEnv = null;
