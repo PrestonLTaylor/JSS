@@ -12,7 +12,8 @@ internal enum ValueType
     Symbol,
     Number,
     BigInt,
-    Object
+    Object,
+    Function
 }
 
 // FIXME: This is a very inefficient way of storing JS values.
@@ -29,6 +30,7 @@ internal abstract class Value
     virtual public bool IsNumber() { return false; }
     virtual public bool IsBigInt() { return false; }
     virtual public bool IsObject() { return false; }
+    virtual public bool IsFunction() { return false; }
 
     abstract public ValueType Type();
 

@@ -11,6 +11,9 @@ internal sealed class FunctionObject : Object
         ECMAScriptCode = body;
     }
 
+    override public bool IsFunction() { return true; }
+    override public ValueType Type() {  return ValueType.Function; }
+
     // 10.2.9 SetFunctionName ( F, name [ , prefix ] ), https://tc39.es/ecma262/#sec-setfunctionname
     public void SetFunctionName(string name, string prefix = "")
     {
