@@ -104,8 +104,15 @@ internal sealed class ObjectEnvironment : Environment
         var asBoolean = (value.Value as Boolean)!;
         if (!asBoolean.Value)
         {
-            // FIXME: a. If S is false, return undefined; otherwise throw a ReferenceError exception.
-            return Completion.ThrowCompletion(new String($"{N} is not defined."));
+            // a. If S is false, return undefined; otherwise FIXME: throw a ReferenceError exception.
+            if (S)
+            {
+                return Completion.ThrowCompletion(new String($"{N} is not defined."));
+            }
+            else
+            {
+                return Completion.NormalCompletion(Undefined.The);
+            }
         }
 
         // 4. Return ? Get(bindingObject, N).
