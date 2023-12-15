@@ -82,8 +82,13 @@ internal sealed class DeclarativeEnvironment : Environment
                 return Completion.ThrowCompletion(new String($"{N} is not defined."));
             }
 
-            // FIXME: b. Perform ! envRec.CreateMutableBinding(N, true).
-            // FIXME: c. Perform ! envRec.InitializeBinding(N, V).
+            // b. Perform ! envRec.CreateMutableBinding(N, true).
+            var createResult = CreateMutableBinding(N, true);
+            Debug.Assert(createResult.IsNormalCompletion());
+
+            // c. Perform ! envRec.InitializeBinding(N, V).
+            var initializeResult = InitializeBinding(N, V);
+            Debug.Assert(initializeResult.IsNormalCompletion());
 
             // d. Return UNUSED.
             return Completion.NormalCompletion(Empty.The);
