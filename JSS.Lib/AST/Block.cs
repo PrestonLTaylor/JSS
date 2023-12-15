@@ -1,4 +1,9 @@
 ﻿using JSS.Lib.Execution;
+using static System.Collections.Specialized.BitVector32;
+using System.Xml.Linq;
+using System;
+using System.Diagnostics;
+using JSS.Lib.AST.Values;
 
 namespace JSS.Lib.AST;
 
@@ -20,7 +25,8 @@ internal sealed class Block : INode
         // 2. Let blockEnv be NewDeclarativeEnvironment(oldEnv).
         var blockEnv = new DeclarativeEnvironment(oldEnv);
 
-        // FIXME: 3. Perform BlockDeclarationInstantiation(StatementList, blockEnv).
+        // 3. Perform BlockDeclarationInstantiation(StatementList, blockEnv).
+        BlockDeclarationInstantiation(blockEnv);
 
         // 4. Set the running execution context's LexicalEnvironment to blockEnv.
         currentExecutionContext.LexicalEnvironment = blockEnv;
@@ -33,6 +39,55 @@ internal sealed class Block : INode
 
         // 7. Return ? blockValue.
         return blockValue;
+    }
+
+    // 14.2.3 BlockDeclarationInstantiation ( code, env ), https://tc39.es/ecma262/#sec-blockdeclarationinstantiation
+    private void BlockDeclarationInstantiation(DeclarativeEnvironment env)
+    {
+        // 1. Let declarations be the LexicallyScopedDeclarations of code.
+        var declarations = Statements.LexicallyScopedDeclarations();
+
+        // FIXME: 2. Let privateEnv be the running execution context's PrivateEnvironment.
+
+        // 3. For each element d of declarations, do
+        foreach (var d in declarations)
+        {
+            // a. For each element dn of the BoundNames of d, do
+            foreach (var dn in d.BoundNames())
+            {
+                // i. If IsConstantDeclaration of d is true, then
+                if (d is ConstDeclaration)
+                {
+                    // 1. Perform ! env.CreateImmutableBinding(dn, true).
+                    var createResult = env.CreateImmutableBinding(dn, true);
+                    Debug.Assert(createResult.IsNormalCompletion());
+                }
+                // ii. Else,
+                else
+                {
+                    // 1. Perform ! env.CreateMutableBinding(dn, false). NOTE: This step is replaced in section B.3.2.6.
+                    var createResult = env.CreateMutableBinding(dn, true);
+                    Debug.Assert(createResult.IsNormalCompletion());
+                }
+            }
+
+            // b. If d is either a FunctionDeclaration, FIXME: a GeneratorDeclaration, an AsyncFunctionDeclaration, or an AsyncGeneratorDeclaration, then
+            if (d is FunctionDeclaration)
+            {
+                // i. Let fn be the sole element of the BoundNames of d.
+                var fn = d.BoundNames().FirstOrDefault()!;
+
+                // ii. Let fo be InstantiateFunctionObject of d with arguments env and privateEnv.
+                var f = d as FunctionDeclaration;
+                var fo = f!.InstantiateFunctionObject(env);
+
+                // iii. Perform ! env.InitializeBinding(fn, fo). NOTE: This step is replaced in section B.3.2.6.
+                var initResult = env.InitializeBinding(fn, fo);
+                Debug.Assert(initResult.IsNormalCompletion());
+            }
+        }
+
+        // 4. Return unused.
     }
 
     // 8.2.4 Static Semantics: LexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-lexicallydeclarednames

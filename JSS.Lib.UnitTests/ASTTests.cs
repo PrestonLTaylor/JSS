@@ -935,6 +935,21 @@ internal sealed class ASTTests
         Assert.That(completion.Value, Is.EqualTo(expectedValue));
     }
 
+    [Test]
+    public void LetDeclarations_InsideBlock_DontEscapeToOuterScope()
+    {
+        // Arrange
+        const string identifier = "a";
+        var script = ParseScript($"{{ let {identifier} = 0 }} a");
+
+        // Act
+        var completion = script.ScriptEvaluation();
+
+        // Assert
+        Assert.That(completion.IsThrowCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(new String($"{identifier} is not defined")));
+    }
+
     static private string EscapeString(string toEscape, char quote = '"')
     {
         return $"{quote}{toEscape}{quote}";
