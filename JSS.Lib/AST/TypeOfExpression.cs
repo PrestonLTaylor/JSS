@@ -83,7 +83,11 @@ internal sealed class TypeOfExpression : IExpression
 
         // 12. NOTE: This step is replaced in section B.3.6.3.
 
-        // FIXME: 13. If val has a [[Call]] internal slot, return "function".
+        // 13. If val has a [[Call]] internal slot, return "function".
+        if (val.Value.IsFunction())
+        {
+            return Completion.NormalCompletion(new String("function"));
+        }
 
         // 14. Return "object".
         return Completion.NormalCompletion(new String("object"));
