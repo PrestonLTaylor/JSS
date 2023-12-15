@@ -34,7 +34,7 @@ internal sealed class DeclarativeEnvironment : Environment
 
         // 2. Create a mutable binding in envRec for N and record that it is FIXME: uninitialized.
         // FIXME: If D is true, record that the newly created binding may be deleted by a subsequent DeleteBinding call.
-        _identifierToBinding.Add(N, new Binding(Undefined.The, true));
+        _identifierToBinding.Add(N, new Binding(Undefined.The, true, false));
 
         // 3. Return unused.
         return Completion.NormalCompletion(Empty.The);
@@ -47,8 +47,8 @@ internal sealed class DeclarativeEnvironment : Environment
         Debug.Assert(!_identifierToBinding.ContainsKey(N));
 
         // 2. Create an immutable binding in envRec for N and record that it is FIXME: uninitialized.
-        // FIXME: If S is true, record that the newly created binding is a strict binding.
-        _identifierToBinding.Add(N, new Binding(Undefined.The, false));
+        // If S is true, record that the newly created binding is a strict binding.
+        _identifierToBinding.Add(N, new Binding(Undefined.The, false, S));
 
         // 3. Return unused.
         return Completion.NormalCompletion(Empty.The);
@@ -94,19 +94,31 @@ internal sealed class DeclarativeEnvironment : Environment
             return Completion.NormalCompletion(Empty.The);
         }
 
-        // FIXME: 2. If the binding for N in envRec is a strict binding, set S to true.
+        // 2. If the binding for N in envRec is a strict binding, set S to true.
+        var binding = _identifierToBinding[N];
+        if (binding.Strict)
+        {
+            S = true;
+        }
 
         // FIXME: 3. If the binding for N in envRec has not yet been initialized, then
         // FIXME: a. Throw a ReferenceError exception.
 
         // 4. Else if the binding for N in envRec is a mutable binding, then
-        // a. Change its bound value to V.
-        var binding = _identifierToBinding[N];
-        binding.Value = V;
+        if (binding.Mutable)
+        {
+            // a. Change its bound value to V.
+            binding.Value = V;
+        }
+        // 5. Else,
+        else
+        {
+            // NOTE: This assert is intrinsic
+            // a. Assert: This is an attempt to change the value of an immutable binding.
 
-        // FIXME: 5. Else,
-        // FIXME: a. Assert: This is an attempt to change the value of an immutable binding.
-        // FIXME: b. If S is true, throw a TypeError exception.
+            // b. If S is true, FIXME: throw a TypeError exception.
+            if (S) return Completion.ThrowCompletion(new String($"invalid assignment to const {N}"));
+        }
 
         // 6. Return UNUSED.
         return Completion.NormalCompletion(Empty.The);
