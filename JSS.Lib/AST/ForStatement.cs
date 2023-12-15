@@ -93,7 +93,7 @@ internal sealed class ForStatement : INode
     private Completion ForBodyEvaluation(VM vm)
     {
         // 1. Let V be undefined.
-        var V = (Value)vm.Undefined;
+        var V = (Value)Undefined.The;
 
         // FIXME: 2. Perform ? CreatePerIterationEnvironment(perIterationBindings).
 

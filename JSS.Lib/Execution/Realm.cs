@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using JSS.Lib.AST.Values;
 using Object = JSS.Lib.AST.Values.Object;
 
 namespace JSS.Lib.Execution;
@@ -86,12 +87,12 @@ internal sealed class Realm
 
         // 7. If the host requires use of an exotic object to serve as realm's global object, let global be such an object created in a host-defined manner.
         // Otherwise, let global be undefined, indicating that an ordinary object should be created as the global object.
-        var global = vm.Undefined;
+        var global = Undefined.The;
 
         // 8. If the host requires that the this binding in realm's global scope return an object other than the global object,
         // let thisValue be such an object created in a host-defined manner.
         // Otherwise, let thisValue be undefined, indicating that realm's global this binding should be the global object.
-        var thisValue = vm.Undefined;
+        var thisValue = Undefined.The;
 
         // 9. Perform SetRealmGlobalObject(realm, global, thisValue).
         realm.SetRealmGlobalObject(global, thisValue);
@@ -100,7 +101,7 @@ internal sealed class Realm
         // FIXME: 11. Create any host-defined global object properties on globalObj.
 
         // 12. Return UNUSED.
-        return Completion.NormalCompletion(vm.Empty);
+        return Completion.NormalCompletion(Empty.The);
     }
 
     public Agent Agent { get; }

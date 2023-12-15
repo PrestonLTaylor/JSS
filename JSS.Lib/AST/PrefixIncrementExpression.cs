@@ -22,7 +22,7 @@ internal sealed class PrefixIncrementExpression : IExpression
         var getResult = expr.Value.GetValue();
         if (getResult.IsAbruptCompletion()) return getResult;
 
-        var oldValue = getResult.Value.ToNumeric(vm);
+        var oldValue = getResult.Value.ToNumeric();
         if (oldValue.IsAbruptCompletion()) return oldValue;
 
         // 3. If oldValue is a Number, then

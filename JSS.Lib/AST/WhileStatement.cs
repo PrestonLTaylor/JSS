@@ -31,7 +31,7 @@ internal sealed class WhileStatement : INode
     override public Completion Evaluate(VM vm)
     {
         // 1.Let V be undefined.
-        var V = (Value)vm.Undefined;
+        var V = (Value)Undefined.The;
 
         // 2.Repeat,
         while (true)

@@ -166,7 +166,7 @@ internal sealed class TryStatement : INode
         }
 
         // 6. Return ? UpdateEmpty(F, undefined).
-        F.UpdateEmpty(vm.Undefined);
+        F.UpdateEmpty(Undefined.The);
         return F;
     }
 
@@ -188,7 +188,7 @@ internal sealed class TryStatement : INode
         }
 
         // 4. Return ? UpdateEmpty(C, undefined).
-        C.UpdateEmpty(vm.Undefined);
+        C.UpdateEmpty(Undefined.The);
         return C;
     }
 
@@ -207,7 +207,7 @@ internal sealed class TryStatement : INode
         }
 
         // 4. Return ? UpdateEmpty(F, undefined).
-        F.UpdateEmpty(vm.Undefined);
+        F.UpdateEmpty(Undefined.The);
         return F;
     }
 

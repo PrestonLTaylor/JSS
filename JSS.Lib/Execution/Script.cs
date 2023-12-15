@@ -1,7 +1,8 @@
-﻿using JSS.Lib.AST;
-using System.Diagnostics;
-using Boolean = JSS.Lib.AST.Values.Boolean;
+﻿using Boolean = JSS.Lib.AST.Values.Boolean;
+using JSS.Lib.AST.Values;
+using JSS.Lib.AST;
 using String = JSS.Lib.AST.Values.String;
+using System.Diagnostics;
 
 namespace JSS.Lib.Execution;
 
@@ -58,7 +59,7 @@ internal sealed class Script
         if (result.IsNormalCompletion() && result.IsValueEmpty())
         {
             // i. Set result to NormalCompletion(undefined).
-            result = Completion.NormalCompletion(VM.Undefined);
+            result = Completion.NormalCompletion(Undefined.The);
         }
 
         // 14. (FIXME: Suspend) scriptContext and remove it from the execution context stack.
@@ -239,12 +240,12 @@ internal sealed class Script
         foreach (var vn in declaredVarNames)
         {
             // a. Perform ? env.CreateGlobalVarBinding(vn, false).
-            var createResult = env.CreateGlobalVarBinding(VM, vn, false);
+            var createResult = env.CreateGlobalVarBinding(vn, false);
             if (createResult.IsAbruptCompletion()) return createResult;
         }
 
         // 18. Return UNUSUED.
-        return Completion.NormalCompletion(VM.Empty);
+        return Completion.NormalCompletion(Empty.The);
     }
 
     // 8.2.4 Static Semantics: LexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-lexicallydeclarednames

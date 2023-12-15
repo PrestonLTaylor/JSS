@@ -27,7 +27,7 @@ internal sealed class ScriptExecutionContext : ExecutionContext
         // let strict be true; else let strict be false.
 
         // 4. Return ? GetIdentifierReference(env, name, strict).
-        return Environment.GetIdentifierReference(vm, env, name);
+        return Environment.GetIdentifierReference(env, name);
     }
 
     public Environment? LexicalEnvironment { get; set; }

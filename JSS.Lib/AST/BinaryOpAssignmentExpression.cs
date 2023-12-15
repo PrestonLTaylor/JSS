@@ -35,7 +35,7 @@ internal sealed class BinaryOpAssignmentExpression : IExpression
         // 5. Let assignmentOpText be the source text matched by AssignmentOperator.
         // 6. Let opText be the sequence of Unicode code points associated with assignmentOpText in the following table:
         // 7. Let r be ? ApplyStringOrNumericBinaryOperator(lval, opText, rval).
-        var r = ApplyStringOrNumericBinaryOperator(vm, lval.Value, Op, rval.Value);
+        var r = ApplyStringOrNumericBinaryOperator(lval.Value, Op, rval.Value);
         if (r.IsAbruptCompletion()) return r;
 
         // 8. Perform ? PutValue(lref, r).

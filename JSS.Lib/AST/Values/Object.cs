@@ -52,9 +52,8 @@ internal class Object : Value
             return Completion.ThrowCompletion(new String($"Failed to set {P}"));
         }
 
-        // FIXME: new Empty()
         // 3. Return UNUSED.
-        return Completion.NormalCompletion(new Empty());
+        return Completion.NormalCompletion(Empty.The);
     }
 
     // 7.3.9 DefinePropertyOrThrow ( O, P, desc ), https://tc39.es/ecma262/#sec-definepropertyorthrow
@@ -68,9 +67,8 @@ internal class Object : Value
         var asBoolean = (success.Value as Boolean)!;
         if (!asBoolean.Value) return Completion.ThrowCompletion(new String($"Should not define property of name {P} with a value of {desc.Value}"));
 
-        // FIXME: new Empty()
-        // 3. Return unused.
-        return Completion.NormalCompletion(new Empty());
+        // 3. Return UNUSED.
+        return Completion.NormalCompletion(Empty.The);
     }
 
     // 7.3.12 HasProperty ( O, P ), https://tc39.es/ecma262/#sec-hasproperty
@@ -105,8 +103,7 @@ internal class Object : Value
         // 1. If O does not have an own property with key P, return undefined.
         if (!O.DataProperties.ContainsKey(P))
         {
-            // FIXME: Remove new Undefined()
-            return Completion.NormalCompletion(new Undefined());
+            return Completion.NormalCompletion(Undefined.The);
         }
 
         // FIXME: 2. Let D be a newly created Property Descriptor with no fields.

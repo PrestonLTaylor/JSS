@@ -32,7 +32,7 @@ internal sealed class LooseEqualityExpression : IExpression
         if (rval.IsAbruptCompletion()) return rval;
 
         // 5. Return ? IsLooselyEqual(rval, lval).
-        return Value.IsLooselyEqual(vm, rval.Value, lval.Value);
+        return Value.IsLooselyEqual(rval.Value, lval.Value);
     }
 
     public IExpression Lhs { get; }

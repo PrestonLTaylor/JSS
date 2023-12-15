@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.Execution;
+using JSS.Lib.AST.Values;
 using System.Diagnostics;
 
 namespace JSS.Lib.AST;
@@ -16,11 +17,11 @@ internal sealed class DebuggerStatement : INode
             Debugger.Break();
 
             // b. Return a new implementation-defined Completion Record.
-            return Completion.NormalCompletion(vm.Empty);
+            return Completion.NormalCompletion(Empty.The);
         }
 
         // 2. Else,
         // a. Return EMPTY.
-        return Completion.NormalCompletion(vm.Empty);
+        return Completion.NormalCompletion(Empty.The);
     }
 }

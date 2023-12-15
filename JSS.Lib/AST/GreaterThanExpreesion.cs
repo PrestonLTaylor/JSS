@@ -33,7 +33,7 @@ internal sealed class GreaterThanExpression : IExpression
         if (rval.IsAbruptCompletion()) return rval;
 
         // 5. Let r be ? IsLessThan(rval, lval, false).
-        var r = Value.IsLessThan(vm, rval.Value, lval.Value, false);
+        var r = Value.IsLessThan(rval.Value, lval.Value, false);
         if (r.IsAbruptCompletion()) return r;
 
         // 6. If r is undefined, return false. Otherwise, return r.

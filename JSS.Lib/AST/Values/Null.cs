@@ -2,6 +2,8 @@
 
 internal sealed class Null : Value
 {
+    private Null() { }
+
     public override bool IsNull() { return true; }
     override public ValueType Type() { return ValueType.Null; }
 
@@ -15,6 +17,15 @@ internal sealed class Null : Value
     {
         return nullGuid.GetHashCode();
     }
+
+    static public Null The
+    {
+        get
+        {
+            return _null;
+        }
+    }
+    static readonly private Null _null = new();
 
     // NOTE: This is a hack for making sure all nulls have the same hash code
     static private readonly Guid nullGuid = Guid.NewGuid();

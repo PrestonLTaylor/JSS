@@ -91,7 +91,7 @@ internal abstract class Value
             if (setResult.IsAbruptCompletion()) return setResult;
 
             // d. Return UNUSED.
-            return Completion.NormalCompletion(vm.Empty);
+            return Completion.NormalCompletion(Empty.The);
         }
         // FIXME: 3.If IsPropertyReference(V) is true, then
         // FIXME: a. Let baseObj be? ToObject(V.[[Base]]).
@@ -110,7 +110,7 @@ internal abstract class Value
             // b. Assert: base is an Environment Record.
 
             // c. Return ? base.SetMutableBinding(V.[[ReferencedName]], W, FIXME: V.[[Strict]]) (see 9.1).
-            return @base.SetMutableBinding(vm, reference.ReferencedName, W, false);
+            return @base.SetMutableBinding(reference.ReferencedName, W, false);
         }
     }
 
@@ -177,7 +177,7 @@ internal abstract class Value
     }
 
     // 7.1.3 ToNumeric ( value ), https://tc39.es/ecma262/#sec-tonumeric
-    public Completion ToNumeric(VM vm)
+    public Completion ToNumeric()
     {
         // 1. Let primValue be ? ToPrimitive(value, FIXME: NUMBER).
         var primValue = ToPrimitive();
@@ -186,11 +186,11 @@ internal abstract class Value
         // FIXME: 2. If primValue is a BigInt, return primValue.
 
         // 3. Return ? ToNumber(primValue).
-        return primValue.Value.ToNumber(vm);
+        return primValue.Value.ToNumber();
     }
 
     // 7.1.4 ToNumber ( argument ), https://tc39.es/ecma262/#sec-tonumber
-    public Completion ToNumber(VM vm)
+    public Completion ToNumber()
     {
         // 1. If argument is a Number, return argument.
         if (IsNumber()) return Completion.NormalCompletion(this);
@@ -222,7 +222,7 @@ internal abstract class Value
             }
             catch (Exception)
             {
-                return Completion.NormalCompletion(vm.NaN);
+                return Completion.NormalCompletion(Number.NaN);
             }
         }
 
@@ -311,7 +311,7 @@ internal abstract class Value
     }
 
     // 7.2.13 IsLessThan ( x, y, LeftFirst )
-    static public Completion IsLessThan(VM vm, Value x, Value y, bool leftFirst)
+    static public Completion IsLessThan(Value x, Value y, bool leftFirst)
     {
         Completion px;
         Completion py;
@@ -391,11 +391,11 @@ internal abstract class Value
         // c. NOTE: Because px and py are primitive values, evaluation order is not important.
 
         // d. Let nx be ? ToNumeric(px).
-        var nx = px.Value.ToNumeric(vm);
+        var nx = px.Value.ToNumeric();
         if (nx.IsAbruptCompletion()) return nx;
 
         // e. Let ny be ? ToNumeric(py).
-        var ny = py.Value.ToNumeric(vm);
+        var ny = py.Value.ToNumeric();
         if (ny.IsAbruptCompletion()) return ny;
 
         // FIXME: f. If Type(nx) is Type(ny), then
@@ -416,7 +416,7 @@ internal abstract class Value
     }
 
     // 7.2.14 IsLooselyEqual ( x, y ), https://tc39.es/ecma262/#sec-islooselyequal
-    static public Completion IsLooselyEqual(VM vm, Value x, Value y)
+    static public Completion IsLooselyEqual(Value x, Value y)
     {
         // 1. If Type(x) is Type(y), then
         if (x.Type().Equals(y.Type()))
@@ -443,10 +443,10 @@ internal abstract class Value
         if (x.IsNumber() && y.IsString())
         {
             // FIXME: Maybe a MUST-like function for the asserts
-            var yAsNumber = y.ToNumber(vm);
+            var yAsNumber = y.ToNumber();
             Debug.Assert(yAsNumber.IsNormalCompletion());
 
-            var result = IsLooselyEqual(vm, x, yAsNumber.Value);
+            var result = IsLooselyEqual(x, yAsNumber.Value);
             Debug.Assert(result.IsNormalCompletion());
             return result;
         }
@@ -454,10 +454,10 @@ internal abstract class Value
         // 6. If x is a String and y is a Number, return ! IsLooselyEqual(! ToNumber(x), y).
         if (x.IsString() && y.IsNumber())
         {
-            var xAsNumber = x.ToNumber(vm);
+            var xAsNumber = x.ToNumber();
             Debug.Assert(xAsNumber.IsNormalCompletion());
 
-            var result = IsLooselyEqual(vm, xAsNumber.Value, y);
+            var result = IsLooselyEqual(xAsNumber.Value, y);
             Debug.Assert(result.IsNormalCompletion());
             return result;
         }
@@ -471,10 +471,10 @@ internal abstract class Value
         // 9. If x is a Boolean, return !IsLooselyEqual(!ToNumber(x), y).
         if (x.IsBoolean())
         {
-            var xAsNumber = x.ToNumber(vm);
+            var xAsNumber = x.ToNumber();
             Debug.Assert(xAsNumber.IsNormalCompletion());
 
-            var result = IsLooselyEqual(vm, xAsNumber.Value, y);
+            var result = IsLooselyEqual(xAsNumber.Value, y);
             Debug.Assert(result.IsNormalCompletion());
             return result;
         }
@@ -482,10 +482,10 @@ internal abstract class Value
         // 10. If y is a Boolean, return !IsLooselyEqual(x, !ToNumber(y)).
         if (y.IsBoolean())
         {
-            var yAsNumber = y.ToNumber(vm);
+            var yAsNumber = y.ToNumber();
             Debug.Assert(yAsNumber.IsNormalCompletion());
 
-            var result = IsLooselyEqual(vm, x, yAsNumber.Value);
+            var result = IsLooselyEqual(x, yAsNumber.Value);
             Debug.Assert(result.IsNormalCompletion());
             return result;
         }

@@ -33,7 +33,7 @@ internal sealed class LessThanExpression : IExpression
         if (rval.IsAbruptCompletion()) return rval;
 
         // 5. Let r be ? IsLessThan(lval, rval, true).
-        var r = Value.IsLessThan(vm, lval.Value, rval.Value, true);
+        var r = Value.IsLessThan(lval.Value, rval.Value, true);
         if (r.IsAbruptCompletion()) return r;
 
         // 6. If r is undefined, return false. Otherwise, return r.

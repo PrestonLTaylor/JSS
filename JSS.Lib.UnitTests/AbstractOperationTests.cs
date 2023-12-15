@@ -11,7 +11,7 @@ internal sealed class AbstractOperationTests
 {
     static private readonly List<Value> toPrimitiveIdentityTestCases = new()
     {
-        new Null(),
+        Null.The,
         new Boolean(false),
         new Boolean(true),
         new Number(0.0),
@@ -39,7 +39,7 @@ internal sealed class AbstractOperationTests
     // FIXME: Replace other Dictionary test cases with object[]
     static private readonly object[] valueToExpectedStringTestCases =
     {
-        new object[] { new Null(), "null" },
+        new object[] { Null.The, "null" },
         new object[] { new Boolean(false), "false" },
         new object[] { new Boolean(true), "true" },
         new object[] { new Number(0.0), 0.0.ToString() },
@@ -69,7 +69,7 @@ internal sealed class AbstractOperationTests
 
     static private readonly object[] valueToExpectedNumberTestCases = new object[]
     {
-        new object[] { new Null(), 0.0 },
+        new object[] { Null.The, 0.0 },
         new object[] { new Boolean(false), 0.0 },
         new object[] { new Boolean(true), 1.0 },
         new object[] { new Number(0.0), 0.0 },
@@ -84,11 +84,9 @@ internal sealed class AbstractOperationTests
     public void ToNumber_ReturnsNormalCompletion_WithExpectedNumber_WhenProvidingValue(Value testCase, double expectedNumber)
     {
         // Arrange
-        var realm = new Realm();
-        var vm = new VM(realm);
 
         // Act
-        var asNumber = testCase.ToNumber(vm);
+        var asNumber = testCase.ToNumber();
 
         // Assert
         Assert.That(asNumber.IsNormalCompletion(), Is.True);
@@ -102,11 +100,9 @@ internal sealed class AbstractOperationTests
     public void ToNumeric_ReturnsNormalCompletion_WithExpectedNumber_WhenProvidingValue(Value testCase, double expectedNumber)
     {
         // Arrange
-        var realm = new Realm();
-        var vm = new VM(realm);
 
         // Act
-        var asNumeric = testCase.ToNumeric(vm);
+        var asNumeric = testCase.ToNumeric();
 
         // Assert
         Assert.That(asNumeric.IsNormalCompletion(), Is.True);
@@ -163,11 +159,9 @@ internal sealed class AbstractOperationTests
     public void ApplyStringOrNumericBinaryOperator_ReturnsNormalCompletion_WithExpectedValue(Value lhs, BinaryOpType op, Value rhs, Value expectedValue)
     {
         // Arrange
-        var realm = new Realm();
-        var vm = new VM(realm);
 
         // Act
-        var result = IExpression.ApplyStringOrNumericBinaryOperator(vm, lhs, op, rhs);
+        var result = IExpression.ApplyStringOrNumericBinaryOperator(lhs, op, rhs);
 
         // Assert
         Assert.That(result.IsNormalCompletion(), Is.True);
@@ -230,13 +224,11 @@ internal sealed class AbstractOperationTests
     public void IsLessThan_ReturnsNormalCompletion_WithExpectedResult(Value lhs, Value rhs, bool expectedResult)
     {
         // Arrange
-        var realm = new Realm();
-        var vm = new VM(realm);
         var expectedValue = new Boolean(expectedResult);
 
         // Act
         // NOTE: leftFirst has no visiable side effect in these tests
-        var completion = Value.IsLessThan(vm, lhs, rhs, false);
+        var completion = Value.IsLessThan(lhs, rhs, false);
 
         // Assert
         Assert.That(completion.IsNormalCompletion(), Is.True);
@@ -249,8 +241,8 @@ internal sealed class AbstractOperationTests
         new object[] { new Boolean(false), false },
         new object[] { new Boolean(true), true },
 
-        new object[] { new Undefined(), false },
-        new object[] { new Null(), false },
+        new object[] { Undefined.The, false },
+        new object[] { Null.The, false },
         new object[] { new Number(0), false },
         new object[] { new Number(double.NaN), false },
         new object[] { new String(""), false },
@@ -275,17 +267,17 @@ internal sealed class AbstractOperationTests
     // FIXME: Tests for Number::equal and SameValueNonNumber
     static private readonly object[] isStrictlyEqualLhsAndRhsToExpectedResultTestCases =
     {
-        new object[] { new Null(), new Undefined(), false },
-        new object[] { new Undefined(), new Null(), false },
-        new object[] { new Undefined(), new Number(1), false },
-        new object[] { new Undefined(), new String("1"), false },
+        new object[] { Null.The, Undefined.The, false },
+        new object[] { Undefined.The, Null.The, false },
+        new object[] { Undefined.The, new Number(1), false },
+        new object[] { Undefined.The, new String("1"), false },
         new object[] { new Number(1), new String("1"), false },
         new object[] { new String("1"), new Number(1), false },
         new object[] { new String("1"), new String("2"), false },
         new object[] { new Number(1), new Number(2), false },
         new object[] { new Boolean(false), new Boolean(true), false },
-        new object[] { new Undefined(), new Undefined(), true },
-        new object[] { new Null(), new Null(), true },
+        new object[] { Undefined.The, Undefined.The, true },
+        new object[] { Null.The, Null.The, true },
         new object[] { new Boolean(false), new Boolean(false), true },
         new object[] { new Boolean(true), new Boolean(true), true },
         new object[] { new String("1"), new String("1"), true },
@@ -307,17 +299,17 @@ internal sealed class AbstractOperationTests
 
     static private readonly object[] isLooselyEqualLhsAndRhsToExpectedResultTestCases =
     {
-        new object[] { new Null(), new Undefined(), true },
-        new object[] { new Undefined(), new Null(), true },
-        new object[] { new Undefined(), new Number(1), false },
-        new object[] { new Undefined(), new String("1"), false },
+        new object[] { Null.The, Undefined.The, true },
+        new object[] { Undefined.The, Null.The, true },
+        new object[] { Undefined.The, new Number(1), false },
+        new object[] { Undefined.The, new String("1"), false },
         new object[] { new Number(1), new String("1"), true },
         new object[] { new String("1"), new Number(1), true },
         new object[] { new String("1"), new String("2"), false },
         new object[] { new Number(1), new Number(2), false },
         new object[] { new Boolean(false), new Boolean(true), false },
-        new object[] { new Undefined(), new Undefined(), true },
-        new object[] { new Null(), new Null(), true },
+        new object[] { Undefined.The, Undefined.The, true },
+        new object[] { Null.The, Null.The, true },
         new object[] { new Boolean(false), new Boolean(false), true },
         new object[] { new Boolean(true), new Boolean(true), true },
         new object[] { new String("1"), new String("1"), true },
@@ -328,12 +320,10 @@ internal sealed class AbstractOperationTests
     public void IsLooselyEqual_ReturnsNormalCompletion_WithExpectedResult(Value lhs, Value rhs, bool expectedResult)
     {
         // Arrange
-        var realm = new Realm();
-        var vm = new VM(realm);
         var expectedValue = new Boolean(expectedResult);
 
         // Act
-        var completion = Value.IsLooselyEqual(vm, lhs, rhs);
+        var completion = Value.IsLooselyEqual(lhs, rhs);
 
         // Assert
         Assert.That(completion.IsNormalCompletion(), Is.True);
@@ -343,11 +333,11 @@ internal sealed class AbstractOperationTests
 
     static private readonly object[] loopContinuesValueToExpectedResultTestCases =
     {
-        new object[] { Completion.NormalCompletion(new Undefined()), true },
-        new object[] { Completion.ThrowCompletion(new Undefined()), false },
-        new object[] { Completion.BreakCompletion(new Undefined(), ""), false },
-        new object[] { Completion.ReturnCompletion(new Undefined()), false },
-        new object[] { Completion.ContinueCompletion(new Undefined(), ""), true },
+        new object[] { Completion.NormalCompletion(Undefined.The), true },
+        new object[] { Completion.ThrowCompletion(Undefined.The), false },
+        new object[] { Completion.BreakCompletion(Undefined.The, ""), false },
+        new object[] { Completion.ReturnCompletion(Undefined.The), false },
+        new object[] { Completion.ContinueCompletion(Undefined.The, ""), true },
     };
 
     [TestCaseSource(nameof(loopContinuesValueToExpectedResultTestCases))]

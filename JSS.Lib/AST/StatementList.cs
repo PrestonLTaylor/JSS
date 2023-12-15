@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.Execution;
+using JSS.Lib.AST.Values;
 
 namespace JSS.Lib.AST;
 
@@ -14,7 +15,7 @@ internal sealed class StatementList : INode
     override public Completion Evaluate(VM vm)
     {
         // 1. Let sl be ? Evaluation of StatementList.
-        Completion completion = Completion.NormalCompletion(vm.Empty);
+        Completion completion = Completion.NormalCompletion(Empty.The);
         foreach (var statement in Statements)
         {
             // 2. Let s be Completion(Evaluation of StatementListItem).

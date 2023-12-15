@@ -1,5 +1,5 @@
 ﻿using JSS.Lib.Execution;
-using ExecutionContext = JSS.Lib.Execution.ExecutionContext;
+using JSS.Lib.AST.Values;
 
 namespace JSS.Lib.AST;
 
@@ -38,7 +38,7 @@ internal sealed class VarStatement : INode
     {
         if (Initializer is null)
         {
-            return EvaluateWithoutInitializer(vm);
+            return EvaluateWithoutInitializer();
         }
         else
         {
@@ -46,10 +46,10 @@ internal sealed class VarStatement : INode
         }
     }
 
-    private Completion EvaluateWithoutInitializer(VM vm)
+    private Completion EvaluateWithoutInitializer()
     {
         // 1. Return EMPTY.
-        return Completion.NormalCompletion(vm.Empty);
+        return Completion.NormalCompletion(Empty.The);
     }
 
     private Completion EvaluateWithInitializer(VM vm)
@@ -78,7 +78,7 @@ internal sealed class VarStatement : INode
         if (putResult.IsAbruptCompletion()) return putResult;
 
         // 6. Return EMPTY.
-        return Completion.NormalCompletion(vm.Empty);
+        return Completion.NormalCompletion(Empty.The);
     }
 
     public string Identifier { get; }

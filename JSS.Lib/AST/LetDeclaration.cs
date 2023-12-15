@@ -41,11 +41,11 @@ internal sealed class LetDeclaration : Declaration
 
         // 2. Perform ! InitializeReferencedBinding(lhs, undefined).
         var asReference = (lhs.Value as Reference)!;
-        var initializationResult = asReference.InitializeReferencedBinding(vm, vm.Undefined);
+        var initializationResult = asReference.InitializeReferencedBinding(Undefined.The);
         Debug.Assert(initializationResult.IsNormalCompletion());
 
         // 3. Return EMPTY.
-        return Completion.NormalCompletion(vm.Empty);
+        return Completion.NormalCompletion(Empty.The);
     }
 
     private Completion EvaluateWithInitializer(VM vm)
@@ -69,11 +69,11 @@ internal sealed class LetDeclaration : Declaration
 
         // 5. Perform ! InitializeReferencedBinding(lhs, value).
         var asReference = (lhs.Value as Reference)!;
-        var initializationResult = asReference.InitializeReferencedBinding(vm, value.Value);
+        var initializationResult = asReference.InitializeReferencedBinding(value.Value);
         Debug.Assert(initializationResult.IsNormalCompletion());
 
         // 6. Return EMPTY.
-        return Completion.NormalCompletion(vm.Empty);
+        return Completion.NormalCompletion(Empty.The);
     }
 
     public string Identifier { get; }

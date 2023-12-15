@@ -35,7 +35,7 @@ internal class Reference : Value
     }
 
     // 6.2.5.8 InitializeReferencedBinding ( V, W ), https://tc39.es/ecma262/#sec-initializereferencedbinding
-    public Completion InitializeReferencedBinding(VM vm, Value W)
+    public Completion InitializeReferencedBinding(Value W)
     {
         // 1. Assert: IsUnresolvableReference(V) is false.
         Debug.Assert(!IsUnresolvableReference());
@@ -46,7 +46,7 @@ internal class Reference : Value
         Debug.Assert(Base is not null);
 
         // 4. Return ? base.InitializeBinding(V.[[ReferencedName]], W).
-        return Base.InitializeBinding(vm, ReferencedName, W);
+        return Base.InitializeBinding(ReferencedName, W);
     }
 
     // FIXME: Base can have a ECMAScript language value

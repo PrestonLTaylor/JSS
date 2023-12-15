@@ -19,7 +19,7 @@ internal sealed class BreakStatement : INode
         var label = Label is not null ? Label.Name : "";
 
         // 2. Return Completion Record { [[Type]]: BREAK, [[Value]]: EMPTY, [[Target]]: label }.
-        return Completion.BreakCompletion(vm.Empty, label);
+        return Completion.BreakCompletion(Empty.The, label);
     }
 
     public Identifier? Label { get; }

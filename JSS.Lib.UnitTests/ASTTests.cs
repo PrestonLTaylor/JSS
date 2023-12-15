@@ -39,10 +39,10 @@ internal sealed class ASTTests
         CreateAdditionTestCase(1, 0, 1),
 
         // Tests for an empty statement
-        new object[] { ";", Completion.NormalCompletion(new Undefined()) },
+        new object[] { ";", Completion.NormalCompletion(Undefined.The) },
 
         // Tests for a block
-        new object[] { "{ }", Completion.NormalCompletion(new Undefined()) },
+        new object[] { "{ }", Completion.NormalCompletion(Undefined.The) },
         new object[] { "{ true }", Completion.NormalCompletion(new Boolean(true)) },
         new object[] { "{ 1 }", Completion.NormalCompletion(new Number(1)) },
         new object[] { $"{{ {EscapeString("string")} }}", Completion.NormalCompletion(new String("string")) },
@@ -167,14 +167,14 @@ internal sealed class ASTTests
         CreateStrictInequalTestCase("1", "1", false),
 
         // Tests for Return
-        CreateReturnTestCase("null", new Null()),
+        CreateReturnTestCase("null", Null.The),
         CreateReturnTestCase("false", new Boolean(false)),
         CreateReturnTestCase("true", new Boolean(true)),
         CreateReturnTestCase("1", new Number(1)),
         CreateReturnTestCase(EscapeString("1"), new String("1")),
 
         // Tests for Throw
-        CreateThrowTestCase("null", new Null()),
+        CreateThrowTestCase("null", Null.The),
         CreateThrowTestCase("false", new Boolean(false)),
         CreateThrowTestCase("true", new Boolean(true)),
         CreateThrowTestCase("1", new Number(1)),
@@ -209,26 +209,26 @@ internal sealed class ASTTests
 
         // FIXME: More iteration test cases when we have variables
         // Tests for DoWhileLoop
-        CreateNormalDoWhileTestCase("false", "null", new Null()),
+        CreateNormalDoWhileTestCase("false", "null", Null.The),
         CreateNormalDoWhileTestCase("false", "false", new Boolean(false)),
         CreateNormalDoWhileTestCase("false", "1", new Number(1)),
         CreateNormalDoWhileTestCase("false", EscapeString("a"), new String("a")),
-        CreateNormalDoWhileTestCase("false", "continue", new Undefined()),
-        CreateBreakDoWhileTestCase("false", "break", new Undefined()),
-        CreateReturnDoWhileTestCase("false", "return null", new Null()),
-        CreateThrowDoWhileTestCase("false", "throw null", new Null()),
+        CreateNormalDoWhileTestCase("false", "continue", Undefined.The),
+        CreateBreakDoWhileTestCase("false", "break", Undefined.The),
+        CreateReturnDoWhileTestCase("false", "return null", Null.The),
+        CreateThrowDoWhileTestCase("false", "throw null", Null.The),
 
         // Tests for WhileLoop
-        CreateWhileTestCase("false", "null", new Undefined()),
-        CreateWhileTestCase("false", "false", new Undefined()),
-        CreateWhileTestCase("false", "1", new Undefined()),
-        CreateWhileTestCase("false", EscapeString("a"), new Undefined()),
+        CreateWhileTestCase("false", "null", Undefined.The),
+        CreateWhileTestCase("false", "false", Undefined.The),
+        CreateWhileTestCase("false", "1", Undefined.The),
+        CreateWhileTestCase("false", EscapeString("a"), Undefined.The),
 
         // Tests for ForLoop with Initialization Expression
-        CreateForTestCase("", "false", "", "null", new Undefined()),
-        CreateForTestCase("", "false", "", "false", new Undefined()),
-        CreateForTestCase("", "false", "", "1", new Undefined()),
-        CreateForTestCase("", "false", "", EscapeString("a"), new Undefined()),
+        CreateForTestCase("", "false", "", "null", Undefined.The),
+        CreateForTestCase("", "false", "", "false", Undefined.The),
+        CreateForTestCase("", "false", "", "1", Undefined.The),
+        CreateForTestCase("", "false", "", EscapeString("a"), Undefined.The),
 
         // Tests for BitwiseNOT
         CreateBitwiseNOTTestCase(1, -2),
@@ -241,21 +241,21 @@ internal sealed class ASTTests
         CreateThrowingIdentifierTestCase("truey"),
 
         // Tests for VarStatement
-        CreateVarStatementTestCase("a", "null", new Null()),
+        CreateVarStatementTestCase("a", "null", Null.The),
         CreateVarStatementTestCase("a", "false", new Boolean(false)),
         CreateVarStatementTestCase("a", "true", new Boolean(true)),
         CreateVarStatementTestCase("a", "1", new Number(1)),
         CreateVarStatementTestCase("a", EscapeString("1"), new String("1")),
 
         // Tests for BasicAssignmentExpression
-        CreateBasicAssignmentExpressionTestCase("a", "null", new Null()),
+        CreateBasicAssignmentExpressionTestCase("a", "null", Null.The),
         CreateBasicAssignmentExpressionTestCase("a", "false", new Boolean(false)),
         CreateBasicAssignmentExpressionTestCase("a", "true", new Boolean(true)),
         CreateBasicAssignmentExpressionTestCase("a", "1", new Number(1)),
         CreateBasicAssignmentExpressionTestCase("a", EscapeString("1"), new String("1")),
 
         // Tests for LogicalAndAssignmentExpression
-        CreateLogicalAndAssignmentExpressionTestCase("a", "true", "null", new Null()),
+        CreateLogicalAndAssignmentExpressionTestCase("a", "true", "null", Null.The),
         CreateLogicalAndAssignmentExpressionTestCase("a", "true", "false", new Boolean(false)),
         CreateLogicalAndAssignmentExpressionTestCase("a", "true", "true", new Boolean(true)),
         CreateLogicalAndAssignmentExpressionTestCase("a", "true", "1", new Number(1)),
@@ -267,7 +267,7 @@ internal sealed class ASTTests
         CreateLogicalAndAssignmentExpressionTestCase("a", "false", EscapeString("1"), new Boolean(false)),
 
         // Tests for LogicalOrAssignmentExpression
-        CreateLogicalOrAssignmentExpressionTestCase("a", "false", "null", new Null()),
+        CreateLogicalOrAssignmentExpressionTestCase("a", "false", "null", Null.The),
         CreateLogicalOrAssignmentExpressionTestCase("a", "false", "false", new Boolean(false)),
         CreateLogicalOrAssignmentExpressionTestCase("a", "false", "true", new Boolean(true)),
         CreateLogicalOrAssignmentExpressionTestCase("a", "false", "1", new Number(1)),
@@ -279,7 +279,7 @@ internal sealed class ASTTests
         CreateLogicalOrAssignmentExpressionTestCase("a", "true", EscapeString("1"), new Boolean(true)),
 
         // Tests for LogicalOrAssignmentExpression
-        CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "null", new Null()),
+        CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "null", Null.The),
         CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "false", new Boolean(false)),
         CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "true", new Boolean(true)),
         CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "1", new Number(1)),
@@ -306,9 +306,9 @@ internal sealed class ASTTests
         CreateBinaryOpAssignmentExpressionTestCase("a", "2", "|", "3", new Number(3)),
 
         // Tests for empty TryStatement blocks
-        CreateTryStatementTestCase("", "", null, new Undefined(), CompletionType.Normal),
-        CreateTryStatementTestCase("", null, "", new Undefined(), CompletionType.Normal),
-        CreateTryStatementTestCase("", "", "", new Undefined(), CompletionType.Normal),
+        CreateTryStatementTestCase("", "", null, Undefined.The, CompletionType.Normal),
+        CreateTryStatementTestCase("", null, "", Undefined.The, CompletionType.Normal),
+        CreateTryStatementTestCase("", "", "", Undefined.The, CompletionType.Normal),
 
         // Tests for TryStatements with only catch 
         CreateTryStatementTestCase("1", "2", null, new Number(1), CompletionType.Normal),
@@ -363,7 +363,7 @@ internal sealed class ASTTests
         CreatePrefixIncrementExpressionTestCase(EscapeString("1"), new Number(2)),
 
         // Tests for VarStatement
-        CreateLetDeclarationTestCase("a", "null", new Null()),
+        CreateLetDeclarationTestCase("a", "null", Null.The),
         CreateLetDeclarationTestCase("a", "false", new Boolean(false)),
         CreateLetDeclarationTestCase("a", "true", new Boolean(true)),
         CreateLetDeclarationTestCase("a", "1", new Number(1)),
@@ -462,7 +462,7 @@ internal sealed class ASTTests
 
     static private object[] CreateVoidTestCase(string value)
     {
-        return new object[] { $"void {value}", Completion.NormalCompletion(new Undefined()) };
+        return new object[] { $"void {value}", Completion.NormalCompletion(Undefined.The) };
     }
 
     static private object[] CreateTypeOfTestCase(string value, string expected)
@@ -615,8 +615,8 @@ internal sealed class ASTTests
         // Assert
         Assert.That(completion.IsNormalCompletion(), Is.True);
 
-        // NOTE: This assert makes sure we use the vm's global null value
-        Assert.That(completion.Value, Is.SameAs(script.VM.Null));
+        // NOTE: This assert makes sure we use the global null value
+        Assert.That(completion.Value, Is.SameAs(Null.The));
     }
 
     [Test]
@@ -632,7 +632,7 @@ internal sealed class ASTTests
 
         // Assert
         Assert.That(completion.IsBreakCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(vm.Empty));
+        Assert.That(completion.Value, Is.EqualTo(Empty.The));
         Assert.That(completion.Target, Is.Empty);
     }
 
@@ -651,7 +651,7 @@ internal sealed class ASTTests
 
         // Assert
         Assert.That(completion.IsBreakCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(vm.Empty));
+        Assert.That(completion.Value, Is.EqualTo(Empty.The));
         Assert.That(completion.Target, Is.EqualTo(expectedTarget));
     }
 
@@ -668,7 +668,7 @@ internal sealed class ASTTests
 
         // Assert
         Assert.That(completion.IsContinueCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(vm.Empty));
+        Assert.That(completion.Value, Is.EqualTo(Empty.The));
         Assert.That(completion.Target, Is.Empty);
     }
 
@@ -687,7 +687,7 @@ internal sealed class ASTTests
 
         // Assert
         Assert.That(completion.IsContinueCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(vm.Empty));
+        Assert.That(completion.Value, Is.EqualTo(Empty.The));
         Assert.That(completion.Target, Is.EqualTo(expectedTarget));
     }
 

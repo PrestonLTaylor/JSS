@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.Execution;
+using JSS.Lib.AST.Values;
 
 namespace JSS.Lib.AST;
 
@@ -17,7 +18,7 @@ internal sealed class ContinueStatement : INode
         var label = Label is not null ? Label.Name : "";
 
         // 2. Return Completion Record { [[Type]]: CONTINUE, [[Value]]: EMPTY, [[Target]]: label }.
-        return Completion.ContinueCompletion(vm.Empty, label);
+        return Completion.ContinueCompletion(Empty.The, label);
     }
 
     public Identifier? Label { get; }

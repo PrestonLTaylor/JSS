@@ -21,7 +21,7 @@ internal sealed class UnaryPlusExpression : IExpression
         var exprValue = expr.Value.GetValue();
         if (exprValue.IsAbruptCompletion()) return exprValue;
 
-        return exprValue.Value.ToNumber(vm);
+        return exprValue.Value.ToNumber();
     }
 
     public IExpression Expression { get; }

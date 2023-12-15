@@ -2,7 +2,7 @@
 
 internal sealed class Undefined : Object 
 {
-    public Undefined() : base(null)
+    private Undefined() : base(null)
     {
     }
 
@@ -20,6 +20,15 @@ internal sealed class Undefined : Object
     {
         return undefinedGuid.GetHashCode();
     }
+
+    static public Undefined The
+    {
+        get
+        {
+            return _undefined;
+        }
+    }
+    static readonly private Undefined _undefined = new();
 
     // NOTE: This is a hack for making sure all undefineds have the same hash code
     static private readonly Guid undefinedGuid = Guid.NewGuid();

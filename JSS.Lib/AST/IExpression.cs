@@ -23,7 +23,7 @@ internal enum BinaryOpType
 internal abstract class IExpression : INode
 {
     // 13.15.3 ApplyStringOrNumericBinaryOperator ( lval, opText, rval ), https://tc39.es/ecma262/#sec-applystringornumericbinaryoperator
-    static public Completion ApplyStringOrNumericBinaryOperator(VM vm, Value lval, BinaryOpType op, Value rval)
+    static public Completion ApplyStringOrNumericBinaryOperator(Value lval, BinaryOpType op, Value rval)
     {
         // 1. If opText is +, then
         if (op == BinaryOpType.Add)
@@ -64,11 +64,11 @@ internal abstract class IExpression : INode
         // 2. NOTE: At this point, it must be a numeric operation.
 
         // 3. Let lnum be ? ToNumeric(lval).
-        var lnum = lval.ToNumeric(vm);
+        var lnum = lval.ToNumeric();
         if (lnum.IsAbruptCompletion()) return lnum;
 
         // 4. Let rnum be ? ToNumeric(rval).
-        var rnum = rval.ToNumeric(vm);
+        var rnum = rval.ToNumeric();
         if (rnum.IsAbruptCompletion()) return rnum;
 
         // NOTE: This only happens when one side is a BigInt and the other is a Number
@@ -122,6 +122,6 @@ internal abstract class IExpression : INode
         if (rval.IsAbruptCompletion()) return rval;
 
         // 5. Return ? ApplyStringOrNumericBinaryOperator(lval, opText, rval).
-        return ApplyStringOrNumericBinaryOperator(vm, lval.Value, op, rval.Value);
+        return ApplyStringOrNumericBinaryOperator(lval.Value, op, rval.Value);
     }
 }

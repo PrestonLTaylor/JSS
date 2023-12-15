@@ -264,7 +264,7 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.16 NumberBitwiseOp ( op, x, y ), https://tc39.es/ecma262/#sec-numberbitwiseop
-    static public Number NumberBitwiseOp(BitwiseOp op,  Number x, Number y)
+    static public Number NumberBitwiseOp(BitwiseOp op, Number x, Number y)
     {
         // FIXME: 1. Let lnum be !ToInt32(x).
         // FIXME: 2. Let rnum be !ToInt32(y).
@@ -310,6 +310,15 @@ internal sealed class Number : Value
         // 1. Return NumberBitwiseOp(|, x, y).
         return NumberBitwiseOp(BitwiseOp.OR, x, y);
     }
+
+    static public Number NaN
+    {
+        get
+        {
+            return _nan;
+        }
+    }
+    static readonly private Number _nan = new(double.NaN);
 
     public double Value { get; }
 }

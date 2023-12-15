@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.Execution;
+using JSS.Lib.AST.Values;
 
 namespace JSS.Lib.AST;
 
@@ -9,6 +10,6 @@ internal sealed class EmptyStatement : INode
     override public Completion Evaluate(VM vm)
     {
         // 1. Return EMPTY.
-        return Completion.NormalCompletion(vm.Empty);
+        return Completion.NormalCompletion(Empty.The);
     }
 }

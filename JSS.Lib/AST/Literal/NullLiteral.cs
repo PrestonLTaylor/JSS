@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.Execution;
+using JSS.Lib.AST.Values;
 
 namespace JSS.Lib.AST.Literal;
 
@@ -9,6 +10,6 @@ internal sealed class NullLiteral : IExpression
     override public Completion Evaluate(VM vm)
     {
         // 1. Return null.
-        return Completion.NormalCompletion(vm.Null);
+        return Completion.NormalCompletion(Null.The);
     }
 }

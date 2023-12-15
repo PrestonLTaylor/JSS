@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.Execution;
+using JSS.Lib.AST.Values;
 
 namespace JSS.Lib.AST;
 
@@ -15,7 +16,7 @@ internal sealed class ReturnStatement : INode
     {
         if (ReturnExpression is null)
         {
-            return EvaluateWithNoExpression(vm);
+            return EvaluateWithNoExpression();
         }
         else
         {
@@ -23,10 +24,10 @@ internal sealed class ReturnStatement : INode
         }
     }
 
-    private Completion EvaluateWithNoExpression(VM vm)
+    private Completion EvaluateWithNoExpression()
     {
         // 1. Return Completion Record { [[Type]]: RETURN, [[Value]]: undefined, [[Target]]: EMPTY }.
-        return Completion.ReturnCompletion(vm.Undefined);
+        return Completion.ReturnCompletion(Undefined.The);
     }
 
     private Completion EvaluateWithExpression(VM vm)

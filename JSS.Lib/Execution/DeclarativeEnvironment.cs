@@ -34,11 +34,10 @@ internal sealed class DeclarativeEnvironment : Environment
 
         // 2. Create a mutable binding in envRec for N and record that it is FIXME: uninitialized.
         // FIXME: If D is true, record that the newly created binding may be deleted by a subsequent DeleteBinding call.
-        _identifierToBinding.Add(N, new Binding(new Undefined(), true));
+        _identifierToBinding.Add(N, new Binding(Undefined.The, true));
 
-        // FIXME: new Empty()
         // 3. Return unused.
-        return Completion.NormalCompletion(new Empty());
+        return Completion.NormalCompletion(Empty.The);
     }
 
     // 9.1.1.1.3 CreateImmutableBinding ( N, S ), https://tc39.es/ecma262/#sec-declarative-environment-records-createimmutablebinding-n-s
@@ -49,15 +48,14 @@ internal sealed class DeclarativeEnvironment : Environment
 
         // 2. Create an immutable binding in envRec for N and record that it is FIXME: uninitialized.
         // FIXME: If S is true, record that the newly created binding is a strict binding.
-        _identifierToBinding.Add(N, new Binding(new Undefined(), false));
+        _identifierToBinding.Add(N, new Binding(Undefined.The, false));
 
-        // FIXME: new Empty()
         // 3. Return unused.
-        return Completion.NormalCompletion(new Empty());
+        return Completion.NormalCompletion(Empty.The);
     }
 
     // 9.1.1.1.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-declarative-environment-records-initializebinding-n-v
-    public override Completion InitializeBinding(VM vm, string N, Value V)
+    public override Completion InitializeBinding(string N, Value V)
     {
         // FIXME: 1. Assert: envRec must have an uninitialized binding for N.
 
@@ -69,11 +67,11 @@ internal sealed class DeclarativeEnvironment : Environment
         // FIXME: 3. Record that the binding for N in envRec has been initialized.
 
         // 4. Return unused.
-        return Completion.NormalCompletion(vm.Empty);
+        return Completion.NormalCompletion(Empty.The);
     }
 
     // 9.1.1.1.5 SetMutableBinding ( N, V, S ), https://tc39.es/ecma262/#sec-declarative-environment-records-getbindingvalue-n-s
-    public override Completion SetMutableBinding(VM vm, string N, Value V, bool S)
+    public override Completion SetMutableBinding(string N, Value V, bool S)
     {
         // 1. If envRec does not have a binding for N, then
         if (!_identifierToBinding.ContainsKey(N))
@@ -88,7 +86,7 @@ internal sealed class DeclarativeEnvironment : Environment
             // FIXME: c. Perform ! envRec.InitializeBinding(N, V).
 
             // d. Return UNUSED.
-            return Completion.NormalCompletion(vm.Empty);
+            return Completion.NormalCompletion(Empty.The);
         }
 
         // FIXME: 2. If the binding for N in envRec is a strict binding, set S to true.
@@ -106,7 +104,7 @@ internal sealed class DeclarativeEnvironment : Environment
         // FIXME: b. If S is true, throw a TypeError exception.
 
         // 6. Return UNUSED.
-        return Completion.NormalCompletion(vm.Empty);
+        return Completion.NormalCompletion(Empty.The);
     }
 
     // 9.1.1.1.6 GetBindingValue ( N, S ), https://tc39.es/ecma262/#sec-declarative-environment-records-getbindingvalue-n-s

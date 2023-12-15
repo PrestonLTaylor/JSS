@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.Execution;
+using JSS.Lib.AST.Values;
 
 namespace JSS.Lib.AST;
 
@@ -22,7 +23,7 @@ internal sealed class VoidExpression : IExpression
         if (value.IsAbruptCompletion()) return value;
 
         // 3. Return undefined.
-        return Completion.NormalCompletion(vm.Undefined);
+        return Completion.NormalCompletion(Undefined.The);
     }
 
     public IExpression Expression { get; }
