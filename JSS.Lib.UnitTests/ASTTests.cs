@@ -188,6 +188,7 @@ internal sealed class ASTTests
         CreateVoidTestCase(EscapeString("1")),
 
         // Tests for typeof
+        CreateTypeOfTestCase("a", "undefined"),
         CreateTypeOfTestCase("null", "object"),
         CreateTypeOfTestCase(EscapeString("a"), "string"),
         CreateTypeOfTestCase("true", "boolean"),

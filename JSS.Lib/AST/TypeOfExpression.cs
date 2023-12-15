@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.Execution;
+using JSS.Lib.AST.Values;
 using String = JSS.Lib.AST.Values.String;
 using Boolean = JSS.Lib.AST.Values.Boolean;
 using System.Diagnostics;
@@ -20,8 +21,16 @@ internal sealed class TypeOfExpression : IExpression
         var val = Expression.Evaluate(vm);
         if (val.IsAbruptCompletion()) return val;
 
-        // FIXME: 2. If val is a Reference Record, then
-        // FIXME: a. If IsUnresolvableReference(val) is true, return "undefined".
+        // 2. If val is a Reference Record, then
+        if (val.Value.IsReference())
+        {
+            // a. If IsUnresolvableReference(val) is true, return "undefined".
+            var asReference = (val.Value as Reference)!;
+            if (asReference.IsUnresolvableReference())
+            {
+                return Completion.NormalCompletion(new String("undefined"));
+            }
+        }
 
         // 3. Set val to ? GetValue(val).
         val = val.Value.GetValue();
