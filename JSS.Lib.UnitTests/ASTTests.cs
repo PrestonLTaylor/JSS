@@ -363,12 +363,19 @@ internal sealed class ASTTests
         CreatePrefixIncrementExpressionTestCase(EscapeString("a"), new Number(double.NaN)),
         CreatePrefixIncrementExpressionTestCase(EscapeString("1"), new Number(2)),
 
-        // Tests for VarStatement
+        // Tests for LetDeclarations
         CreateLetDeclarationTestCase("a", "null", Null.The),
         CreateLetDeclarationTestCase("a", "false", new Boolean(false)),
         CreateLetDeclarationTestCase("a", "true", new Boolean(true)),
         CreateLetDeclarationTestCase("a", "1", new Number(1)),
         CreateLetDeclarationTestCase("a", EscapeString("1"), new String("1")),
+        
+        // Tests for ConstDeclarations
+        CreateConstDeclarationTestCase("a", "null", Null.The),
+        CreateConstDeclarationTestCase("a", "false", new Boolean(false)),
+        CreateConstDeclarationTestCase("a", "true", new Boolean(true)),
+        CreateConstDeclarationTestCase("a", "1", new Number(1)),
+        CreateConstDeclarationTestCase("a", EscapeString("1"), new String("1")),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -589,6 +596,11 @@ internal sealed class ASTTests
     static private object[] CreateLetDeclarationTestCase(string identifier, string initializer, Value expected)
     {
         return new object[] { $"let {identifier} = {initializer}; {identifier}", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateConstDeclarationTestCase(string identifier, string initializer, Value expected)
+    {
+        return new object[] { $"const {identifier} = {initializer}; {identifier}", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
@@ -948,6 +960,36 @@ internal sealed class ASTTests
         // Assert
         Assert.That(completion.IsThrowCompletion(), Is.True);
         Assert.That(completion.Value, Is.EqualTo(new String($"{identifier} is not defined")));
+    }
+
+    [Test]
+    public void ConstDeclarations_InsideBlock_DontEscapeToOuterScope()
+    {
+        // Arrange
+        const string identifier = "a";
+        var script = ParseScript($"{{ const {identifier} = 0 }} a");
+
+        // Act
+        var completion = script.ScriptEvaluation();
+
+        // Assert
+        Assert.That(completion.IsThrowCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(new String($"{identifier} is not defined")));
+    }
+
+    [Test]
+    public void AssignmentToConstDeclaration_ReturnsThrowCompletion()
+    {
+        // Arrange
+        const string identifier = "a";
+        var script = ParseScript($"const {identifier} = 0; a = 1");
+
+        // Act
+        var completion = script.ScriptEvaluation();
+
+        // Assert
+        Assert.That(completion.IsThrowCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(new String($"invalid assignment to const {identifier}")));
     }
 
     static private string EscapeString(string toEscape, char quote = '"')
