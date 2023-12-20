@@ -4,6 +4,7 @@ using JSS.Lib.Execution;
 using Boolean = JSS.Lib.AST.Values.Boolean;
 using String = JSS.Lib.AST.Values.String;
 using JSS.Lib.AST;
+using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace JSS.Lib.UnitTests;
 
@@ -381,6 +382,15 @@ internal sealed class ASTTests
         CreateFunctionDeclarationTestCase(""),
         CreateFunctionDeclarationTestCase("return false"),
         CreateFunctionDeclarationTestCase("throw false"),
+
+        // Tests for IfStatement
+        CreateIfStatementTestCase("false", "1", null, Undefined.The),
+        CreateIfStatementTestCase("true", "1", null, new Number(1)),
+        CreateIfStatementTestCase("true", ";", null, Undefined.The),
+        CreateIfStatementTestCase("false", "1", "2", new Number(2)),
+        CreateIfStatementTestCase("false", "1", ";", Undefined.The),
+        CreateIfStatementTestCase("true", "1", "2", new Number(1)),
+        CreateIfStatementTestCase("true", ";", "2", Undefined.The),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -611,6 +621,17 @@ internal sealed class ASTTests
     static private object[] CreateFunctionDeclarationTestCase(string functionCode)
     {
         return new object[] { $"function a() {{ {functionCode} }}", Completion.NormalCompletion(Undefined.The) };
+    }
+
+    static private object[] CreateIfStatementTestCase(string expression, string trueStatement, string? falseStatement, Value expected)
+    {
+        string testCode = $"if ({expression}) {{ {trueStatement} }} ";
+        if (falseStatement is not null)
+        {
+            testCode += $"else {{ {falseStatement} }}";
+        }
+
+        return new object[] { testCode, Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]

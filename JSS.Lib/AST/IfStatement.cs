@@ -1,4 +1,7 @@
-﻿namespace JSS.Lib.AST;
+﻿using JSS.Lib.AST.Values;
+using JSS.Lib.Execution;
+
+namespace JSS.Lib.AST;
 
 // 14.6 The if Statement, https://tc39.es/ecma262/#sec-if-statement
 internal sealed class IfStatement : INode
@@ -42,7 +45,79 @@ internal sealed class IfStatement : INode
         return declarations;
     }
 
-    // FIXME: 14.6.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-if-statement-runtime-semantics-evaluation
+    // 14.6.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-if-statement-runtime-semantics-evaluation
+    override public Completion Evaluate(VM vm)
+    {
+        if (ElseCaseStatement is null)
+        {
+            return EvaluateWithoutElse(vm);
+        }
+        else
+        {
+            return EvaluateWithElse(vm);
+        }
+    }
+
+    private Completion EvaluateWithoutElse(VM vm)
+    {
+        // 1. Let exprRef be ? Evaluation of Expression.
+        var exprRef = IfExpression.Evaluate(vm);
+        if (exprRef.IsAbruptCompletion()) return exprRef;
+
+        // 2. Let exprValue be ToBoolean(? GetValue(exprRef)).
+        var getResult = exprRef.Value.GetValue();
+        if (getResult.IsAbruptCompletion()) return getResult;
+
+        var exprValue = getResult.Value.ToBoolean();
+
+        // 3. If exprValue is false, then
+        if (!exprValue.Value)
+        {
+            // a. Return undefined.
+            return Completion.NormalCompletion(Undefined.The);
+        }
+        // 4. Else,
+        else
+        {
+            // a. Let stmtCompletion be Completion(Evaluation of Statement).
+            var stmtCompletion = IfCaseStatement.Evaluate(vm);
+
+            // b. Return ? UpdateEmpty(stmtCompletion, undefined).
+            stmtCompletion.UpdateEmpty(Undefined.The);
+            return stmtCompletion;
+        }
+    }
+
+    private Completion EvaluateWithElse(VM vm)
+    {
+        // 1. Let exprRef be ? Evaluation of Expression.
+        var exprRef = IfExpression.Evaluate(vm);
+        if (exprRef.IsAbruptCompletion()) return exprRef;
+
+        // 2. Let exprValue be ToBoolean(? GetValue(exprRef)).
+        var getResult = exprRef.Value.GetValue();
+        if (getResult.IsAbruptCompletion()) return getResult;
+
+        var exprValue = getResult.Value.ToBoolean();
+
+        // 3. If exprValue is true, then
+        Completion stmtCompletion;
+        if (exprValue.Value)
+        {
+            // a. Let stmtCompletion be Completion(Evaluation of the first Statement).
+            stmtCompletion = IfCaseStatement.Evaluate(vm);
+        }
+        // 4. Else,
+        else
+        {
+            // a. Let stmtCompletion be Completion(Evaluation of the second Statement).
+            stmtCompletion = ElseCaseStatement!.Evaluate(vm);
+        }
+
+        // 5. Return ? UpdateEmpty(stmtCompletion, undefined).
+        stmtCompletion.UpdateEmpty(Undefined.The);
+        return stmtCompletion;
+    }
 
     public IExpression IfExpression { get; }
     public INode IfCaseStatement { get; }
