@@ -376,6 +376,11 @@ internal sealed class ASTTests
         CreateConstDeclarationTestCase("a", "true", new Boolean(true)),
         CreateConstDeclarationTestCase("a", "1", new Number(1)),
         CreateConstDeclarationTestCase("a", EscapeString("1"), new String("1")),
+
+        // Tests for FunctionDeclarations
+        CreateFunctionDeclarationTestCase(""),
+        CreateFunctionDeclarationTestCase("return false"),
+        CreateFunctionDeclarationTestCase("throw false"),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -601,6 +606,11 @@ internal sealed class ASTTests
     static private object[] CreateConstDeclarationTestCase(string identifier, string initializer, Value expected)
     {
         return new object[] { $"const {identifier} = {initializer}; {identifier}", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateFunctionDeclarationTestCase(string functionCode)
+    {
+        return new object[] { $"function a() {{ {functionCode} }}", Completion.NormalCompletion(Undefined.The) };
     }
 
     [TestCaseSource(nameof(astTestCases))]

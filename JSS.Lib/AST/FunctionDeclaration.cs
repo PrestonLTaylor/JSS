@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
+using JSS.Lib.Execution;
 using Environment = JSS.Lib.Execution.Environment;
 
 namespace JSS.Lib.AST;
@@ -42,7 +43,12 @@ internal sealed class FunctionDeclaration : Declaration
         return F;
     }
 
-    // FIXME: 15.2.6 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-function-definitions-runtime-semantics-evaluation
+    // 15.2.6 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-function-definitions-runtime-semantics-evaluation
+    override public Completion Evaluate(VM vm)
+    {
+        // 1. Return EMPTY.
+        return Completion.NormalCompletion(Empty.The);
+    }
 
     public string Identifier { get; }
     public IReadOnlyList<Identifier> Parameters { get; }
