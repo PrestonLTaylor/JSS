@@ -32,6 +32,8 @@ internal abstract class Value
     virtual public bool IsObject() { return false; }
     virtual public bool IsFunction() { return false; }
 
+    virtual public bool HasInternalCall() { return false; }
+
     abstract public ValueType Type();
 
     // 6.2.5.5 GetValue ( V ), https://tc39.es/ecma262/#sec-getvalue
@@ -292,6 +294,19 @@ internal abstract class Value
         var asString = key.Value.ToStringJS();
         Debug.Assert(asString.IsNormalCompletion());
         return asString;
+    }
+
+    // 7.2.3 IsCallable ( argument ), https://tc39.es/ecma262/#sec-iscallable
+    public bool IsCallable()
+    {
+        // 1. If argument is not an Object, return false.
+        if (!IsObject()) return false;
+
+        // 2. If argument has a [[Call]] internal method, return true.
+        if (HasInternalCall()) return true;
+
+        // 3. Return false.
+        return false;
     }
 
     // 7.2.12 SameValueNonNumber( x, y ), https://tc39.es/ecma262/#sec-samevaluenonnumber
