@@ -274,6 +274,26 @@ internal abstract class Value
         throw new NotImplementedException();
     }
 
+    // 7.1.19 ToPropertyKey ( argument ), https://tc39.es/ecma262/#sec-topropertykey
+    public Completion ToPropertyKey()
+    {
+        // 1. Let key be ? ToPrimitive(argument, string).
+        var key = ToPrimitive();
+        if (key.IsAbruptCompletion()) return key;
+
+        // 2. If key is a Symbol, then
+        if (key.Value.IsSymbol())
+        {
+            // a. Return key.
+            return key;
+        }
+
+        // 3. Return ! ToString(key).
+        var asString = key.Value.ToStringJS();
+        Debug.Assert(asString.IsNormalCompletion());
+        return asString;
+    }
+
     // 7.2.12 SameValueNonNumber( x, y ), https://tc39.es/ecma262/#sec-samevaluenonnumber
     static public Boolean SameValueNonNumber(Value x, Value y)
     {
