@@ -3,8 +3,8 @@ using JSS.Lib.AST.Literal;
 using JSS.Lib.Execution;
 using Boolean = JSS.Lib.AST.Values.Boolean;
 using String = JSS.Lib.AST.Values.String;
+using ValueType = JSS.Lib.AST.Values.ValueType;
 using JSS.Lib.AST;
-using static System.Runtime.CompilerServices.RuntimeHelpers;
 
 namespace JSS.Lib.UnitTests;
 
@@ -391,6 +391,13 @@ internal sealed class ASTTests
         CreateIfStatementTestCase("false", "1", ";", Undefined.The),
         CreateIfStatementTestCase("true", "1", "2", new Number(1)),
         CreateIfStatementTestCase("true", ";", "2", Undefined.The),
+
+        // FIXME: Add more tests for InExpressions when we have object literals
+        // Tests for InExpressions
+        CreateThrowingInExpressionTestCase("1", "null", ValueType.Null),
+        CreateThrowingInExpressionTestCase("1", "2", ValueType.Number),
+        CreateThrowingInExpressionTestCase("1", EscapeString("2"), ValueType.String),
+        CreateThrowingInExpressionTestCase("1", "true", ValueType.Boolean),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -632,6 +639,12 @@ internal sealed class ASTTests
         }
 
         return new object[] { testCode, Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateThrowingInExpressionTestCase(string lhs, string rhs, ValueType rhsType)
+    {
+        // FIXME: ThrowHelper so we dont have string literals spewed everywhere
+        return new object[] { $"{lhs} in {rhs}", Completion.ThrowCompletion(new String($"rhs of 'in' should be an Object, but got {rhsType}")) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
