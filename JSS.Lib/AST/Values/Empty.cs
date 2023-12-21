@@ -1,6 +1,6 @@
 ﻿namespace JSS.Lib.AST.Values;
 
-internal class Empty : Value
+internal sealed class Empty : Value
 {
     private Empty() { }
 
