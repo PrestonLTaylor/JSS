@@ -90,6 +90,23 @@ internal class Object : Value
         return Completion.NormalCompletion(new Boolean(!desc.Value.IsUndefined()));
     }
 
+    // 7.3.14 Call ( F, V [ , argumentsList ] )
+    static public Completion Call(VM vm, Value F, Value V, Value? argumentsList = null)
+    {
+        // 1. If argumentsList is not present, set argumentsList to a new empty List.
+        argumentsList ??= new List();
+
+        // 2. If IsCallable(F) is false, FIXME: throw a TypeError exception.
+        if (!F.IsCallable())
+        {
+            return Completion.ThrowCompletion(new String("Tried to call a non-callable object"));
+        }
+
+        // 3. Return ? F.[[Call]](V, argumentsList).
+        var asCallable = (F as Callable)!;
+        return asCallable.Call(vm, V, (argumentsList as List)!);
+    }
+
     // 10.1.5 [[GetOwnProperty]] ( P )
     public Completion GetOwnProperty(string P)
     {
