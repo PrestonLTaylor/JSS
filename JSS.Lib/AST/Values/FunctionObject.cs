@@ -1,14 +1,18 @@
-﻿using System.Diagnostics;
+﻿using JSS.Lib.Execution;
+using System.Diagnostics;
+using Environment = JSS.Lib.Execution.Environment;
+using ExecutionContext = JSS.Lib.Execution.ExecutionContext;
 
 namespace JSS.Lib.AST.Values;
 
 // FIXME: Spec links for FunctionObject when FunctionObject is more fleshed out
 internal sealed class FunctionObject : Object
 {
-    public FunctionObject(IReadOnlyList<Identifier> formalParameters, StatementList body) : base(null)
+    public FunctionObject(IReadOnlyList<Identifier> formalParameters, StatementList body, Environment env) : base(null)
     {
         FormalParameters = formalParameters;
         ECMAScriptCode = body;
+        Environment = env;
     }
 
     override public bool IsFunction() { return true; }
@@ -49,4 +53,5 @@ internal sealed class FunctionObject : Object
 
     public IReadOnlyList<Identifier> FormalParameters { get; }
     public StatementList ECMAScriptCode { get; }
+    public Environment Environment { get; }
 }

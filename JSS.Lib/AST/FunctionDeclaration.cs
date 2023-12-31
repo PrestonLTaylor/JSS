@@ -32,7 +32,7 @@ internal sealed class FunctionDeclaration : Declaration
         // FIXME: 2. Let sourceText be the source text matched by FunctionDeclaration.
 
         // FIXME: 3. Let F be OrdinaryFunctionCreate(%Function.prototype%, sourceText, FormalParameters, FunctionBody, non-lexical-this, env, privateEnv).
-        var F = new FunctionObject(Parameters, Body);
+        var F = new FunctionObject(Parameters, Body, env);
 
         // 4. Perform SetFunctionName(F, name).
         F.SetFunctionName(Identifier);
