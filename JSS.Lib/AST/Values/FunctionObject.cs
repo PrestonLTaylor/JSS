@@ -6,7 +6,7 @@ using ExecutionContext = JSS.Lib.Execution.ExecutionContext;
 namespace JSS.Lib.AST.Values;
 
 // FIXME: Spec links for FunctionObject when FunctionObject is more fleshed out
-internal sealed class FunctionObject : Object
+internal sealed class FunctionObject : Callable
 {
     public FunctionObject(IReadOnlyList<Identifier> formalParameters, StatementList body, Environment env) : base(null)
     {
@@ -16,7 +16,6 @@ internal sealed class FunctionObject : Object
     }
 
     override public bool IsFunction() { return true; }
-    public override bool HasInternalCall() { return true; }
     override public ValueType Type() {  return ValueType.Function; }
 
     // 10.2.9 SetFunctionName ( F, name [ , prefix ] ), https://tc39.es/ecma262/#sec-setfunctionname
