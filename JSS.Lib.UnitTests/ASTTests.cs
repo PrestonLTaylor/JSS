@@ -398,6 +398,29 @@ internal sealed class ASTTests
         CreateThrowingInExpressionTestCase("1", "2", ValueType.Number),
         CreateThrowingInExpressionTestCase("1", EscapeString("2"), ValueType.String),
         CreateThrowingInExpressionTestCase("1", "true", ValueType.Boolean),
+
+        // Tests for CallExpression
+        CreateCallExpressionTestCase("null", Undefined.The),
+        CreateCallExpressionTestCase("false", Undefined.The),
+        CreateCallExpressionTestCase("true", Undefined.The),
+        CreateCallExpressionTestCase("1", Undefined.The),
+        CreateCallExpressionTestCase(EscapeString("1"), Undefined.The),
+        CreateCallExpressionTestCase("return null", Null.The),
+        CreateCallExpressionTestCase("return false", new Boolean(false)),
+        CreateCallExpressionTestCase("return true", new Boolean(true)),
+        CreateCallExpressionTestCase("return 1", new Number(1)),
+        CreateCallExpressionTestCase($"return {EscapeString("1")}", new String("1")),
+        CreateThrowingCallExpressionTestCase("throw null", Null.The),
+        CreateThrowingCallExpressionTestCase("throw false", new Boolean(false)),
+        CreateThrowingCallExpressionTestCase("throw true", new Boolean(true)),
+        CreateThrowingCallExpressionTestCase("throw 1", new Number(1)),
+        CreateThrowingCallExpressionTestCase($"throw {EscapeString("1")}", new String("1")),
+        CreateCallExpressionParameterTestCase("", Undefined.The),
+        CreateCallExpressionParameterTestCase("null", Null.The),
+        CreateCallExpressionParameterTestCase("false", new Boolean(false)),
+        CreateCallExpressionParameterTestCase("true", new Boolean(true)),
+        CreateCallExpressionParameterTestCase("1", new Number(1)),
+        CreateCallExpressionParameterTestCase(EscapeString("1"), new String("1")),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -645,6 +668,21 @@ internal sealed class ASTTests
     {
         // FIXME: ThrowHelper so we dont have string literals spewed everywhere
         return new object[] { $"{lhs} in {rhs}", Completion.ThrowCompletion(new String($"rhs of 'in' should be an Object, but got {rhsType}")) };
+    }
+
+    static private object[] CreateCallExpressionTestCase(string functionCode, Value expected)
+    {
+        return new object[] { $"function a() {{ {functionCode} }} a()", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateThrowingCallExpressionTestCase(string functionCode, Value expected)
+    {
+        return new object[] { $"function a() {{ {functionCode} }} a()", Completion.ThrowCompletion(expected) };
+    }
+
+    static private object[] CreateCallExpressionParameterTestCase(string parameterValue, Value expected)
+    {
+        return new object[] { $"function a(param) {{ return param }} a({parameterValue})", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
@@ -1034,6 +1072,36 @@ internal sealed class ASTTests
         // Assert
         Assert.That(completion.IsThrowCompletion(), Is.True);
         Assert.That(completion.Value, Is.EqualTo(new String($"invalid assignment to const {identifier}")));
+    }
+
+    [Test]
+    public void LetDeclarations_InsideFunctionDeclaration_DontEscapeToOuterScope()
+    {
+        // Arrange
+        const string identifier = "a";
+        var script = ParseScript($"function func() {{ let {identifier} = 0 }} a");
+
+        // Act
+        var completion = script.ScriptEvaluation();
+
+        // Assert
+        Assert.That(completion.IsThrowCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(new String($"{identifier} is not defined")));
+    }
+
+    [Test]
+    public void ConstDeclarations_InsideFunctionDeclaration_DontEscapeToOuterScope()
+    {
+        // Arrange
+        const string identifier = "a";
+        var script = ParseScript($"function func() {{ const {identifier} = 0 }} a");
+
+        // Act
+        var completion = script.ScriptEvaluation();
+
+        // Assert
+        Assert.That(completion.IsThrowCompletion(), Is.True);
+        Assert.That(completion.Value, Is.EqualTo(new String($"{identifier} is not defined")));
     }
 
     static private string EscapeString(string toEscape, char quote = '"')
