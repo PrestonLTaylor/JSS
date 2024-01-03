@@ -41,7 +41,7 @@ internal sealed class ConstDeclaration : Declaration
         if (value.IsAbruptCompletion()) return value;
 
         // 5. Perform ! InitializeReferencedBinding(lhs, value).
-        var asReference = (lhs.Value as Reference)!;
+        var asReference = lhs.Value.AsReference();
         var initializationResult = asReference.InitializeReferencedBinding(value.Value);
         Debug.Assert(initializationResult.IsNormalCompletion());
 

@@ -30,7 +30,7 @@ internal sealed class BitwiseNotExpression : IExpression
         if (oldValue.Value.IsNumber())
         {
             // a. Return Number::bitwiseNOT(oldValue).
-            var asNumber = (oldValue.Value as Number)!;
+            var asNumber = oldValue.Value.AsNumber();
             return Completion.NormalCompletion(Number.BitwiseNOT(asNumber));
         }
         // 4. Else,

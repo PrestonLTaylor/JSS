@@ -31,7 +31,7 @@ internal sealed class PrefixDecrementExpression : IExpression
         if (oldValue.Value.IsNumber())
         {
             // a. Let newValue be Number::subtract(oldValue, 1𝔽).
-            var asNumber = (oldValue.Value as Number)!;
+            var asNumber = oldValue.Value.AsNumber();
             newValue = Number.Subtract(asNumber, new Number(1));
         }
         // 4. Else,

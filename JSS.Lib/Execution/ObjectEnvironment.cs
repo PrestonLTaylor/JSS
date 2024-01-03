@@ -32,7 +32,7 @@ internal sealed class ObjectEnvironment : Environment
 
         // FIXME: Handle AbruptCompletions
         // 2. Let foundBinding be ? HasProperty(bindingObject, N).
-        var foundBinding = (Object.HasProperty(bindingObject, N).Value as Boolean)!;
+        var foundBinding = Object.HasProperty(bindingObject, N).Value.AsBoolean();
 
         // 3. If foundBinding is false, return false.
         return foundBinding.Value;
@@ -77,7 +77,7 @@ internal sealed class ObjectEnvironment : Environment
         if (stillExists.IsAbruptCompletion()) return stillExists;
 
         // 3. If stillExists is false and S is true, throw a ReferenceError exception.
-        var asBoolean = (stillExists.Value as Boolean)!;
+        var asBoolean = stillExists.Value.AsBoolean();
         if (!asBoolean.Value && S)
         {
             // FIXME: Throw a ReferenceError object
@@ -101,7 +101,7 @@ internal sealed class ObjectEnvironment : Environment
         if (value.IsAbruptCompletion()) return value;
 
         // 3. If value is false, then
-        var asBoolean = (value.Value as Boolean)!;
+        var asBoolean = value.Value.AsBoolean();
         if (!asBoolean.Value)
         {
             // a. If S is false, return undefined; otherwise FIXME: throw a ReferenceError exception.

@@ -30,7 +30,7 @@ internal sealed class PostfixIncrementExpression : IExpression
         if (oldValue.Value.IsNumber())
         {
             // a. Let newValue be Number::add(oldValue, 1𝔽).
-            var asNumber = (oldValue.Value as Number)!;
+            var asNumber = oldValue.Value.AsNumber();
             newValue = Number.Add(asNumber, new Number(1));
         }
         // 4. Else,

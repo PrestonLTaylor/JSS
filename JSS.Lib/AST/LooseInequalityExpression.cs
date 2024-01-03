@@ -37,7 +37,7 @@ internal sealed class LooseInequalityExpression : IExpression
         if (r.IsAbruptCompletion()) return r;
 
         // 6. If r is true, return false. Otherwise, return true.
-        var rAsBoolean = (r.Value as Boolean)!.Value;
+        var rAsBoolean = r.Value.AsBoolean().Value;
         return Completion.NormalCompletion(new Boolean(!rAsBoolean));
     }
 

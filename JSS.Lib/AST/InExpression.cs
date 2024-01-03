@@ -39,13 +39,13 @@ internal sealed class InExpression : IExpression
         }
 
         // 6. Return ? HasProperty(rval, ? ToPropertyKey(lval)).
-        var asObject = (rval.Value as Object)!;
+        var asObject = rval.Value.AsObject();
 
         var propertyKey = lval.Value.ToPropertyKey();
         if (propertyKey.IsAbruptCompletion()) return propertyKey;
 
         // FIXME: We should be able to handle Symbols
-        var propertyKeyAsString = (propertyKey.Value as String)!;
+        var propertyKeyAsString = propertyKey.Value.AsString();
 
         return Object.HasProperty(asObject, propertyKeyAsString.Value);
     }

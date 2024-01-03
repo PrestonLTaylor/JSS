@@ -51,17 +51,17 @@ internal sealed class Print
         }
         else if (value.IsBoolean())
         {
-            var asBoolean = (value as Boolean)!;
+            var asBoolean = value.AsBoolean();
             return asBoolean.Value ? "true" : "false";
         }
         else if (value.IsString())
         {
-            var asString = (value as String)!;
+            var asString = value.AsString();
             return $"\"{asString.Value}\"";
         }
         else if (value.IsNumber())
         {
-            var asNumber = (value as Number)!;
+            var asNumber = value.AsNumber();
             return asNumber.Value.ToString();
         }
 

@@ -173,7 +173,7 @@ internal sealed class GlobalEnvironment : Environment
         if (hasProperty.IsAbruptCompletion()) return hasProperty;
 
         // 4. If hasProperty is true, return true.
-        var asBoolean = (hasProperty.Value as Boolean)!;
+        var asBoolean = hasProperty.Value.AsBoolean();
         if (asBoolean.Value) return Completion.NormalCompletion(new Boolean(true));
 
         // FIXME: 5. Return ? IsExtensible(globalObject).
@@ -213,7 +213,7 @@ internal sealed class GlobalEnvironment : Environment
 
         // FIXME: 4. Let extensible be ? IsExtensible(globalObject).
         // 5. If hasProperty is false FIXME: (and extensible is true), then
-        var asBoolean = (hasProperty.Value as Boolean)!;
+        var asBoolean = hasProperty.Value.AsBoolean();
         if (!asBoolean.Value)
         {
             // a. Perform ? ObjRec.CreateMutableBinding(N, D).

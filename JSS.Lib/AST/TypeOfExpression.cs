@@ -25,7 +25,7 @@ internal sealed class TypeOfExpression : IExpression
         if (val.Value.IsReference())
         {
             // a. If IsUnresolvableReference(val) is true, return "undefined".
-            var asReference = (val.Value as Reference)!;
+            var asReference = val.Value.AsReference();
             if (asReference.IsUnresolvableReference())
             {
                 return Completion.NormalCompletion(new String("undefined"));

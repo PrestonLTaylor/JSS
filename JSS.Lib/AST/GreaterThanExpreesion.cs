@@ -39,7 +39,7 @@ internal sealed class GreaterThanExpression : IExpression
         // 6. If r is undefined, return false. Otherwise, return r.
         if (r.Value.IsUndefined()) return Completion.NormalCompletion(new Boolean(false));
 
-        var rAsBoolean = (r.Value as Boolean)!;
+        var rAsBoolean = r.Value.AsBoolean();
         return Completion.NormalCompletion(new Boolean(rAsBoolean.Value));
     }
 

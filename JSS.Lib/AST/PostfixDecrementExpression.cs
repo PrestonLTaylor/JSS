@@ -31,7 +31,7 @@ internal sealed class PostfixDecrementExpression : IExpression
         if (oldValue.Value.IsNumber())
         {
             // a. Let newValue be Number::subtract(oldValue, 1𝔽).
-            var oldAsNumber = (oldValue.Value as Number)!;
+            var oldAsNumber = oldValue.Value.AsNumber();
             newValue = Number.Subtract(oldAsNumber, new Number(1));
         }
         // 4. Else,

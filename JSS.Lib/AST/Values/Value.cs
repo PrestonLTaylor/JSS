@@ -32,6 +32,36 @@ internal abstract class Value
     virtual public bool IsObject() { return false; }
     virtual public bool IsFunction() { return false; }
 
+    public Reference AsReference()
+    {
+        Debug.Assert(IsReference());
+        return (this as Reference)!;
+    }
+
+    public Boolean AsBoolean()
+    {
+        Debug.Assert(IsBoolean());
+        return (this as Boolean)!;
+    }
+
+    public String AsString()
+    {
+        Debug.Assert(IsString());
+        return (this as String)!;
+    }
+
+    public Number AsNumber()
+    {
+        Debug.Assert(IsNumber());
+        return (this as Number)!;
+    }
+
+    public Object AsObject()
+    {
+        Debug.Assert(IsObject());
+        return (this as Object)!;
+    }
+
     virtual public bool HasInternalCall() { return false; }
 
     abstract public ValueType Type();
@@ -47,7 +77,7 @@ internal abstract class Value
 
         // FIXME: Throw an ReferenceError Object
         // 2. If IsUnresolvableReference(V) is true, throw a ReferenceError exception.
-        var asReference = (this as Reference)!;
+        var asReference = AsReference();
         if (asReference.IsUnresolvableReference())
         {
             return Completion.ThrowCompletion(new String($"{asReference.ReferencedName} is not defined"));
@@ -80,7 +110,7 @@ internal abstract class Value
             return Completion.ThrowCompletion(new String("Tried to put a value into a non-reference."));
         }
 
-        var reference = (this as Reference)!;
+        var reference = AsReference();
 
         // 2. If IsUnresolvableReference(V) is true, then
         if (reference.IsUnresolvableReference())
@@ -147,7 +177,7 @@ internal abstract class Value
         // 1. If argument is a Boolean, return argument.
         if (IsBoolean())
         {
-            return (this as Boolean)!;
+            return AsBoolean();
         }
 
         // 2. If argument is one of undefined, null, +0𝔽, -0𝔽, NaN, 0ℤ, or the empty String, return false.
@@ -158,7 +188,7 @@ internal abstract class Value
 
         if (IsNumber())
         {
-            var asNumber = (this as Number)!.Value;
+            var asNumber = AsNumber().Value;
             if (asNumber == 0 || double.IsNaN(asNumber))
             {
                 return new Boolean(false);
@@ -167,7 +197,7 @@ internal abstract class Value
 
         if (IsString())
         {
-            var asString = (this as String)!.Value;
+            var asString = AsString().Value;
             if (asString.Length == 0)
             {
                 return new Boolean(false);
@@ -209,8 +239,8 @@ internal abstract class Value
         if (IsBoolean())
         {
             // 5. If argument is true, return 1𝔽.
-            var boolean = this as Boolean;
-            var asNumber = new Number(boolean!.Value ? 1.0 : 0.0);
+            var boolean = AsBoolean();
+            var asNumber = new Number(boolean.Value ? 1.0 : 0.0);
             return Completion.NormalCompletion(asNumber);
         }
 
@@ -220,8 +250,8 @@ internal abstract class Value
         {
             try
             {
-                var asString = this as String;
-                var asNumber = new Number(double.Parse(asString!.Value));
+                var asString = AsString(); 
+                var asNumber = new Number(double.Parse(asString.Value));
                 return Completion.NormalCompletion(asNumber);
             }
             catch (Exception)
@@ -254,8 +284,8 @@ internal abstract class Value
         // 6. If argument is false, return "false".
         if (IsBoolean())
         {
-            var boolean = this as Boolean;
-            var asString = new String(boolean!.Value ? "true" : "false");
+            var boolean = AsBoolean();
+            var asString = new String(boolean.Value ? "true" : "false");
             return Completion.NormalCompletion(asString);
         }
 
@@ -263,8 +293,8 @@ internal abstract class Value
         // 7. If argument is a Number, return Number::toString(argument, 10).
         if (IsNumber())
         {
-            var number = this as Number;
-            var asString = new String(number!.Value.ToString());
+            var number = AsNumber();
+            var asString = new String(number.Value.ToString());
             return Completion.NormalCompletion(asString);
         }
 
@@ -328,8 +358,8 @@ internal abstract class Value
         if (x.IsString())
         {
             // a. If x and y have the same length and the same code units in the same positions, return true; otherwise, return false.
-            var xAsString = (x as String)!.Value;
-            var yAsString = (y as String)!.Value;
+            var xAsString = x.AsString().Value;
+            var yAsString = y.AsString().Value;
             return new Boolean(xAsString == yAsString);
         }
 
@@ -337,8 +367,8 @@ internal abstract class Value
         if (x.IsBoolean())
         {
             // 6. If x and y are both true or both false, return true; otherwise, return false.
-            var xAsBoolean = (x as Boolean)!.Value;
-            var yAsBoolean = (y as Boolean)!.Value;
+            var xAsBoolean = x.AsBoolean().Value;
+            var yAsBoolean = y.AsBoolean().Value;
             return new Boolean(xAsBoolean == yAsBoolean);
         }
 
@@ -382,11 +412,11 @@ internal abstract class Value
         if (px.Value.IsString() && py.Value.IsString())
         {
             // a. Let lx be the length of px.
-            var pxAsString = (px.Value as String)!;
+            var pxAsString = px.Value.AsString();
             var lx = pxAsString!.Value.Length;
 
             // b. Let ly be the length of py.
-            var pyAsString = (py.Value as String)!;
+            var pyAsString = py.Value.AsString();
             var ly = pyAsString!.Value.Length;
 
             // c. For each integer i such that 0 ≤ i < min(lx, ly), in ascending order, do
@@ -439,7 +469,7 @@ internal abstract class Value
 
         // i. If nx is a Number, then
         // 1. Return Number::lessThan(nx, ny).
-        var result = Number.LessThan((nx.Value as Number)!, (ny.Value as Number)!);
+        var result = Number.LessThan(nx.Value.AsNumber(), ny.Value.AsNumber());
         return Completion.NormalCompletion(result);
 
         // FIXME: ii. Else,
@@ -550,7 +580,7 @@ internal abstract class Value
         if (x.IsNumber())
         {
             // a. Return Number::equal(x, y).
-            return Number.Equal((x as Number)!, (y as Number)!);
+            return Number.Equal(x.AsNumber(), y.AsNumber());
         }
 
         // 3. Return SameValueNonNumber(x, y).

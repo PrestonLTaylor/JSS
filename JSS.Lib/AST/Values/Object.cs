@@ -46,7 +46,7 @@ internal class Object : Value
 
         // FIXME: Throw an actual TypeError object
         // 2. If success is false and Throw is true, throw a TypeError exception.
-        var asBoolean = (success.Value as Boolean)!;
+        var asBoolean = success.Value.AsBoolean();
         if (!asBoolean.Value && Throw)
         {
             return Completion.ThrowCompletion(new String($"Failed to set {P}"));
@@ -64,7 +64,7 @@ internal class Object : Value
         if (success.IsAbruptCompletion()) return success;
 
         // 2. If success is false, FIXME: throw a TypeError exception.
-        var asBoolean = (success.Value as Boolean)!;
+        var asBoolean = success.Value.AsBoolean();
         if (!asBoolean.Value) return Completion.ThrowCompletion(new String($"Should not define property of name {P} with a value of {desc.Value}"));
 
         // 3. Return UNUSED.

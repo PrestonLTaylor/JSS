@@ -98,7 +98,7 @@ internal sealed class Script
             if (hasRestrictedGlobal.IsAbruptCompletion()) return hasRestrictedGlobal;
 
             // d. If hasRestrictedGlobal is true, throw a SyntaxError exception.
-            var asBoolean = (hasRestrictedGlobal.Value as Boolean)!;
+            var asBoolean = hasRestrictedGlobal.Value.AsBoolean();
             if (asBoolean.Value) return Completion.ThrowCompletion(new String($"redeclaration of Unconfigurable {name}"));
         }
 
@@ -143,7 +143,7 @@ internal sealed class Script
 
                     // FIXME: Throw an actual TypeError Error
                     // 2. If fnDefinable is false, throw a TypeError exception.
-                    var asBoolean = (fnDefinable.Value as Boolean)!;
+                    var asBoolean = fnDefinable.Value.AsBoolean();
                     if (!asBoolean.Value) return Completion.ThrowCompletion(new String($"redeclaration of Unconfigurable function {fn}"));
 
                     // 3. Append fn to declaredFunctionNames.
@@ -174,8 +174,8 @@ internal sealed class Script
                         var vnDefinable = env.CanDeclareGlobalVar(vn);
                         if (vnDefinable.IsAbruptCompletion()) return vnDefinable;
 
-                        // b. If vnDefinable is false, throw a TypeError exception.
-                        var asBoolean = (vnDefinable.Value as Boolean)!;
+                        // b. If vnDefinable is false, FIXME: throw a TypeError exception.
+                        var asBoolean = vnDefinable.Value.AsBoolean();
                         if (!asBoolean.Value) return Completion.ThrowCompletion(new String($"redeclaration of Unextensible var {vn}"));
 
                         // c. If declaredVarNames does not contain vn, then

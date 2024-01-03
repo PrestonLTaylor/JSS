@@ -48,9 +48,9 @@ internal abstract class IExpression : INode
                 if (rstr.IsAbruptCompletion()) return rstr;
 
                 // iii. Return the string-concatenation of lstr and rstr.
-                var lstrValue = lstr.Value as String;
-                var rstrValue = rstr.Value as String;
-                var concatenation = lstrValue!.Value + rstrValue!.Value;
+                var lstrValue = lstr.Value.AsString();
+                var rstrValue = rstr.Value.AsString();
+                var concatenation = lstrValue.Value + rstrValue.Value;
                 return Completion.NormalCompletion(new String(concatenation));
             }
 
@@ -98,7 +98,7 @@ internal abstract class IExpression : INode
             _ => throw new InvalidOperationException(),
         };
 
-        var result = operation((lnum.Value as Number)!, (rnum.Value as Number)!);
+        var result = operation(lnum.Value.AsNumber(), rnum.Value.AsNumber());
         return Completion.NormalCompletion(result);
     }
 

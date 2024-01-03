@@ -30,7 +30,7 @@ internal sealed class UnaryMinusExpression : IExpression
         if (oldValue.Value.IsNumber())
         {
             // a. Return Number::unaryMinus(oldValue).
-            var asNumber = (oldValue.Value as Number)!;
+            var asNumber = oldValue.Value.AsNumber();
             return Completion.NormalCompletion(Number.UnaryMinus(asNumber));
         }
         // 4. Else,

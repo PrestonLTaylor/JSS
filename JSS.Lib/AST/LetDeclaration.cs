@@ -40,7 +40,7 @@ internal sealed class LetDeclaration : Declaration
         Debug.Assert(lhs.IsNormalCompletion());
 
         // 2. Perform ! InitializeReferencedBinding(lhs, undefined).
-        var asReference = (lhs.Value as Reference)!;
+        var asReference = lhs.Value.AsReference();
         var initializationResult = asReference.InitializeReferencedBinding(Undefined.The);
         Debug.Assert(initializationResult.IsNormalCompletion());
 
@@ -68,7 +68,7 @@ internal sealed class LetDeclaration : Declaration
         if (value.IsAbruptCompletion()) return value;
 
         // 5. Perform ! InitializeReferencedBinding(lhs, value).
-        var asReference = (lhs.Value as Reference)!;
+        var asReference = lhs.Value.AsReference();
         var initializationResult = asReference.InitializeReferencedBinding(value.Value);
         Debug.Assert(initializationResult.IsNormalCompletion());
 
