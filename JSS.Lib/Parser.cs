@@ -1240,6 +1240,11 @@ internal sealed class Parser
             parsedExpression = ParseStringLiteral();
             return true;
         }
+        if (IsObjectLiteral())
+        {
+            parsedExpression = ParseObjectLiteral();
+            return true;
+        }
         if (IsParenthesizedExpression())
         {
             parsedExpression = ParseParenthesizedExpression();
@@ -1341,6 +1346,21 @@ internal sealed class Parser
         var stringLiteral = _consumer.ConsumeTokenOfType(TokenType.String);
         var stringValue = stringLiteral.data[1..^1];
         return new StringLiteral(stringValue);
+    }
+
+    // 13.2.5 Object Initializer, https://tc39.es/ecma262/#prod-ObjectLiteral
+    private bool IsObjectLiteral()
+    {
+        return _consumer.IsTokenOfType(TokenType.OpenBrace);
+    }
+
+    private ObjectLiteral ParseObjectLiteral()
+    {
+        // FIXME: Implement parsing of PropertyDefinitionList
+        _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
+        _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
+
+        return new ObjectLiteral();
     }
 
     // 14.2 Block, https://tc39.es/ecma262/#sec-block

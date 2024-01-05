@@ -1442,8 +1442,32 @@ internal sealed class ParserTests
         Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
     }
 
+    // FIXME: More tests when we don't only parse empty object literals
+    // Tests for ObjectLiteral
+    [Test]
+    public void Parse_ReturnsAssignment_WithObjectLiteralRHS_WhenProvidingAssignment_WithObjectLiteralRHS()
+    {
+        // Arrange
+        var parser = new Parser("a = {}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var assignmentExpression = expressionStatement.Expression as BasicAssignmentExpression;
+        Assert.That(assignmentExpression, Is.Not.Null);
+
+        var objectLiteral = assignmentExpression.Rhs as ObjectLiteral;
+        Assert.That(objectLiteral, Is.Not.Null);
+    }
+
     // Tests for SyntaxErrors
-    // FIXME: More test cases where ConsumeTokenOfType is used
     static private readonly Dictionary<string, string> unexpectedTokenTestCases = new()
     {
         {"", "}"},
@@ -1602,6 +1626,7 @@ internal sealed class ParserTests
         "super.",
         "let",
         "let a = ",
+        "let a = {",
         "for (1 ",
         "for (1; 1 ",
         "for (1; 1; 1 ",
