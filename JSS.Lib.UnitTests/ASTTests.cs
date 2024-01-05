@@ -422,6 +422,13 @@ internal sealed class ASTTests
         CreateCallExpressionParameterTestCase("true", new Boolean(true)),
         CreateCallExpressionParameterTestCase("1", new Number(1)),
         CreateCallExpressionParameterTestCase(EscapeString("1"), new String("1")),
+
+        // Tests for PropertyExpression
+        CreatePropertyExpressionTestCase("null", Null.The),
+        CreatePropertyExpressionTestCase("false", new Boolean(false)),
+        CreatePropertyExpressionTestCase("true", new Boolean(true)),
+        CreatePropertyExpressionTestCase("1", new Number(1)),
+        CreatePropertyExpressionTestCase(EscapeString("1"), new String("1")),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -684,6 +691,11 @@ internal sealed class ASTTests
     static private object[] CreateCallExpressionParameterTestCase(string parameterValue, Value expected)
     {
         return new object[] { $"function a(param) {{ return param }} a({parameterValue})", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreatePropertyExpressionTestCase(string propertyValue, Value expected)
+    {
+        return new object[] { $"let a = {{}}; a.b = {propertyValue}; a.b", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
