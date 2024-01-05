@@ -1,13 +1,12 @@
 ﻿using JSS.Lib.Execution;
 using System.Diagnostics;
-using Environment = JSS.Lib.Execution.Environment;
 
 namespace JSS.Lib.AST.Values;
 
 // 6.2.5 The Reference Record Specification Type, https://tc39.es/ecma262/#sec-reference-record-specification-type
 internal class Reference : Value
 {
-    public Reference(Environment? @base, string referencedName, Value thisValue)
+    public Reference(Value? @base, string referencedName, Value thisValue)
     {
         Base = @base;
         ReferencedName = referencedName;
@@ -22,7 +21,7 @@ internal class Reference : Value
         return new Reference(null, referencedName, thisValue);
     }
 
-    static public Reference Resolvable(Environment @base, string referencedName, Value thisValue)
+    static public Reference Resolvable(Value @base, string referencedName, Value thisValue)
     {
         return new Reference(@base, referencedName, thisValue);
     }
@@ -43,14 +42,15 @@ internal class Reference : Value
         // 2. Let base be V.[[Base]].
 
         // 3. Assert: base is an Environment Record.
-        Debug.Assert(Base is not null);
+        Debug.Assert(Base!.IsEnvironment());
 
         // 4. Return ? base.InitializeBinding(V.[[ReferencedName]], W).
-        return Base.InitializeBinding(ReferencedName, W);
+        var environment = Base.AsEnvironment();
+        return environment.InitializeBinding(ReferencedName, W);
     }
 
     // FIXME: Base can have a ECMAScript language value
-    public Environment? Base { get; }
+    public Value? Base { get; }
 
     // FIXME: ReferencedName can be a Symbol or Private Name
     public string ReferencedName { get; }

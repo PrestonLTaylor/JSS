@@ -1,5 +1,6 @@
 ﻿using JSS.Lib.Execution;
 using System.Diagnostics;
+using Environment = JSS.Lib.Execution.Environment;
 
 namespace JSS.Lib.AST.Values;
 
@@ -22,6 +23,7 @@ internal abstract class Value
 {
     virtual public bool IsEmpty() { return false; }
     virtual public bool IsReference() { return false; }
+    virtual public bool IsEnvironment() { return false; }
     virtual public bool IsUndefined() { return false; }
     virtual public bool IsNull() { return false; }
     virtual public bool IsBoolean() { return false; }
@@ -36,6 +38,12 @@ internal abstract class Value
     {
         Debug.Assert(IsReference());
         return (this as Reference)!;
+    }
+
+    public Environment AsEnvironment()
+    {
+        Debug.Assert(IsEnvironment());
+        return (this as Environment)!;
     }
 
     public Boolean AsBoolean()
@@ -93,11 +101,12 @@ internal abstract class Value
         // a. Let base be V.[[Base]].
         var @base = asReference.Base!;
 
-        // FIXME: Assert when base can be an environment record
         // b. Assert: base is an Environment Record.
+        Debug.Assert(@base.IsEnvironment());
 
         // c. Return ? base.GetBindingValue(V.[[ReferencedName]], FIXME: V.[[Strict]]) (see 9.1).
-        return @base.GetBindingValue(asReference.ReferencedName, false);
+        var environment = @base.AsEnvironment();
+        return environment.GetBindingValue(asReference.ReferencedName, false);
     }
 
     // 6.2.5.6 PutValue( V, W ), https://tc39.es/ecma262/#sec-putvalue
@@ -140,11 +149,12 @@ internal abstract class Value
             // a. Let base be V.[[Base]].
             var @base = reference.Base!;
 
-            // FIXME: Implement the assert when base can be an object
             // b. Assert: base is an Environment Record.
+            Debug.Assert(@base.IsEnvironment());
 
             // c. Return ? base.SetMutableBinding(V.[[ReferencedName]], W, FIXME: V.[[Strict]]) (see 9.1).
-            return @base.SetMutableBinding(reference.ReferencedName, W, false);
+            var environment = @base.AsEnvironment();
+            return environment.SetMutableBinding(reference.ReferencedName, W, false);
         }
     }
 

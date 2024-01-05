@@ -1,10 +1,14 @@
 ﻿using JSS.Lib.AST.Values;
+using ValueType = JSS.Lib.AST.Values.ValueType;
 
 namespace JSS.Lib.Execution;
 
 // 9.1 Environment Records, https://tc39.es/ecma262/#sec-environment-records
-internal abstract class Environment
+internal abstract class Environment : Value
 {
+    override public bool IsEnvironment() { return true; }
+    override public ValueType Type() { throw new InvalidOperationException("Tried to get the Type of Environment"); }
+
     // Abstract Methods of Environment Records, https://tc39.es/ecma262/#table-abstract-methods-of-environment-records
     virtual public bool HasBinding(string N) { throw new NotImplementedException(); }
     virtual public Completion CreateMutableBinding(string N, bool D) { throw new NotImplementedException(); }
