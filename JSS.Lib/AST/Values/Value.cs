@@ -91,22 +91,33 @@ internal abstract class Value
             return Completion.ThrowCompletion(new String($"{asReference.ReferencedName} is not defined"));
         }
 
-        // FIXME: 3. If IsPropertyReference(V) is true, then
-        // FIXME: a. Let baseObj be ? ToObject(V.[[Base]]).
-        // FIXME: b. If IsPrivateReference(V) is true, then
-        // FIXME: i. Return ? PrivateGet(baseObj, V.[[ReferencedName]]).
-        // FIXME: c. Return ? baseObj.[[Get]](V.[[ReferencedName]], GetThisValue(V)).
-        // FIXME: 4. Else,
+        // 3. If IsPropertyReference(V) is true, then
+        if (asReference.IsPropertyReference())
+        {
+            // a. Let baseObj be ? ToObject(V.[[Base]]).
+            var baseObj = asReference.Base!.ToObject();
+            if (baseObj.IsAbruptCompletion()) return baseObj;
 
-        // a. Let base be V.[[Base]].
-        var @base = asReference.Base!;
+            // FIXME: b. If IsPrivateReference(V) is true, then
+            // FIXME: i. Return ? PrivateGet(baseObj, V.[[ReferencedName]]).
 
-        // b. Assert: base is an Environment Record.
-        Debug.Assert(@base.IsEnvironment());
+            // c. Return ? baseObj.[[Get]](V.[[ReferencedName]], FIXME: GetThisValue(V)).
+            var obj = baseObj.Value.AsObject();
+            return obj.Get(asReference.ReferencedName, obj);
+        }
+        // 4. Else,
+        else
+        {
+            // a. Let base be V.[[Base]].
+            var @base = asReference.Base!;
 
-        // c. Return ? base.GetBindingValue(V.[[ReferencedName]], FIXME: V.[[Strict]]) (see 9.1).
-        var environment = @base.AsEnvironment();
-        return environment.GetBindingValue(asReference.ReferencedName, false);
+            // b. Assert: base is an Environment Record.
+            Debug.Assert(@base.IsEnvironment());
+
+            // c. Return ? base.GetBindingValue(V.[[ReferencedName]], FIXME: V.[[Strict]]) (see 9.1).
+            var environment = @base.AsEnvironment();
+            return environment.GetBindingValue(asReference.ReferencedName, false);
+        }
     }
 
     // 6.2.5.6 PutValue( V, W ), https://tc39.es/ecma262/#sec-putvalue

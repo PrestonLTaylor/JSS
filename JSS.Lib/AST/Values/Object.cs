@@ -179,7 +179,7 @@ internal class Object : Value
     }
 
     // 10.1.8 [[Get]] ( P, Receiver ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-get-p-receiver
-    private Completion Get(string P, Object receiver)
+    public Completion Get(string P, Object receiver)
     {
         // 1. Return ? OrdinaryGet(O, P, Receiver).
         return OrdinaryGet(this, P, receiver);

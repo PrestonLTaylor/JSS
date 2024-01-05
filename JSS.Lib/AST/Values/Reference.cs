@@ -26,6 +26,16 @@ internal class Reference : Value
         return new Reference(@base, referencedName, thisValue);
     }
 
+    // 6.2.5.1 IsPropertyReference ( V ), https://tc39.es/ecma262/#sec-ispropertyreference
+    public bool IsPropertyReference()
+    {
+        // 1. If V.[[Base]] is UNRESOLVABLE, return false.
+        if (IsUnresolvableReference()) return false;
+
+        // 2. If V.[[Base]] is an Environment Record, return false; otherwise return true.
+        return !Base!.IsEnvironment();
+    }
+
     // 6.2.5.2 IsUnresolvableReference ( V ), https://tc39.es/ecma262/#sec-isunresolvablereference
     public bool IsUnresolvableReference()
     {
