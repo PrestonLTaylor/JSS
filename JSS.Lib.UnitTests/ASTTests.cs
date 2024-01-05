@@ -2,6 +2,7 @@
 using JSS.Lib.AST.Literal;
 using JSS.Lib.Execution;
 using Boolean = JSS.Lib.AST.Values.Boolean;
+using Object = JSS.Lib.AST.Values.Object;
 using String = JSS.Lib.AST.Values.String;
 using ValueType = JSS.Lib.AST.Values.ValueType;
 using JSS.Lib.AST;
@@ -784,6 +785,29 @@ internal sealed class ASTTests
         Assert.That(completion.IsContinueCompletion(), Is.True);
         Assert.That(completion.Value, Is.EqualTo(Empty.The));
         Assert.That(completion.Target, Is.EqualTo(expectedTarget));
+    }
+
+    // FIXME: More tests when we parse more object literals
+    static private readonly object[] objectLiteralTestCases =
+    {
+        new object[] { "{}" },
+    };
+
+    [TestCaseSource(nameof(objectLiteralTestCases))]
+    public void AssignmentWithObjectLiterals_AssignsAsExpectedObjectValue(string objectLiteral)
+    {
+        // Arrange
+        var script = ParseScript($"let a = {objectLiteral}; a");
+
+        // Act
+        var actualCompletion = script.ScriptEvaluation();
+
+        // Assert
+        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+
+        var actualObject = actualCompletion.Value as Object;
+        Assert.That(actualObject, Is.Not.Null);
+        Assert.That(actualObject.DataProperties, Has.Count.EqualTo(0));
     }
 
     // FIXME: Replace these manual ast tests with the astTestCases array when we can parse more numbers
