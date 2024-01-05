@@ -316,6 +316,27 @@ internal abstract class Value
         throw new NotImplementedException();
     }
 
+    // 7.1.18 ToObject ( argument ), https://tc39.es/ecma262/#sec-toobject
+    public Completion ToObject()
+    {
+        // Undefined, FIXME: Throw a TypeError exception.
+        if (IsUndefined())
+        {
+            return Completion.ThrowCompletion(new String("Unable to convert undefined to an object"));
+        }
+
+        // Null, FIXME: Throw a TypeError exception.
+        if (IsNull())
+        {
+            return Completion.ThrowCompletion(new String("Unable to convert null to an object"));
+        }
+
+        // FIXME: Implement the rest of the conversions
+
+        // Object, Return argument.
+        return Completion.NormalCompletion(this);
+    }
+
     // 7.1.19 ToPropertyKey ( argument ), https://tc39.es/ecma262/#sec-topropertykey
     public Completion ToPropertyKey()
     {
