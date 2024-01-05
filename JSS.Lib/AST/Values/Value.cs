@@ -147,13 +147,24 @@ internal abstract class Value
             // d. Return UNUSED.
             return Completion.NormalCompletion(Empty.The);
         }
-        // FIXME: 3.If IsPropertyReference(V) is true, then
-        // FIXME: a. Let baseObj be? ToObject(V.[[Base]]).
-        // FIXME: b. If IsPrivateReference(V) is true, then
-        // FIXME: i. Return ? PrivateSet(baseObj, V.[[ReferencedName]], W).
-        // FIXME: c. Let succeeded be? baseObj.[[Set]](V.[[ReferencedName]], W, GetThisValue(V)).
-        // FIXME: d. If succeeded is false and V.[[Strict]] is true, throw a TypeError exception.
-        // FIXME: e. Return UNUSED.
+        // 3. If IsPropertyReference(V) is true, then
+        if (reference.IsPropertyReference())
+        {
+            // a. Let baseObj be ? ToObject(V.[[Base]]).
+            var baseObj = reference.Base!.ToObject();
+
+            // FIXME: b. If IsPrivateReference(V) is true, then
+            // FIXME: i. Return ? PrivateSet(baseObj, V.[[ReferencedName]], W).
+
+            // FIXME: c. Let succeeded be ? baseObj.[[Set]](V.[[ReferencedName]], W, FIXME: GetThisValue(V)).
+            var obj = baseObj.Value.AsObject();
+            var succeeded = obj.Set(reference.ReferencedName, W, obj);
+            if (succeeded.IsAbruptCompletion()) return succeeded;
+
+            // FIXME: d. If succeeded is false FIXME: (and V.[[Strict]] is true,) throw a TypeError exception.
+            // e. Return UNUSED.
+            return Completion.NormalCompletion(Empty.The);
+        }
         // 4. Else,
         else
         {

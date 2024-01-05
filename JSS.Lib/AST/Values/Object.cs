@@ -204,7 +204,7 @@ internal class Object : Value
     }
 
     // 10.1.9 [[Set]] ( P, V, Receiver ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-set-p-v-receiver
-    private Completion Set(string P, Value V, Object receiver)
+    public Completion Set(string P, Value V, Object receiver)
     {
         // 1. Return ? OrdinarySet(O, P, V, Receiver).
         return OrdinarySet(this, P, V, receiver);
