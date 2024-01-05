@@ -429,6 +429,13 @@ internal sealed class ASTTests
         CreatePropertyExpressionTestCase("true", new Boolean(true)),
         CreatePropertyExpressionTestCase("1", new Number(1)),
         CreatePropertyExpressionTestCase(EscapeString("1"), new String("1")),
+
+        // Tests for ComputedPropertyExpression
+        CreateComputedPropertyExpressionTestCase("null", Null.The),
+        CreateComputedPropertyExpressionTestCase("false", new Boolean(false)),
+        CreateComputedPropertyExpressionTestCase("true", new Boolean(true)),
+        CreateComputedPropertyExpressionTestCase("1", new Number(1)),
+        CreateComputedPropertyExpressionTestCase(EscapeString("1"), new String("1")),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -698,6 +705,11 @@ internal sealed class ASTTests
         return new object[] { $"let a = {{}}; a.b = {propertyValue}; a.b", Completion.NormalCompletion(expected) };
     }
 
+    static private object[] CreateComputedPropertyExpressionTestCase(string propertyValue, Value expected)
+    {
+        return new object[] { $"let a = {{}}; a[\"b\"] = {propertyValue}; a[\"b\"]", Completion.NormalCompletion(expected) };
+    }
+
     [TestCaseSource(nameof(astTestCases))]
     public void ScriptEvaluation_ReturnsExpectedCompletionAndValue(string testCase, Completion expectedCompletion)
     {
@@ -820,6 +832,23 @@ internal sealed class ASTTests
         var actualObject = actualCompletion.Value as Object;
         Assert.That(actualObject, Is.Not.Null);
         Assert.That(actualObject.DataProperties, Has.Count.EqualTo(0));
+    }
+
+    [Test]
+    public void ComputedProperties_HaveTheSameValue_AsNormalProperties()
+    {
+        // Arrange
+        var script = ParseScript("let a = {}; a.b = 1; a.b == a[\"b\"]");
+
+        // Act
+        var actualCompletion = script.ScriptEvaluation();
+
+        // Assert
+        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+
+        var shouldBeTrue = actualCompletion.Value as Boolean;
+        Assert.That(shouldBeTrue, Is.Not.Null);
+        Assert.That(shouldBeTrue.Value, Is.True);
     }
 
     // FIXME: Replace these manual ast tests with the astTestCases array when we can parse more numbers
