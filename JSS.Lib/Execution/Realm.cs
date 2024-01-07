@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using JSS.Lib.AST.Values;
+using JSS.Lib.Runtime;
 using Object = JSS.Lib.AST.Values.Object;
 
 namespace JSS.Lib.Execution;
@@ -59,6 +60,43 @@ internal sealed class Realm
         // 7. Return UNUSED.
     }
 
+    // 9.3.4 SetDefaultGlobalBindings ( realmRec ), https://tc39.es/ecma262/#sec-setdefaultglobalbindings
+    private Completion SetDefaultGlobalBindings()
+    {
+        // 1. Let global be realmRec.[[GlobalObject]].
+
+        // 2. For each property of the Global Object specified in clause 19, do
+        var globalProperties = CreateGlobalProperties();
+        foreach (var property in globalProperties)
+        {
+            // a. Let name be the String value of the property name.
+            var name = property.Key;
+
+            // b. Let desc be the fully populated data Property Descriptor for the property, containing the specified attributes for the property.
+            // FIXME: For properties listed in 19.2, 19.3, or 19.4 the value of the [[Value]] attribute is the corresponding intrinsic object from realmRec.
+            var desc = property.Value;
+
+            // c. Perform ? DefinePropertyOrThrow(global, name, desc).
+            var defineResult = Object.DefinePropertyOrThrow(GlobalObject, name, desc);
+            if (defineResult.IsAbruptCompletion()) return defineResult;
+        }
+
+        // 3. Return global.
+        return Completion.NormalCompletion(GlobalObject);
+    }
+
+    private Dictionary<string, Property> CreateGlobalProperties()
+    {
+        Dictionary<string, Property> globalProperties = new();
+
+        // 20.1.1 The Object Constructor, https://tc39.es/ecma262/#sec-object-constructor
+        var result = ObjectConstructor.Create();
+        Debug.Assert(result.IsNormalCompletion()) ;
+        globalProperties.Add("Object", new Property(result.Value, new(true, false, true)));
+
+        return globalProperties;
+    }
+
     // 9.4.6 GetGlobalObject ( ), https://tc39.es/ecma262/#sec-getglobalobject
     static public Object GetGlobalObject(VM vm)
     {
@@ -97,7 +135,10 @@ internal sealed class Realm
         // 9. Perform SetRealmGlobalObject(realm, global, thisValue).
         realm.SetRealmGlobalObject(global, thisValue);
 
-        // FIXME: 10. Let globalObj be ? SetDefaultGlobalBindings(realm).
+        // 10. Let globalObj be ? SetDefaultGlobalBindings(realm).
+        var globalObj = realm.SetDefaultGlobalBindings();
+        if (globalObj.IsAbruptCompletion()) return globalObj;
+
         // FIXME: 11. Create any host-defined global object properties on globalObj.
 
         // 12. Return UNUSED.

@@ -851,6 +851,42 @@ internal sealed class ASTTests
         Assert.That(shouldBeTrue.Value, Is.True);
     }
 
+    // FIXME: We should have a different file for runtime tests
+    [Test]
+    public void TypeOf_ObjectConstructor_ReturnsAString_EqualToFunction()
+    {
+        // Arrange
+        var script = ParseScript("typeof Object");
+
+        // Act
+        var actualCompletion = script.ScriptEvaluation();
+
+        // Assert
+        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+
+        var actualTypeOf = actualCompletion.Value as String;
+        Assert.That(actualTypeOf, Is.Not.Null);
+        Assert.That(actualTypeOf.Value, Is.EqualTo("function"));
+    }
+
+    [Test]
+    public void Calling_ObjectConstrcutor_ReturnsANewEmptyObject()
+    {
+        // Arrange
+        var script = ParseScript("let a = Object(); a");
+
+        // Act
+        var actualCompletion = script.ScriptEvaluation();
+
+        // Assert
+        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+
+        var actualObject = actualCompletion.Value as Object;
+        Assert.That(actualObject, Is.Not.Null);
+        // FIXME: Assert for %Object.prototype%
+        Assert.That(actualObject.DataProperties, Has.Count.Zero);
+    }
+
     // FIXME: Replace these manual ast tests with the astTestCases array when we can parse more numbers
     static private readonly object[] normalCompletionBitwiseAndTestCases =
     {
