@@ -64,6 +64,10 @@ internal sealed class Print
             var asNumber = value.AsNumber();
             return asNumber.Value.ToString();
         }
+        else if (value.HasInternalCall())
+        {
+            return "Function";
+        }
 
         return value.Type().ToString();
     }
