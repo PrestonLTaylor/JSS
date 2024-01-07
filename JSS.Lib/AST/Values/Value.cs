@@ -70,7 +70,13 @@ internal abstract class Value
         return (this as Object)!;
     }
 
-    virtual public bool HasInternalCall() { return false; }
+    public ICallable AsCallable()
+    {
+        Debug.Assert(HasInternalCall());
+        return (this as ICallable)!;
+    }
+
+    virtual public bool HasInternalCall() { return this is ICallable; }
 
     abstract public ValueType Type();
 

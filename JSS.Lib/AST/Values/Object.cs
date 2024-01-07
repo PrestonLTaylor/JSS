@@ -103,7 +103,7 @@ internal class Object : Value
         }
 
         // 3. Return ? F.[[Call]](V, argumentsList).
-        var asCallable = (F as Callable)!;
+        var asCallable = F.AsCallable(); 
         return asCallable.Call(vm, V, (argumentsList as List)!);
     }
 
