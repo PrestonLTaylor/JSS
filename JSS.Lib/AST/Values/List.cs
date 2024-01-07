@@ -7,5 +7,19 @@ internal sealed class List : Value
     public void Add(Value value) => Values.Add(value);
     public void ListConcatenation(List list) => Values.AddRange(list.Values);
 
+    public Value this[int i]
+    {
+        get
+        {
+            // This supports the default JS behaviour of excluded parameters defaulting to undefined
+            if (i >= Values.Count)
+            {
+                return Undefined.The;
+            }
+
+            return Values[i];
+        }
+    }
+
     public List<Value> Values { get; } = new();
 }
