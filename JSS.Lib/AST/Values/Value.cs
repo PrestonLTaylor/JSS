@@ -77,6 +77,7 @@ internal abstract class Value
     }
 
     virtual public bool HasInternalCall() { return this is ICallable; }
+    virtual public bool HasInternalConstruct() { return this is IConstructable; }
 
     abstract public ValueType Type();
 
@@ -393,6 +394,19 @@ internal abstract class Value
 
         // 2. If argument has a [[Call]] internal method, return true.
         if (HasInternalCall()) return true;
+
+        // 3. Return false.
+        return false;
+    }
+
+    // 7.2.4 IsConstructor ( argument ), https://tc39.es/ecma262/#sec-isconstructor
+    public bool IsConstructor()
+    {
+        // 1. If argument is not an Object, return false.
+        if (!IsObject()) return false;
+
+        // 2. If argument has a [[Construct]] internal method, return true.
+        if (HasInternalConstruct()) return true;
 
         // 3. Return false.
         return false;
