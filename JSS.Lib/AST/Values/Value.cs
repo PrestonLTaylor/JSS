@@ -76,6 +76,12 @@ internal abstract class Value
         return (this as ICallable)!;
     }
 
+    public IConstructable AsConstructable()
+    {
+        Debug.Assert(HasInternalConstruct());
+        return (this as IConstructable)!;
+    }
+
     virtual public bool HasInternalCall() { return this is ICallable; }
     virtual public bool HasInternalConstruct() { return this is IConstructable; }
 
