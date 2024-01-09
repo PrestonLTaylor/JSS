@@ -919,7 +919,6 @@ internal sealed class Parser
     // 13.3 Left-Hand-Side Expressions, https://tc39.es/ecma262/#sec-left-hand-side-expressions
     private bool TryParseLeftHandSideExpression(out IExpression? parsedExpression)
     {
-        // FIXME: Implement parsing of CallExpressions
         // FIXME: Implement parsing of OptionalExpressions
         // FIXME: Early Errors for parsing according to the spec
         if (TryParseNewExpression(out parsedExpression))
@@ -950,6 +949,14 @@ internal sealed class Parser
         // NOTE: This happens when there is a new without a member expression at the end of the new chain
         if (!TryParseInnerNewExpression(out IExpression? innerNewExpression)) ThrowUnexpectedTokenSyntaxError<bool>();
 
+        // NOTE: This is a hack to prevent a call expression from being parsed instead of a new expression
+        // with arguments
+        if (innerNewExpression is CallExpression)
+        {
+            parsedExpression = ParseNewExpressionWithCallExpressionRHS((innerNewExpression as CallExpression)!);
+            return true;
+        }
+
         // NOTE: This rule is duplicated in MemberExpression, however it is simpilier to have it
         List<IExpression> newArguments = new();
         TryParseArguments(newArguments);
@@ -975,6 +982,11 @@ internal sealed class Parser
         }
 
         return false;
+    }
+
+    private NewExpression ParseNewExpressionWithCallExpressionRHS(CallExpression rhs)
+    {
+        return new NewExpression(rhs.Lhs, rhs.Arguments);
     }
 
     // Arguments, https://tc39.es/ecma262/#prod-Arguments

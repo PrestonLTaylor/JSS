@@ -3,7 +3,7 @@
 // 13.3.5 The new Operator, https://tc39.es/ecma262/#sec-new-operator
 internal sealed class NewExpression : IExpression
 {
-    public NewExpression(IExpression expression, List<IExpression> arguments)
+    public NewExpression(IExpression expression, IReadOnlyList<IExpression> arguments)
     {
         Expression = expression;
         Arguments = arguments;

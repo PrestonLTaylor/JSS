@@ -259,6 +259,27 @@ internal sealed class ParserTests
         Assert.That(parsedLiteral.Value, Is.EqualTo(stringValue));
     }
 
+    [Test]
+    public void Parse_ReturnsExpressionStatement_WithNewExpressionWithArguments_WhenProvidingANewWithArguments()
+    {
+        // Arrange
+        var parser = new Parser("new Object({})");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var newExpression = expressionStatement.Expression as NewExpression;
+        Assert.That(newExpression, Is.Not.Null);
+        Assert.That(newExpression.Arguments, Has.Count.EqualTo(1));
+    }
+
     // Tests for 14.2 Block, https://tc39.es/ecma262/#sec-block
     [Test]
     public void Parse_ReturnsAnEmptyBlock_WhenProvidingAnEmptyBlock()
