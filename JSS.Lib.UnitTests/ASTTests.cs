@@ -905,6 +905,24 @@ internal sealed class ASTTests
         Assert.That(actualObject.DataProperties, Has.Count.Zero);
     }
 
+    [Test]
+    public void NewExpression_WithEmptyObjectReturningFunction_ReturnsANewEmptyObject()
+    {
+        // Arrange
+        var script = ParseScript("function a() { return {} }; let b = new a(); b");
+
+        // Act
+        var actualCompletion = script.ScriptEvaluation();
+
+        // Assert
+        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+
+        var actualObject = actualCompletion.Value as Object;
+        Assert.That(actualObject, Is.Not.Null);
+        // FIXME: Assert for %Object.prototype%
+        Assert.That(actualObject.DataProperties, Has.Count.Zero);
+    }
+
     // FIXME: Replace these manual ast tests with the astTestCases array when we can parse more numbers
     static private readonly object[] normalCompletionBitwiseAndTestCases =
     {

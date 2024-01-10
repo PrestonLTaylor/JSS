@@ -18,7 +18,7 @@ enum LexicalThisMode
 }
 
 // FIXME: Spec links for FunctionObject when FunctionObject is more fleshed out
-internal sealed class FunctionObject : Object, ICallable
+internal sealed class FunctionObject : Object, ICallable, IConstructable
 {
 #pragma warning disable CS8618 // All properties are initialised in OrdinaryFunctionCreate
     private FunctionObject(Object? prototype) : base(prototype)
@@ -60,6 +60,63 @@ internal sealed class FunctionObject : Object, ICallable
         if (result.IsAbruptCompletion()) return result;
 
         // 10. Return undefined.
+        return Completion.NormalCompletion(Undefined.The);
+    }
+
+    // 10.2.2 [[Construct]] ( argumentsList, FIXME: newTarget ), https://tc39.es/ecma262/#sec-ecmascript-function-objects-construct-argumentslist-newtarget
+    public Completion Construct(VM vm, List argumentsList)
+    {
+        // 1. Let callerContext be the running execution context.
+        var callerContext = (vm.CurrentExecutionContext as ScriptExecutionContext)!;
+
+        // FIXME: 2. Let kind be F.[[ConstructorKind]].
+        // FIXME: 3. If kind is BASE, then
+        // a. Let thisArgument be ? FIXME: OrdinaryCreateFromConstructor(newTarget, "%Object.prototype%").
+        var thisArgument = new Object(null);
+
+        // 4. Let calleeContext be PrepareForOrdinaryCall(F, FIXME: newTarget).
+        var calleeContext = (PrepareForOrdinaryCall(vm, Undefined.The) as ScriptExecutionContext)!;
+
+        // 5. Assert: calleeContext is now the running execution context.
+        Debug.Assert(vm.CurrentExecutionContext == calleeContext);
+
+        // FIXME: 6. If kind is BASE, then
+        // FIXME: a. Perform OrdinaryCallBindThis(F, calleeContext, thisArgument).
+        // FIXME: b. Let initializeResult be Completion(InitializeInstanceElements(thisArgument, F)).
+        // FIXME: c. If initializeResult is an abrupt completion, then
+        // FIXME: i. Remove calleeContext from the execution context stack and restore callerContext as the running execution context.
+        // FIXME: ii. Return ? initializeResult.
+
+        // 7. Let constructorEnv be the LexicalEnvironment of calleeContext.
+        var constructorEnv = calleeContext.LexicalEnvironment;
+
+        // 8. Let result be Completion(OrdinaryCallEvaluateBody(F, argumentsList)).
+        var result = OrdinaryCallEvaluateBody(vm, argumentsList);
+
+        // 9. Remove calleeContext from the execution context stack and restore callerContext as the running execution context.
+        vm.PopExecutionContext();
+
+        // 10. If result.[[Type]] is RETURN, then
+        if (result.IsReturnCompletion())
+        {
+            // a. If result.[[Value]] is an Object, return result.[[Value]].
+            if (result.Value.IsObject()) return Completion.NormalCompletion(result.Value);
+
+            // FIXME: b. If kind is BASE, return thisArgument.
+
+            // c. If result.[[Value]] is not undefined, throw a FIXME: TypeError exception.
+            if (!result.Value.IsUndefined()) return Completion.ThrowCompletion(new String("Function constructor without kind of base did not return an object/undefined"));
+        }
+        // 11. Else,
+        else
+        {
+            // a. ReturnIfAbrupt(result).
+            if (result.IsAbruptCompletion()) return result;
+        }
+
+        // FIXME: 12. Let thisBinding be ? constructorEnv.GetThisBinding().
+        // FIXME: 13. Assert: thisBinding is an Object.
+        // FIXME: 14. Return thisBinding.
         return Completion.NormalCompletion(Undefined.The);
     }
 
