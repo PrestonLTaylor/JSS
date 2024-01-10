@@ -234,6 +234,35 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         return EvaluateBody(vm, argumentsList);
     }
 
+    // 10.2.5 MakeConstructor ( F [ , writablePrototype [ , prototype ] ] ), https://tc39.es/ecma262/#sec-makeconstructor
+    public void MakeConstructor(bool? writiablePrototype = null, Object? prototype = null)
+    {
+        // NOTE: This is implemented using inheritance so these steps are done at compile time
+        // FIXME: 1. If F is an ECMAScript function object, then
+        // a. Assert: IsConstructor(F) is false.
+        // b. Assert: F is an extensible object that does not have a "prototype" own property.
+        // c. Set F.[[Construct]] to the definition specified in 10.2.2.
+        // FIXME: 2. Else,
+        // FIXME: a. Set F.[[Construct]] to the definition specified in 10.3.2.
+
+        // 3. Set F.[[ConstructorKind]] to BASE.
+        ConstructorKind = ConstructorKind.BASE;
+
+        // 4. If writablePrototype is not present, set writablePrototype to true.
+        writiablePrototype ??= true;
+
+        // 5. If prototype is not present, then
+        if (prototype is null)
+        {
+            // FIXME: a. Set prototype to OrdinaryObjectCreate(%Object.prototype%).
+            // FIXME: b. Perform ! DefinePropertyOrThrow(prototype, "constructor", PropertyDescriptor { [[Value]]: F, [[Writable]]: writablePrototype, [[Enumerable]]: false, [[Configurable]]: true }).
+        }
+
+        // FIXME: 6. Perform ! DefinePropertyOrThrow(F, "prototype", PropertyDescriptor { [[Value]]: prototype, [[Writable]]: writablePrototype, [[Enumerable]]: false, [[Configurable]]: false }).
+
+        // 7. Return UNUSED.
+    }
+
     // 10.2.9 SetFunctionName ( F, name [ , prefix ] ), https://tc39.es/ecma262/#sec-setfunctionname
     public void SetFunctionName(string name, string prefix = "")
     {
@@ -558,4 +587,5 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
     public StatementList ECMAScriptCode { get; private set; }
     public Environment Environment { get; private set; }
     public ThisMode ThisMode { get; private set; }
+    public ConstructorKind ConstructorKind { get; private set; }
 }

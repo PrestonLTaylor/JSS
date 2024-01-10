@@ -2,6 +2,11 @@
 
 namespace JSS.Lib.AST.Values;
 
+enum ConstructorKind
+{
+    BASE,
+}
+
 internal interface IConstructable
 {
     // 7.3.15 Construct ( F [ , argumentsList [ , newTarget ] ] ), https://tc39.es/ecma262/#sec-construct

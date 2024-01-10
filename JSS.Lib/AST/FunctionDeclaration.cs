@@ -37,7 +37,8 @@ internal sealed class FunctionDeclaration : Declaration
         // 4. Perform SetFunctionName(F, name).
         F.SetFunctionName(Identifier);
 
-        // FIXME: 5. Perform MakeConstructor(F).
+        // 5. Perform MakeConstructor(F).
+        F.MakeConstructor();
 
         // 6. Return F.
         return F;
