@@ -5,15 +5,26 @@ using ExecutionContext = JSS.Lib.Execution.ExecutionContext;
 
 namespace JSS.Lib.AST.Values;
 
+enum ThisMode
+{
+    LEXICAL,
+    GLOBAL,
+}
+
+enum LexicalThisMode
+{
+    LEXICAL_THIS,
+    NON_LEXICAL_THIS,
+}
+
 // FIXME: Spec links for FunctionObject when FunctionObject is more fleshed out
 internal sealed class FunctionObject : Object, ICallable
 {
-    public FunctionObject(IReadOnlyList<Identifier> formalParameters, StatementList body, Environment env) : base(null)
+#pragma warning disable CS8618 // All properties are initialised in OrdinaryFunctionCreate
+    private FunctionObject(Object? prototype) : base(prototype)
     {
-        FormalParameters = formalParameters;
-        ECMAScriptCode = body;
-        Environment = env;
     }
+#pragma warning restore CS8618
 
     override public bool IsFunction() { return true; }
     override public ValueType Type() { return ValueType.Function; }
@@ -92,6 +103,59 @@ internal sealed class FunctionObject : Object, ICallable
         // FIXME: Evaluate other types of functions when we implement them
         // 1. Return ? EvaluateFunctionBody of FunctionBody with arguments functionObject and argumentsList.
         return EvaluateFunctionBody(vm, argumentsList);
+    }
+
+    // 10.2.3 OrdinaryFunctionCreate ( FIXME: functionPrototype, FIXME: sourceText, ParameterList, Body, thisMode, env, FIXME: privateEnv ), https://tc39.es/ecma262/#sec-ordinaryfunctioncreate
+    static public FunctionObject OrdinaryFunctionCreate(IReadOnlyList<Identifier> parameterList, StatementList body, LexicalThisMode thisMode, Environment env)
+    {
+        // 1. Let internalSlotsList be the internal slots listed in Table 30.
+
+        // FIXME: 2. Let F be OrdinaryObjectCreate(functionPrototype, internalSlotsList).
+        var f = new FunctionObject(null);
+
+        // 3. Set F.[[Call]] to the definition specified in 10.2.1.
+
+        // FIXME: 4. Set F.[[SourceText]] to sourceText.
+
+        // 5. Set F.[[FormalParameters]] to ParameterList.
+        f.FormalParameters = parameterList;
+
+        // 6. Set F.[[ECMAScriptCode]] to Body.
+        f.ECMAScriptCode = body;
+
+        // FIXME: 7. If the source text matched by Body is strict mode code, let Strict be true; else let Strict be false.
+        // FIXME: 8. Set F.[[Strict]] to Strict.
+
+        // 9. If thisMode is LEXICAL-THIS, set F.[[ThisMode]] to LEXICAL.
+        if (thisMode == LexicalThisMode.LEXICAL_THIS)
+        {
+            f.ThisMode = ThisMode.LEXICAL;
+        }
+        // FIXME: 10. Else if Strict is true, set F.[[ThisMode]] to STRICT.
+        // 11. Else, set F.[[ThisMode]] to GLOBAL.
+        else
+        {
+            f.ThisMode = ThisMode.GLOBAL;
+        }
+
+        // FIXME: 12. Set F.[[IsClassConstructor]] to false.
+
+        // 13. Set F.[[Environment]] to env.
+        f.Environment = env;
+
+        // FIXME: 14. Set F.[[PrivateEnvironment]] to privateEnv.
+        // FIXME: 15. Set F.[[ScriptOrModule]] to GetActiveScriptOrModule().
+        // FIXME: 16. Set F.[[Realm]] to the current Realm Record.
+        // FIXME: 17. Set F.[[HomeObject]] to undefined.
+        // FIXME: 18. Set F.[[Fields]] to a new empty List.
+        // FIXME: 19. Set F.[[PrivateMethods]] to a new empty List.
+        // FIXME: 20. Set F.[[ClassFieldInitializerName]] to EMPTY.
+
+        // FIXME: 21. Let len be the ExpectedArgumentCount of ParameterList.
+        // FIXME: 22. Perform SetFunctionLength(F, len).
+
+        // 23. Return F.
+        return f;
     }
 
     // FIXME: This should be here
@@ -433,7 +497,8 @@ internal sealed class FunctionObject : Object, ICallable
         return names;
     }
 
-    public IReadOnlyList<Identifier> FormalParameters { get; }
-    public StatementList ECMAScriptCode { get; }
-    public Environment Environment { get; }
+    public IReadOnlyList<Identifier> FormalParameters { get; private set; }
+    public StatementList ECMAScriptCode { get; private set; }
+    public Environment Environment { get; private set; }
+    public ThisMode ThisMode { get; private set; }
 }
