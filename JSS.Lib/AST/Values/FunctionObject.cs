@@ -69,10 +69,16 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         // 1. Let callerContext be the running execution context.
         var callerContext = (vm.CurrentExecutionContext as ScriptExecutionContext)!;
 
-        // FIXME: 2. Let kind be F.[[ConstructorKind]].
-        // FIXME: 3. If kind is BASE, then
-        // a. Let thisArgument be ? FIXME: OrdinaryCreateFromConstructor(newTarget, "%Object.prototype%").
-        var thisArgument = new Object(null);
+        // 2. Let kind be F.[[ConstructorKind]].
+
+        Object thisArgument = Undefined.The;
+
+        // 3. If kind is BASE, then
+        if (ConstructorKind == ConstructorKind.BASE)
+        {
+            // a. Let thisArgument be ? FIXME: OrdinaryCreateFromConstructor(newTarget, "%Object.prototype%").
+            thisArgument = new Object(null);
+        }
 
         // 4. Let calleeContext be PrepareForOrdinaryCall(F, FIXME: newTarget).
         var calleeContext = (PrepareForOrdinaryCall(vm, Undefined.The) as ScriptExecutionContext)!;
@@ -102,7 +108,8 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             // a. If result.[[Value]] is an Object, return result.[[Value]].
             if (result.Value.IsObject()) return Completion.NormalCompletion(result.Value);
 
-            // FIXME: b. If kind is BASE, return thisArgument.
+            // b. If kind is BASE, return thisArgument.
+            if (ConstructorKind == ConstructorKind.BASE) return Completion.NormalCompletion(thisArgument);
 
             // c. If result.[[Value]] is not undefined, throw a FIXME: TypeError exception.
             if (!result.Value.IsUndefined()) return Completion.ThrowCompletion(new String("Function constructor without kind of base did not return an object/undefined"));
