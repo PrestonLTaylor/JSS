@@ -90,9 +90,8 @@ internal sealed class Realm
         Dictionary<string, Property> globalProperties = new();
 
         // 20.1.1 The Object Constructor, https://tc39.es/ecma262/#sec-object-constructor
-        var result = ObjectConstructor.Create();
-        Debug.Assert(result.IsNormalCompletion()) ;
-        globalProperties.Add("Object", new Property(result.Value, new(true, false, true)));
+        var objectConstructor = new ObjectConstructor();
+        globalProperties.Add("Object", new Property(objectConstructor, new(true, false, true)));
 
         return globalProperties;
     }

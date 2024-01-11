@@ -7,16 +7,11 @@ namespace JSS.Lib.Runtime;
 
 internal class ObjectConstructor : Object, ICallable, IConstructable
 {
-    private ObjectConstructor(Object? prototype) : base(prototype)
+    // FIXME: The Object constructor has a [[Prototype]] internal slot whose value is %Function.prototype%.
+    public ObjectConstructor() : base(null)
     {
-    }
-
-    static public Completion Create()
-    {
-        // FIXME: The Object constructor has a [[Prototype]] internal slot whose value is %Function.prototype%.
-        var objectConstructor = new ObjectConstructor(null);
-
-        return Completion.NormalCompletion(objectConstructor);
+        // The Object constructor has a "length" property whose value is 1𝔽.
+        DataProperties.Add("length", new Property(new Number(1), new Attributes(true, false, true)));
     }
 
     // 20.1.1.1 Object ( [ value ] ), https://tc39.es/ecma262/#sec-object-value
