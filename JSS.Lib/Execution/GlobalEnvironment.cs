@@ -125,6 +125,13 @@ internal sealed class GlobalEnvironment : Environment
         return ObjectRecord.GetBindingValue(N, S);
     }
 
+    // 9.1.1.4.11 GetThisBinding ( ), https://tc39.es/ecma262/#sec-global-environment-records-getthisbinding
+    public override Completion GetThisBinding()
+    {
+        // 1. Return envRec.[[GlobalThisValue]].
+        return Completion.NormalCompletion(GlobalThisValue);
+    }
+
     // 9.1.1.4.12 HasVarDeclaration ( N ), https://tc39.es/ecma262/#sec-hasvardeclaration
     public bool HasVarDeclaration(string N)
     {

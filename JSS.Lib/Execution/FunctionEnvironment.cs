@@ -64,6 +64,22 @@ internal class FunctionEnvironment : DeclarativeEnvironment
         return Completion.NormalCompletion(V);
     }
 
+    // 9.1.1.3.4 GetThisBinding ( ), https://tc39.es/ecma262/#sec-function-environment-records-getthisbinding
+    public override Completion GetThisBinding()
+    {
+        // 1. Assert: envRec.[[ThisBindingStatus]] is not LEXICAL.
+        Debug.Assert(ThisBindingStatus != ThisBindingStatus.LEXICAL);
+
+        // 2. If envRec.[[ThisBindingStatus]] is UNINITIALIZED, throw a FIXME: ReferenceError exception.
+        if (ThisBindingStatus == ThisBindingStatus.UNINITIALIZED)
+        {
+            return Completion.NormalCompletion(new String("Tried to get an uninitialized this value"));
+        }
+
+        // 3. Return envRec.[[ThisValue]].
+        return Completion.NormalCompletion(ThisValue!);
+    }
+
     public Value? ThisValue { get; private set; }
     public ThisBindingStatus ThisBindingStatus { get; private set; }
     public FunctionObject FunctionObject { get; }
