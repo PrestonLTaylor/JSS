@@ -1,9 +1,5 @@
 ﻿using JSS.Lib.Execution;
-using static System.Collections.Specialized.BitVector32;
-using System.Xml.Linq;
-using System;
-using System.Diagnostics;
-using JSS.Lib.AST.Values;
+using static JSS.Lib.Execution.CompletionHelper;
 
 namespace JSS.Lib.AST;
 
@@ -59,15 +55,13 @@ internal sealed class Block : INode
                 if (d is ConstDeclaration)
                 {
                     // 1. Perform ! env.CreateImmutableBinding(dn, true).
-                    var createResult = env.CreateImmutableBinding(dn, true);
-                    Debug.Assert(createResult.IsNormalCompletion());
+                    MUST(env.CreateImmutableBinding(dn, true));
                 }
                 // ii. Else,
                 else
                 {
                     // 1. Perform ! env.CreateMutableBinding(dn, false). NOTE: This step is replaced in section B.3.2.6.
-                    var createResult = env.CreateMutableBinding(dn, true);
-                    Debug.Assert(createResult.IsNormalCompletion());
+                    MUST(env.CreateMutableBinding(dn, true));
                 }
             }
 
@@ -82,8 +76,7 @@ internal sealed class Block : INode
                 var fo = f!.InstantiateFunctionObject(env);
 
                 // iii. Perform ! env.InitializeBinding(fn, fo). NOTE: This step is replaced in section B.3.2.6.
-                var initResult = env.InitializeBinding(fn, fo);
-                Debug.Assert(initResult.IsNormalCompletion());
+                MUST(env.InitializeBinding(fn, fo));
             }
         }
 

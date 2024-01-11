@@ -1,6 +1,6 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
-using System.Diagnostics;
+using static JSS.Lib.Execution.CompletionHelper;
 
 namespace JSS.Lib.AST;
 
@@ -36,13 +36,11 @@ internal sealed class LetDeclaration : Declaration
     private Completion EvaluateWithoutInitializer(VM vm)
     {
         // 1. Let lhs be ! ResolveBinding(StringValue of BindingIdentifier).
-        var lhs = ScriptExecutionContext.ResolveBinding(vm, Identifier);
-        Debug.Assert(lhs.IsNormalCompletion());
+        var lhs = MUST(ScriptExecutionContext.ResolveBinding(vm, Identifier));
 
         // 2. Perform ! InitializeReferencedBinding(lhs, undefined).
-        var asReference = lhs.Value.AsReference();
-        var initializationResult = asReference.InitializeReferencedBinding(Undefined.The);
-        Debug.Assert(initializationResult.IsNormalCompletion());
+        var asReference = lhs.AsReference();
+        MUST(asReference.InitializeReferencedBinding(Undefined.The));
 
         // 3. Return EMPTY.
         return Completion.NormalCompletion(Empty.The);
@@ -52,8 +50,7 @@ internal sealed class LetDeclaration : Declaration
     {
         // 1. Let bindingId be StringValue of BindingIdentifier.
         // 2. Let lhs be ! ResolveBinding(bindingId).
-        var lhs = ScriptExecutionContext.ResolveBinding(vm, Identifier);
-        Debug.Assert(lhs.IsNormalCompletion());
+        var lhs = MUST(ScriptExecutionContext.ResolveBinding(vm, Identifier));
 
         // FIXME: 3. If IsAnonymousFunctionDefinition(Initializer) is true, then
         // FIXME: a. Let value be ? NamedEvaluation of Initializer with argument bindingId.
@@ -68,9 +65,8 @@ internal sealed class LetDeclaration : Declaration
         if (value.IsAbruptCompletion()) return value;
 
         // 5. Perform ! InitializeReferencedBinding(lhs, value).
-        var asReference = lhs.Value.AsReference();
-        var initializationResult = asReference.InitializeReferencedBinding(value.Value);
-        Debug.Assert(initializationResult.IsNormalCompletion());
+        var asReference = lhs.AsReference();
+        MUST(asReference.InitializeReferencedBinding(value.Value));
 
         // 6. Return EMPTY.
         return Completion.NormalCompletion(Empty.The);

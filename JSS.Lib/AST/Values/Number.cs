@@ -1,6 +1,4 @@
-﻿using System.Diagnostics;
-
-namespace JSS.Lib.AST.Values;
+﻿namespace JSS.Lib.AST.Values;
 
 internal sealed class Number : Value
 {

@@ -1,6 +1,7 @@
 ﻿using JSS.Lib.Execution;
 using System.Diagnostics;
 using Environment = JSS.Lib.Execution.Environment;
+using static JSS.Lib.Execution.CompletionHelper;
 
 namespace JSS.Lib.AST.Values;
 
@@ -387,9 +388,7 @@ internal abstract class Value
         }
 
         // 3. Return ! ToString(key).
-        var asString = key.Value.ToStringJS();
-        Debug.Assert(asString.IsNormalCompletion());
-        return asString;
+        return Completion.NormalCompletion(MUST(key.Value.ToStringJS()));
     }
 
     // 7.2.3 IsCallable ( argument ), https://tc39.es/ecma262/#sec-iscallable
@@ -588,24 +587,13 @@ internal abstract class Value
         // 5. If x is a Number and y is a String, return ! IsLooselyEqual(x, ! ToNumber(y)).
         if (x.IsNumber() && y.IsString())
         {
-            // FIXME: Maybe a MUST-like function for the asserts
-            var yAsNumber = y.ToNumber();
-            Debug.Assert(yAsNumber.IsNormalCompletion());
-
-            var result = IsLooselyEqual(x, yAsNumber.Value);
-            Debug.Assert(result.IsNormalCompletion());
-            return result;
+            return Completion.NormalCompletion(MUST(IsLooselyEqual(x, MUST(y.ToNumber()))));
         }
 
         // 6. If x is a String and y is a Number, return ! IsLooselyEqual(! ToNumber(x), y).
         if (x.IsString() && y.IsNumber())
         {
-            var xAsNumber = x.ToNumber();
-            Debug.Assert(xAsNumber.IsNormalCompletion());
-
-            var result = IsLooselyEqual(xAsNumber.Value, y);
-            Debug.Assert(result.IsNormalCompletion());
-            return result;
+            return Completion.NormalCompletion(MUST(IsLooselyEqual(MUST(x.ToNumber()), y)));
         }
 
         // FIXME: 7. If x is a BigInt and y is a String, then

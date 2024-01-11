@@ -1,6 +1,7 @@
 ﻿using JSS.Lib.AST.Values;
 using System.Diagnostics;
 using String = JSS.Lib.AST.Values.String;
+using static JSS.Lib.Execution.CompletionHelper;
 
 namespace JSS.Lib.Execution;
 
@@ -83,12 +84,10 @@ internal class DeclarativeEnvironment : Environment
             }
 
             // b. Perform ! envRec.CreateMutableBinding(N, true).
-            var createResult = CreateMutableBinding(N, true);
-            Debug.Assert(createResult.IsNormalCompletion());
+            MUST(CreateMutableBinding(N, true));
 
             // c. Perform ! envRec.InitializeBinding(N, V).
-            var initializeResult = InitializeBinding(N, V);
-            Debug.Assert(initializeResult.IsNormalCompletion());
+            MUST(InitializeBinding(N, V));
 
             // d. Return UNUSED.
             return Completion.NormalCompletion(Empty.The);

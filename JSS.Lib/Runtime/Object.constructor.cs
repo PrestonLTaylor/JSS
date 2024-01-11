@@ -2,6 +2,7 @@
 using JSS.Lib.Execution;
 using System.Diagnostics;
 using Object = JSS.Lib.AST.Values.Object;
+using static JSS.Lib.Execution.CompletionHelper;
 
 namespace JSS.Lib.Runtime;
 
@@ -35,9 +36,7 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
         }
 
         // 3. Return ! ToObject(value).
-        var asObject = value.ToObject();
-        Debug.Assert(asObject.IsNormalCompletion());
-        return asObject;
+        return Completion.NormalCompletion(MUST(value.ToObject()));
     }
 
     static public ObjectConstructor The

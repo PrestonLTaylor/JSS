@@ -3,6 +3,7 @@ using System.Diagnostics;
 using Boolean = JSS.Lib.AST.Values.Boolean;
 using String = JSS.Lib.AST.Values.String;
 using Object = JSS.Lib.AST.Values.Object;
+using static JSS.Lib.Execution.CompletionHelper;
 
 namespace JSS.Lib.Execution;
 
@@ -58,9 +59,7 @@ internal sealed class GlobalEnvironment : Environment
         if (DeclarativeRecord.HasBinding(N)) return Completion.ThrowCompletion(new String($"redeclaration of mutable binding {N}"));
 
         // 3. Return ! DclRec.CreateMutableBinding(N, D).
-        var result = DeclarativeRecord.CreateMutableBinding(N, D);
-        Debug.Assert(result.IsNormalCompletion());
-        return result;
+        return Completion.NormalCompletion(MUST(DeclarativeRecord.CreateMutableBinding(N, D)));
     }
 
     // 9.1.1.4.3 CreateImmutableBinding ( N, S ), https://tc39.es/ecma262/#sec-global-environment-records-createimmutablebinding-n-s
@@ -71,7 +70,7 @@ internal sealed class GlobalEnvironment : Environment
         if (DeclarativeRecord.HasBinding(N)) return Completion.ThrowCompletion(new String($"redeclaration of immutable binding {N}"));
 
         // 3. Return ! DclRec.CreateImmutableBinding(N, S).
-        return DeclarativeRecord.CreateImmutableBinding(N, S);
+        return Completion.NormalCompletion(MUST(DeclarativeRecord.CreateImmutableBinding(N, S)));
     }
 
     // 9.1.1.4.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-global-environment-records-initializebinding-n-v
@@ -82,7 +81,7 @@ internal sealed class GlobalEnvironment : Environment
         if (DeclarativeRecord.HasBinding(N))
         {
             // a. Return ! DclRec.InitializeBinding(N, V).
-            return DeclarativeRecord.InitializeBinding(N, V);
+            return Completion.NormalCompletion(MUST(DeclarativeRecord.InitializeBinding(N, V)));
         }
 
         // 3. Assert: If the binding exists, it must be in the Object Environment Record.

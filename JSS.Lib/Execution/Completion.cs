@@ -115,3 +115,20 @@ internal sealed class Completion
     public Value Value { get; private set; }
     public string Target { get; }
 }
+
+internal static class CompletionHelper
+{
+    // FIXME: Find out if there is some way in C# to do '?'
+
+    // Implements the '!' spec steps, https://tc39.es/ecma262/#sec-returnifabrupt-shorthands
+    static public Value MUST(Completion completion)
+    {
+        // 1. Let val be OperationName().
+
+        // 2. Assert: val is a normal completion.
+        Debug.Assert(completion.IsNormalCompletion());
+
+        // 3. Set val to val.[[Value]].
+        return completion.Value;
+    }
+}

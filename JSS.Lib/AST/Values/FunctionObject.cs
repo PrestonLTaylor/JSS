@@ -3,6 +3,7 @@ using JSS.Lib.Runtime;
 using System.Diagnostics;
 using Environment = JSS.Lib.Execution.Environment;
 using ExecutionContext = JSS.Lib.Execution.ExecutionContext;
+using static JSS.Lib.Execution.CompletionHelper;
 
 namespace JSS.Lib.AST.Values;
 
@@ -142,9 +143,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             else
             {
                 // i. Let thisValue be ! ToObject(thisArgument).
-                var toObject = thisArgument.ToObject();
-                Debug.Assert(toObject.IsNormalCompletion());
-                thisValue = toObject.Value;
+                thisValue = MUST(thisArgument.ToObject());
 
                 // ii. NOTE: ToObject produces wrapper objects using calleeRealm.
             }
@@ -157,8 +156,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
 
         // 9. Perform ! localEnv.BindThisValue(thisValue).
         var localFunctionEnv = localEnv as FunctionEnvironment;
-        var bindResult = localFunctionEnv!.BindThisValue(thisValue);
-        Debug.Assert(bindResult.IsNormalCompletion());
+        MUST(localFunctionEnv!.BindThisValue(thisValue));
 
         // 10. Return UNUSED.
     }
@@ -374,8 +372,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         }
 
         // 6. Perform ! DefinePropertyOrThrow(F, "name", PropertyDescriptor { [[Value]]: name, [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: true }).
-        var result = DefinePropertyOrThrow(this, "name", new Property(new String(name), new Attributes(false, false, true)));
-        Debug.Assert(result.IsNormalCompletion());
+        MUST(DefinePropertyOrThrow(this, "name", new Property(new String(name), new Attributes(false, false, true))));
 
         // 7. Return unused.
     }
@@ -491,15 +488,13 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             if (!alreadyDeclared)
             {
                 // i. Perform ! env.CreateMutableBinding(paramName, false).
-                var createResult = env.CreateMutableBinding(paramName, false);
-                Debug.Assert(createResult.IsNormalCompletion());
+                MUST(env.CreateMutableBinding(paramName, false));
 
                 // ii. If hasDuplicates is true, then
                 if (hasDuplicates)
                 {
                     // 1. Perform ! env.InitializeBinding(paramName, undefined).
-                    var initializeResult = env.InitializeBinding(paramName, Undefined.The);
-                    Debug.Assert(initializeResult.IsNormalCompletion());
+                    MUST(env.InitializeBinding(paramName, Undefined.The));
                 }
             }
         }
@@ -528,8 +523,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         // FIXME: a. Perform ? IteratorBindingInitialization of formals with arguments iteratorRecord and env.
         for (int i = 0; i < Math.Min(FormalParameters.Count, argumentsList.Values.Count); ++i)
         {
-            var initResult = env.InitializeBinding(FormalParameters[i].Name, argumentsList.Values[i]);
-            Debug.Assert(initResult.IsNormalCompletion());
+            MUST(env.InitializeBinding(FormalParameters[i].Name, argumentsList.Values[i]));
         }
 
         // FIXME: 27. If hasParameterExpressions is false, then
@@ -563,8 +557,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
                 instantiatedVarNames.Add(n);
 
                 // 2. Perform ! varEnv.CreateMutableBinding(n, false).
-                var createResult = varEnv.CreateMutableBinding(n, false);
-                Debug.Assert(createResult.IsNormalCompletion());
+                MUST(varEnv.CreateMutableBinding(n, false));
 
                 // 3. If parameterBindings does not contain n, or if functionNames contains n, then
                 Value initialValue;
@@ -577,14 +570,11 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
                 else
                 {
                     // a. Let initialValue be ! env.GetBindingValue(n, false).
-                    var getResult = env.GetBindingValue(n, false);
-                    Debug.Assert(getResult.IsNormalCompletion());
-                    initialValue = getResult.Value;
+                    initialValue = MUST(env.GetBindingValue(n, false));
                 }
 
                 // 5. Perform ! varEnv.InitializeBinding(n, initialValue).
-                var initializeResult = varEnv.InitializeBinding(n, initialValue);
-                Debug.Assert(initializeResult.IsNormalCompletion());
+                MUST(varEnv.InitializeBinding(n, initialValue));
 
                 // 6. NOTE: A var with the same name as a formal parameter initially has the same value as the corresponding initialized parameter.
             }
@@ -620,15 +610,13 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
                 if (d is ConstDeclaration)
                 {
                     // 1. Perform ! lexEnv.CreateImmutableBinding(dn, true).
-                    var createResult = lexEnv.CreateImmutableBinding(dn, true);
-                    Debug.Assert(createResult.IsNormalCompletion());
+                    MUST(lexEnv.CreateImmutableBinding(dn, true));
                 }
                 // ii. Else,
                 else
                 {
                     // 1. Perform ! lexEnv.CreateMutableBinding(dn, false).
-                    var createResult = lexEnv.CreateMutableBinding(dn, false);
-                    Debug.Assert(createResult.IsNormalCompletion());
+                    MUST(lexEnv.CreateMutableBinding(dn, false));
                 }
             }
         }
@@ -645,8 +633,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             var fo = f.InstantiateFunctionObject(lexEnv);
 
             // c. Perform ! varEnv.SetMutableBinding(fn, fo, false).
-            var setResult = varEnv.SetMutableBinding(fn, fo, false);
-            Debug.Assert(setResult.IsNormalCompletion());
+            MUST(varEnv.SetMutableBinding(fn, fo, false));
         }
 
         // 37. Return UNUSED.
