@@ -923,6 +923,30 @@ internal sealed class ASTTests
         Assert.That(actualObject.DataProperties, Has.Count.Zero);
     }
 
+    // NOTE/FIXME: I'm not sure this behaviour is correct chromeium doesn't replicate this 
+    [Test]
+    public void ThisExpression_ReturnsObject_WithTheRealmsGlobalObjectProps_WhenProvidedInGlobalNamespace()
+    {
+        // Arrange
+        var script = ParseScript("function a() {}; this");
+
+        // Act
+        var actualCompletion = script.ScriptEvaluation();
+
+        // Assert
+        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+
+        var thisObject = actualCompletion.Value as Object;
+        Assert.That(thisObject, Is.Not.Null);
+        // FIXME: Assert for %Object.prototype%
+
+        var globalObject = script.Realm.GlobalObject;
+        foreach (var prop in globalObject.DataProperties)
+        {
+            Assert.That(thisObject.DataProperties.ContainsKey(prop.Key), Is.True);
+        }
+    }
+
     // FIXME: Replace these manual ast tests with the astTestCases array when we can parse more numbers
     static private readonly object[] normalCompletionBitwiseAndTestCases =
     {
