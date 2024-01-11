@@ -240,10 +240,15 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             if (result.IsAbruptCompletion()) return result;
         }
 
-        // FIXME: 12. Let thisBinding be ? constructorEnv.GetThisBinding().
-        // FIXME: 13. Assert: thisBinding is an Object.
+        // 12. Let thisBinding be ? constructorEnv.GetThisBinding().
+        var thisBinding = constructorEnv!.GetThisBinding();
+        if (thisBinding.IsAbruptCompletion()) return thisBinding;
+
+        // 13. Assert: thisBinding is an Object.
+        Debug.Assert(thisBinding.Value is Object);
+
         // FIXME: 14. Return thisBinding.
-        return Completion.NormalCompletion(Undefined.The);
+        return Completion.NormalCompletion(thisBinding.Value);
     }
 
     // 10.2.3 OrdinaryFunctionCreate ( FIXME: functionPrototype, FIXME: sourceText, ParameterList, Body, thisMode, env, FIXME: privateEnv ), https://tc39.es/ecma262/#sec-ordinaryfunctioncreate

@@ -923,7 +923,23 @@ internal sealed class ASTTests
         Assert.That(actualObject.DataProperties, Has.Count.Zero);
     }
 
-    // NOTE/FIXME: I'm not sure this behaviour is correct chromeium doesn't replicate this 
+    [Test]
+    public void NewExpression_WithThisSettingFunction_ReturnsANewObject_WithExpectedProps()
+    {
+        // Arrange
+        var script = ParseScript("function a() { this.a = 1 }; let b = new a(); b.a");
+
+        // Act
+        var actualCompletion = script.ScriptEvaluation();
+
+        // Assert
+        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+
+        var actualValue = actualCompletion.Value as Number;
+        Assert.That(actualValue, Is.Not.Null);
+        Assert.That(actualValue.Value, Is.EqualTo(1));
+    }
+
     [Test]
     public void ThisExpression_ReturnsObject_WithTheRealmsGlobalObjectProps_WhenProvidedInGlobalNamespace()
     {
