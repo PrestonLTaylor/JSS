@@ -1,4 +1,6 @@
 ﻿using JSS.Lib.AST.Values;
+using System.Diagnostics;
+using String = JSS.Lib.AST.Values.String;
 using Object = JSS.Lib.AST.Values.Object;
 
 namespace JSS.Lib.Execution;
@@ -6,6 +8,7 @@ namespace JSS.Lib.Execution;
 enum ThisBindingStatus
 {
     LEXICAL,
+    INITIALIZED,
     UNINITIALIZED,
 }
 
@@ -39,7 +42,30 @@ internal class FunctionEnvironment : DeclarativeEnvironment
         // 7. Return env.
     }
 
+    // 9.1.1.3.1 BindThisValue ( V ), https://tc39.es/ecma262/#sec-bindthisvalue
+    public Completion BindThisValue(Value V)
+    {
+        // 1. Assert: envRec.[[ThisBindingStatus]] is not LEXICAL.
+        Debug.Assert(ThisBindingStatus == ThisBindingStatus.LEXICAL);
+
+        // 2. If envRec.[[ThisBindingStatus]] is INITIALIZED, throw a FIXKME: ReferenceError exception.
+        if (ThisBindingStatus == ThisBindingStatus.INITIALIZED)
+        {
+            return Completion.NormalCompletion(new String("Tried to bind a this value to already this-initialized function environment"));
+        }
+
+        // 3. Set envRec.[[ThisValue]] to V.
+        ThisValue = V;
+
+        // 4. Set envRec.[[ThisBindingStatus]] to INITIALIZED.
+        ThisBindingStatus = ThisBindingStatus.INITIALIZED;
+
+        // 5. Return V.
+        return Completion.NormalCompletion(V);
+    }
+
+    public Value? ThisValue { get; private set; }
+    public ThisBindingStatus ThisBindingStatus { get; private set; }
     public FunctionObject FunctionObject { get; }
     public Object NewTarget { get; }
-    public ThisBindingStatus ThisBindingStatus { get; }
 }
