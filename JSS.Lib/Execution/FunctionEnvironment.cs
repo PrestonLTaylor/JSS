@@ -46,7 +46,7 @@ internal class FunctionEnvironment : DeclarativeEnvironment
     public Completion BindThisValue(Value V)
     {
         // 1. Assert: envRec.[[ThisBindingStatus]] is not LEXICAL.
-        Debug.Assert(ThisBindingStatus == ThisBindingStatus.LEXICAL);
+        Debug.Assert(ThisBindingStatus != ThisBindingStatus.LEXICAL);
 
         // 2. If envRec.[[ThisBindingStatus]] is INITIALIZED, throw a FIXKME: ReferenceError exception.
         if (ThisBindingStatus == ThisBindingStatus.INITIALIZED)

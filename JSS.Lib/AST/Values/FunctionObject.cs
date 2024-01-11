@@ -7,6 +7,7 @@ namespace JSS.Lib.AST.Values;
 
 enum ThisMode
 {
+    STRICT,
     LEXICAL,
     GLOBAL,
 }
@@ -35,7 +36,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         // 1. Let callerContext be the running execution context.
 
         // 2. Let calleeContext be PrepareForOrdinaryCall(F, undefined).
-        var calleeContext = PrepareForOrdinaryCall(vm, Undefined.The);
+        var calleeContext = (PrepareForOrdinaryCall(vm, Undefined.The) as ScriptExecutionContext)!;
 
         // 3. Assert: calleeContext is now the running execution context.
         Debug.Assert(vm.CurrentExecutionContext == calleeContext);
@@ -45,7 +46,9 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         // FIXME: b. NOTE: error is created in calleeContext with F's associated Realm Record.
         // FIXME: c. Remove calleeContext from the execution context stack and restore callerContext as the running execution context.
         // FIXME: d. Return ThrowCompletion(error).
-        // FIXME: 5. Perform OrdinaryCallBindThis(F, calleeContext, thisArgument).
+
+        // 5. Perform OrdinaryCallBindThis(F, calleeContext, thisArgument).
+        OrdinaryCallBindThis(vm, calleeContext, thisArgument);
 
         // 6. Let result be Completion(OrdinaryCallEvaluateBody(F, argumentsList)).
         var result = OrdinaryCallEvaluateBody(vm, argumentsList);
@@ -60,70 +63,6 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         if (result.IsAbruptCompletion()) return result;
 
         // 10. Return undefined.
-        return Completion.NormalCompletion(Undefined.The);
-    }
-
-    // 10.2.2 [[Construct]] ( argumentsList, FIXME: newTarget ), https://tc39.es/ecma262/#sec-ecmascript-function-objects-construct-argumentslist-newtarget
-    public Completion Construct(VM vm, List argumentsList)
-    {
-        // 1. Let callerContext be the running execution context.
-        var callerContext = (vm.CurrentExecutionContext as ScriptExecutionContext)!;
-
-        // 2. Let kind be F.[[ConstructorKind]].
-
-        Object thisArgument = Undefined.The;
-
-        // 3. If kind is BASE, then
-        if (ConstructorKind == ConstructorKind.BASE)
-        {
-            // a. Let thisArgument be ? FIXME: OrdinaryCreateFromConstructor(newTarget, "%Object.prototype%").
-            thisArgument = new Object(null);
-        }
-
-        // 4. Let calleeContext be PrepareForOrdinaryCall(F, FIXME: newTarget).
-        var calleeContext = (PrepareForOrdinaryCall(vm, Undefined.The) as ScriptExecutionContext)!;
-
-        // 5. Assert: calleeContext is now the running execution context.
-        Debug.Assert(vm.CurrentExecutionContext == calleeContext);
-
-        // FIXME: 6. If kind is BASE, then
-        // FIXME: a. Perform OrdinaryCallBindThis(F, calleeContext, thisArgument).
-        // FIXME: b. Let initializeResult be Completion(InitializeInstanceElements(thisArgument, F)).
-        // FIXME: c. If initializeResult is an abrupt completion, then
-        // FIXME: i. Remove calleeContext from the execution context stack and restore callerContext as the running execution context.
-        // FIXME: ii. Return ? initializeResult.
-
-        // 7. Let constructorEnv be the LexicalEnvironment of calleeContext.
-        var constructorEnv = calleeContext.LexicalEnvironment;
-
-        // 8. Let result be Completion(OrdinaryCallEvaluateBody(F, argumentsList)).
-        var result = OrdinaryCallEvaluateBody(vm, argumentsList);
-
-        // 9. Remove calleeContext from the execution context stack and restore callerContext as the running execution context.
-        vm.PopExecutionContext();
-
-        // 10. If result.[[Type]] is RETURN, then
-        if (result.IsReturnCompletion())
-        {
-            // a. If result.[[Value]] is an Object, return result.[[Value]].
-            if (result.Value.IsObject()) return Completion.NormalCompletion(result.Value);
-
-            // b. If kind is BASE, return thisArgument.
-            if (ConstructorKind == ConstructorKind.BASE) return Completion.NormalCompletion(thisArgument);
-
-            // c. If result.[[Value]] is not undefined, throw a FIXME: TypeError exception.
-            if (!result.Value.IsUndefined()) return Completion.ThrowCompletion(new String("Function constructor without kind of base did not return an object/undefined"));
-        }
-        // 11. Else,
-        else
-        {
-            // a. ReturnIfAbrupt(result).
-            if (result.IsAbruptCompletion()) return result;
-        }
-
-        // FIXME: 12. Let thisBinding be ? constructorEnv.GetThisBinding().
-        // FIXME: 13. Assert: thisBinding is an Object.
-        // FIXME: 14. Return thisBinding.
         return Completion.NormalCompletion(Undefined.The);
     }
 
@@ -161,12 +100,150 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         return calleeContext;
     }
 
+    // 10.2.1.2 OrdinaryCallBindThis ( F, calleeContext, thisArgument ), https://tc39.es/ecma262/#sec-ordinarycallbindthis
+    private void OrdinaryCallBindThis(VM vm, ScriptExecutionContext calleeContext, Value thisArgument)
+    {
+        // 1. Let thisMode be F.[[ThisMode]].
+
+        // 2. If thisMode is LEXICAL, return UNUSED.
+        if (ThisMode == ThisMode.LEXICAL) return;
+
+        // 3. Let calleeRealm be FIXME: F.[[Realm]].
+        var calleeRealm = vm.Realm;
+
+        // 4. Let localEnv be the LexicalEnvironment of calleeContext.
+        var localEnv = calleeContext.LexicalEnvironment;
+
+        Value thisValue;
+
+        // 5. If thisMode is STRICT, then
+        if (ThisMode == ThisMode.STRICT)
+        {
+            // a. Let thisValue be thisArgument.
+            thisValue = thisArgument;
+        }
+        // 6. Else,
+        else
+        {
+            // a. If thisArgument is either undefined or null, then
+            if (thisArgument.IsUndefined() || thisArgument.IsNull())
+            {
+                // i. Let globalEnv be calleeRealm.[[GlobalEnv]].
+                var globalEnv = calleeRealm.GlobalEnv;
+
+                // ii. Assert: globalEnv is a Global Environment Record.
+                Debug.Assert(globalEnv is GlobalEnvironment);
+
+                // iii. Let thisValue be globalEnv.[[GlobalThisValue]].
+                thisValue = globalEnv.GlobalThisValue;
+            }
+            // b. Else,
+            else
+            {
+                // i. Let thisValue be ! ToObject(thisArgument).
+                var toObject = thisArgument.ToObject();
+                Debug.Assert(toObject.IsNormalCompletion());
+                thisValue = toObject.Value;
+
+                // ii. NOTE: ToObject produces wrapper objects using calleeRealm.
+            }
+        }
+
+        // 7. Assert: localEnv is a Function Environment Record.
+        Debug.Assert(localEnv is FunctionEnvironment);
+
+        // 8. Assert: The next step never returns an abrupt completion because localEnv.[[ThisBindingStatus]] is not INITIALIZED.
+
+        // 9. Perform ! localEnv.BindThisValue(thisValue).
+        var localFunctionEnv = localEnv as FunctionEnvironment;
+        var bindResult = localFunctionEnv!.BindThisValue(thisValue);
+        Debug.Assert(bindResult.IsNormalCompletion());
+
+        // 10. Return UNUSED.
+    }
+
     // 10.2.1.3 Runtime Semantics: EvaluateBody, https://tc39.es/ecma262/#sec-runtime-semantics-evaluatebody
     private Completion EvaluateBody(VM vm, List argumentsList)
     {
         // FIXME: Evaluate other types of functions when we implement them
         // 1. Return ? EvaluateFunctionBody of FunctionBody with arguments functionObject and argumentsList.
         return EvaluateFunctionBody(vm, argumentsList);
+    }
+
+    // 10.2.1.4 OrdinaryCallEvaluateBody ( F, argumentsList ), https://tc39.es/ecma262/#sec-ordinarycallevaluatebody
+    private Completion OrdinaryCallEvaluateBody(VM vm, List argumentsList)
+    {
+        // 1. Return ? EvaluateBody of F.[[ECMAScriptCode]] with arguments F and argumentsList.
+        return EvaluateBody(vm, argumentsList);
+    }
+
+    // 10.2.2 [[Construct]] ( argumentsList, FIXME: newTarget ), https://tc39.es/ecma262/#sec-ecmascript-function-objects-construct-argumentslist-newtarget
+    public Completion Construct(VM vm, List argumentsList)
+    {
+        // 1. Let callerContext be the running execution context.
+        var callerContext = (vm.CurrentExecutionContext as ScriptExecutionContext)!;
+
+        // 2. Let kind be F.[[ConstructorKind]].
+
+        Object thisArgument = Undefined.The;
+
+        // 3. If kind is BASE, then
+        if (ConstructorKind == ConstructorKind.BASE)
+        {
+            // a. Let thisArgument be ? FIXME: OrdinaryCreateFromConstructor(newTarget, "%Object.prototype%").
+            thisArgument = new Object(null);
+        }
+
+        // 4. Let calleeContext be PrepareForOrdinaryCall(F, FIXME: newTarget).
+        var calleeContext = (PrepareForOrdinaryCall(vm, Undefined.The) as ScriptExecutionContext)!;
+
+        // 5. Assert: calleeContext is now the running execution context.
+        Debug.Assert(vm.CurrentExecutionContext == calleeContext);
+
+        // 6. If kind is BASE, then
+        if (ConstructorKind == ConstructorKind.BASE)
+        {
+            // a. Perform OrdinaryCallBindThis(F, calleeContext, thisArgument).
+            OrdinaryCallBindThis(vm, calleeContext, thisArgument);
+
+            // FIXME: b. Let initializeResult be Completion(InitializeInstanceElements(thisArgument, F)).
+            // FIXME: c. If initializeResult is an abrupt completion, then
+            // FIXME: i. Remove calleeContext from the execution context stack and restore callerContext as the running execution context.
+            // FIXME: ii. Return ? initializeResult.
+        }
+
+        // 7. Let constructorEnv be the LexicalEnvironment of calleeContext.
+        var constructorEnv = calleeContext.LexicalEnvironment;
+
+        // 8. Let result be Completion(OrdinaryCallEvaluateBody(F, argumentsList)).
+        var result = OrdinaryCallEvaluateBody(vm, argumentsList);
+
+        // 9. Remove calleeContext from the execution context stack and restore callerContext as the running execution context.
+        vm.PopExecutionContext();
+
+        // 10. If result.[[Type]] is RETURN, then
+        if (result.IsReturnCompletion())
+        {
+            // a. If result.[[Value]] is an Object, return result.[[Value]].
+            if (result.Value.IsObject()) return Completion.NormalCompletion(result.Value);
+
+            // b. If kind is BASE, return thisArgument.
+            if (ConstructorKind == ConstructorKind.BASE) return Completion.NormalCompletion(thisArgument);
+
+            // c. If result.[[Value]] is not undefined, throw a FIXME: TypeError exception.
+            if (!result.Value.IsUndefined()) return Completion.ThrowCompletion(new String("Function constructor without kind of base did not return an object/undefined"));
+        }
+        // 11. Else,
+        else
+        {
+            // a. ReturnIfAbrupt(result).
+            if (result.IsAbruptCompletion()) return result;
+        }
+
+        // FIXME: 12. Let thisBinding be ? constructorEnv.GetThisBinding().
+        // FIXME: 13. Assert: thisBinding is an Object.
+        // FIXME: 14. Return thisBinding.
+        return Completion.NormalCompletion(Undefined.The);
     }
 
     // 10.2.3 OrdinaryFunctionCreate ( FIXME: functionPrototype, FIXME: sourceText, ParameterList, Body, thisMode, env, FIXME: privateEnv ), https://tc39.es/ecma262/#sec-ordinaryfunctioncreate
@@ -232,13 +309,6 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
 
         // 2. Return ? Evaluation of FunctionStatementList.
         return ECMAScriptCode.Evaluate(vm);
-    }
-
-    // 10.2.1.4 OrdinaryCallEvaluateBody ( F, argumentsList ), https://tc39.es/ecma262/#sec-ordinarycallevaluatebody
-    private Completion OrdinaryCallEvaluateBody(VM vm, List argumentsList)
-    {
-        // 1. Return ? EvaluateBody of F.[[ECMAScriptCode]] with arguments F and argumentsList.
-        return EvaluateBody(vm, argumentsList);
     }
 
     // 10.2.5 MakeConstructor ( F [ , writablePrototype [ , prototype ] ] ), https://tc39.es/ecma262/#sec-makeconstructor
