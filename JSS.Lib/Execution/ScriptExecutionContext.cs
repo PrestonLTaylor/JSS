@@ -1,4 +1,6 @@
-﻿namespace JSS.Lib.Execution;
+﻿using System.Diagnostics;
+
+namespace JSS.Lib.Execution;
 
 internal sealed class ScriptExecutionContext : ExecutionContext
 {
@@ -28,6 +30,42 @@ internal sealed class ScriptExecutionContext : ExecutionContext
 
         // 4. Return ? GetIdentifierReference(env, name, strict).
         return Environment.GetIdentifierReference(env, name);
+    }
+
+    // 9.4.3 GetThisEnvironment ( ), https://tc39.es/ecma262/#sec-getthisenvironment
+    static public Environment GetThisEnvironment(VM vm)
+    {
+        // 1. Let env be the running execution context's LexicalEnvironment.
+        var env = (vm.CurrentExecutionContext as ScriptExecutionContext)!.LexicalEnvironment;
+
+        // 2. Repeat,
+        while (true)
+        {
+            // a. Let exists be env.HasThisBinding().
+            var exists = env!.HasThisBinding();
+
+            // b. If exists is true, return env.
+            if (exists) return env;
+
+            // c. Let outer be env.[[OuterEnv]].
+            var outer = env.OuterEnv;
+
+            // d. Assert: outer is not null.
+            Debug.Assert(outer is not null);
+
+            // e. Set env to outer.
+            env = outer;
+        }
+    }
+
+    // 9.4.4 ResolveThisBinding ( ), https://tc39.es/ecma262/#sec-resolvethisbinding
+    static public Completion ResolveThisBinding(VM vm)
+    {
+        // 1. Let envRec be GetThisEnvironment().
+        var envRec = GetThisEnvironment(vm);
+
+        // 2. Return ? envRec.GetThisBinding().
+        return envRec.GetThisBinding();
     }
 
     public Environment? LexicalEnvironment { get; set; }
