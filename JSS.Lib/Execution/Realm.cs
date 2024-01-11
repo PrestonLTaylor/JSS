@@ -35,8 +35,8 @@ internal sealed class Realm
         if (globalObj.IsUndefined())
         {
             // FIXME: a. Let intrinsics be realmRec.[[Intrinsics]].
-            // FIXME: b. Set globalObj to OrdinaryObjectCreate(intrinsics.[[% Object.prototype %]]).
-            globalObj = new Object(null);
+            // b. Set globalObj to OrdinaryObjectCreate(intrinsics.[[% Object.prototype %]]).
+            globalObj = new Object(ObjectPrototype.The);
         }
 
         // 2. Assert: globalObj is an Object.

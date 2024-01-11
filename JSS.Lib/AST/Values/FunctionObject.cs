@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.Execution;
+using JSS.Lib.Runtime;
 using System.Diagnostics;
 using Environment = JSS.Lib.Execution.Environment;
 using ExecutionContext = JSS.Lib.Execution.ExecutionContext;
@@ -191,7 +192,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         if (ConstructorKind == ConstructorKind.BASE)
         {
             // a. Let thisArgument be ? FIXME: OrdinaryCreateFromConstructor(newTarget, "%Object.prototype%").
-            thisArgument = new Object(null);
+            thisArgument = new Object(ObjectPrototype.The);
         }
 
         // 4. Let calleeContext be PrepareForOrdinaryCall(F, FIXME: newTarget).
@@ -336,7 +337,9 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         // 5. If prototype is not present, then
         if (prototype is null)
         {
-            // FIXME: a. Set prototype to OrdinaryObjectCreate(%Object.prototype%).
+            // a. Set prototype to OrdinaryObjectCreate(%Object.prototype%).
+            prototype = new Object(ObjectPrototype.The);
+
             // FIXME: b. Perform ! DefinePropertyOrThrow(prototype, "constructor", PropertyDescriptor { [[Value]]: F, [[Writable]]: writablePrototype, [[Enumerable]]: false, [[Configurable]]: true }).
         }
 

@@ -27,11 +27,11 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
         // FIXME: 1. If NewTarget is neither undefined nor the active function object, then
         // FIXME: a. Return ? OrdinaryCreateFromConstructor(NewTarget, "%Object.prototype%").
 
-        // 2. If value is either undefined or null, FIXME: return OrdinaryObjectCreate(%Object.prototype%).
+        // 2. If value is either undefined or null, return OrdinaryObjectCreate(%Object.prototype%).
         var value = argumentList[0];
         if (value.IsUndefined() || value.IsNull())
         {
-            return Completion.NormalCompletion(new Object(null));
+            return Completion.NormalCompletion(new Object(ObjectPrototype.The));
         }
 
         // 3. Return ! ToObject(value).
