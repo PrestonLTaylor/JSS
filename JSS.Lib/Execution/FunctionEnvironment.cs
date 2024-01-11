@@ -3,6 +3,12 @@ using Object = JSS.Lib.AST.Values.Object;
 
 namespace JSS.Lib.Execution;
 
+enum ThisBindingStatus
+{
+    LEXICAL,
+    UNINITIALIZED,
+}
+
 // 9.1.1.3 Function Environment Records, https://tc39.es/ecma262/#sec-function-environment-records
 internal class FunctionEnvironment : DeclarativeEnvironment
 {
@@ -13,8 +19,16 @@ internal class FunctionEnvironment : DeclarativeEnvironment
         // 2. Set env.[[FunctionObject]] to F.
         FunctionObject = F;
 
-        // FIXME: 3. If F.[[ThisMode]] is LEXICAL, set env.[[ThisBindingStatus]] to LEXICAL.
-        // FIXME: 4. Else, set env.[[ThisBindingStatus]] to UNINITIALIZED.
+        // 3. If F.[[ThisMode]] is LEXICAL, set env.[[ThisBindingStatus]] to LEXICAL.
+        if (F.ThisMode == ThisMode.LEXICAL)
+        {
+            ThisBindingStatus = ThisBindingStatus.LEXICAL;
+        }
+        // 4. Else, set env.[[ThisBindingStatus]] to UNINITIALIZED.
+        else
+        {
+            ThisBindingStatus = ThisBindingStatus.UNINITIALIZED;
+        }
 
         // 5. Set env.[[NewTarget]] to newTarget.
         NewTarget = newTarget;
@@ -27,4 +41,5 @@ internal class FunctionEnvironment : DeclarativeEnvironment
 
     public FunctionObject FunctionObject { get; }
     public Object NewTarget { get; }
+    public ThisBindingStatus ThisBindingStatus { get; }
 }
