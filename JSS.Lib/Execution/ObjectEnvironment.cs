@@ -119,6 +119,13 @@ internal sealed class ObjectEnvironment : Environment
         return Object.Get(BindingObject, N);
     }
 
+    // 9.1.1.2.8 HasThisBinding ( ), https://tc39.es/ecma262/#sec-object-environment-records-hasthisbinding
+    override public bool HasThisBinding()
+    {
+        // 1. Return false.
+        return false;
+    }
+
     public Object BindingObject { get; }
     public bool IsWithEnvironment { get; }
 }

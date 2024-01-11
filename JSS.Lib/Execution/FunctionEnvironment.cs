@@ -64,8 +64,15 @@ internal class FunctionEnvironment : DeclarativeEnvironment
         return Completion.NormalCompletion(V);
     }
 
+    // 9.1.1.3.2 HasThisBinding ( ), https://tc39.es/ecma262/#sec-function-environment-records-hasthisbinding
+    override public bool HasThisBinding()
+    {
+        // 1. If envRec.[[ThisBindingStatus]] is LEXICAL, return false; otherwise, return true.
+        return ThisBindingStatus != ThisBindingStatus.LEXICAL;
+    }
+
     // 9.1.1.3.4 GetThisBinding ( ), https://tc39.es/ecma262/#sec-function-environment-records-getthisbinding
-    public override Completion GetThisBinding()
+    override public Completion GetThisBinding()
     {
         // 1. Assert: envRec.[[ThisBindingStatus]] is not LEXICAL.
         Debug.Assert(ThisBindingStatus != ThisBindingStatus.LEXICAL);

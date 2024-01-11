@@ -1,6 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
 using ValueType = JSS.Lib.AST.Values.ValueType;
-using Object = JSS.Lib.AST.Values.Object;
 
 namespace JSS.Lib.Execution;
 
@@ -18,7 +17,7 @@ internal abstract class Environment : Value
     virtual public Completion SetMutableBinding(string N, Value V, bool S) { throw new NotImplementedException(); }
     virtual public Completion GetBindingValue(string N, bool S) { throw new NotImplementedException(); }
     virtual public Completion DeleteBinding(string N) { throw new NotImplementedException(); }
-    virtual public bool HasThisBinding() { throw new NotImplementedException(); }
+    abstract public bool HasThisBinding();
     virtual public bool HasSuperBinding() { throw new NotImplementedException(); }
     virtual public Value WithBaseObject() { throw new NotImplementedException(); }
     virtual public Completion GetThisBinding() { throw new InvalidOperationException(); }

@@ -137,5 +137,12 @@ internal class DeclarativeEnvironment : Environment
         return Completion.NormalCompletion(binding.Value);
     }
 
+    // 9.1.1.1.8 HasThisBinding ( ), https://tc39.es/ecma262/#sec-declarative-environment-records-hasthisbinding
+    override public bool HasThisBinding()
+    {
+        // 1. Return false.
+        return false;
+    }
+
     private readonly Dictionary<string, Binding> _identifierToBinding = new();
 }
