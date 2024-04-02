@@ -59,7 +59,7 @@ internal sealed class Script
         if (result.IsNormalCompletion() && result.IsValueEmpty())
         {
             // i. Set result to NormalCompletion(undefined).
-            result = Completion.NormalCompletion(Undefined.The);
+            result = Undefined.The;
         }
 
         // 14. (FIXME: Suspend) scriptContext and remove it from the execution context stack.
@@ -245,7 +245,7 @@ internal sealed class Script
         }
 
         // 18. Return UNUSUED.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     // 8.2.4 Static Semantics: LexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-lexicallydeclarednames

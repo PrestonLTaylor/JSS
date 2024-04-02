@@ -51,7 +51,7 @@ internal abstract class IExpression : INode
                 var lstrValue = lstr.Value.AsString();
                 var rstrValue = rstr.Value.AsString();
                 var concatenation = lstrValue.Value + rstrValue.Value;
-                return Completion.NormalCompletion(new String(concatenation));
+                return new String(concatenation);
             }
 
             // d. Set lval to lprim.
@@ -99,7 +99,7 @@ internal abstract class IExpression : INode
         };
 
         var result = operation(lnum.Value.AsNumber(), rnum.Value.AsNumber());
-        return Completion.NormalCompletion(result);
+        return result;
     }
 
     // 13.15.4 EvaluateStringOrNumericBinaryExpression ( leftOperand, opText, rightOperand )

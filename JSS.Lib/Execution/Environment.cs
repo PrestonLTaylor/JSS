@@ -29,7 +29,7 @@ internal abstract class Environment : Value
         if (env is null)
         {
             // a. Return the Reference Record { [[Base]]: UNRESOLVABLE, [[ReferencedName]]: name, [[Strict]]: strict, [[ThisValue]]: EMPTY }.
-            return Completion.NormalCompletion(Reference.Unresolvable(name, Empty.The));
+            return Reference.Unresolvable(name, Empty.The);
         }
 
         // 2. Let exists be ? env.HasBinding(name).
@@ -39,7 +39,7 @@ internal abstract class Environment : Value
         if (exists)
         {
             // a. Return the Reference Record { [[Base]]: env, [[ReferencedName]]: name, [[Strict]]: strict, [[ThisValue]]: EMPTY }.
-            return Completion.NormalCompletion(Reference.Resolvable(env, name, Empty.The));
+            return Reference.Resolvable(env, name, Empty.The);
         }
         // 4. Else,
         else

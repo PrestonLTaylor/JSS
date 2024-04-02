@@ -31,11 +31,11 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
         var value = argumentList[0];
         if (value.IsUndefined() || value.IsNull())
         {
-            return Completion.NormalCompletion(new Object(ObjectPrototype.The));
+            return new Object(ObjectPrototype.The);
         }
 
         // 3. Return ! ToObject(value).
-        return Completion.NormalCompletion(MUST(value.ToObject()));
+        return MUST(value.ToObject());
     }
 
     static public ObjectConstructor The

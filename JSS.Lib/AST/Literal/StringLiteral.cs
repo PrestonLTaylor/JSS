@@ -15,7 +15,7 @@ internal sealed class StringLiteral : IExpression
     override public Completion Evaluate(VM _)
     {
         // 1. Return the SV of StringLiteral as defined in 12.9.4.2.
-        return Completion.NormalCompletion(_value);
+        return _value;
     }
 
     public string Value

@@ -59,7 +59,7 @@ internal sealed class GlobalEnvironment : Environment
         if (DeclarativeRecord.HasBinding(N)) return Completion.ThrowCompletion(new String($"redeclaration of mutable binding {N}"));
 
         // 3. Return ! DclRec.CreateMutableBinding(N, D).
-        return Completion.NormalCompletion(MUST(DeclarativeRecord.CreateMutableBinding(N, D)));
+        return MUST(DeclarativeRecord.CreateMutableBinding(N, D));
     }
 
     // 9.1.1.4.3 CreateImmutableBinding ( N, S ), https://tc39.es/ecma262/#sec-global-environment-records-createimmutablebinding-n-s
@@ -70,7 +70,7 @@ internal sealed class GlobalEnvironment : Environment
         if (DeclarativeRecord.HasBinding(N)) return Completion.ThrowCompletion(new String($"redeclaration of immutable binding {N}"));
 
         // 3. Return ! DclRec.CreateImmutableBinding(N, S).
-        return Completion.NormalCompletion(MUST(DeclarativeRecord.CreateImmutableBinding(N, S)));
+        return MUST(DeclarativeRecord.CreateImmutableBinding(N, S));
     }
 
     // 9.1.1.4.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-global-environment-records-initializebinding-n-v
@@ -81,7 +81,7 @@ internal sealed class GlobalEnvironment : Environment
         if (DeclarativeRecord.HasBinding(N))
         {
             // a. Return ! DclRec.InitializeBinding(N, V).
-            return Completion.NormalCompletion(MUST(DeclarativeRecord.InitializeBinding(N, V)));
+            return MUST(DeclarativeRecord.InitializeBinding(N, V));
         }
 
         // 3. Assert: If the binding exists, it must be in the Object Environment Record.
@@ -135,7 +135,7 @@ internal sealed class GlobalEnvironment : Environment
     public override Completion GetThisBinding()
     {
         // 1. Return envRec.[[GlobalThisValue]].
-        return Completion.NormalCompletion(GlobalThisValue);
+        return GlobalThisValue;
     }
 
     // 9.1.1.4.12 HasVarDeclaration ( N ), https://tc39.es/ecma262/#sec-hasvardeclaration
@@ -167,11 +167,11 @@ internal sealed class GlobalEnvironment : Environment
         if (existingProp.IsAbruptCompletion()) return existingProp;
 
         // 4. If existingProp is undefined, return false.
-        if (existingProp.Value.IsUndefined()) return Completion.NormalCompletion(new Boolean(false));
+        if (existingProp.Value.IsUndefined()) return new Boolean(false);
 
         // FIXME: 5. If existingProp.[[Configurable]] is true, return false.
         // 6. Return true.
-        return Completion.NormalCompletion(new Boolean(true));
+        return new Boolean(true);
     }
 
     // 9.1.1.4.15 CanDeclareGlobalVar ( N ), https://tc39.es/ecma262/#sec-candeclareglobalvar
@@ -187,10 +187,10 @@ internal sealed class GlobalEnvironment : Environment
 
         // 4. If hasProperty is true, return true.
         var asBoolean = hasProperty.Value.AsBoolean();
-        if (asBoolean.Value) return Completion.NormalCompletion(new Boolean(true));
+        if (asBoolean.Value) return new Boolean(true);
 
         // FIXME: 5. Return ? IsExtensible(globalObject).
-        return Completion.NormalCompletion(new Boolean(true));
+        return new Boolean(true);
     }
 
     // 9.1.1.4.16 CanDeclareGlobalFunction ( N ), https://tc39.es/ecma262/#sec-candeclareglobalfunction
@@ -205,12 +205,12 @@ internal sealed class GlobalEnvironment : Environment
         if (existingProp.IsAbruptCompletion()) return existingProp;
 
         // 4. If existingProp is undefined, FIXME: return ? IsExtensible(globalObject).
-        if (existingProp.Value.IsUndefined()) return Completion.NormalCompletion(new Boolean(true));
+        if (existingProp.Value.IsUndefined()) return new Boolean(true);
 
         // FIXME: 5. If existingProp.[[Configurable]] is true, return true.
         // FIXME: 6. If IsDataDescriptor(existingProp) is true and existingProp has attribute values { [[Writable]]: true, [[Enumerable]]: true }, return true.
         // 7. Return false.
-        return Completion.NormalCompletion(new Boolean(false));
+        return new Boolean(false);
     }
 
     // 9.1.1.4.17 CreateGlobalVarBinding ( N, D ), https://tc39.es/ecma262/#sec-createglobalvarbinding
@@ -246,7 +246,7 @@ internal sealed class GlobalEnvironment : Environment
         }
 
         // 7. Return unused.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     // 9.1.1.4.18 CreateGlobalFunctionBinding ( N, V, D ), https://tc39.es/ecma262/#sec-createglobalfunctionbinding
@@ -291,7 +291,7 @@ internal sealed class GlobalEnvironment : Environment
         }
 
         // 9. Return unused.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     public ObjectEnvironment ObjectRecord { get; }

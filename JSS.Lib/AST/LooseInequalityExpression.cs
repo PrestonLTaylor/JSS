@@ -38,7 +38,7 @@ internal sealed class LooseInequalityExpression : IExpression
 
         // 6. If r is true, return false. Otherwise, return true.
         var rAsBoolean = r.Value.AsBoolean().Value;
-        return Completion.NormalCompletion(new Boolean(!rAsBoolean));
+        return new Boolean(!rAsBoolean);
     }
 
     public IExpression Lhs { get; }

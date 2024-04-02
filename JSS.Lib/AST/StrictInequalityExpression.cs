@@ -36,7 +36,7 @@ internal sealed class StrictInequalityExpression : IExpression
         var r = Value.IsStrictlyEqual(rval.Value, lval.Value);
 
         // 6. If r is true, return false. Otherwise, return true.
-        return Completion.NormalCompletion(new Boolean(!r.Value));
+        return new Boolean(!r.Value);
     }
 
     public IExpression Lhs { get; }

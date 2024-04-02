@@ -49,7 +49,7 @@ internal sealed class VarStatement : INode
     private Completion EvaluateWithoutInitializer()
     {
         // 1. Return EMPTY.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     private Completion EvaluateWithInitializer(VM vm)
@@ -78,7 +78,7 @@ internal sealed class VarStatement : INode
         if (putResult.IsAbruptCompletion()) return putResult;
 
         // 6. Return EMPTY.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     public string Identifier { get; }

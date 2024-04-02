@@ -54,7 +54,7 @@ internal sealed class ObjectEnvironment : Environment
         if (defineResult.IsAbruptCompletion()) return defineResult;
 
         // 3. Return UNUSED.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     // 9.1.1.2.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-object-environment-records-initializebinding-n-v
@@ -65,7 +65,7 @@ internal sealed class ObjectEnvironment : Environment
         if (setResult.IsAbruptCompletion()) return setResult;
 
         // 2. Return UNUSED.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     // 9.1.1.2.5 SetMutableBinding ( N, V, S ), https://tc39.es/ecma262/#sec-object-environment-records-getbindingvalue-n-s
@@ -89,7 +89,7 @@ internal sealed class ObjectEnvironment : Environment
         if (setResult.IsAbruptCompletion()) return setResult;
 
         // 5. Return UNUSED.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     // 9.1.1.2.6 GetBindingValue ( N, S ), https://tc39.es/ecma262/#sec-object-environment-records-getbindingvalue-n-s
@@ -111,7 +111,7 @@ internal sealed class ObjectEnvironment : Environment
             }
             else
             {
-                return Completion.NormalCompletion(Undefined.The);
+                return Undefined.The;
             }
         }
 

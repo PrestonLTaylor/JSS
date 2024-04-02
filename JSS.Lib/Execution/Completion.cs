@@ -41,6 +41,9 @@ internal sealed class Completion
         return new Completion(CompletionType.Normal, value, "");
     }
 
+    // NOTE: We use an implicit conversion operator as a syntaxic sugar for NormalCompletion in functions
+    public static implicit operator Completion(Value value) => NormalCompletion(value);
+
     // 6.2.4.2 ThrowCompletion ( value ), https://tc39.es/ecma262/#sec-throwcompletion
     static public Completion ThrowCompletion(Value value)
     {

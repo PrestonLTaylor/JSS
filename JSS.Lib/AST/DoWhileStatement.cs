@@ -62,7 +62,7 @@ internal sealed class DoWhileStatement : INode
             // f. If ToBoolean(exprValue) is false, return V.
             if (!exprValue.Value.ToBoolean().Value)
             {
-                return Completion.NormalCompletion(V);
+                return V;
             }
         }
     }

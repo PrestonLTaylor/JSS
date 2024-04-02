@@ -49,7 +49,7 @@ internal sealed class PrefixDecrementExpression : IExpression
         if (putResult.IsAbruptCompletion()) return putResult;
 
         // 6. Return newValue.
-        return Completion.NormalCompletion(newValue);
+        return newValue;
     }
 
     public IExpression Expression { get; }

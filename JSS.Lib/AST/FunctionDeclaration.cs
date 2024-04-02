@@ -48,7 +48,7 @@ internal sealed class FunctionDeclaration : Declaration
     override public Completion Evaluate(VM vm)
     {
         // 1. Return EMPTY.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     public string Identifier { get; }

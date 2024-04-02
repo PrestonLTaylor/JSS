@@ -105,7 +105,7 @@ internal sealed class CallExpression : IExpression
             precedingArgs.Add(arg.Value);
         }
 
-        return Completion.NormalCompletion(precedingArgs);
+        return precedingArgs;
     }
 
     public IExpression Lhs { get; }

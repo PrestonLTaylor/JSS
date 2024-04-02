@@ -38,7 +38,7 @@ internal class DeclarativeEnvironment : Environment
         _identifierToBinding.Add(N, new Binding(Undefined.The, true, false));
 
         // 3. Return unused.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     // 9.1.1.1.3 CreateImmutableBinding ( N, S ), https://tc39.es/ecma262/#sec-declarative-environment-records-createimmutablebinding-n-s
@@ -52,7 +52,7 @@ internal class DeclarativeEnvironment : Environment
         _identifierToBinding.Add(N, new Binding(Undefined.The, false, S));
 
         // 3. Return unused.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     // 9.1.1.1.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-declarative-environment-records-initializebinding-n-v
@@ -68,7 +68,7 @@ internal class DeclarativeEnvironment : Environment
         // FIXME: 3. Record that the binding for N in envRec has been initialized.
 
         // 4. Return unused.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     // 9.1.1.1.5 SetMutableBinding ( N, V, S ), https://tc39.es/ecma262/#sec-declarative-environment-records-getbindingvalue-n-s
@@ -90,7 +90,7 @@ internal class DeclarativeEnvironment : Environment
             MUST(InitializeBinding(N, V));
 
             // d. Return UNUSED.
-            return Completion.NormalCompletion(Empty.The);
+            return Empty.The;
         }
 
         // 2. If the binding for N in envRec is a strict binding, set S to true.
@@ -120,7 +120,7 @@ internal class DeclarativeEnvironment : Environment
         }
 
         // 6. Return UNUSED.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     // 9.1.1.1.6 GetBindingValue ( N, S ), https://tc39.es/ecma262/#sec-declarative-environment-records-getbindingvalue-n-s
@@ -133,7 +133,7 @@ internal class DeclarativeEnvironment : Environment
 
         // 3. Return the value currently bound to N in envRec.
         var binding = _identifierToBinding[N];
-        return Completion.NormalCompletion(binding.Value);
+        return binding.Value;
     }
 
     // 9.1.1.1.8 HasThisBinding ( ), https://tc39.es/ecma262/#sec-declarative-environment-records-hasthisbinding

@@ -26,7 +26,7 @@ internal sealed class LogicalNotExpression : IExpression
 
         // 3. If oldValue is true, return false.
         // 4. Return true.
-        return Completion.NormalCompletion(new Boolean(!oldValue.Value));
+        return new Boolean(!oldValue.Value);
     }
 
     public IExpression Expression { get; }

@@ -15,7 +15,7 @@ internal sealed class NumericLiteral : IExpression
     override public Completion Evaluate(VM _)
     {
         // 1. Return the NumericValue of NumericLiteral as defined in 12.9.3.
-        return Completion.NormalCompletion(_value);
+        return _value;
     }
 
     public double Value

@@ -15,7 +15,7 @@ internal sealed class StatementList : INode
     override public Completion Evaluate(VM vm)
     {
         // 1. Let sl be ? Evaluation of StatementList.
-        Completion completion = Completion.NormalCompletion(Empty.The);
+        Completion completion = Empty.The;
         foreach (var statement in Statements)
         {
             // 2. Let s be Completion(Evaluation of StatementListItem).

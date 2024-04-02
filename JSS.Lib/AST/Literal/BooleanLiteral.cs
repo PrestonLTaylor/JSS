@@ -17,7 +17,7 @@ internal sealed class BooleanLiteral : IExpression
     {
         // 1. If BooleanLiteral is the token false, return false.
         // 2. If BooleanLiteral is the token true, return true.
-        return Completion.NormalCompletion(_value);
+        return _value;
     }
 
     public bool Value

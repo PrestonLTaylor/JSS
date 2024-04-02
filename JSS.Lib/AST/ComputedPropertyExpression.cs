@@ -46,7 +46,7 @@ internal sealed class ComputedPropertyExpression : IExpression
 
         // 4. Return the Reference Record { [[Base]]: baseValue, [[ReferencedName]]: propertyKey, [[Strict]]: strict, [[ThisValue]]: EMPTY }.
         var propertyString = propertyKey.Value.AsString();
-        return Completion.NormalCompletion(Reference.Resolvable(baseValue, propertyString.Value, Empty.The));
+        return Reference.Resolvable(baseValue, propertyString.Value, Empty.The);
     }
 
     public IExpression Lhs { get; }

@@ -51,7 +51,7 @@ internal class FunctionEnvironment : DeclarativeEnvironment
         // 2. If envRec.[[ThisBindingStatus]] is INITIALIZED, throw a FIXKME: ReferenceError exception.
         if (ThisBindingStatus == ThisBindingStatus.INITIALIZED)
         {
-            return Completion.NormalCompletion(new String("Tried to bind a this value to already this-initialized function environment"));
+            return new String("Tried to bind a this value to already this-initialized function environment");
         }
 
         // 3. Set envRec.[[ThisValue]] to V.
@@ -61,7 +61,7 @@ internal class FunctionEnvironment : DeclarativeEnvironment
         ThisBindingStatus = ThisBindingStatus.INITIALIZED;
 
         // 5. Return V.
-        return Completion.NormalCompletion(V);
+        return V;
     }
 
     // 9.1.1.3.2 HasThisBinding ( ), https://tc39.es/ecma262/#sec-function-environment-records-hasthisbinding
@@ -80,11 +80,11 @@ internal class FunctionEnvironment : DeclarativeEnvironment
         // 2. If envRec.[[ThisBindingStatus]] is UNINITIALIZED, throw a FIXME: ReferenceError exception.
         if (ThisBindingStatus == ThisBindingStatus.UNINITIALIZED)
         {
-            return Completion.NormalCompletion(new String("Tried to get an uninitialized this value"));
+            return Completion.ThrowCompletion(new String("Tried to get an uninitialized this value"));
         }
 
         // 3. Return envRec.[[ThisValue]].
-        return Completion.NormalCompletion(ThisValue!);
+        return ThisValue!;
     }
 
     public Value? ThisValue { get; private set; }

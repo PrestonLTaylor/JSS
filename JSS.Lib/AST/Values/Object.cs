@@ -53,7 +53,7 @@ internal class Object : Value
         }
 
         // 3. Return UNUSED.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     // 7.3.9 DefinePropertyOrThrow ( O, P, desc ), https://tc39.es/ecma262/#sec-definepropertyorthrow
@@ -68,7 +68,7 @@ internal class Object : Value
         if (!asBoolean.Value) return Completion.ThrowCompletion(new String($"Should not define property of name {P} with a value of {desc.Value}"));
 
         // 3. Return UNUSED.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     // 7.3.12 HasProperty ( O, P ), https://tc39.es/ecma262/#sec-hasproperty
@@ -87,7 +87,7 @@ internal class Object : Value
 
         // 2. If desc is undefined, return false.
         // 3. Return true.
-        return Completion.NormalCompletion(new Boolean(!desc.Value.IsUndefined()));
+        return new Boolean(!desc.Value.IsUndefined());
     }
 
     // 7.3.14 Call ( F, V [ , argumentsList ] )
@@ -120,7 +120,7 @@ internal class Object : Value
         // 1. If O does not have an own property with key P, return undefined.
         if (!O.DataProperties.ContainsKey(P))
         {
-            return Completion.NormalCompletion(Undefined.The);
+            return Undefined.The;
         }
 
         // FIXME: 2. Let D be a newly created Property Descriptor with no fields.
@@ -135,7 +135,7 @@ internal class Object : Value
         // FIXME: 6. Set D.[[Enumerable]] to the value of X's [[Enumerable]] attribute.
         // FIXME: 7. Set D.[[Configurable]] to the value of X's [[Configurable]] attribute.
         // FIXME: 8. Return D.
-        return Completion.NormalCompletion(O.DataProperties[P].Value);
+        return O.DataProperties[P].Value;
     }
 
     // 10.1.6 [[DefineOwnProperty]] ( P, Desc ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-defineownproperty-p-desc
@@ -152,7 +152,7 @@ internal class Object : Value
         // FIXME: 2. Let extensible be ? IsExtensible(O).
         // FIXME: 3. Return ValidateAndApplyPropertyDescriptor(O, P, extensible, Desc, current).
         O.DataProperties.Add(P, desc);
-        return Completion.NormalCompletion(new Boolean(true));
+        return new Boolean(true);
     }
 
     // 10.1.7 [[HasProperty]] ( P ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-hasproperty-p
@@ -170,7 +170,7 @@ internal class Object : Value
         if (hasOwn.IsAbruptCompletion()) return hasOwn;
 
         // FIXME: 2. If hasOwn is not undefined, return true.
-        return Completion.NormalCompletion(new Boolean(!hasOwn.Value.IsUndefined()));
+        return new Boolean(!hasOwn.Value.IsUndefined());
 
         // FIXME: 3. Let parent be ? O.[[GetPrototypeOf]]().
         // FIXME: 4. If parent is not null, then
@@ -195,7 +195,7 @@ internal class Object : Value
         // FIXME: c. Return ? parent.[[Get]](P, Receiver).
 
         // FIXME: 3. If IsDataDescriptor(desc) is true, return desc.[[Value]].
-        return Completion.NormalCompletion(O.DataProperties[P].Value);
+        return O.DataProperties[P].Value;
 
         // FIXME: 4. Assert: IsAccessorDescriptor(desc) is true.
         // FIXME: 5. Let getter be desc.[[Get]].
@@ -225,7 +225,7 @@ internal class Object : Value
             receiver.DataProperties[P] = new Property(V, new Attributes(true, false, false));
         }
 
-        return Completion.NormalCompletion(new Boolean(true));
+        return new Boolean(true);
     }
 
     // FIXME: Accessor Attributes

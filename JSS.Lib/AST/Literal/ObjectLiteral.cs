@@ -12,6 +12,6 @@ internal class ObjectLiteral : IExpression
     {
         // FIXME: Implement the rest of the evaluation when we parse property definitions
         // 1. Return OrdinaryObjectCreate(%Object.prototype%).
-        return Completion.NormalCompletion(new Object(ObjectPrototype.The));
+        return new Object(ObjectPrototype.The);
     }
 }

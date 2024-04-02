@@ -37,10 +37,10 @@ internal sealed class LessThanExpression : IExpression
         if (r.IsAbruptCompletion()) return r;
 
         // 6. If r is undefined, return false. Otherwise, return r.
-        if (r.Value.IsUndefined()) return Completion.NormalCompletion(new Boolean(false));
+        if (r.Value.IsUndefined()) return new Boolean(false);
 
         var rAsBoolean = r.Value.AsBoolean();
-        return Completion.NormalCompletion(new Boolean(rAsBoolean.Value));
+        return new Boolean(rAsBoolean.Value);
     }
 
     public IExpression Lhs { get; }
