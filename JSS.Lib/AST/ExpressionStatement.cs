@@ -1,4 +1,6 @@
-﻿namespace JSS.Lib.AST;
+﻿using JSS.Lib.Execution;
+
+namespace JSS.Lib.AST;
 
 // 14.5 Expression Statement, https://tc39.es/ecma262/#sec-expression-statement
 internal sealed class ExpressionStatement : INode
@@ -8,8 +10,16 @@ internal sealed class ExpressionStatement : INode
         Expression = expression;
     }
 
-    // FIXME: 14.5.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-expression-statement-runtime-semantics-evaluation
-    public void Execute() { }
+    // 14.5.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-expression-statement-runtime-semantics-evaluation
+    override public Completion Evaluate(VM vm)
+    {
+        // 1. Let exprRef be ? Evaluation of Expression.
+        var exprRef = Expression.Evaluate(vm);
+        if (exprRef.IsAbruptCompletion()) return exprRef;
+
+        // 2. Return ? GetValue(exprRef).
+        return exprRef.Value.GetValue();
+    }
 
     public IExpression Expression { get; }
 }

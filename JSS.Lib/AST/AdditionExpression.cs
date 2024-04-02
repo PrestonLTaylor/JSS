@@ -1,4 +1,6 @@
-﻿namespace JSS.Lib.AST;
+﻿using JSS.Lib.Execution;
+
+namespace JSS.Lib.AST;
 
 // 13.8.1 The Addition Operator ( + ), https://tc39.es/ecma262/#sec-addition-operator-plus
 internal sealed class AdditionExpression : IExpression
@@ -9,8 +11,12 @@ internal sealed class AdditionExpression : IExpression
         Rhs = rhs;
     }
 
-    // FIXME: 13.8.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-addition-operator-plus-runtime-semantics-evaluation
-    public void Execute() { }
+    // 13.8.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-addition-operator-plus-runtime-semantics-evaluation
+    override public Completion Evaluate(VM vm)
+    {
+        // 1. Return ? EvaluateStringOrNumericBinaryExpression(AdditiveExpression, +, MultiplicativeExpression).
+        return EvaluateStringOrNumericBinaryExpression(vm, Lhs, BinaryOpType.Add, Rhs);
+    }
 
     public IExpression Lhs { get; }
     public IExpression Rhs { get; }

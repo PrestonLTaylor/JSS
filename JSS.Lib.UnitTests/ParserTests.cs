@@ -1,5 +1,6 @@
 ﻿using JSS.Lib.AST;
 using JSS.Lib.AST.Literal;
+using JSS.Lib.Execution;
 
 namespace JSS.Lib.UnitTests;
 
@@ -64,8 +65,8 @@ internal sealed class ParserTests
         var parser = new Parser(expressionStatement);
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -122,8 +123,8 @@ internal sealed class ParserTests
         var parser = new Parser(expressionStatement);
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -141,8 +142,8 @@ internal sealed class ParserTests
         var parser = new Parser(identifierString);
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -162,8 +163,8 @@ internal sealed class ParserTests
         var parser = new Parser("false");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -183,8 +184,8 @@ internal sealed class ParserTests
         var parser = new Parser("true");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -211,8 +212,8 @@ internal sealed class ParserTests
         var parser = new Parser(numericLiteral);
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -244,8 +245,8 @@ internal sealed class ParserTests
         var parser = new Parser(stringLiteral);
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -258,6 +259,27 @@ internal sealed class ParserTests
         Assert.That(parsedLiteral.Value, Is.EqualTo(stringValue));
     }
 
+    [Test]
+    public void Parse_ReturnsExpressionStatement_WithNewExpressionWithArguments_WhenProvidingANewWithArguments()
+    {
+        // Arrange
+        var parser = new Parser("new Object({})");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var newExpression = expressionStatement.Expression as NewExpression;
+        Assert.That(newExpression, Is.Not.Null);
+        Assert.That(newExpression.Arguments, Has.Count.EqualTo(1));
+    }
+
     // Tests for 14.2 Block, https://tc39.es/ecma262/#sec-block
     [Test]
     public void Parse_ReturnsAnEmptyBlock_WhenProvidingAnEmptyBlock()
@@ -266,15 +288,15 @@ internal sealed class ParserTests
         var parser = new Parser("{}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
 
         var block = rootNodes[0] as Block;
         Assert.That(block, Is.Not.Null);
-        Assert.That(block.Nodes, Is.Empty);
+        Assert.That(block.Statements.Statements, Is.Empty);
     }
 
     // FIXME: Make test cases for a variety of statements/declarations
@@ -285,8 +307,8 @@ internal sealed class ParserTests
         var parser = new Parser("{ 0 }");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -294,7 +316,7 @@ internal sealed class ParserTests
         var block = rootNodes[0] as Block;
         Assert.That(block, Is.Not.Null);
 
-        var blockNodes = block.Nodes;
+        var blockNodes = block.Statements.Statements;
         Assert.That(blockNodes, Has.Count.EqualTo(1));
         Assert.That(blockNodes[0], Is.InstanceOf<ExpressionStatement>());
     }
@@ -308,8 +330,8 @@ internal sealed class ParserTests
         var parser = new Parser($"let {expectedIdentifier}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -330,8 +352,8 @@ internal sealed class ParserTests
         var parser = new Parser($"let {expectedIdentifier} = {initializer}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -352,8 +374,8 @@ internal sealed class ParserTests
         var parser = new Parser($"const {expectedIdentifier} = {initializer}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -373,8 +395,8 @@ internal sealed class ParserTests
         var parser = new Parser($"var {expectedIdentifier}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -395,8 +417,8 @@ internal sealed class ParserTests
         var parser = new Parser($"var {expectedIdentifier} = {initializer}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -415,8 +437,8 @@ internal sealed class ParserTests
         var parser = new Parser(";");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -435,8 +457,8 @@ internal sealed class ParserTests
         var parser = new Parser($"if ({expression}) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -457,8 +479,8 @@ internal sealed class ParserTests
         var parser = new Parser($"if ({expression}) {{ }} else {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -480,8 +502,8 @@ internal sealed class ParserTests
         var parser = new Parser($"do {{ }} while ({expression})");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -501,8 +523,8 @@ internal sealed class ParserTests
         var parser = new Parser($"while ({expression}) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -522,8 +544,8 @@ internal sealed class ParserTests
         var parser = new Parser($"for ({expression}; {expression}; {expression}) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -543,8 +565,8 @@ internal sealed class ParserTests
         var parser = new Parser($"for (;;) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -565,8 +587,8 @@ internal sealed class ParserTests
         var parser = new Parser($"for (var {expectedIdentifier};;) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -590,8 +612,8 @@ internal sealed class ParserTests
         var parser = new Parser($"for (let {expectedIdentifier};;) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -615,8 +637,8 @@ internal sealed class ParserTests
         var parser = new Parser($"for (const {expectedIdentifier} = 0;;) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -641,8 +663,8 @@ internal sealed class ParserTests
         var parser = new Parser($"continue {expectedLabel}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -660,8 +682,8 @@ internal sealed class ParserTests
         var parser = new Parser("continue");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -680,8 +702,8 @@ internal sealed class ParserTests
         var parser = new Parser($"break {expectedLabel}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -699,8 +721,8 @@ internal sealed class ParserTests
         var parser = new Parser("break");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -718,8 +740,8 @@ internal sealed class ParserTests
         var parser = new Parser("return");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -738,8 +760,8 @@ internal sealed class ParserTests
         var parser = new Parser($"return {expression}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -759,8 +781,8 @@ internal sealed class ParserTests
         var parser = new Parser($"switch ({expression}) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -781,8 +803,8 @@ internal sealed class ParserTests
         var parser = new Parser($"switch ({expression}) {{ default: {expression} }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -810,8 +832,8 @@ internal sealed class ParserTests
         var parser = new Parser($"switch ({expression}) {{ case {expression}: {expression} }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -837,8 +859,8 @@ internal sealed class ParserTests
         var parser = new Parser("switch (1) { case 2: 3 default: 4 case 5: 6");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -860,8 +882,8 @@ internal sealed class ParserTests
         var parser = new Parser($"throw {expression}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -879,8 +901,8 @@ internal sealed class ParserTests
         var parser = new Parser("try { } catch { }");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -902,8 +924,8 @@ internal sealed class ParserTests
         var parser = new Parser($"try {{ }} catch ({expectedCatchIdentifier}) {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -924,8 +946,8 @@ internal sealed class ParserTests
         var parser = new Parser("try { } finally { }");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -945,8 +967,8 @@ internal sealed class ParserTests
         var parser = new Parser("try { } catch { } finally { }");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -967,8 +989,8 @@ internal sealed class ParserTests
         var parser = new Parser($"try {{ }} catch ({expectedCatchIdentifier}) {{ }} finally {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -990,8 +1012,8 @@ internal sealed class ParserTests
         var parser = new Parser("debugger");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1009,8 +1031,8 @@ internal sealed class ParserTests
         var parser = new Parser($"function {expectedFunctionIdentifier}() {{}}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1019,7 +1041,7 @@ internal sealed class ParserTests
         Assert.That(functionDeclaration, Is.Not.Null);
         Assert.That(functionDeclaration.Identifier, Is.EqualTo(expectedFunctionIdentifier));
         Assert.That(functionDeclaration.Parameters, Is.Empty);
-        Assert.That(functionDeclaration.Body, Is.Empty);
+        Assert.That(functionDeclaration.Body.Statements, Is.Empty);
     }
 
     [Test]
@@ -1032,8 +1054,8 @@ internal sealed class ParserTests
         var parser = new Parser($"function {expectedFunctionIdentifier}({expectedFirstParameterIdentifier}, {expectedSecondParameterIdentifier}) {{}}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1041,7 +1063,7 @@ internal sealed class ParserTests
         var functionDeclaration = rootNodes[0] as FunctionDeclaration;
         Assert.That(functionDeclaration, Is.Not.Null);
         Assert.That(functionDeclaration.Identifier, Is.EqualTo(expectedFunctionIdentifier));
-        Assert.That(functionDeclaration.Body, Is.Empty);
+        Assert.That(functionDeclaration.Body.Statements, Is.Empty);
 
         var parameters  = functionDeclaration.Parameters;
         Assert.That(parameters, Has.Count.EqualTo(2));
@@ -1058,8 +1080,8 @@ internal sealed class ParserTests
         var parser = new Parser($"function {expectedFunctionIdentifier}({expectedParameterIdentifier},) {{}}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1067,7 +1089,7 @@ internal sealed class ParserTests
         var functionDeclaration = rootNodes[0] as FunctionDeclaration;
         Assert.That(functionDeclaration, Is.Not.Null);
         Assert.That(functionDeclaration.Identifier, Is.EqualTo(expectedFunctionIdentifier));
-        Assert.That(functionDeclaration.Body, Is.Empty);
+        Assert.That(functionDeclaration.Body.Statements, Is.Empty);
 
         var parameters = functionDeclaration.Parameters;
         Assert.That(parameters, Has.Count.EqualTo(1));
@@ -1083,8 +1105,8 @@ internal sealed class ParserTests
         var parser = new Parser($"class {expectedIdentifier} {{ }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1107,8 +1129,8 @@ internal sealed class ParserTests
         var parser = new Parser($"class {expectedIdentifier} {{ {expectedMethodIdentifier}() {{ }} }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1125,7 +1147,7 @@ internal sealed class ParserTests
         var publicMethod = classDeclaration.Methods[0];
         Assert.That(publicMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
         Assert.That(publicMethod.Parameters, Is.Empty);
-        Assert.That(publicMethod.Body, Is.Empty);
+        Assert.That(publicMethod.Body.Statements, Is.Empty);
         Assert.That(publicMethod.IsPrivate, Is.False);
     }
 
@@ -1138,8 +1160,8 @@ internal sealed class ParserTests
         var parser = new Parser($"class {expectedIdentifier} {{ #{expectedMethodIdentifier}() {{ }} }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1156,7 +1178,7 @@ internal sealed class ParserTests
         var privateMethod = classDeclaration.Methods[0];
         Assert.That(privateMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
         Assert.That(privateMethod.Parameters, Is.Empty);
-        Assert.That(privateMethod.Body, Is.Empty);
+        Assert.That(privateMethod.Body.Statements, Is.Empty);
         Assert.That(privateMethod.IsPrivate, Is.True);
     }
 
@@ -1169,8 +1191,8 @@ internal sealed class ParserTests
         var parser = new Parser($"class {expectedIdentifier} {{ static {expectedMethodIdentifier}() {{ }} }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1187,7 +1209,7 @@ internal sealed class ParserTests
         var staticPublicMethod = classDeclaration.StaticMethods[0];
         Assert.That(staticPublicMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
         Assert.That(staticPublicMethod.Parameters, Is.Empty);
-        Assert.That(staticPublicMethod.Body, Is.Empty);
+        Assert.That(staticPublicMethod.Body.Statements, Is.Empty);
         Assert.That(staticPublicMethod.IsPrivate, Is.False);
     }
 
@@ -1200,8 +1222,8 @@ internal sealed class ParserTests
         var parser = new Parser($"class {expectedIdentifier} {{ static #{expectedMethodIdentifier}() {{ }} }}");
 
         // Act
-        var parsedProgram = parser.Parse();
-        var rootNodes = parsedProgram.RootNodes;
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
         Assert.That(rootNodes, Has.Count.EqualTo(1));
@@ -1218,12 +1240,255 @@ internal sealed class ParserTests
         var staticPrivateMethod = classDeclaration.StaticMethods[0];
         Assert.That(staticPrivateMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
         Assert.That(staticPrivateMethod.Parameters, Is.Empty);
-        Assert.That(staticPrivateMethod.Body, Is.Empty);
+        Assert.That(staticPrivateMethod.Body.Statements, Is.Empty);
         Assert.That(staticPrivateMethod.IsPrivate, Is.True);
     }
 
+    // Tests for AssignmentExpressions
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBasicAssignmentExpression_WhenProvidingBasicAssignmentExpression(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        const string expectedIdentifier = "identifier";
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"{expectedIdentifier} = {expression}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var assignmentExpression = expressionStatement.Expression as BasicAssignmentExpression;
+        Assert.That(assignmentExpression, Is.Not.Null);
+
+        var identifier = assignmentExpression.Lhs as Identifier;
+        Assert.That(identifier, Is.Not.Null);
+        Assert.That(identifier.Name, Is.EqualTo(expectedIdentifier));
+
+        Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsLogicalAndAssignmentExpression_WhenProvidingLogicalAndAssignmentExpression(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        const string expectedIdentifier = "identifier";
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"{expectedIdentifier} &&= {expression}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var assignmentExpression = expressionStatement.Expression as LogicalAndAssignmentExpression;
+        Assert.That(assignmentExpression, Is.Not.Null);
+
+        var identifier = assignmentExpression.Lhs as Identifier;
+        Assert.That(identifier, Is.Not.Null);
+        Assert.That(identifier.Name, Is.EqualTo(expectedIdentifier));
+
+        Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsLogicalOrAssignmentExpression_WhenProvidingLogicalOrAssignmentExpression(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        const string expectedIdentifier = "identifier";
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"{expectedIdentifier} ||= {expression}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var assignmentExpression = expressionStatement.Expression as LogicalOrAssignmentExpression;
+        Assert.That(assignmentExpression, Is.Not.Null);
+
+        var identifier = assignmentExpression.Lhs as Identifier;
+        Assert.That(identifier, Is.Not.Null);
+        Assert.That(identifier.Name, Is.EqualTo(expectedIdentifier));
+
+        Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsNullCoalescingAssignmentExpression_WhenProvidingNullCoalescingAssignmentExpression(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        const string expectedIdentifier = "identifier";
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"{expectedIdentifier} ??= {expression}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var assignmentExpression = expressionStatement.Expression as NullCoalescingAssignmentExpression;
+        Assert.That(assignmentExpression, Is.Not.Null);
+
+        var identifier = assignmentExpression.Lhs as Identifier;
+        Assert.That(identifier, Is.Not.Null);
+        Assert.That(identifier.Name, Is.EqualTo(expectedIdentifier));
+
+        Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithExponentiationBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "**=", BinaryOpType.Exponentiate);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithMultiplyBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "*=", BinaryOpType.Multiply);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithDivideBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "/=", BinaryOpType.Divide);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithRemainderBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "%=", BinaryOpType.Remainder);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithAddBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "+=", BinaryOpType.Add);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithSubtractBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "-=", BinaryOpType.Subtract);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithLeftShiftBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "<<=", BinaryOpType.LeftShift);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithSignedRightShiftBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, ">>=", BinaryOpType.SignedRightShift);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithUnsignedRightShiftBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, ">>>=", BinaryOpType.UnsignedRightShift);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithBitwiseANDBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "&=", BinaryOpType.BitwiseAND);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithBitwiseXORBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "^=", BinaryOpType.BitwiseXOR);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsBinaryOpAssignmentExpression_WithBitwiseORBinaryOp(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(expressionToExpectedType, "|=", BinaryOpType.BitwiseOR);
+    }
+
+    private void Parse_ReturnsBinaryOpAssignmentExpression_WithExpectedBinaryOp(KeyValuePair<string, Type> expressionToExpectedType, string binaryOp, BinaryOpType expectedOp)
+    {
+        // Arrange
+        const string expectedIdentifier = "identifier";
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"{expectedIdentifier} {binaryOp} {expression}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var assignmentExpression = expressionStatement.Expression as BinaryOpAssignmentExpression;
+        Assert.That(assignmentExpression, Is.Not.Null);
+
+        var identifier = assignmentExpression.Lhs as Identifier;
+        Assert.That(identifier, Is.Not.Null);
+        Assert.That(identifier.Name, Is.EqualTo(expectedIdentifier));
+
+        Assert.That(assignmentExpression.Op, Is.EqualTo(expectedOp));
+
+        Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
+    }
+
+    // FIXME: More tests when we don't only parse empty object literals
+    // Tests for ObjectLiteral
+    [Test]
+    public void Parse_ReturnsAssignment_WithObjectLiteralRHS_WhenProvidingAssignment_WithObjectLiteralRHS()
+    {
+        // Arrange
+        var parser = new Parser("a = {}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        Assert.That(rootNodes, Has.Count.EqualTo(1));
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        Assert.That(expressionStatement, Is.Not.Null);
+
+        var assignmentExpression = expressionStatement.Expression as BasicAssignmentExpression;
+        Assert.That(assignmentExpression, Is.Not.Null);
+
+        var objectLiteral = assignmentExpression.Rhs as ObjectLiteral;
+        Assert.That(objectLiteral, Is.Not.Null);
+    }
+
     // Tests for SyntaxErrors
-    // FIXME: More test cases where ConsumeTokenOfType is used
     static private readonly Dictionary<string, string> unexpectedTokenTestCases = new()
     {
         {"", "}"},
@@ -1297,6 +1562,23 @@ internal sealed class ParserTests
         {"class a { b(", "}"},
         {"class a { b(c ", "d"},
         {"class a { b(c) ", "}"},
+        {"a ", "}"},
+        {"a =", "}"},
+        {"a &&=", "}"},
+        {"a ||=", "}"},
+        {"a ??=", "}"},
+        {"a **=", "}"},
+        {"a *=", "}"},
+        {"a /=", "}"},
+        {"a %=", "}"},
+        {"a +=", "}"},
+        {"a -=", "}"},
+        {"a <<=", "}"},
+        {"a >>=", "}"},
+        {"a >>>=", "}"},
+        {"a &=", "}"},
+        {"a ^=", "}"},
+        {"a |=", "}"},
     };
 
     [TestCaseSource(nameof(unexpectedTokenTestCases))]
@@ -1365,6 +1647,7 @@ internal sealed class ParserTests
         "super.",
         "let",
         "let a = ",
+        "let a = {",
         "for (1 ",
         "for (1; 1 ",
         "for (1; 1; 1 ",
@@ -1387,6 +1670,22 @@ internal sealed class ParserTests
         "class a { b(",
         "class a { b(c ",
         "class a { b(c) ",
+        "a =",
+        "a &&=",
+        "a ||=",
+        "a ??=",
+        "a **=",
+        "a *=",
+        "a /=",
+        "a %=",
+        "a +=",
+        "a -=",
+        "a <<=",
+        "a >>=",
+        "a >>>=",
+        "a &=",
+        "a ^=",
+        "a |=",
     };
 
     [TestCaseSource(nameof(unexpectedEofTestCases))]
@@ -1443,7 +1742,18 @@ internal sealed class ParserTests
 
     private void AssertThatSyntaxErrorMatchesExpected(Parser parser, SyntaxErrorException expectedException)
     {
-        var actualException = Assert.Throws<SyntaxErrorException>(() => parser.Parse());
+        var actualException = Assert.Throws<SyntaxErrorException>(() => ParseScript(parser));
         Assert.That(actualException.Message, Is.EqualTo(expectedException.Message));
+    }
+
+    static private Script ParseScript(Parser parser)
+    {
+        var completion = Realm.InitializeHostDefinedRealm(out VM vm);
+        if (completion.IsAbruptCompletion())
+        {
+            Assert.Fail("Failed to initialize host defined realm");
+        }
+
+        return parser.Parse(vm);
     }
 }

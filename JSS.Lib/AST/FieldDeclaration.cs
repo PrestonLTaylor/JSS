@@ -11,7 +11,6 @@ internal sealed class FieldDeclaration : INode
     }
 
     // FIXME: 15.7.10 Runtime Semantics: ClassFieldDefinitionEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-classfielddefinitionevaluation
-    public void Execute() { }
 
     public string Identifier { get; }
     public INode? Initializer { get; }

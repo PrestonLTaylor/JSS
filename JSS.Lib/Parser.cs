@@ -1,5 +1,6 @@
 ﻿using JSS.Lib.AST;
 using JSS.Lib.AST.Literal;
+using JSS.Lib.Execution;
 
 namespace JSS.Lib;
 
@@ -13,19 +14,28 @@ internal sealed class Parser
         _consumer = new TokenConsumer(lexer.Lex().ToList());
     }
 
-    public Program Parse()
+    // NOTE: sourceText is provided in the constructor, the VM holds the realm and we don't use hostDefined right now
+    // 16.1.5 ParseScript ( sourceText, realm, hostDefined ), https://tc39.es/ecma262/#sec-parse-script
+    public Script Parse(VM vm)
     {
-        return new Program(ParseScript());
+        // 1. Let script be ParseText(sourceText, Script).
+        var script = ParseScript();
+
+        // NOTE: This step is handled as C# exceptions
+        // 2. If script is a List of errors, return script.
+
+        // 3. Return Script Record { [[Realm]]: realm, [[ECMAScriptCode]]: script, [[LoadedModules]]: « », [[HostDefined]]: hostDefined }.
+        return new Script(vm, script);
     }
 
     // 16.1 Scripts, https://tc39.es/ecma262/#sec-scripts
-    private List<INode> ParseScript()
+    private StatementList ParseScript()
     {
         return ParseStatementListWhile(() => _consumer.CanConsume());
     }
 
     // StatementList, https://tc39.es/ecma262/#prod-StatementList
-    private List<INode> ParseStatementListWhile(Func<bool> shouldParse)
+    private StatementList ParseStatementListWhile(Func<bool> shouldParse)
     {
         List<INode> nodes = new();
 
@@ -34,7 +44,7 @@ internal sealed class Parser
             nodes.Add(ParseStatementListItem());
         }
 
-        return nodes;
+        return new StatementList(nodes);
     }
 
     // StatementListItem, https://tc39.es/ecma262/#prod-StatementListItem
@@ -198,13 +208,169 @@ internal sealed class Parser
     // AssignmentExpression, https://tc39.es/ecma262/#prod-AssignmentExpression
     private bool TryParseAssignmentExpression(out IExpression? parsedExpression)
     {
-        if (TryParseConditionalExpression(out parsedExpression))
+        if (!TryParseConditionalExpression(out IExpression? lhs))
         {
+            parsedExpression = null;
+            return false;
+        }
+
+        // FIXME: Use this early error rule https://tc39.es/ecma262/#sec-static-semantics-assignmenttargettype
+        if (!IsLeftHandSideExpressionNode(lhs!) || !TryParseRhsOfAssignmentExpression(lhs!, out parsedExpression))
+        {
+            parsedExpression = lhs;
+        }
+
+        return true;
+    }
+
+    private bool IsLeftHandSideExpressionNode(IExpression expression)
+    {
+        return expression is Identifier or PropertyExpression or ComputedPropertyExpression or SuperPropertyExpression or SuperComputedPropertyExpression;
+    }
+
+    private bool TryParseRhsOfAssignmentExpression(IExpression lhs, out IExpression? parsedExpression)
+    {
+        if (IsBasicAssignmentOperator())
+        {
+            parsedExpression = ParseBasicAssignmentExpression(lhs);
+            return true;
+        }
+        if (IsLogicalAndAssignmentOperator())
+        {
+            parsedExpression = ParseLogicalAndAssignmentExpression(lhs);
+            return true;
+        }
+        if (IsLogicalOrAssignmentOperator())
+        {
+            parsedExpression = ParseLogicalOrAssignmentExpression(lhs);
+            return true;
+        }
+        if (IsNullCoalescingAssignmentOperator())
+        {
+            parsedExpression = ParseNullCoalescingAssignmentExpression(lhs);
+            return true;
+        }
+        if (IsBinaryOpAssignmentOperator())
+        {
+            parsedExpression = ParseBinaryOpAssignmentExpression(lhs);
             return true;
         }
 
         parsedExpression = null;
         return false;
+    }
+
+    private bool IsBasicAssignmentOperator()
+    {
+        return _consumer.IsTokenOfType(TokenType.Assignment);
+    }
+
+    private IExpression ParseBasicAssignmentExpression(IExpression lhs)
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Assignment);
+
+        if (!TryParseAssignmentExpression(out IExpression? rhs))
+        {
+            ThrowUnexpectedTokenSyntaxError<IExpression>();
+        }
+
+        return new BasicAssignmentExpression(lhs, rhs!);
+    }
+
+    private bool IsLogicalAndAssignmentOperator()
+    {
+        return _consumer.IsTokenOfType(TokenType.AndAssignment);
+    }
+
+    private IExpression ParseLogicalAndAssignmentExpression(IExpression lhs)
+    {
+        _consumer.ConsumeTokenOfType(TokenType.AndAssignment);
+
+        if (!TryParseAssignmentExpression(out IExpression? rhs))
+        {
+            ThrowUnexpectedTokenSyntaxError<IExpression>();
+        }
+
+        return new LogicalAndAssignmentExpression(lhs, rhs!);
+    }
+
+    private bool IsLogicalOrAssignmentOperator()
+    {
+        return _consumer.IsTokenOfType(TokenType.OrAssignment);
+    }
+
+    private IExpression ParseLogicalOrAssignmentExpression(IExpression lhs)
+    {
+        _consumer.ConsumeTokenOfType(TokenType.OrAssignment);
+
+        if (!TryParseAssignmentExpression(out IExpression? rhs))
+        {
+            ThrowUnexpectedTokenSyntaxError<IExpression>();
+        }
+
+        return new LogicalOrAssignmentExpression(lhs, rhs!);
+    }
+
+    private bool IsNullCoalescingAssignmentOperator()
+    {
+        return _consumer.IsTokenOfType(TokenType.NullCoalescingAssignment);
+    }
+
+    private IExpression ParseNullCoalescingAssignmentExpression(IExpression lhs)
+    {
+        _consumer.ConsumeTokenOfType(TokenType.NullCoalescingAssignment);
+
+        if (!TryParseAssignmentExpression(out IExpression? rhs))
+        {
+            ThrowUnexpectedTokenSyntaxError<IExpression>();
+        }
+
+        return new NullCoalescingAssignmentExpression(lhs, rhs!);
+    }
+
+    private bool IsBinaryOpAssignmentOperator()
+    {
+        return _consumer.CanConsume() && _consumer.Peek().type switch
+        {
+            TokenType.ExponentiationAssignment or TokenType.MultiplyAssignment or TokenType.DivisionAssignment 
+                or TokenType.ModuloAssignment or TokenType.PlusAssignment or TokenType.MinusAssignment or TokenType.LeftShiftAssignment
+                or TokenType.RightShiftAssignment or TokenType.UnsignedRightShiftAssignment or TokenType.BitwiseAndAssignment
+                or TokenType.BitwiseXorAssignment or TokenType.BitwiseOrAssignment => true,
+            _ => false,
+        };
+    }
+
+    private IExpression ParseBinaryOpAssignmentExpression(IExpression lhs)
+    {
+        var binaryOpToken = _consumer.Consume();
+        var binaryOpType = BinaryOpTokenToBinaryOpType(binaryOpToken);
+
+        if (!TryParseAssignmentExpression(out IExpression? rhs))
+        {
+            ThrowUnexpectedTokenSyntaxError<IExpression>();
+        }
+
+        return new BinaryOpAssignmentExpression(lhs, binaryOpType, rhs!);
+    }
+
+    private BinaryOpType BinaryOpTokenToBinaryOpType(Token binaryOp)
+    {
+        return binaryOp.type switch
+        {
+            TokenType.ExponentiationAssignment => BinaryOpType.Exponentiate, 
+            TokenType.MultiplyAssignment => BinaryOpType.Multiply,
+            TokenType.DivisionAssignment => BinaryOpType.Divide,
+            TokenType.ModuloAssignment => BinaryOpType.Remainder,
+            TokenType.PlusAssignment => BinaryOpType.Add,
+            TokenType.MinusAssignment => BinaryOpType.Subtract,
+            TokenType.LeftShiftAssignment => BinaryOpType.LeftShift,
+            TokenType.RightShiftAssignment => BinaryOpType.SignedRightShift,
+            TokenType.UnsignedRightShiftAssignment => BinaryOpType.UnsignedRightShift,
+            TokenType.BitwiseAndAssignment => BinaryOpType.BitwiseAND,
+            TokenType.BitwiseXorAssignment => BinaryOpType.BitwiseXOR,
+            TokenType.BitwiseOrAssignment => BinaryOpType.BitwiseOR,
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to get a binary op type with a token of type {binaryOp.type}"),
+        };
     }
 
     // ConditionalExpression, https://tc39.es/ecma262/#prod-ConditionalExpression
@@ -753,7 +919,6 @@ internal sealed class Parser
     // 13.3 Left-Hand-Side Expressions, https://tc39.es/ecma262/#sec-left-hand-side-expressions
     private bool TryParseLeftHandSideExpression(out IExpression? parsedExpression)
     {
-        // FIXME: Implement parsing of CallExpressions
         // FIXME: Implement parsing of OptionalExpressions
         // FIXME: Early Errors for parsing according to the spec
         if (TryParseNewExpression(out parsedExpression))
@@ -784,6 +949,14 @@ internal sealed class Parser
         // NOTE: This happens when there is a new without a member expression at the end of the new chain
         if (!TryParseInnerNewExpression(out IExpression? innerNewExpression)) ThrowUnexpectedTokenSyntaxError<bool>();
 
+        // NOTE: This is a hack to prevent a call expression from being parsed instead of a new expression
+        // with arguments
+        if (innerNewExpression is CallExpression)
+        {
+            parsedExpression = ParseNewExpressionWithCallExpressionRHS((innerNewExpression as CallExpression)!);
+            return true;
+        }
+
         // NOTE: This rule is duplicated in MemberExpression, however it is simpilier to have it
         List<IExpression> newArguments = new();
         TryParseArguments(newArguments);
@@ -809,6 +982,11 @@ internal sealed class Parser
         }
 
         return false;
+    }
+
+    private NewExpression ParseNewExpressionWithCallExpressionRHS(CallExpression rhs)
+    {
+        return new NewExpression(rhs.Lhs, rhs.Arguments);
     }
 
     // Arguments, https://tc39.es/ecma262/#prod-Arguments
@@ -1074,6 +1252,11 @@ internal sealed class Parser
             parsedExpression = ParseStringLiteral();
             return true;
         }
+        if (IsObjectLiteral())
+        {
+            parsedExpression = ParseObjectLiteral();
+            return true;
+        }
         if (IsParenthesizedExpression())
         {
             parsedExpression = ParseParenthesizedExpression();
@@ -1177,6 +1360,21 @@ internal sealed class Parser
         return new StringLiteral(stringValue);
     }
 
+    // 13.2.5 Object Initializer, https://tc39.es/ecma262/#prod-ObjectLiteral
+    private bool IsObjectLiteral()
+    {
+        return _consumer.IsTokenOfType(TokenType.OpenBrace);
+    }
+
+    private ObjectLiteral ParseObjectLiteral()
+    {
+        // FIXME: Implement parsing of PropertyDefinitionList
+        _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
+        _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
+
+        return new ObjectLiteral();
+    }
+
     // 14.2 Block, https://tc39.es/ecma262/#sec-block
     private bool IsBlock()
     {
@@ -1187,11 +1385,11 @@ internal sealed class Parser
     {
         _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
 
-        var blockNodes = ParseStatementListWhile(() => _consumer.CanConsume() && !_consumer.IsTokenOfType(TokenType.ClosedBrace));
+        var statementList = ParseStatementListWhile(() => _consumer.CanConsume() && !_consumer.IsTokenOfType(TokenType.ClosedBrace));
 
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
-        return new Block(blockNodes);
+        return new Block(statementList);
     }
 
     // 14.3.1 Let and Const Declarations, https://tc39.es/ecma262/#sec-let-and-const-declarations
@@ -1584,7 +1782,7 @@ internal sealed class Parser
         return _consumer.IsTokenOfType(TokenType.Default);
     }
 
-    private List<INode> ParseSwitchCaseStatementList()
+    private StatementList ParseSwitchCaseStatementList()
     {
         return ParseStatementListWhile(() =>
         {
@@ -1747,7 +1945,7 @@ internal sealed class Parser
         return new FunctionDeclaration(identifier.Name, parameters, body);
     }
 
-    private List<INode> ParseFunctionBody()
+    private StatementList ParseFunctionBody()
     {
         return ParseStatementListWhile(() => _consumer.CanConsume() && !_consumer.IsTokenOfType(TokenType.ClosedBrace));
     }

@@ -1,4 +1,6 @@
-﻿namespace JSS.Lib.AST;
+﻿using JSS.Lib.Execution;
+
+namespace JSS.Lib.AST;
 
 // 13.9.1 The Left Shift Operator ( << ), https://tc39.es/ecma262/#sec-left-shift-operator
 internal sealed class LeftShiftExpression : IExpression
@@ -9,8 +11,12 @@ internal sealed class LeftShiftExpression : IExpression
         Rhs = rhs;
     }
 
-    // FIXME: 13.9.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-left-shift-operator-runtime-semantics-evaluation
-    public void Execute() { }
+    // 13.9.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-left-shift-operator-runtime-semantics-evaluation
+    override public Completion Evaluate(VM vm)
+    {
+        // 1. Return ? EvaluateStringOrNumericBinaryExpression(ShiftExpression, <<, AdditiveExpression).
+        return EvaluateStringOrNumericBinaryExpression(vm, Lhs, BinaryOpType.LeftShift, Rhs);
+    }
 
     public IExpression Lhs { get; }
     public IExpression Rhs { get; }
