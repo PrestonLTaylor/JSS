@@ -853,10 +853,11 @@ internal sealed class ParserTests
         Assert.That(caseStatement.Expression, Is.InstanceOf(expectedExpressionType));
     }
 
+    [Test]
     public void Parse_ReturnsSwitchStatement_WithADefaultAndCaseBlocks_WhenProvidingSwitch_WithADefaultAndCaseBlocks()
     {
         // Arrange
-        var parser = new Parser("switch (1) { case 2: 3 default: 4 case 5: 6");
+        var parser = new Parser("switch (1) { case 2: 3 default: 4 case 5: 6 }");
 
         // Act
         var parsedProgram = ParseScript(parser);

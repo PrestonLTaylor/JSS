@@ -1786,7 +1786,7 @@ internal sealed class Parser
     {
         return ParseStatementListWhile(() =>
         {
-            return _consumer.Peek().type switch
+            return _consumer.CanConsume() && _consumer.Peek().type switch
             {
                 TokenType.Case or TokenType.Default or TokenType.ClosedBrace => false,
                 _ => true,
