@@ -22,6 +22,8 @@ internal enum ValueType
 // 6.1 ECMAScript Language Types, https://tc39.es/ecma262/#sec-ecmascript-language-types
 internal abstract class Value
 {
+    public static implicit operator Value(bool value) => new Boolean(value);
+
     virtual public bool IsEmpty() { return false; }
     virtual public bool IsReference() { return false; }
     virtual public bool IsEnvironment() { return false; }
@@ -229,7 +231,7 @@ internal abstract class Value
         // 2. If argument is one of undefined, null, +0𝔽, -0𝔽, NaN, 0ℤ, or the empty String, return false.
         if (IsUndefined() || IsNull())
         {
-            return new Boolean(false);
+            return false;
         }
 
         if (IsNumber())
@@ -237,7 +239,7 @@ internal abstract class Value
             var asNumber = AsNumber().Value;
             if (asNumber == 0 || double.IsNaN(asNumber))
             {
-                return new Boolean(false);
+                return false;
             }
         }
 
@@ -246,14 +248,14 @@ internal abstract class Value
             var asString = AsString().Value;
             if (asString.Length == 0)
             {
-                return new Boolean(false);
+                return false;
             }
         }
 
         // 3. NOTE: This step is replaced in section B.3.6.1.
 
         // 4. Return true.
-        return new Boolean(true);
+        return true;
     }
 
     // 7.1.3 ToNumeric ( value ), https://tc39.es/ecma262/#sec-tonumeric
@@ -426,7 +428,7 @@ internal abstract class Value
         // 2. If x is either null or undefined, return true.
         if (x.IsNull() || x.IsUndefined())
         {
-            return new Boolean(true);
+            return true;
         }
 
         // FIXME: 3. If x is a BigInt, then
@@ -438,7 +440,7 @@ internal abstract class Value
             // a. If x and y have the same length and the same code units in the same positions, return true; otherwise, return false.
             var xAsString = x.AsString().Value;
             var yAsString = y.AsString().Value;
-            return new Boolean(xAsString == yAsString);
+            return xAsString == yAsString;
         }
 
         // 5. If x is a Boolean, then
@@ -447,7 +449,7 @@ internal abstract class Value
             // 6. If x and y are both true or both false, return true; otherwise, return false.
             var xAsBoolean = x.AsBoolean().Value;
             var yAsBoolean = y.AsBoolean().Value;
-            return new Boolean(xAsBoolean == yAsBoolean);
+            return xAsBoolean == yAsBoolean;
         }
 
         // FIXME: 6. NOTE: All other ECMAScript language values are compared by identity.
@@ -509,18 +511,18 @@ internal abstract class Value
                 // iii. If cx < cy, return true.
                 if (cx < cy)
                 {
-                    return new Boolean(true);
+                    return true;
                 }
 
                 // iv. If cx > cy, return false.
                 if (cx > cy)
                 {
-                    return new Boolean(false);
+                    return false;
                 }
             }
 
             // d. If lx < ly, return true. Otherwise, return false.
-            return new Boolean(lx < ly);
+            return lx < ly;
         }
 
         // 4. Else,
@@ -573,13 +575,13 @@ internal abstract class Value
         // 2. If x is null and y is undefined, return true.
         if (x.IsNull() && y.IsUndefined())
         {
-            return new Boolean(true);
+            return true;
         }
 
         // 3. If x is undefined and y is null, return true.
         if (x.IsUndefined() && y.IsNull())
         {
-            return new Boolean(true);
+            return true;
         }
 
         // 4. NOTE: This step is replaced in section B.3.6.2.
@@ -631,7 +633,7 @@ internal abstract class Value
         // FIXME: b. If ℝ(x) = ℝ(y), return true; otherwise return false.
 
         // 14. Return false.
-        return new Boolean(false);
+        return false;
     }
 
     // 7.2.15 IsStrictlyEqual ( x, y ), https://tc39.es/ecma262/#sec-isstrictlyequal
@@ -640,7 +642,7 @@ internal abstract class Value
         // 1. If Type(x) is not Type(y), return false.
         if (!x.Type().Equals(y.Type()))
         {
-            return new Boolean(false);
+            return false;
         }
 
         // 2. If x is a Number, then

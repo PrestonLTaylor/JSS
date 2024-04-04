@@ -9,7 +9,7 @@ internal sealed class BooleanLiteral : IExpression
 {
     public BooleanLiteral(bool value)
     {
-        _value = new Boolean(value);
+        _value = value;
     }
 
     // 13.2.3.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-literals-runtime-semantics-evaluation

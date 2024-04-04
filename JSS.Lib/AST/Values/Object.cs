@@ -87,7 +87,7 @@ internal class Object : Value
 
         // 2. If desc is undefined, return false.
         // 3. Return true.
-        return new Boolean(!desc.Value.IsUndefined());
+        return !desc.Value.IsUndefined();
     }
 
     // 7.3.14 Call ( F, V [ , argumentsList ] )
@@ -152,7 +152,7 @@ internal class Object : Value
         // FIXME: 2. Let extensible be ? IsExtensible(O).
         // FIXME: 3. Return ValidateAndApplyPropertyDescriptor(O, P, extensible, Desc, current).
         O.DataProperties.Add(P, desc);
-        return new Boolean(true);
+        return true;
     }
 
     // 10.1.7 [[HasProperty]] ( P ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-hasproperty-p
@@ -170,7 +170,7 @@ internal class Object : Value
         if (hasOwn.IsAbruptCompletion()) return hasOwn;
 
         // FIXME: 2. If hasOwn is not undefined, return true.
-        return new Boolean(!hasOwn.Value.IsUndefined());
+        return !hasOwn.Value.IsUndefined();
 
         // FIXME: 3. Let parent be ? O.[[GetPrototypeOf]]().
         // FIXME: 4. If parent is not null, then
@@ -225,7 +225,7 @@ internal class Object : Value
             receiver.DataProperties[P] = new Property(V, new Attributes(true, false, false));
         }
 
-        return new Boolean(true);
+        return true;
     }
 
     // FIXME: Accessor Attributes

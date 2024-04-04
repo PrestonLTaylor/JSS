@@ -223,7 +223,7 @@ internal sealed class Number : Value
         // FIXME: 10. Assert: x and y are finite.
 
         // 11. If ℝ(x) < ℝ(y), return true. Otherwise, return false.
-        return new Boolean(x.Value < y.Value);
+        return x.Value < y.Value;
     }
 
     // 6.1.6.1.13 Number::equal ( x, y )
@@ -232,26 +232,26 @@ internal sealed class Number : Value
         // 1. If x is NaN, return false.
         if (double.IsNaN(x.Value))
         {
-            return new Boolean(false);
+            return false;
         }
 
         // 2. If y is NaN, return false.
         if (double.IsNaN(y.Value))
         {
-            return new Boolean(false);
+            return false;
         }
 
         // 3. If x is y, return true.
         if (x.Value == y.Value)
         {
-            return new Boolean(true);
+            return true;
         }
 
         // FIXME: 4. If x is +0𝔽 and y is -0𝔽, return true.
         // FIXME: 5. If x is -0𝔽 and y is +0𝔽, return true.
 
         // 6. Return false.
-        return new Boolean(false);
+        return false;
     }
 
     internal enum BitwiseOp

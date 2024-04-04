@@ -12,8 +12,8 @@ internal sealed class AbstractOperationTests
     static private readonly List<Value> toPrimitiveIdentityTestCases = new()
     {
         Null.The,
-        new Boolean(false),
-        new Boolean(true),
+        false,
+        true,
         new Number(0.0),
         new Number(1.0),
         new Number(123456789.0),

@@ -37,10 +37,10 @@ internal sealed class GreaterThanExpression : IExpression
         if (r.IsAbruptCompletion()) return r;
 
         // 6. If r is undefined, return false. Otherwise, return r.
-        if (r.Value.IsUndefined()) return new Boolean(false);
+        if (r.Value.IsUndefined()) return false;
 
         var rAsBoolean = r.Value.AsBoolean();
-        return new Boolean(rAsBoolean.Value);
+        return rAsBoolean.Value;
     }
 
     public IExpression Lhs { get; }

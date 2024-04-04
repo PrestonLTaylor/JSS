@@ -167,11 +167,11 @@ internal sealed class GlobalEnvironment : Environment
         if (existingProp.IsAbruptCompletion()) return existingProp;
 
         // 4. If existingProp is undefined, return false.
-        if (existingProp.Value.IsUndefined()) return new Boolean(false);
+        if (existingProp.Value.IsUndefined()) return false;
 
         // FIXME: 5. If existingProp.[[Configurable]] is true, return false.
         // 6. Return true.
-        return new Boolean(true);
+        return true;
     }
 
     // 9.1.1.4.15 CanDeclareGlobalVar ( N ), https://tc39.es/ecma262/#sec-candeclareglobalvar
@@ -187,10 +187,10 @@ internal sealed class GlobalEnvironment : Environment
 
         // 4. If hasProperty is true, return true.
         var asBoolean = hasProperty.Value.AsBoolean();
-        if (asBoolean.Value) return new Boolean(true);
+        if (asBoolean.Value) return true;
 
         // FIXME: 5. Return ? IsExtensible(globalObject).
-        return new Boolean(true);
+        return true;
     }
 
     // 9.1.1.4.16 CanDeclareGlobalFunction ( N ), https://tc39.es/ecma262/#sec-candeclareglobalfunction
@@ -205,12 +205,12 @@ internal sealed class GlobalEnvironment : Environment
         if (existingProp.IsAbruptCompletion()) return existingProp;
 
         // 4. If existingProp is undefined, FIXME: return ? IsExtensible(globalObject).
-        if (existingProp.Value.IsUndefined()) return new Boolean(true);
+        if (existingProp.Value.IsUndefined()) return true;
 
         // FIXME: 5. If existingProp.[[Configurable]] is true, return true.
         // FIXME: 6. If IsDataDescriptor(existingProp) is true and existingProp has attribute values { [[Writable]]: true, [[Enumerable]]: true }, return true.
         // 7. Return false.
-        return new Boolean(false);
+        return false;
     }
 
     // 9.1.1.4.17 CreateGlobalVarBinding ( N, D ), https://tc39.es/ecma262/#sec-createglobalvarbinding
