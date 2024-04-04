@@ -23,6 +23,7 @@ internal enum ValueType
 internal abstract class Value
 {
     public static implicit operator Value(bool value) => new Boolean(value);
+    public static implicit operator Value(double value) => new Number(value);
 
     virtual public bool IsEmpty() { return false; }
     virtual public bool IsReference() { return false; }
@@ -282,13 +283,13 @@ internal abstract class Value
         // FIXME: 3. If argument is undefined, return NaN.
 
         // 4. If argument is either null or false, return FIXME: +0𝔽.
-        if (IsNull()) return new Number(0.0);
+        if (IsNull()) return 0.0;
 
         if (IsBoolean())
         {
             // 5. If argument is true, return 1𝔽.
             var boolean = AsBoolean();
-            var asNumber = new Number(boolean.Value ? 1.0 : 0.0);
+            var asNumber = boolean.Value ? 1.0 : 0.0;
             return asNumber;
         }
 
@@ -299,7 +300,7 @@ internal abstract class Value
             try
             {
                 var asString = AsString(); 
-                var asNumber = new Number(double.Parse(asString.Value));
+                var asNumber = double.Parse(asString.Value);
                 return asNumber;
             }
             catch (Exception)

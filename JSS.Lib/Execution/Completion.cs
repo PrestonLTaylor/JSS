@@ -23,7 +23,6 @@ internal sealed class Completion
         Target = target;
     }
 
-
     override public bool Equals(object? obj)
     {
         if (obj is not Completion completion) { return false; }
@@ -45,6 +44,7 @@ internal sealed class Completion
     // NOTE: We use an implicit conversion operator as a syntaxic sugar for NormalCompletion in functions
     public static implicit operator Completion(Value value) => NormalCompletion(value);
     public static implicit operator Completion(bool value) => NormalCompletion(value);
+    public static implicit operator Completion(double value) => NormalCompletion(value);
 
     // 6.2.4.2 ThrowCompletion ( value ), https://tc39.es/ecma262/#sec-throwcompletion
     static public Completion ThrowCompletion(Value value)

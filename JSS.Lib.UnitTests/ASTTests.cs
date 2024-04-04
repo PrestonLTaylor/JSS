@@ -46,9 +46,9 @@ internal sealed class ASTTests
         // Tests for a block
         new object[] { "{ }", Completion.NormalCompletion(Undefined.The) },
         new object[] { "{ true }", Completion.NormalCompletion(true) },
-        new object[] { "{ 1 }", Completion.NormalCompletion(new Number(1)) },
+        new object[] { "{ 1 }", Completion.NormalCompletion(1) },
         new object[] { $"{{ {EscapeString("string")} }}", Completion.NormalCompletion(new String("string")) },
-        new object[] { "{ 1 + 1 }", Completion.NormalCompletion(new Number(2)) },
+        new object[] { "{ 1 + 1 }", Completion.NormalCompletion(2) },
         new object[] { "{ true ; }", Completion.NormalCompletion(true) },
 
         // Tests for GreaterThanEquals
@@ -105,12 +105,12 @@ internal sealed class ASTTests
         CreateLogicalANDTestCase("true", "false",  false),
         CreateLogicalANDTestCase("false", "true", false),
         CreateLogicalANDTestCase("true", "true", true),
-        CreateLogicalANDTestCase("0", "true", new Number(0)),
-        CreateLogicalANDTestCase("true", "0", new Number(0)),
+        CreateLogicalANDTestCase("0", "true", 0),
+        CreateLogicalANDTestCase("true", "0", 0),
         CreateLogicalANDTestCase(EscapeString(""), "true", new String("")),
         CreateLogicalANDTestCase("true", EscapeString(""), new String("")),
         CreateLogicalANDTestCase(EscapeString("a"), EscapeString("a"), new String("a")),
-        CreateLogicalANDTestCase("1", "1", new Number(1)),
+        CreateLogicalANDTestCase("1", "1", 1),
 
         // Tests for LogicalOR
         CreateLogicalORTestCase("false", "false", false),
@@ -122,7 +122,7 @@ internal sealed class ASTTests
         CreateLogicalORTestCase(EscapeString(""), "true", true),
         CreateLogicalORTestCase("true", EscapeString(""), true),
         CreateLogicalORTestCase(EscapeString("a"), EscapeString("a"), new String("a")),
-        CreateLogicalORTestCase("1", "1", new Number(1)),
+        CreateLogicalORTestCase("1", "1", 1),
 
         // Tests for LooseEquality
         CreateLooselyEqualTestCase("1", EscapeString("1"), true),
@@ -172,14 +172,14 @@ internal sealed class ASTTests
         CreateReturnTestCase("null", Null.The),
         CreateReturnTestCase("false", false),
         CreateReturnTestCase("true", true),
-        CreateReturnTestCase("1", new Number(1)),
+        CreateReturnTestCase("1", 1),
         CreateReturnTestCase(EscapeString("1"), new String("1")),
 
         // Tests for Throw
         CreateThrowTestCase("null", Null.The),
         CreateThrowTestCase("false", false),
         CreateThrowTestCase("true", true),
-        CreateThrowTestCase("1", new Number(1)),
+        CreateThrowTestCase("1", 1),
         CreateThrowTestCase(EscapeString("1"), new String("1")),
 
         // Tests for void
@@ -214,7 +214,7 @@ internal sealed class ASTTests
         // Tests for DoWhileLoop
         CreateNormalDoWhileTestCase("false", "null", Null.The),
         CreateNormalDoWhileTestCase("false", "false", false),
-        CreateNormalDoWhileTestCase("false", "1", new Number(1)),
+        CreateNormalDoWhileTestCase("false", "1", 1),
         CreateNormalDoWhileTestCase("false", EscapeString("a"), new String("a")),
         CreateNormalDoWhileTestCase("false", "continue", Undefined.The),
         CreateBreakDoWhileTestCase("false", "break", Undefined.The),
@@ -247,21 +247,21 @@ internal sealed class ASTTests
         CreateVarStatementTestCase("a", "null", Null.The),
         CreateVarStatementTestCase("a", "false", false),
         CreateVarStatementTestCase("a", "true", true),
-        CreateVarStatementTestCase("a", "1", new Number(1)),
+        CreateVarStatementTestCase("a", "1", 1),
         CreateVarStatementTestCase("a", EscapeString("1"), new String("1")),
 
         // Tests for BasicAssignmentExpression
         CreateBasicAssignmentExpressionTestCase("a", "null", Null.The),
         CreateBasicAssignmentExpressionTestCase("a", "false", false),
         CreateBasicAssignmentExpressionTestCase("a", "true", true),
-        CreateBasicAssignmentExpressionTestCase("a", "1", new Number(1)),
+        CreateBasicAssignmentExpressionTestCase("a", "1", 1),
         CreateBasicAssignmentExpressionTestCase("a", EscapeString("1"), new String("1")),
 
         // Tests for LogicalAndAssignmentExpression
         CreateLogicalAndAssignmentExpressionTestCase("a", "true", "null", Null.The),
         CreateLogicalAndAssignmentExpressionTestCase("a", "true", "false", false),
         CreateLogicalAndAssignmentExpressionTestCase("a", "true", "true", true),
-        CreateLogicalAndAssignmentExpressionTestCase("a", "true", "1", new Number(1)),
+        CreateLogicalAndAssignmentExpressionTestCase("a", "true", "1", 1),
         CreateLogicalAndAssignmentExpressionTestCase("a", "true", EscapeString("1"), new String("1")),
         CreateLogicalAndAssignmentExpressionTestCase("a", "false", "null", false),
         CreateLogicalAndAssignmentExpressionTestCase("a", "false", "false", false),
@@ -273,7 +273,7 @@ internal sealed class ASTTests
         CreateLogicalOrAssignmentExpressionTestCase("a", "false", "null", Null.The),
         CreateLogicalOrAssignmentExpressionTestCase("a", "false", "false", false),
         CreateLogicalOrAssignmentExpressionTestCase("a", "false", "true", true),
-        CreateLogicalOrAssignmentExpressionTestCase("a", "false", "1", new Number(1)),
+        CreateLogicalOrAssignmentExpressionTestCase("a", "false", "1", 1),
         CreateLogicalOrAssignmentExpressionTestCase("a", "false", EscapeString("1"), new String("1")),
         CreateLogicalOrAssignmentExpressionTestCase("a", "true", "null", true),
         CreateLogicalOrAssignmentExpressionTestCase("a", "true", "false", true),
@@ -285,7 +285,7 @@ internal sealed class ASTTests
         CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "null", Null.The),
         CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "false", false),
         CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "true", true),
-        CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "1", new Number(1)),
+        CreateNullCoalescingAssignmentExpressionTestCase("a", "null", "1", 1),
         CreateNullCoalescingAssignmentExpressionTestCase("a", "null", EscapeString("1"), new String("1")),
         CreateNullCoalescingAssignmentExpressionTestCase("a", "false", "null", false),
         CreateNullCoalescingAssignmentExpressionTestCase("a", "false", "false", false),
@@ -295,18 +295,18 @@ internal sealed class ASTTests
 
         // Tests for BinaryOpAssignmentExpression
         CreateBinaryOpAssignmentExpressionTestCase("a", EscapeString("a"), "+", EscapeString("b"), new String("ab")),
-        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "**", "3", new Number(8)),
-        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "*", "3", new Number(6)),
-        CreateBinaryOpAssignmentExpressionTestCase("a", "6", "/", "3", new Number(2)),
-        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "%", "3", new Number(2)),
-        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "+", "3", new Number(5)),
-        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "-", "3", new Number(-1)),
-        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "<<", "3", new Number(16)),
-        CreateBinaryOpAssignmentExpressionTestCase("a", "2", ">>", "3", new Number(0)),
-        CreateBinaryOpAssignmentExpressionTestCase("a", "2", ">>>", "3", new Number(0)),
-        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "&", "3", new Number(2)),
-        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "^", "3", new Number(1)),
-        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "|", "3", new Number(3)),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "**", "3", 8),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "*", "3", 6),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "6", "/", "3", 2),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "%", "3", 2),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "+", "3", 5),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "-", "3", -1),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "<<", "3", 16),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", ">>", "3", 0),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", ">>>", "3", 0),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "&", "3", 2),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "^", "3", 1),
+        CreateBinaryOpAssignmentExpressionTestCase("a", "2", "|", "3", 3),
 
         // Tests for empty TryStatement blocks
         CreateTryStatementTestCase("", "", null, Undefined.The, CompletionType.Normal),
@@ -314,69 +314,69 @@ internal sealed class ASTTests
         CreateTryStatementTestCase("", "", "", Undefined.The, CompletionType.Normal),
 
         // Tests for TryStatements with only catch 
-        CreateTryStatementTestCase("1", "2", null, new Number(1), CompletionType.Normal),
-        CreateTryStatementTestCase("throw 1", "2", null, new Number(2), CompletionType.Normal),
-        CreateTryStatementTestCase("1", "throw 2", null, new Number(1), CompletionType.Normal),
-        CreateTryStatementTestCase("throw 1", "throw 2", null, new Number(2), CompletionType.Throw),
+        CreateTryStatementTestCase("1", "2", null, 1, CompletionType.Normal),
+        CreateTryStatementTestCase("throw 1", "2", null, 2, CompletionType.Normal),
+        CreateTryStatementTestCase("1", "throw 2", null, 1, CompletionType.Normal),
+        CreateTryStatementTestCase("throw 1", "throw 2", null, 2, CompletionType.Throw),
 
         // Tests for TryStatements with only finally
-        CreateTryStatementTestCase("1", null, "2", new Number(1), CompletionType.Normal),
-        CreateTryStatementTestCase("throw 1", null, "2", new Number(1), CompletionType.Throw),
-        CreateTryStatementTestCase("1", null, "throw 2", new Number(2), CompletionType.Throw),
-        CreateTryStatementTestCase("throw 1", null, "throw 2", new Number(2), CompletionType.Throw),
+        CreateTryStatementTestCase("1", null, "2", 1, CompletionType.Normal),
+        CreateTryStatementTestCase("throw 1", null, "2", 1, CompletionType.Throw),
+        CreateTryStatementTestCase("1", null, "throw 2", 2, CompletionType.Throw),
+        CreateTryStatementTestCase("throw 1", null, "throw 2", 2, CompletionType.Throw),
 
         // Tests for TryStatements with catcha and finally
-        CreateTryStatementTestCase("1", "2", "3", new Number(1), CompletionType.Normal),
-        CreateTryStatementTestCase("throw 1", "2", "3", new Number(2), CompletionType.Normal),
-        CreateTryStatementTestCase("1", "throw 2", "3", new Number(1), CompletionType.Normal),
-        CreateTryStatementTestCase("throw 1", "throw 2", "3", new Number(2), CompletionType.Throw),
-        CreateTryStatementTestCase("throw 1", "throw 2", "throw 3", new Number(3), CompletionType.Throw),
-        CreateTryStatementTestCase("1", "2", "throw 3", new Number(3), CompletionType.Throw),
+        CreateTryStatementTestCase("1", "2", "3", 1, CompletionType.Normal),
+        CreateTryStatementTestCase("throw 1", "2", "3", 2, CompletionType.Normal),
+        CreateTryStatementTestCase("1", "throw 2", "3", 1, CompletionType.Normal),
+        CreateTryStatementTestCase("throw 1", "throw 2", "3", 2, CompletionType.Throw),
+        CreateTryStatementTestCase("throw 1", "throw 2", "throw 3", 3, CompletionType.Throw),
+        CreateTryStatementTestCase("1", "2", "throw 3", 3, CompletionType.Throw),
 
         // Tests for PostfixDecrementExpression
-        CreatePostfixDecrementExpressionTestCase("null", new Number(0)),
-        CreatePostfixDecrementExpressionTestCase("false", new Number(0)),
-        CreatePostfixDecrementExpressionTestCase("true", new Number(1)),
-        CreatePostfixDecrementExpressionTestCase("1", new Number(1)),
-        CreatePostfixDecrementExpressionTestCase(EscapeString("a"), new Number(double.NaN)),
-        CreatePostfixDecrementExpressionTestCase(EscapeString("1"), new Number(1)),
+        CreatePostfixDecrementExpressionTestCase("null", 0),
+        CreatePostfixDecrementExpressionTestCase("false", 0),
+        CreatePostfixDecrementExpressionTestCase("true", 1),
+        CreatePostfixDecrementExpressionTestCase("1", 1),
+        CreatePostfixDecrementExpressionTestCase(EscapeString("a"), double.NaN),
+        CreatePostfixDecrementExpressionTestCase(EscapeString("1"), 1),
 
         // Tests for PrefixDecrementExpression
-        CreatePrefixDecrementExpressionTestCase("null", new Number(-1)),
-        CreatePrefixDecrementExpressionTestCase("false", new Number(-1)),
-        CreatePrefixDecrementExpressionTestCase("true", new Number(0)),
-        CreatePrefixDecrementExpressionTestCase("1", new Number(0)),
-        CreatePrefixDecrementExpressionTestCase(EscapeString("a"), new Number(double.NaN)),
-        CreatePrefixDecrementExpressionTestCase(EscapeString("1"), new Number(0)),
+        CreatePrefixDecrementExpressionTestCase("null", -1),
+        CreatePrefixDecrementExpressionTestCase("false", -1),
+        CreatePrefixDecrementExpressionTestCase("true", 0),
+        CreatePrefixDecrementExpressionTestCase("1", 0),
+        CreatePrefixDecrementExpressionTestCase(EscapeString("a"), double.NaN),
+        CreatePrefixDecrementExpressionTestCase(EscapeString("1"), 0),
 
         // Tests for PostfixIncrementExpression
-        CreatePostfixIncrementExpressionTestCase("null", new Number(0)),
-        CreatePostfixIncrementExpressionTestCase("false", new Number(0)),
-        CreatePostfixIncrementExpressionTestCase("true", new Number(1)),
-        CreatePostfixIncrementExpressionTestCase("1", new Number(1)),
-        CreatePostfixIncrementExpressionTestCase(EscapeString("a"), new Number(double.NaN)),
-        CreatePostfixIncrementExpressionTestCase(EscapeString("1"), new Number(1)),
+        CreatePostfixIncrementExpressionTestCase("null", 0),
+        CreatePostfixIncrementExpressionTestCase("false", 0),
+        CreatePostfixIncrementExpressionTestCase("true", 1),
+        CreatePostfixIncrementExpressionTestCase("1", 1),
+        CreatePostfixIncrementExpressionTestCase(EscapeString("a"), double.NaN),
+        CreatePostfixIncrementExpressionTestCase(EscapeString("1"), 1),
 
         // Tests for PrefixIncrementExpression
-        CreatePrefixIncrementExpressionTestCase("null", new Number(1)),
-        CreatePrefixIncrementExpressionTestCase("false", new Number(1)),
-        CreatePrefixIncrementExpressionTestCase("true", new Number(2)),
-        CreatePrefixIncrementExpressionTestCase("1", new Number(2)),
-        CreatePrefixIncrementExpressionTestCase(EscapeString("a"), new Number(double.NaN)),
-        CreatePrefixIncrementExpressionTestCase(EscapeString("1"), new Number(2)),
+        CreatePrefixIncrementExpressionTestCase("null", 1),
+        CreatePrefixIncrementExpressionTestCase("false", 1),
+        CreatePrefixIncrementExpressionTestCase("true", 2),
+        CreatePrefixIncrementExpressionTestCase("1", 2),
+        CreatePrefixIncrementExpressionTestCase(EscapeString("a"), double.NaN),
+        CreatePrefixIncrementExpressionTestCase(EscapeString("1"), 2),
 
         // Tests for LetDeclarations
         CreateLetDeclarationTestCase("a", "null", Null.The),
         CreateLetDeclarationTestCase("a", "false", false),
         CreateLetDeclarationTestCase("a", "true", true),
-        CreateLetDeclarationTestCase("a", "1", new Number(1)),
+        CreateLetDeclarationTestCase("a", "1", 1),
         CreateLetDeclarationTestCase("a", EscapeString("1"), new String("1")),
         
         // Tests for ConstDeclarations
         CreateConstDeclarationTestCase("a", "null", Null.The),
         CreateConstDeclarationTestCase("a", "false", false),
         CreateConstDeclarationTestCase("a", "true", true),
-        CreateConstDeclarationTestCase("a", "1", new Number(1)),
+        CreateConstDeclarationTestCase("a", "1", 1),
         CreateConstDeclarationTestCase("a", EscapeString("1"), new String("1")),
 
         // Tests for FunctionDeclarations
@@ -386,11 +386,11 @@ internal sealed class ASTTests
 
         // Tests for IfStatement
         CreateIfStatementTestCase("false", "1", null, Undefined.The),
-        CreateIfStatementTestCase("true", "1", null, new Number(1)),
+        CreateIfStatementTestCase("true", "1", null, 1),
         CreateIfStatementTestCase("true", ";", null, Undefined.The),
-        CreateIfStatementTestCase("false", "1", "2", new Number(2)),
+        CreateIfStatementTestCase("false", "1", "2", 2),
         CreateIfStatementTestCase("false", "1", ";", Undefined.The),
-        CreateIfStatementTestCase("true", "1", "2", new Number(1)),
+        CreateIfStatementTestCase("true", "1", "2", 1),
         CreateIfStatementTestCase("true", ";", "2", Undefined.The),
 
         // FIXME: Add more tests for InExpressions when we have object literals
@@ -409,32 +409,32 @@ internal sealed class ASTTests
         CreateCallExpressionTestCase("return null", Null.The),
         CreateCallExpressionTestCase("return false", false),
         CreateCallExpressionTestCase("return true", true),
-        CreateCallExpressionTestCase("return 1", new Number(1)),
+        CreateCallExpressionTestCase("return 1", 1),
         CreateCallExpressionTestCase($"return {EscapeString("1")}", new String("1")),
         CreateThrowingCallExpressionTestCase("throw null", Null.The),
         CreateThrowingCallExpressionTestCase("throw false", false),
         CreateThrowingCallExpressionTestCase("throw true", true),
-        CreateThrowingCallExpressionTestCase("throw 1", new Number(1)),
+        CreateThrowingCallExpressionTestCase("throw 1", 1),
         CreateThrowingCallExpressionTestCase($"throw {EscapeString("1")}", new String("1")),
         CreateCallExpressionParameterTestCase("", Undefined.The),
         CreateCallExpressionParameterTestCase("null", Null.The),
         CreateCallExpressionParameterTestCase("false", false),
         CreateCallExpressionParameterTestCase("true", true),
-        CreateCallExpressionParameterTestCase("1", new Number(1)),
+        CreateCallExpressionParameterTestCase("1", 1),
         CreateCallExpressionParameterTestCase(EscapeString("1"), new String("1")),
 
         // Tests for PropertyExpression
         CreatePropertyExpressionTestCase("null", Null.The),
         CreatePropertyExpressionTestCase("false", false),
         CreatePropertyExpressionTestCase("true", true),
-        CreatePropertyExpressionTestCase("1", new Number(1)),
+        CreatePropertyExpressionTestCase("1", 1),
         CreatePropertyExpressionTestCase(EscapeString("1"), new String("1")),
 
         // Tests for ComputedPropertyExpression
         CreateComputedPropertyExpressionTestCase("null", Null.The),
         CreateComputedPropertyExpressionTestCase("false", false),
         CreateComputedPropertyExpressionTestCase("true", true),
-        CreateComputedPropertyExpressionTestCase("1", new Number(1)),
+        CreateComputedPropertyExpressionTestCase("1", 1),
         CreateComputedPropertyExpressionTestCase(EscapeString("1"), new String("1")),
     };
 
@@ -445,7 +445,7 @@ internal sealed class ASTTests
 
     static private object[] CreateNumericLiteralTestCase(double value)
     {
-        return new object[] { value.ToString(), Completion.NormalCompletion(new Number(value)) };
+        return new object[] { value.ToString(), Completion.NormalCompletion(value) };
     }
 
     static private object[] CreateStringLiteralTestCase(string value, char quote = '"')
@@ -460,7 +460,7 @@ internal sealed class ASTTests
 
     static private object[] CreateAdditionTestCase(double lhs, double rhs, double expected)
     {
-        return new object[] { $"{lhs} + {rhs}", Completion.NormalCompletion(new Number(expected)) };
+        return new object[] { $"{lhs} + {rhs}", Completion.NormalCompletion(expected) };
     }
 
     static private object[] CreateGreaterThanEqualsTestCase(string lhs, string rhs, bool expected)
@@ -540,12 +540,12 @@ internal sealed class ASTTests
 
     static private object[] CreateUnaryMinusTestCase(string value, double expected)
     {
-        return new object[] { $"-{value}", Completion.NormalCompletion(new Number(expected)) };
+        return new object[] { $"-{value}", Completion.NormalCompletion(expected) };
     }
 
     static private object[] CreateUnaryPlusTestCase(string value, double expected)
     {
-        return new object[] { $"+{value}", Completion.NormalCompletion(new Number(expected)) };
+        return new object[] { $"+{value}", Completion.NormalCompletion(expected) };
     }
 
     static private object[] CreateNormalDoWhileTestCase(string expression, string statement, Value expected)
@@ -580,7 +580,7 @@ internal sealed class ASTTests
 
     static private object[] CreateBitwiseNOTTestCase(double value, double expected)
     {
-        return new object[] { $"~{value}", Completion.NormalCompletion(new Number(expected)) };
+        return new object[] { $"~{value}", Completion.NormalCompletion(expected) };
     }
 
     static private object[] CreateThrowingIdentifierTestCase(string identifier)
@@ -966,7 +966,7 @@ internal sealed class ASTTests
     // FIXME: Replace these manual ast tests with the astTestCases array when we can parse more numbers
     static private readonly object[] normalCompletionBitwiseAndTestCases =
     {
-        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(1.0) },
+        new object[] { new NumericLiteral(1.0), new NumericLiteral(1.0), new Number(1.0 )},
         new object[] { new NumericLiteral(1.0), new NumericLiteral(-1.0), new Number(1.0) },
     };
 

@@ -12,7 +12,7 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
     {
         // The Object constructor has a "length" property whose value is 1𝔽.
         // FIXME: We should probably have a method for internally defining properties
-        DataProperties.Add("length", new Property(new Number(1), new Attributes(true, false, true)));
+        DataProperties.Add("length", new Property(1, new Attributes(true, false, true)));
     }
 
     // 20.1.1.1 Object ( [ value ] ), https://tc39.es/ecma262/#sec-object-value

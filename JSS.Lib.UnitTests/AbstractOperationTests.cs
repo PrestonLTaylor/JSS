@@ -14,9 +14,9 @@ internal sealed class AbstractOperationTests
         Null.The,
         false,
         true,
-        new Number(0.0),
-        new Number(1.0),
-        new Number(123456789.0),
+        0.0,
+        1.0,
+        123456789.0,
         new String(""),
         new String("'"),
         new String("\""),
@@ -36,7 +36,6 @@ internal sealed class AbstractOperationTests
         Assert.That(completion.Value, Is.SameAs(expected));
     }
 
-    // FIXME: Replace other Dictionary test cases with object[]
     static private readonly object[] valueToExpectedStringTestCases =
     {
         new object[] { Null.The, "null" },

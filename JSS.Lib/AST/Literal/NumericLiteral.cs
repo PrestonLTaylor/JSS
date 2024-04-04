@@ -8,7 +8,7 @@ internal sealed class NumericLiteral : IExpression
 {
     public NumericLiteral(double value)
     {
-        _value = new Number(value);
+        _value = value;
     }
 
     // 13.2.3.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-literals-runtime-semantics-evaluation
