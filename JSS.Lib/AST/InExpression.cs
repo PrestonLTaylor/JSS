@@ -35,7 +35,7 @@ internal sealed class InExpression : IExpression
         // 5. If rval is not an Object, FIXME: throw a TypeError exception.
         if (!rval.Value.IsObject())
         {
-            return Completion.ThrowCompletion(new String($"rhs of 'in' should be an Object, but got {rval.Value.Type()}"));
+            return Completion.ThrowCompletion($"rhs of 'in' should be an Object, but got {rval.Value.Type()}");
         }
 
         // 6. Return ? HasProperty(rval, ? ToPropertyKey(lval)).

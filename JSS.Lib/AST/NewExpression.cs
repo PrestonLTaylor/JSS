@@ -50,7 +50,7 @@ internal sealed class NewExpression : IExpression
         // 5. If IsConstructor(constructor) is false, FIXME: throw a TypeError exception.
         if (!constructor.Value.IsConstructor())
         {
-            return Completion.ThrowCompletion(new String("Tried to construct from a non-constructable"));
+            return Completion.ThrowCompletion("Tried to construct from a non-constructable");
         }
 
         // 6. Return ? Construct(constructor, argList).

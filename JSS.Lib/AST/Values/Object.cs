@@ -49,7 +49,7 @@ internal class Object : Value
         var asBoolean = success.Value.AsBoolean();
         if (!asBoolean.Value && Throw)
         {
-            return Completion.ThrowCompletion(new String($"Failed to set {P}"));
+            return Completion.ThrowCompletion($"Failed to set {P}");
         }
 
         // 3. Return UNUSED.
@@ -65,7 +65,7 @@ internal class Object : Value
 
         // 2. If success is false, FIXME: throw a TypeError exception.
         var asBoolean = success.Value.AsBoolean();
-        if (!asBoolean.Value) return Completion.ThrowCompletion(new String($"Should not define property of name {P} with a value of {desc.Value}"));
+        if (!asBoolean.Value) return Completion.ThrowCompletion($"Should not define property of name {P} with a value of {desc.Value}");
 
         // 3. Return UNUSED.
         return Empty.The;
@@ -99,7 +99,7 @@ internal class Object : Value
         // 2. If IsCallable(F) is false, FIXME: throw a TypeError exception.
         if (!F.IsCallable())
         {
-            return Completion.ThrowCompletion(new String("Tried to call a non-callable object"));
+            return Completion.ThrowCompletion("Tried to call a non-callable object");
         }
 
         // 3. Return ? F.[[Call]](V, argumentsList).

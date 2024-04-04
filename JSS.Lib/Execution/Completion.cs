@@ -45,6 +45,7 @@ internal sealed class Completion
     public static implicit operator Completion(Value value) => NormalCompletion(value);
     public static implicit operator Completion(bool value) => NormalCompletion(value);
     public static implicit operator Completion(double value) => NormalCompletion(value);
+    public static implicit operator Completion(string value) => NormalCompletion(value);
 
     // 6.2.4.2 ThrowCompletion ( value ), https://tc39.es/ecma262/#sec-throwcompletion
     static public Completion ThrowCompletion(Value value)

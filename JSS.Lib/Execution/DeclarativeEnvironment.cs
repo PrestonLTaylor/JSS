@@ -80,7 +80,7 @@ internal class DeclarativeEnvironment : Environment
             // a. If S is true, throw a ReferenceError exception.
             if (S)
             {
-                return Completion.ThrowCompletion(new String($"{N} is not defined."));
+                return Completion.ThrowCompletion($"{N} is not defined.");
             }
 
             // b. Perform ! envRec.CreateMutableBinding(N, true).
@@ -116,7 +116,7 @@ internal class DeclarativeEnvironment : Environment
             // a. Assert: This is an attempt to change the value of an immutable binding.
 
             // b. If S is true, FIXME: throw a TypeError exception.
-            if (S) return Completion.ThrowCompletion(new String($"invalid assignment to const {N}"));
+            if (S) return Completion.ThrowCompletion($"invalid assignment to const {N}");
         }
 
         // 6. Return UNUSED.

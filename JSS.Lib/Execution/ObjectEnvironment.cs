@@ -81,7 +81,7 @@ internal sealed class ObjectEnvironment : Environment
         if (!asBoolean.Value && S)
         {
             // FIXME: Throw a ReferenceError object
-            return Completion.ThrowCompletion(new String($"{N} is not defined"));
+            return Completion.ThrowCompletion($"{N} is not defined");
         }
 
         // 4. Perform ? Set(bindingObject, N, V, S).
@@ -107,7 +107,7 @@ internal sealed class ObjectEnvironment : Environment
             // a. If S is false, return undefined; otherwise FIXME: throw a ReferenceError exception.
             if (S)
             {
-                return Completion.ThrowCompletion(new String($"{N} is not defined."));
+                return Completion.ThrowCompletion($"{N} is not defined.");
             }
             else
             {

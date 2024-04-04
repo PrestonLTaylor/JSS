@@ -7,6 +7,9 @@ internal sealed class String : Value
         Value = value;
     }
 
+    public static implicit operator String(string value) => new(value);
+    public static implicit operator string(String @string) => @string.Value;
+
     override public bool IsString() { return true; }
     override public ValueType Type() { return ValueType.String; }
 

@@ -24,6 +24,7 @@ internal abstract class Value
 {
     public static implicit operator Value(bool value) => new Boolean(value);
     public static implicit operator Value(double value) => new Number(value);
+    public static implicit operator Value(string value) => new String(value);
 
     virtual public bool IsEmpty() { return false; }
     virtual public bool IsReference() { return false; }
@@ -105,7 +106,7 @@ internal abstract class Value
         var asReference = AsReference();
         if (asReference.IsUnresolvableReference())
         {
-            return Completion.ThrowCompletion(new String($"{asReference.ReferencedName} is not defined"));
+            return Completion.ThrowCompletion($"{asReference.ReferencedName} is not defined");
         }
 
         // 3. If IsPropertyReference(V) is true, then
@@ -144,7 +145,7 @@ internal abstract class Value
         if (!IsReference())
         {
             // FIXME: Throw an actual ReferenceError object
-            return Completion.ThrowCompletion(new String("Tried to put a value into a non-reference."));
+            return Completion.ThrowCompletion("Tried to put a value into a non-reference.");
         }
 
         var reference = AsReference();
@@ -327,15 +328,14 @@ internal abstract class Value
         // FIXME: 3. If argument is undefined, return "undefined".
 
         // 4. If argument is null, return "null".
-        if (IsNull()) return new String("null");
+        if (IsNull()) return "null";
 
         // 5. If argument is true, return "true".
         // 6. If argument is false, return "false".
         if (IsBoolean())
         {
             var boolean = AsBoolean();
-            var asString = new String(boolean.Value ? "true" : "false");
-            return asString;
+            return boolean.Value ? "true" : "false";
         }
 
         // FIXME: Follow the spec instead of using C#'s ToString
@@ -343,8 +343,7 @@ internal abstract class Value
         if (IsNumber())
         {
             var number = AsNumber();
-            var asString = new String(number.Value.ToString());
-            return asString;
+            return number.Value.ToString();
         }
 
         // FIXME: 8. If argument is a BigInt, return BigInt::toString(argument, 10).
@@ -361,13 +360,13 @@ internal abstract class Value
         // Undefined, FIXME: Throw a TypeError exception.
         if (IsUndefined())
         {
-            return Completion.ThrowCompletion(new String("Unable to convert undefined to an object"));
+            return Completion.ThrowCompletion("Unable to convert undefined to an object");
         }
 
         // Null, FIXME: Throw a TypeError exception.
         if (IsNull())
         {
-            return Completion.ThrowCompletion(new String("Unable to convert null to an object"));
+            return Completion.ThrowCompletion("Unable to convert null to an object");
         }
 
         // FIXME: Implement the rest of the conversions

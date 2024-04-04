@@ -70,13 +70,13 @@ internal sealed class CallExpression : IExpression
         // 4. If func is not an Object, FIXME: throw a TypeError exception.
         if (!func.IsObject())
         {
-            return Completion.ThrowCompletion(new String($"Tried to call a {func.Type()}, expected an Object"));
+            return Completion.ThrowCompletion($"Tried to call a {func.Type()}, expected an Object");
         }
 
         // 5. If IsCallable(func) is false, throw a TypeError exception.
         if (!func.IsCallable())
         {
-            return Completion.ThrowCompletion(new String("Tried to call a non-callable Object"));
+            return Completion.ThrowCompletion("Tried to call a non-callable Object");
         }
 
         // FIXME: 6. If tailPosition is true, perform PrepareForTailCall().

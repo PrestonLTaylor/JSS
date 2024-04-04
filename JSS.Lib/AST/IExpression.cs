@@ -50,8 +50,7 @@ internal abstract class IExpression : INode
                 // iii. Return the string-concatenation of lstr and rstr.
                 var lstrValue = lstr.Value.AsString();
                 var rstrValue = rstr.Value.AsString();
-                var concatenation = lstrValue.Value + rstrValue.Value;
-                return new String(concatenation);
+                return lstrValue.Value + rstrValue.Value;
             }
 
             // d. Set lval to lprim.

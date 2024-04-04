@@ -17,10 +17,10 @@ internal sealed class AbstractOperationTests
         0.0,
         1.0,
         123456789.0,
-        new String(""),
-        new String("'"),
-        new String("\""),
-        new String("This is a string literal"),
+        "",
+        "'",
+        "\"",
+        "This is a string literal",
     };
 
     [TestCaseSource(nameof(toPrimitiveIdentityTestCases))]

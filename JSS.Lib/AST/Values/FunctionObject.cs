@@ -230,7 +230,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             if (ConstructorKind == ConstructorKind.BASE) return thisArgument;
 
             // c. If result.[[Value]] is not undefined, throw a FIXME: TypeError exception.
-            if (!result.Value.IsUndefined()) return Completion.ThrowCompletion(new String("Function constructor without kind of base did not return an object/undefined"));
+            if (!result.Value.IsUndefined()) return Completion.ThrowCompletion("Function constructor without kind of base did not return an object/undefined");
         }
         // 11. Else,
         else
@@ -372,7 +372,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         }
 
         // 6. Perform ! DefinePropertyOrThrow(F, "name", PropertyDescriptor { [[Value]]: name, [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: true }).
-        MUST(DefinePropertyOrThrow(this, "name", new Property(new String(name), new Attributes(false, false, true))));
+        MUST(DefinePropertyOrThrow(this, "name", new Property(name, new Attributes(false, false, true))));
 
         // 7. Return unused.
     }

@@ -51,7 +51,7 @@ internal class FunctionEnvironment : DeclarativeEnvironment
         // 2. If envRec.[[ThisBindingStatus]] is INITIALIZED, throw a FIXKME: ReferenceError exception.
         if (ThisBindingStatus == ThisBindingStatus.INITIALIZED)
         {
-            return new String("Tried to bind a this value to already this-initialized function environment");
+            return Completion.ThrowCompletion("Tried to bind a this value to already this-initialized function environment");
         }
 
         // 3. Set envRec.[[ThisValue]] to V.
@@ -80,7 +80,7 @@ internal class FunctionEnvironment : DeclarativeEnvironment
         // 2. If envRec.[[ThisBindingStatus]] is UNINITIALIZED, throw a FIXME: ReferenceError exception.
         if (ThisBindingStatus == ThisBindingStatus.UNINITIALIZED)
         {
-            return Completion.ThrowCompletion(new String("Tried to get an uninitialized this value"));
+            return Completion.ThrowCompletion("Tried to get an uninitialized this value");
         }
 
         // 3. Return envRec.[[ThisValue]].

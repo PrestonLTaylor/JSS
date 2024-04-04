@@ -88,10 +88,10 @@ internal sealed class Script
         {
             // FIXME: Throw SyntaxError Objects
             // a. If env.HasVarDeclaration(name) is true, throw a SyntaxError exception.
-            if (env.HasVarDeclaration(name)) return Completion.ThrowCompletion(new String($"redeclaration of var {name}"));
+            if (env.HasVarDeclaration(name)) return Completion.ThrowCompletion($"redeclaration of var {name}");
 
             // b. If env.HasLexicalDeclaration(name) is true, throw a SyntaxError exception.
-            if (env.HasLexicalDeclaration(name)) return Completion.ThrowCompletion(new String($"redeclaration of let {name}"));
+            if (env.HasLexicalDeclaration(name)) return Completion.ThrowCompletion($"redeclaration of let {name}");
 
             // c. Let hasRestrictedGlobal be ? env.HasRestrictedGlobalProperty(name).
             var hasRestrictedGlobal = env.HasRestrictedGlobalProperty(name);
@@ -99,14 +99,14 @@ internal sealed class Script
 
             // d. If hasRestrictedGlobal is true, throw a SyntaxError exception.
             var asBoolean = hasRestrictedGlobal.Value.AsBoolean();
-            if (asBoolean.Value) return Completion.ThrowCompletion(new String($"redeclaration of Unconfigurable {name}"));
+            if (asBoolean.Value) return Completion.ThrowCompletion($"redeclaration of Unconfigurable {name}");
         }
 
         // 4. For each element name of varNames, do
         foreach (var name in varNames)
         {
             // a. If env.HasLexicalDeclaration(name) is true, throw a SyntaxError exception.
-            if (env.HasLexicalDeclaration(name)) return Completion.ThrowCompletion(new String($"redeclaration of let {name}"));
+            if (env.HasLexicalDeclaration(name)) return Completion.ThrowCompletion($"redeclaration of let {name}");
         }
 
         // 5. Let varDeclarations be the VarScopedDeclarations of script.
@@ -144,7 +144,7 @@ internal sealed class Script
                     // FIXME: Throw an actual TypeError Error
                     // 2. If fnDefinable is false, throw a TypeError exception.
                     var asBoolean = fnDefinable.Value.AsBoolean();
-                    if (!asBoolean.Value) return Completion.ThrowCompletion(new String($"redeclaration of Unconfigurable function {fn}"));
+                    if (!asBoolean.Value) return Completion.ThrowCompletion($"redeclaration of Unconfigurable function {fn}");
 
                     // 3. Append fn to declaredFunctionNames.
                     declaredFunctionNames.Add(fn);
@@ -176,7 +176,7 @@ internal sealed class Script
 
                         // b. If vnDefinable is false, FIXME: throw a TypeError exception.
                         var asBoolean = vnDefinable.Value.AsBoolean();
-                        if (!asBoolean.Value) return Completion.ThrowCompletion(new String($"redeclaration of Unextensible var {vn}"));
+                        if (!asBoolean.Value) return Completion.ThrowCompletion($"redeclaration of Unextensible var {vn}");
 
                         // c. If declaredVarNames does not contain vn, then
                         if (!declaredVarNames.Contains(vn))

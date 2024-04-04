@@ -56,7 +56,7 @@ internal sealed class GlobalEnvironment : Environment
     {
         // 1. Let DclRec be envRec.[[DeclarativeRecord]].
         // 2. If ! DclRec.HasBinding(N) is true, throw a TypeError exception.
-        if (DeclarativeRecord.HasBinding(N)) return Completion.ThrowCompletion(new String($"redeclaration of mutable binding {N}"));
+        if (DeclarativeRecord.HasBinding(N)) return Completion.ThrowCompletion($"redeclaration of mutable binding {N}");
 
         // 3. Return ! DclRec.CreateMutableBinding(N, D).
         return MUST(DeclarativeRecord.CreateMutableBinding(N, D));
@@ -67,7 +67,7 @@ internal sealed class GlobalEnvironment : Environment
     {
         // 1. Let DclRec be envRec.[[DeclarativeRecord]].
         // 2. If ! DclRec.HasBinding(N) is true, throw a TypeError exception.
-        if (DeclarativeRecord.HasBinding(N)) return Completion.ThrowCompletion(new String($"redeclaration of immutable binding {N}"));
+        if (DeclarativeRecord.HasBinding(N)) return Completion.ThrowCompletion($"redeclaration of immutable binding {N}");
 
         // 3. Return ! DclRec.CreateImmutableBinding(N, S).
         return MUST(DeclarativeRecord.CreateImmutableBinding(N, S));
