@@ -5,10 +5,10 @@ using JSS.Lib.Runtime;
 namespace JSS.Lib.Execution;
 
 // 9.3 Realms, https://tc39.es/ecma262/#realm-record
-internal sealed class Realm
+public sealed class Realm
 {
     // 9.3.1 CreateRealm ( ), https://tc39.es/ecma262/#sec-createrealm
-    public Realm()
+    internal Realm()
     {
         // 1. Let realmRec be a new Realm Record.
         // FIXME: 2. Perform CreateIntrinsics(realmRec).
@@ -28,7 +28,7 @@ internal sealed class Realm
     }
 
     // 9.3.3 SetRealmGlobalObject ( realmRec, globalObj, thisValue ), https://tc39.es/ecma262/#sec-setrealmglobalobject
-    public void SetRealmGlobalObject(Object globalObj, Object thisValue)
+    internal void SetRealmGlobalObject(Object globalObj, Object thisValue)
     {
         // 1. If globalObj is undefined, then
         if (globalObj.IsUndefined())
@@ -95,7 +95,7 @@ internal sealed class Realm
     }
 
     // 9.4.6 GetGlobalObject ( ), https://tc39.es/ecma262/#sec-getglobalobject
-    static public Object GetGlobalObject(VM vm)
+    static internal Object GetGlobalObject(VM vm)
     {
         // 1. Let currentRealm be the current Realm Record.
         var currentRealm = vm.Realm;
@@ -142,9 +142,9 @@ internal sealed class Realm
         return Empty.The;
     }
 
-    public Agent Agent { get; }
-    public Object GlobalObject { get; private set; }
-    public GlobalEnvironment? GlobalEnv { get; private set; }
+    internal Agent Agent { get; }
+    internal Object GlobalObject { get; private set; }
+    internal GlobalEnvironment? GlobalEnv { get; private set; }
     // FIXME: [[Intrinsics]]
     // FIXME: [[LoadedModules]]
 }

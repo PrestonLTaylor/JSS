@@ -5,9 +5,9 @@ using System.Diagnostics;
 namespace JSS.Lib.Execution;
 
 // 16.1.4 Script Records, https://tc39.es/ecma262/#sec-script-records 
-internal sealed class Script
+public sealed class Script
 {
-    public Script(VM vm, StatementList statementList)
+    internal Script(VM vm, StatementList statementList)
     {
         VM = vm;
         Realm = vm.Realm;
@@ -276,7 +276,7 @@ internal sealed class Script
 
     public VM VM { get; }
     public Realm Realm { get; }
-    public IReadOnlyList<INode> ScriptCode
+    internal IReadOnlyList<INode> ScriptCode
     {
         get { return _statementList.Statements; }
     }

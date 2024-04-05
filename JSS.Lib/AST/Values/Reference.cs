@@ -4,9 +4,9 @@ using System.Diagnostics;
 namespace JSS.Lib.AST.Values;
 
 // 6.2.5 The Reference Record Specification Type, https://tc39.es/ecma262/#sec-reference-record-specification-type
-internal class Reference : Value
+public class Reference : Value
 {
-    public Reference(Value? @base, string referencedName, Value thisValue)
+    internal Reference(Value? @base, string referencedName, Value thisValue)
     {
         Base = @base;
         ReferencedName = referencedName;

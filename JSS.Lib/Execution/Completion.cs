@@ -13,9 +13,9 @@ internal enum CompletionType
 }
 
 // 6.2.4 The Completion Record Specification Type, https://tc39.es/ecma262/#sec-completion-record-specification-type
-internal sealed class Completion
+public sealed class Completion
 {
-    public Completion(CompletionType type, Value value, string target)
+    internal Completion(CompletionType type, Value value, string target)
     {
         Type = type;
         Value = value;
@@ -116,7 +116,7 @@ internal sealed class Completion
 
     public bool IsValueEmpty() {  return Value.IsEmpty(); }
 
-    public CompletionType Type { get; }
+    internal CompletionType Type { get; }
     public Value Value { get; private set; }
     public string Target { get; }
 }
