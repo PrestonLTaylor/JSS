@@ -1,9 +1,6 @@
 ﻿using JSS.Lib.Execution;
 using JSS.Lib.Runtime;
 using System.Diagnostics;
-using Environment = JSS.Lib.Execution.Environment;
-using ExecutionContext = JSS.Lib.Execution.ExecutionContext;
-using static JSS.Lib.Execution.CompletionHelper;
 
 namespace JSS.Lib.AST.Values;
 

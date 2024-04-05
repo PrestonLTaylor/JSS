@@ -1,7 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
-using String = JSS.Lib.AST.Values.String;
-
 namespace JSS.Lib.AST;
 
 // 13.3.5 The new Operator, https://tc39.es/ecma262/#sec-new-operator

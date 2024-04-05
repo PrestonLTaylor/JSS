@@ -1,5 +1,4 @@
 ﻿using JSS.Lib.Execution;
-using static JSS.Lib.Execution.CompletionHelper;
 
 namespace JSS.Lib.AST;
 

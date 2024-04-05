@@ -1,6 +1,5 @@
 ﻿using JSS.Lib.Execution;
 using JSS.Lib.Runtime;
-using Object = JSS.Lib.AST.Values.Object;
 
 namespace JSS.Lib.AST.Literal;
 

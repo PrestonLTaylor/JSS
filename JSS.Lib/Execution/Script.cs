@@ -1,7 +1,5 @@
-﻿using Boolean = JSS.Lib.AST.Values.Boolean;
-using JSS.Lib.AST.Values;
+﻿using JSS.Lib.AST.Values;
 using JSS.Lib.AST;
-using String = JSS.Lib.AST.Values.String;
 using System.Diagnostics;
 
 namespace JSS.Lib.Execution;

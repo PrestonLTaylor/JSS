@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using JSS.Lib.AST.Values;
 using JSS.Lib.Runtime;
-using Object = JSS.Lib.AST.Values.Object;
 
 namespace JSS.Lib.Execution;
 

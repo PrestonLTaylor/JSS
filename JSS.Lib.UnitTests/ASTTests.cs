@@ -1,10 +1,6 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.AST.Literal;
 using JSS.Lib.Execution;
-using Boolean = JSS.Lib.AST.Values.Boolean;
-using Object = JSS.Lib.AST.Values.Object;
-using String = JSS.Lib.AST.Values.String;
-using ValueType = JSS.Lib.AST.Values.ValueType;
 using JSS.Lib.AST;
 using FluentAssertions;
 

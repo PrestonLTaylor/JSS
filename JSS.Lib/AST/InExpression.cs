@@ -1,6 +1,4 @@
 ﻿using JSS.Lib.Execution;
-using Object = JSS.Lib.AST.Values.Object;
-using String = JSS.Lib.AST.Values.String;
 
 namespace JSS.Lib.AST;
 

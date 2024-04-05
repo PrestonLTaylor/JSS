@@ -1,5 +1,4 @@
 ﻿using JSS.Lib.Execution;
-using String = JSS.Lib.AST.Values.String;
 
 namespace JSS.Lib.AST.Literal;
 

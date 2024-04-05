@@ -1,8 +1,4 @@
 ﻿using JSS.Lib.AST.Values;
-using Boolean = JSS.Lib.AST.Values.Boolean;
-using Object = JSS.Lib.AST.Values.Object;
-using String = JSS.Lib.AST.Values.String;
-
 namespace JSS.Lib.Execution;
 
 internal sealed class ObjectEnvironment : Environment

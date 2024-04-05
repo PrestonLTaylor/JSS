@@ -3,8 +3,6 @@ using JSS.Lib.AST;
 using JSS.Lib.AST.Literal;
 using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
-using Boolean = JSS.Lib.AST.Values.Boolean;
-using String = JSS.Lib.AST.Values.String;
 
 namespace JSS.Lib.UnitTests;
 

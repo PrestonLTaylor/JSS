@@ -1,5 +1,4 @@
 ﻿using JSS.Lib.Execution;
-using Boolean = JSS.Lib.AST.Values.Boolean;
 
 namespace JSS.Lib.AST.Literal;
 
