@@ -6,6 +6,7 @@ using Object = JSS.Lib.AST.Values.Object;
 using String = JSS.Lib.AST.Values.String;
 using ValueType = JSS.Lib.AST.Values.ValueType;
 using JSS.Lib.AST;
+using FluentAssertions;
 
 namespace JSS.Lib.UnitTests;
 
@@ -720,7 +721,7 @@ internal sealed class ASTTests
         var actualCompletion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(actualCompletion, Is.EqualTo(expectedCompletion));
+        actualCompletion.Should().Be(expectedCompletion);
     }
 
     [Test]
@@ -733,10 +734,10 @@ internal sealed class ASTTests
         var completion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
+        completion.IsNormalCompletion().Should().BeTrue();
 
-        // NOTE: This assert makes sure we use the global null value
-        Assert.That(completion.Value, Is.SameAs(Null.The));
+        // NOTE: This makes sure we use the global null value
+        completion.Value.Should().Be(Null.The);
     }
 
     [Test]
@@ -751,9 +752,9 @@ internal sealed class ASTTests
         var completion = breakStatement.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsBreakCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(Empty.The));
-        Assert.That(completion.Target, Is.Empty);
+        completion.IsBreakCompletion().Should().BeTrue();
+        completion.Value.Should().Be(Empty.The);
+        completion.Target.Should().BeEmpty();
     }
 
     [Test]
@@ -770,9 +771,9 @@ internal sealed class ASTTests
         var completion = breakStatement.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsBreakCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(Empty.The));
-        Assert.That(completion.Target, Is.EqualTo(expectedTarget));
+        completion.IsBreakCompletion().Should().BeTrue();
+        completion.Value.Should().Be(Empty.The);
+        completion.Target.Should().Be(expectedTarget);
     }
 
     [Test]
@@ -787,9 +788,9 @@ internal sealed class ASTTests
         var completion = continueStatement.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsContinueCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(Empty.The));
-        Assert.That(completion.Target, Is.Empty);
+        completion.IsContinueCompletion().Should().BeTrue();
+        completion.Value.Should().Be(Empty.The);
+        completion.Target.Should().BeEmpty();
     }
 
     [Test]
@@ -806,9 +807,9 @@ internal sealed class ASTTests
         var completion = continueStatement.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsContinueCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(Empty.The));
-        Assert.That(completion.Target, Is.EqualTo(expectedTarget));
+        completion.IsContinueCompletion().Should().BeTrue();
+        completion.Value.Should().Be(Empty.The);
+        completion.Target.Should().Be(expectedTarget);
     }
 
     // FIXME: More tests when we parse more object literals
@@ -827,11 +828,11 @@ internal sealed class ASTTests
         var actualCompletion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+        actualCompletion.IsNormalCompletion().Should().BeTrue();
 
         var actualObject = actualCompletion.Value as Object;
-        Assert.That(actualObject, Is.Not.Null);
-        Assert.That(actualObject.DataProperties, Has.Count.EqualTo(0));
+        actualObject.Should().NotBeNull();
+        actualObject!.DataProperties.Should().HaveCount(0);
     }
 
     [Test]
@@ -844,11 +845,11 @@ internal sealed class ASTTests
         var actualCompletion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+        actualCompletion.IsNormalCompletion().Should().BeTrue();
 
         var shouldBeTrue = actualCompletion.Value as Boolean;
-        Assert.That(shouldBeTrue, Is.Not.Null);
-        Assert.That(shouldBeTrue.Value, Is.True);
+        shouldBeTrue.Should().NotBeNull();
+        shouldBeTrue!.Value.Should().BeTrue();
     }
 
     // FIXME: We should have a different file for runtime tests
@@ -862,11 +863,11 @@ internal sealed class ASTTests
         var actualCompletion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+        actualCompletion.IsNormalCompletion().Should().BeTrue();
 
         var actualTypeOf = actualCompletion.Value as String;
-        Assert.That(actualTypeOf, Is.Not.Null);
-        Assert.That(actualTypeOf.Value, Is.EqualTo("function"));
+        actualTypeOf.Should().NotBeNull();
+        actualTypeOf!.Value.Should().Be("function");
     }
 
     [Test]
@@ -879,12 +880,12 @@ internal sealed class ASTTests
         var actualCompletion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+        actualCompletion.IsNormalCompletion().Should().BeTrue();
 
         var actualObject = actualCompletion.Value as Object;
-        Assert.That(actualObject, Is.Not.Null);
+        actualObject.Should().NotBeNull();
         // FIXME: Assert for %Object.prototype%
-        Assert.That(actualObject.DataProperties, Has.Count.Zero);
+        actualObject!.DataProperties.Should().BeEmpty();
     }
 
     [Test]
@@ -897,12 +898,12 @@ internal sealed class ASTTests
         var actualCompletion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+        actualCompletion.IsNormalCompletion().Should().BeTrue();
 
         var actualObject = actualCompletion.Value as Object;
-        Assert.That(actualObject, Is.Not.Null);
+        actualObject.Should().NotBeNull();
         // FIXME: Assert for %Object.prototype%
-        Assert.That(actualObject.DataProperties, Has.Count.Zero);
+        actualObject!.DataProperties.Should().BeEmpty();
     }
 
     [Test]
@@ -915,12 +916,12 @@ internal sealed class ASTTests
         var actualCompletion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+        actualCompletion.IsNormalCompletion().Should().BeTrue();
 
         var actualObject = actualCompletion.Value as Object;
-        Assert.That(actualObject, Is.Not.Null);
+        actualObject.Should().NotBeNull();
         // FIXME: Assert for %Object.prototype%
-        Assert.That(actualObject.DataProperties, Has.Count.Zero);
+        actualObject!.DataProperties.Should().BeEmpty();
     }
 
     [Test]
@@ -933,11 +934,11 @@ internal sealed class ASTTests
         var actualCompletion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+        actualCompletion.IsNormalCompletion().Should().BeTrue();
 
         var actualValue = actualCompletion.Value as Number;
-        Assert.That(actualValue, Is.Not.Null);
-        Assert.That(actualValue.Value, Is.EqualTo(1));
+        actualValue.Should().NotBeNull();
+        actualValue!.Value.Should().Be(1);
     }
 
     [Test]
@@ -950,16 +951,16 @@ internal sealed class ASTTests
         var actualCompletion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(actualCompletion.IsNormalCompletion(), Is.True);
+        actualCompletion.IsNormalCompletion().Should().BeTrue();
 
         var thisObject = actualCompletion.Value as Object;
-        Assert.That(thisObject, Is.Not.Null);
+        thisObject.Should().NotBeNull();
         // FIXME: Assert for %Object.prototype%
 
         var globalObject = script.Realm.GlobalObject;
         foreach (var prop in globalObject.DataProperties)
         {
-            Assert.That(thisObject.DataProperties.ContainsKey(prop.Key), Is.True);
+            thisObject!.DataProperties.ContainsKey(prop.Key).Should().BeTrue();
         }
     }
 
@@ -982,8 +983,8 @@ internal sealed class ASTTests
         var completion = bitwiseAndExpression.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+        completion.IsNormalCompletion().Should().BeTrue();
+        completion.Value.Should().Be(expectedValue);
     }
 
     static private readonly object[] normalCompletionBitwiseOrTestCases =
@@ -1004,8 +1005,8 @@ internal sealed class ASTTests
         var completion = bitwiseOrExpression.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+        completion.IsNormalCompletion().Should().BeTrue();
+        completion.Value.Should().Be(expectedValue);
     }
 
     static private readonly object[] normalCompletionBitwiseXorTestCases =
@@ -1026,8 +1027,8 @@ internal sealed class ASTTests
         var completion = bitwiseXorExpression.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+        completion.IsNormalCompletion().Should().BeTrue();
+        completion.Value.Should().Be(expectedValue);
     }
 
     static private readonly object[] normalCompletionDivisionTestCases =
@@ -1048,8 +1049,8 @@ internal sealed class ASTTests
         var completion = divisionExpression.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+        completion.IsNormalCompletion().Should().BeTrue();
+        completion.Value.Should().Be(expectedValue);
     }
 
     static private readonly object[] normalCompletionExponentiationTestCases =
@@ -1070,8 +1071,8 @@ internal sealed class ASTTests
         var completion = exponentiationExpression.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+        completion.IsNormalCompletion().Should().BeTrue();
+        completion.Value.Should().Be(expectedValue);
     }
 
     static private readonly object[] normalCompletionLeftShiftTestCases =
@@ -1092,8 +1093,8 @@ internal sealed class ASTTests
         var completion = leftShiftExpression.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+        completion.IsNormalCompletion().Should().BeTrue();
+        completion.Value.Should().Be(expectedValue);
     }
 
     static private readonly object[] normalCompletionModuloTestCases =
@@ -1114,8 +1115,8 @@ internal sealed class ASTTests
         var completion = moduloExpression.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+        completion.IsNormalCompletion().Should().BeTrue();
+        completion.Value.Should().Be(expectedValue);
     }
 
     static private readonly object[] normalCompletionMultiplyTestCases =
@@ -1136,8 +1137,8 @@ internal sealed class ASTTests
         var completion = multiplicationExpression.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+        completion.IsNormalCompletion().Should().BeTrue();
+        completion.Value.Should().Be(expectedValue);
     }
 
     static private readonly object[] normalCompletionRightShiftTestCases =
@@ -1158,8 +1159,8 @@ internal sealed class ASTTests
         var completion = rightShiftExpression.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+        completion.IsNormalCompletion().Should().BeTrue();
+        completion.Value.Should().Be(expectedValue);
     }
 
     static private readonly object[] normalCompletionSubtractionTestCases =
@@ -1180,8 +1181,8 @@ internal sealed class ASTTests
         var completion = subtractionExpression.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+        completion.IsNormalCompletion().Should().BeTrue();
+        completion.Value.Should().Be(expectedValue);
     }
 
     static private readonly object[] normalCompletionUnsignedRightShiftTestCases =
@@ -1202,8 +1203,8 @@ internal sealed class ASTTests
         var completion = unsignedRightShiftExpression.Evaluate(vm);
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+        completion.IsNormalCompletion().Should().BeTrue();
+        completion.Value.Should().Be(expectedValue);
     }
 
     [Test]
@@ -1217,8 +1218,8 @@ internal sealed class ASTTests
         var completion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(completion.IsThrowCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(new String($"{identifier} is not defined")));
+        completion.IsThrowCompletion().Should().BeTrue();
+        completion.Value.Should().Be(new String($"{identifier} is not defined"));
     }
 
     [Test]
@@ -1232,8 +1233,8 @@ internal sealed class ASTTests
         var completion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(completion.IsThrowCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(new String($"{identifier} is not defined")));
+        completion.IsThrowCompletion().Should().BeTrue();
+        completion.Value.Should().Be(new String($"{identifier} is not defined"));
     }
 
     [Test]
@@ -1247,8 +1248,8 @@ internal sealed class ASTTests
         var completion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(completion.IsThrowCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(new String($"invalid assignment to const {identifier}")));
+        completion.IsThrowCompletion().Should().BeTrue();
+        completion.Value.Should().Be(new String($"invalid assignment to const {identifier}"));
     }
 
     [Test]
@@ -1262,8 +1263,8 @@ internal sealed class ASTTests
         var completion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(completion.IsThrowCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(new String($"{identifier} is not defined")));
+        completion.IsThrowCompletion().Should().BeTrue();
+        completion.Value.Should().Be(new String($"{identifier} is not defined"));
     }
 
     [Test]
@@ -1277,8 +1278,8 @@ internal sealed class ASTTests
         var completion = script.ScriptEvaluation();
 
         // Assert
-        Assert.That(completion.IsThrowCompletion(), Is.True);
-        Assert.That(completion.Value, Is.EqualTo(new String($"{identifier} is not defined")));
+        completion.IsThrowCompletion().Should().BeTrue();
+        completion.Value.Should().Be(new String($"{identifier} is not defined"));
     }
 
     static private string EscapeString(string toEscape, char quote = '"')

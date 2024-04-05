@@ -1,4 +1,5 @@
-﻿using JSS.Lib.AST;
+﻿using FluentAssertions;
+using JSS.Lib.AST;
 using JSS.Lib.AST.Literal;
 using JSS.Lib.Execution;
 
@@ -69,11 +70,11 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var actualExpressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(actualExpressionStatement, Is.Not.Null);
-        Assert.That(actualExpressionStatement.Expression, Is.InstanceOf(expectedType));
+        actualExpressionStatement.Should().NotBeNull();
+        actualExpressionStatement!.Expression.Should().BeOfType(expectedType);
     }
 
     static private readonly Dictionary<string, Type> nestedExpressionStatementToTypeTestCases = new()
@@ -127,11 +128,11 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var actualExpressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(actualExpressionStatement, Is.Not.Null);
-        Assert.That(actualExpressionStatement.Expression, Is.InstanceOf(expectedType));
+        actualExpressionStatement.Should().NotBeNull();
+        actualExpressionStatement!.Expression.Should().BeOfType(expectedType);
     }
 
     [Test]
@@ -146,14 +147,14 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
+        expressionStatement.Should().NotBeNull();
 
-        var identifier = expressionStatement.Expression as Identifier;
-        Assert.That(identifier, Is.Not.Null);
-        Assert.That(identifier.Name, Is.EqualTo(identifierString));
+        var identifier = expressionStatement!.Expression as Identifier;
+        identifier.Should().NotBeNull();
+        identifier!.Name.Should().Be(identifierString);
     }
 
     [Test]
@@ -167,14 +168,14 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
+        expressionStatement.Should().NotBeNull();
 
-        var booleanLiteral = expressionStatement.Expression as BooleanLiteral;
-        Assert.That(booleanLiteral, Is.Not.Null);
-        Assert.That(booleanLiteral.Value, Is.EqualTo(false));
+        var booleanLiteral = expressionStatement!.Expression as BooleanLiteral;
+        booleanLiteral.Should().NotBeNull();
+        booleanLiteral!.Value.Should().BeFalse();
     }
 
     [Test]
@@ -188,14 +189,14 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
+        expressionStatement.Should().NotBeNull();
 
-        var booleanLiteral = expressionStatement.Expression as BooleanLiteral;
-        Assert.That(booleanLiteral, Is.Not.Null);
-        Assert.That(booleanLiteral.Value, Is.EqualTo(true));
+        var booleanLiteral = expressionStatement!.Expression as BooleanLiteral;
+        booleanLiteral.Should().NotBeNull();
+        booleanLiteral!.Value.Should().BeTrue();
     }
 
     static private readonly Dictionary<string, double> numericLiteralToValueTestCases = new()
@@ -216,14 +217,14 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
+        expressionStatement.Should().NotBeNull();
 
-        var parsedLiteral = expressionStatement.Expression as NumericLiteral;
-        Assert.That(parsedLiteral, Is.Not.Null);
-        Assert.That(parsedLiteral.Value, Is.EqualTo(numericValue));
+        var parsedLiteral = expressionStatement!.Expression as NumericLiteral;
+        parsedLiteral.Should().NotBeNull();
+        parsedLiteral!.Value.Should().BeApproximately(numericValue, 0.0001);
     }
 
     static private readonly Dictionary<string, string> stringLiteralToValueTestCases = new()
@@ -249,14 +250,14 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
+        expressionStatement.Should().NotBeNull();
 
-        var parsedLiteral = expressionStatement.Expression as StringLiteral;
-        Assert.That(parsedLiteral, Is.Not.Null);
-        Assert.That(parsedLiteral.Value, Is.EqualTo(stringValue));
+        var parsedLiteral = expressionStatement!.Expression as StringLiteral;
+        parsedLiteral.Should().NotBeNull();
+        parsedLiteral!.Value.Should().Be(stringValue);
     }
 
     [Test]
@@ -270,14 +271,14 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
+        expressionStatement.Should().NotBeNull();
 
-        var newExpression = expressionStatement.Expression as NewExpression;
-        Assert.That(newExpression, Is.Not.Null);
-        Assert.That(newExpression.Arguments, Has.Count.EqualTo(1));
+        var newExpression = expressionStatement!.Expression as NewExpression;
+        newExpression.Should().NotBeNull();
+        newExpression!.Arguments.Should().HaveCount(1);
     }
 
     // Tests for 14.2 Block, https://tc39.es/ecma262/#sec-block
@@ -292,11 +293,11 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var block = rootNodes[0] as Block;
-        Assert.That(block, Is.Not.Null);
-        Assert.That(block.Statements.Statements, Is.Empty);
+        block.Should().NotBeNull();
+        block!.Statements.Statements.Should().BeEmpty();
     }
 
     // FIXME: Make test cases for a variety of statements/declarations
@@ -311,14 +312,14 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var block = rootNodes[0] as Block;
-        Assert.That(block, Is.Not.Null);
+        block.Should().NotBeNull();
 
-        var blockNodes = block.Statements.Statements;
-        Assert.That(blockNodes, Has.Count.EqualTo(1));
-        Assert.That(blockNodes[0], Is.InstanceOf<ExpressionStatement>());
+        var blockNodes = block!.Statements.Statements;
+        blockNodes.Should().HaveCount(1);
+        blockNodes[0].Should().BeOfType<ExpressionStatement>();
     }
 
     // Tests for 14.3.1 Let and Const Declarations, https://tc39.es/ecma262/#sec-let-and-const-declarations
@@ -334,12 +335,12 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var letDeclaration = rootNodes[0] as LetDeclaration;
-        Assert.That(letDeclaration, Is.Not.Null);
-        Assert.That(letDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
-        Assert.That(letDeclaration.Initializer, Is.Null);
+        letDeclaration.Should().NotBeNull();
+        letDeclaration!.Identifier.Should().Be(expectedIdentifier);
+        letDeclaration.Initializer.Should().BeNull();
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -356,12 +357,12 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var letDeclaration = rootNodes[0] as LetDeclaration;
-        Assert.That(letDeclaration, Is.Not.Null);
-        Assert.That(letDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
-        Assert.That(letDeclaration.Initializer, Is.InstanceOf(expectedInitializerType));
+        letDeclaration.Should().NotBeNull();
+        letDeclaration!.Identifier.Should().Be(expectedIdentifier);
+        letDeclaration.Initializer.Should().BeOfType(expectedInitializerType);
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -378,12 +379,12 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var constDeclaration = rootNodes[0] as ConstDeclaration;
-        Assert.That(constDeclaration, Is.Not.Null);
-        Assert.That(constDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
-        Assert.That(constDeclaration.Initializer, Is.InstanceOf(expectedInitializerType));
+        constDeclaration.Should().NotBeNull();
+        constDeclaration!.Identifier.Should().Be(expectedIdentifier);
+        constDeclaration.Initializer.Should().BeOfType(expectedInitializerType);
     }
 
     // Tests for 14.3.2 Variable Statement, https://tc39.es/ecma262/#sec-variable-statement
@@ -399,12 +400,12 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var varStatement = rootNodes[0] as VarStatement;
-        Assert.That(varStatement, Is.Not.Null);
-        Assert.That(varStatement.Identifier, Is.EqualTo(expectedIdentifier));
-        Assert.That(varStatement.Initializer, Is.Null);
+        varStatement.Should().NotBeNull();
+        varStatement!.Identifier.Should().Be(expectedIdentifier);
+        varStatement!.Initializer.Should().BeNull();
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -421,12 +422,12 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var varStatement = rootNodes[0] as VarStatement;
-        Assert.That(varStatement, Is.Not.Null);
-        Assert.That(varStatement.Identifier, Is.EqualTo(expectedIdentifier));
-        Assert.That(varStatement.Initializer, Is.InstanceOf(expectedInitializerType));
+        varStatement.Should().NotBeNull();
+        varStatement!.Identifier.Should().Be(expectedIdentifier);
+        varStatement.Initializer.Should().BeOfType(expectedInitializerType);
     }
 
     // Tests for 14.4 Empty Statement, https://tc39.es/ecma262/#sec-empty-statement
@@ -441,10 +442,10 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var emptyStatement = rootNodes[0] as EmptyStatement;
-        Assert.That(emptyStatement, Is.Not.Null);
+        emptyStatement.Should().NotBeNull();
     }
 
     // Tests for 14.6 The if Statement, https://tc39.es/ecma262/#sec-if-statement
@@ -461,13 +462,13 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var ifStatement = rootNodes[0] as IfStatement;
-        Assert.That(ifStatement, Is.Not.Null);
-        Assert.That(ifStatement.IfExpression, Is.InstanceOf(expectedExpressionType));
-        Assert.That(ifStatement.IfCaseStatement, Is.Not.Null);
-        Assert.That(ifStatement.ElseCaseStatement, Is.Null);
+        ifStatement.Should().NotBeNull();
+        ifStatement!.IfExpression.Should().BeOfType(expectedExpressionType);
+        ifStatement.IfCaseStatement.Should().NotBeNull();
+        ifStatement.ElseCaseStatement.Should().BeNull();
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -483,13 +484,13 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var ifStatement = rootNodes[0] as IfStatement;
-        Assert.That(ifStatement, Is.Not.Null);
-        Assert.That(ifStatement.IfExpression, Is.InstanceOf(expectedExpressionType));
-        Assert.That(ifStatement.IfCaseStatement, Is.Not.Null);
-        Assert.That(ifStatement.ElseCaseStatement, Is.Not.Null);
+        ifStatement.Should().NotBeNull();
+        ifStatement!.IfExpression.Should().BeOfType(expectedExpressionType);
+        ifStatement.IfCaseStatement.Should().NotBeNull();
+        ifStatement.ElseCaseStatement.Should().NotBeNull();
     }
 
     // Tests for 14.7 Iteration Statements, https://tc39.es/ecma262/#sec-iteration-statements
@@ -506,12 +507,12 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var doWhileStatement = rootNodes[0] as DoWhileStatement;
-        Assert.That(doWhileStatement, Is.Not.Null);
-        Assert.That(doWhileStatement.WhileExpression, Is.InstanceOf(expectedExpressionType));
-        Assert.That(doWhileStatement.IterationStatement, Is.Not.Null);
+        doWhileStatement.Should().NotBeNull();
+        doWhileStatement!.WhileExpression.Should().BeOfType(expectedExpressionType);
+        doWhileStatement.IterationStatement.Should().NotBeNull();
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -527,12 +528,12 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var whileStatement = rootNodes[0] as WhileStatement;
-        Assert.That(whileStatement, Is.Not.Null);
-        Assert.That(whileStatement.WhileExpression, Is.InstanceOf(expectedExpressionType));
-        Assert.That(whileStatement.IterationStatement, Is.Not.Null);
+        whileStatement.Should().NotBeNull();
+        whileStatement!.WhileExpression.Should().BeOfType(expectedExpressionType);
+        whileStatement.IterationStatement.Should().NotBeNull();
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -548,14 +549,14 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var forStatement = rootNodes[0] as ForStatement;
-        Assert.That(forStatement, Is.Not.Null);
-        Assert.That(forStatement.InitializationExpression, Is.InstanceOf(expectedExpressionType));
-        Assert.That(forStatement.TestExpression, Is.InstanceOf(expectedExpressionType));
-        Assert.That(forStatement.IncrementExpression, Is.InstanceOf(expectedExpressionType));
-        Assert.That(forStatement.IterationStatement, Is.Not.Null);
+        forStatement.Should().NotBeNull();
+        forStatement!.InitializationExpression.Should().BeOfType(expectedExpressionType);
+        forStatement.TestExpression.Should().BeOfType(expectedExpressionType);
+        forStatement.IncrementExpression.Should().BeOfType(expectedExpressionType);
+        forStatement.IterationStatement.Should().NotBeNull();
     }
 
     [Test]
@@ -569,14 +570,14 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var forStatement = rootNodes[0] as ForStatement;
-        Assert.That(forStatement, Is.Not.Null);
-        Assert.That(forStatement.InitializationExpression, Is.Null);
-        Assert.That(forStatement.TestExpression, Is.Null);
-        Assert.That(forStatement.IncrementExpression, Is.Null);
-        Assert.That(forStatement.IterationStatement, Is.Not.Null);
+        forStatement.Should().NotBeNull();
+        forStatement!.InitializationExpression.Should().BeNull();
+        forStatement.TestExpression.Should().BeNull();
+        forStatement.IncrementExpression.Should().BeNull();
+        forStatement.IterationStatement.Should().NotBeNull();
     }
 
     [Test]
@@ -591,17 +592,17 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var forStatement = rootNodes[0] as ForStatement;
-        Assert.That(forStatement, Is.Not.Null);
-        Assert.That(forStatement.TestExpression, Is.Null);
-        Assert.That(forStatement.IncrementExpression, Is.Null);
-        Assert.That(forStatement.IterationStatement, Is.Not.Null);
+        forStatement.Should().NotBeNull();
+        forStatement!.TestExpression.Should().BeNull();
+        forStatement.IncrementExpression.Should().BeNull();
+        forStatement.IterationStatement.Should().NotBeNull();
 
         var varStatement = forStatement.InitializationExpression as VarStatement;
-        Assert.That(varStatement, Is.Not.Null);
-        Assert.That(varStatement.Identifier, Is.EqualTo(expectedIdentifier));
+        varStatement.Should().NotBeNull();
+        varStatement!.Identifier.Should().Be(expectedIdentifier);
     }
 
     [Test]
@@ -616,17 +617,17 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var forStatement = rootNodes[0] as ForStatement;
-        Assert.That(forStatement, Is.Not.Null);
-        Assert.That(forStatement.TestExpression, Is.Null);
-        Assert.That(forStatement.IncrementExpression, Is.Null);
-        Assert.That(forStatement.IterationStatement, Is.Not.Null);
+        forStatement.Should().NotBeNull();
+        forStatement!.TestExpression.Should().BeNull();
+        forStatement.IncrementExpression.Should().BeNull();
+        forStatement.IterationStatement.Should().NotBeNull();
 
         var varStatement = forStatement.InitializationExpression as LetDeclaration;
-        Assert.That(varStatement, Is.Not.Null);
-        Assert.That(varStatement.Identifier, Is.EqualTo(expectedIdentifier));
+        varStatement.Should().NotBeNull();
+        varStatement!.Identifier.Should().Be(expectedIdentifier);
     }
 
     [Test]
@@ -641,17 +642,17 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var forStatement = rootNodes[0] as ForStatement;
-        Assert.That(forStatement, Is.Not.Null);
-        Assert.That(forStatement.TestExpression, Is.Null);
-        Assert.That(forStatement.IncrementExpression, Is.Null);
-        Assert.That(forStatement.IterationStatement, Is.Not.Null);
+        forStatement.Should().NotBeNull();
+        forStatement!.TestExpression.Should().BeNull();
+        forStatement.IncrementExpression.Should().BeNull();
+        forStatement.IterationStatement.Should().NotBeNull();
 
         var varStatement = forStatement.InitializationExpression as ConstDeclaration;
-        Assert.That(varStatement, Is.Not.Null);
-        Assert.That(varStatement.Identifier, Is.EqualTo(expectedIdentifier));
+        varStatement.Should().NotBeNull();
+        varStatement!.Identifier.Should().Be(expectedIdentifier);
     }
 
     // Tests for 14.8 The continue Statement, https://tc39.es/ecma262/#sec-continue-statement
@@ -667,12 +668,13 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var continueStatement = rootNodes[0] as ContinueStatement;
-        Assert.That(continueStatement, Is.Not.Null);
-        Assert.That(continueStatement.Label, Is.Not.Null);
-        Assert.That(continueStatement.Label.Name, Is.EqualTo(expectedLabel));
+        continueStatement.Should().NotBeNull();
+
+        continueStatement!.Label.Should().NotBeNull();
+        continueStatement.Label!.Name.Should().Be(expectedLabel);
     }
 
     [Test]
@@ -686,11 +688,11 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var continueStatement = rootNodes[0] as ContinueStatement;
-        Assert.That(continueStatement, Is.Not.Null);
-        Assert.That(continueStatement.Label, Is.Null);
+        continueStatement.Should().NotBeNull();
+        continueStatement!.Label.Should().BeNull();
     }
 
     // Tests for 14.9 The break Statement, https://tc39.es/ecma262/#sec-break-statement
@@ -706,12 +708,13 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var breakStatement = rootNodes[0] as BreakStatement;
-        Assert.That(breakStatement, Is.Not.Null);
-        Assert.That(breakStatement.Label, Is.Not.Null);
-        Assert.That(breakStatement.Label.Name, Is.EqualTo(expectedLabel));
+        breakStatement.Should().NotBeNull();
+
+        breakStatement!.Label.Should().NotBeNull();
+        breakStatement.Label!.Name.Should().Be(expectedLabel);
     }
 
     [Test]
@@ -725,11 +728,11 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var breakStatement = rootNodes[0] as BreakStatement;
-        Assert.That(breakStatement, Is.Not.Null);
-        Assert.That(breakStatement.Label, Is.Null);
+        breakStatement.Should().NotBeNull();
+        breakStatement!.Label.Should().BeNull();
     }
 
     // Tests for 14.10 The return Statement, https://tc39.es/ecma262/#sec-return-statement
@@ -744,11 +747,11 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var returnStatement = rootNodes[0] as ReturnStatement;
-        Assert.That(returnStatement, Is.Not.Null);
-        Assert.That(returnStatement.ReturnExpression, Is.Null);
+        returnStatement.Should().NotBeNull();
+        returnStatement!.ReturnExpression.Should().BeNull();
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -764,11 +767,11 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var returnStatement = rootNodes[0] as ReturnStatement;
-        Assert.That(returnStatement, Is.Not.Null);
-        Assert.That(returnStatement.ReturnExpression, Is.InstanceOf(expectedExpressionType));
+        returnStatement.Should().NotBeNull();
+        returnStatement!.ReturnExpression.Should().BeOfType(expectedExpressionType);
     }
 
     // Tests for 14.12 The switch Statement, https://tc39.es/ecma262/#sec-switch-statement
@@ -785,13 +788,13 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var switchStatement = rootNodes[0] as SwitchStatement;
-        Assert.That(switchStatement, Is.Not.Null);
-        Assert.That(switchStatement.SwitchExpression, Is.InstanceOf(expectedExpressionType));
-        Assert.That(switchStatement.CaseBlocks, Is.Empty);
-        Assert.That(switchStatement.DefaultCase, Is.Null);
+        switchStatement.Should().NotBeNull();
+        switchStatement!.SwitchExpression.Should().BeOfType(expectedExpressionType);
+        switchStatement.CaseBlocks.Should().BeEmpty();
+        switchStatement.DefaultCase.Should().BeNull();
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -807,20 +810,20 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var switchStatement = rootNodes[0] as SwitchStatement;
-        Assert.That(switchStatement, Is.Not.Null);
-        Assert.That(switchStatement.SwitchExpression, Is.InstanceOf(expectedExpressionType));
-        Assert.That(switchStatement.CaseBlocks, Is.Empty);
-        Assert.That(switchStatement.DefaultCase, Is.Not.Null);
+        switchStatement.Should().NotBeNull();
+        switchStatement!.SwitchExpression.Should().BeOfType(expectedExpressionType);
+        switchStatement.CaseBlocks.Should().BeEmpty();
+        switchStatement.DefaultCase.Should().NotBeNull();
 
         var defaultCase = switchStatement.DefaultCase!.Value;
-        Assert.That(defaultCase.StatementList, Has.Count.EqualTo(1));
+        defaultCase.StatementList.Should().HaveCount(1);
 
         var defaultCaseStatement = defaultCase.StatementList[0] as ExpressionStatement;
-        Assert.That(defaultCaseStatement, Is.Not.Null);
-        Assert.That(defaultCaseStatement.Expression, Is.InstanceOf(expectedExpressionType));
+        defaultCaseStatement.Should().NotBeNull();
+        defaultCaseStatement!.Expression.Should().BeOfType(expectedExpressionType);
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -836,21 +839,21 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var switchStatement = rootNodes[0] as SwitchStatement;
-        Assert.That(switchStatement, Is.Not.Null);
-        Assert.That(switchStatement.SwitchExpression, Is.InstanceOf(expectedExpressionType));
-        Assert.That(switchStatement.DefaultCase, Is.Null);
-        Assert.That(switchStatement.CaseBlocks, Has.Count.EqualTo(1));
+        switchStatement.Should().NotBeNull();
+        switchStatement!.SwitchExpression.Should().BeOfType(expectedExpressionType);
+        switchStatement.DefaultCase.Should().BeNull();
+        switchStatement.CaseBlocks.Should().HaveCount(1);
 
         var caseBlock = switchStatement.CaseBlocks[0];
-        Assert.That(caseBlock.CaseExpression, Is.InstanceOf(expectedExpressionType));
-        Assert.That(caseBlock.StatementList, Has.Count.EqualTo(1));
+        caseBlock.CaseExpression.Should().BeOfType(expectedExpressionType);
+        caseBlock.StatementList.Should().HaveCount(1);
 
         var caseStatement = caseBlock.StatementList[0] as ExpressionStatement;
-        Assert.That(caseStatement, Is.Not.Null);
-        Assert.That(caseStatement.Expression, Is.InstanceOf(expectedExpressionType));
+        caseStatement.Should().NotBeNull();
+        caseStatement!.Expression.Should().BeOfType(expectedExpressionType);
     }
 
     [Test]
@@ -864,13 +867,13 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var switchStatement = rootNodes[0] as SwitchStatement;
-        Assert.That(switchStatement, Is.Not.Null);
-        Assert.That(switchStatement.SwitchExpression, Is.Not.Null);
-        Assert.That(switchStatement.DefaultCase, Is.Not.Null);
-        Assert.That(switchStatement.CaseBlocks, Has.Count.EqualTo(2));
+        switchStatement.Should().NotBeNull();
+        switchStatement!.SwitchExpression.Should().NotBeNull();
+        switchStatement.DefaultCase.Should().NotBeNull();
+        switchStatement.CaseBlocks.Should().HaveCount(2);
     }
     
     // Tests for 14.14 The throw Statement, https://tc39.es/ecma262/#sec-throw-statement
@@ -887,11 +890,11 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var throwStatement = rootNodes[0] as ThrowStatement;
-        Assert.That(throwStatement, Is.Not.Null);
-        Assert.That(throwStatement.ThrowExpression, Is.InstanceOf(expectedExpressionType));
+        throwStatement.Should().NotBeNull();
+        throwStatement!.ThrowExpression.Should().BeOfType(expectedExpressionType);
     }
 
     // Tests for 14.15 The try Statement, https://tc39.es/ecma262/#sec-try-statement
@@ -906,14 +909,14 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var tryStatement = rootNodes[0] as TryStatement;
-        Assert.That(tryStatement, Is.Not.Null);
-        Assert.That(tryStatement.TryBlock, Is.Not.Null);
-        Assert.That(tryStatement.CatchBlock, Is.Not.Null);
-        Assert.That(tryStatement.CatchParameter, Is.Null);
-        Assert.That(tryStatement.FinallyBlock, Is.Null);
+        tryStatement.Should().NotBeNull();
+        tryStatement!.TryBlock.Should().NotBeNull();
+        tryStatement.CatchBlock.Should().NotBeNull();
+        tryStatement.CatchParameter.Should().BeNull();
+        tryStatement.FinallyBlock.Should().BeNull();
     }
 
     // FIXME: Tests for BindingPatterns
@@ -929,15 +932,15 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var tryStatement = rootNodes[0] as TryStatement;
-        Assert.That(tryStatement, Is.Not.Null);
-        Assert.That(tryStatement.TryBlock, Is.Not.Null);
-        Assert.That(tryStatement.CatchBlock, Is.Not.Null);
-        Assert.That(tryStatement.CatchParameter, Is.Not.Null);
-        Assert.That(tryStatement.CatchParameter!.Name, Is.EqualTo(expectedCatchIdentifier));
-        Assert.That(tryStatement.FinallyBlock, Is.Null);
+        tryStatement.Should().NotBeNull();
+        tryStatement!.TryBlock.Should().NotBeNull();
+        tryStatement.CatchBlock.Should().NotBeNull();
+        tryStatement.CatchParameter.Should().NotBeNull();
+        tryStatement.CatchParameter!.Name.Should().Be(expectedCatchIdentifier);
+        tryStatement.FinallyBlock.Should().BeNull();
     }
 
     [Test]
@@ -951,14 +954,14 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var tryStatement = rootNodes[0] as TryStatement;
-        Assert.That(tryStatement, Is.Not.Null);
-        Assert.That(tryStatement.TryBlock, Is.Not.Null);
-        Assert.That(tryStatement.CatchBlock, Is.Null);
-        Assert.That(tryStatement.CatchParameter, Is.Null);
-        Assert.That(tryStatement.FinallyBlock, Is.Not.Null);
+        tryStatement.Should().NotBeNull();
+        tryStatement!.TryBlock.Should().NotBeNull();
+        tryStatement.CatchBlock.Should().BeNull();
+        tryStatement.CatchParameter.Should().BeNull();
+        tryStatement.FinallyBlock.Should().NotBeNull();
     }
 
     [Test]
@@ -972,14 +975,14 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var tryStatement = rootNodes[0] as TryStatement;
-        Assert.That(tryStatement, Is.Not.Null);
-        Assert.That(tryStatement.TryBlock, Is.Not.Null);
-        Assert.That(tryStatement.CatchBlock, Is.Not.Null);
-        Assert.That(tryStatement.CatchParameter, Is.Null);
-        Assert.That(tryStatement.FinallyBlock, Is.Not.Null);
+        tryStatement.Should().NotBeNull();
+        tryStatement!.TryBlock.Should().NotBeNull();
+        tryStatement.CatchBlock.Should().NotBeNull();
+        tryStatement.CatchParameter.Should().BeNull();
+        tryStatement.FinallyBlock.Should().NotBeNull();
     }
 
     [Test]
@@ -994,15 +997,15 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var tryStatement = rootNodes[0] as TryStatement;
-        Assert.That(tryStatement, Is.Not.Null);
-        Assert.That(tryStatement.TryBlock, Is.Not.Null);
-        Assert.That(tryStatement.CatchBlock, Is.Not.Null);
-        Assert.That(tryStatement.CatchParameter, Is.Not.Null);
-        Assert.That(tryStatement.CatchParameter!.Name, Is.EqualTo(expectedCatchIdentifier));
-        Assert.That(tryStatement.FinallyBlock, Is.Not.Null);
+        tryStatement.Should().NotBeNull();
+        tryStatement!.TryBlock.Should().NotBeNull();
+        tryStatement.CatchBlock.Should().NotBeNull();
+        tryStatement.CatchParameter.Should().NotBeNull();
+        tryStatement.CatchParameter!.Name.Should().Be(expectedCatchIdentifier);
+        tryStatement.FinallyBlock.Should().NotBeNull();
     }
 
     // Tests for 14.16 The debugger Statement, https://tc39.es/ecma262/#sec-debugger-statement
@@ -1017,10 +1020,10 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var debuggerStatement = rootNodes[0] as DebuggerStatement;
-        Assert.That(debuggerStatement, Is.Not.Null);
+        debuggerStatement.Should().NotBeNull();
     }
 
     // Tests for 15.2 Function Definitions, https://tc39.es/ecma262/#sec-function-definitions
@@ -1036,13 +1039,13 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var functionDeclaration = rootNodes[0] as FunctionDeclaration;
-        Assert.That(functionDeclaration, Is.Not.Null);
-        Assert.That(functionDeclaration.Identifier, Is.EqualTo(expectedFunctionIdentifier));
-        Assert.That(functionDeclaration.Parameters, Is.Empty);
-        Assert.That(functionDeclaration.Body.Statements, Is.Empty);
+        functionDeclaration.Should().NotBeNull();
+        functionDeclaration!.Identifier.Should().Be(expectedFunctionIdentifier);
+        functionDeclaration.Parameters.Should().BeEmpty();
+        functionDeclaration.Body.Statements.Should().BeEmpty();
     }
 
     [Test]
@@ -1059,17 +1062,17 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var functionDeclaration = rootNodes[0] as FunctionDeclaration;
-        Assert.That(functionDeclaration, Is.Not.Null);
-        Assert.That(functionDeclaration.Identifier, Is.EqualTo(expectedFunctionIdentifier));
-        Assert.That(functionDeclaration.Body.Statements, Is.Empty);
+        functionDeclaration.Should().NotBeNull();
+        functionDeclaration!.Identifier.Should().Be(expectedFunctionIdentifier);
+        functionDeclaration.Body.Statements.Should().BeEmpty();
 
         var parameters  = functionDeclaration.Parameters;
-        Assert.That(parameters, Has.Count.EqualTo(2));
-        Assert.That(parameters[0].Name, Is.EqualTo(expectedFirstParameterIdentifier));
-        Assert.That(parameters[1].Name, Is.EqualTo(expectedSecondParameterIdentifier));
+        parameters.Should().HaveCount(2);
+        parameters[0].Name.Should().Be(expectedFirstParameterIdentifier);
+        parameters[1].Name.Should().Be(expectedSecondParameterIdentifier);
     }
 
     [Test]
@@ -1085,16 +1088,16 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var functionDeclaration = rootNodes[0] as FunctionDeclaration;
-        Assert.That(functionDeclaration, Is.Not.Null);
-        Assert.That(functionDeclaration.Identifier, Is.EqualTo(expectedFunctionIdentifier));
-        Assert.That(functionDeclaration.Body.Statements, Is.Empty);
+        functionDeclaration.Should().NotBeNull();
+        functionDeclaration!.Identifier.Should().Be(expectedFunctionIdentifier);
+        functionDeclaration.Body.Statements.Should().BeEmpty();
 
         var parameters = functionDeclaration.Parameters;
-        Assert.That(parameters, Has.Count.EqualTo(1));
-        Assert.That(parameters[0].Name, Is.EqualTo(expectedParameterIdentifier));
+        parameters.Should().HaveCount(1);
+        parameters[0].Name.Should().Be(expectedParameterIdentifier);
     }
 
     // Tests for 15.7 Class Definitions, https://tc39.es/ecma262/#sec-class-definitions
@@ -1110,15 +1113,15 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var classDeclaration = rootNodes[0] as ClassDeclaration;
-        Assert.That(classDeclaration, Is.Not.Null);
-        Assert.That(classDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
-        Assert.That(classDeclaration.Methods, Is.Empty);
-        Assert.That(classDeclaration.StaticMethods, Is.Empty);
-        Assert.That(classDeclaration.Fields, Is.Empty);
-        Assert.That(classDeclaration.StaticFields, Is.Empty);
+        classDeclaration.Should().NotBeNull();
+        classDeclaration!.Identifier.Should().Be(expectedIdentifier);
+        classDeclaration.Methods.Should().BeEmpty();
+        classDeclaration.StaticMethods.Should().BeEmpty();
+        classDeclaration.Fields.Should().BeEmpty();
+        classDeclaration.StaticFields.Should().BeEmpty();
     }
 
     [Test]
@@ -1134,22 +1137,22 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var classDeclaration = rootNodes[0] as ClassDeclaration;
-        Assert.That(classDeclaration, Is.Not.Null);
-        Assert.That(classDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
-        Assert.That(classDeclaration.StaticMethods, Is.Empty);
-        Assert.That(classDeclaration.Fields, Is.Empty);
-        Assert.That(classDeclaration.StaticFields, Is.Empty);
+        classDeclaration.Should().NotBeNull();
+        classDeclaration!.Identifier.Should().Be(expectedIdentifier);
+        classDeclaration.StaticMethods.Should().BeEmpty();
+        classDeclaration.Fields.Should().BeEmpty();
+        classDeclaration.StaticFields.Should().BeEmpty();
 
-        Assert.That(classDeclaration.Methods, Has.Count.EqualTo(1));
+        classDeclaration.Methods.Should().HaveCount(1);
 
         var publicMethod = classDeclaration.Methods[0];
-        Assert.That(publicMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
-        Assert.That(publicMethod.Parameters, Is.Empty);
-        Assert.That(publicMethod.Body.Statements, Is.Empty);
-        Assert.That(publicMethod.IsPrivate, Is.False);
+        publicMethod.Identifier.Should().Be(expectedMethodIdentifier);
+        publicMethod.Parameters.Should().BeEmpty();
+        publicMethod.Body.Statements.Should().BeEmpty();
+        publicMethod.IsPrivate.Should().BeFalse();
     }
 
     [Test]
@@ -1165,22 +1168,22 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var classDeclaration = rootNodes[0] as ClassDeclaration;
-        Assert.That(classDeclaration, Is.Not.Null);
-        Assert.That(classDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
-        Assert.That(classDeclaration.StaticMethods, Is.Empty);
-        Assert.That(classDeclaration.Fields, Is.Empty);
-        Assert.That(classDeclaration.StaticFields, Is.Empty);
+        classDeclaration.Should().NotBeNull();
+        classDeclaration!.Identifier.Should().Be(expectedIdentifier);
+        classDeclaration.StaticMethods.Should().BeEmpty();
+        classDeclaration.Fields.Should().BeEmpty();
+        classDeclaration.StaticFields.Should().BeEmpty();
 
-        Assert.That(classDeclaration.Methods, Has.Count.EqualTo(1));
+        classDeclaration.Methods.Should().HaveCount(1);
 
         var privateMethod = classDeclaration.Methods[0];
-        Assert.That(privateMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
-        Assert.That(privateMethod.Parameters, Is.Empty);
-        Assert.That(privateMethod.Body.Statements, Is.Empty);
-        Assert.That(privateMethod.IsPrivate, Is.True);
+        privateMethod.Identifier.Should().Be(expectedMethodIdentifier);
+        privateMethod.Parameters.Should().BeEmpty();
+        privateMethod.Body.Statements.Should().BeEmpty();
+        privateMethod.IsPrivate.Should().BeTrue();
     }
 
     [Test]
@@ -1196,22 +1199,22 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var classDeclaration = rootNodes[0] as ClassDeclaration;
-        Assert.That(classDeclaration, Is.Not.Null);
-        Assert.That(classDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
-        Assert.That(classDeclaration.Methods, Is.Empty);
-        Assert.That(classDeclaration.Fields, Is.Empty);
-        Assert.That(classDeclaration.StaticFields, Is.Empty);
+        classDeclaration.Should().NotBeNull();
+        classDeclaration!.Identifier.Should().Be(expectedIdentifier);
+        classDeclaration.Methods.Should().BeEmpty();
+        classDeclaration.Fields.Should().BeEmpty();
+        classDeclaration.StaticFields.Should().BeEmpty();
 
-        Assert.That(classDeclaration.StaticMethods, Has.Count.EqualTo(1));
+        classDeclaration.StaticMethods.Should().HaveCount(1);
 
         var staticPublicMethod = classDeclaration.StaticMethods[0];
-        Assert.That(staticPublicMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
-        Assert.That(staticPublicMethod.Parameters, Is.Empty);
-        Assert.That(staticPublicMethod.Body.Statements, Is.Empty);
-        Assert.That(staticPublicMethod.IsPrivate, Is.False);
+        staticPublicMethod.Identifier.Should().Be(expectedMethodIdentifier);
+        staticPublicMethod.Parameters.Should().BeEmpty();
+        staticPublicMethod.Body.Statements.Should().BeEmpty();
+        staticPublicMethod.IsPrivate.Should().BeFalse();
     }
 
     [Test]
@@ -1227,22 +1230,22 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var classDeclaration = rootNodes[0] as ClassDeclaration;
-        Assert.That(classDeclaration, Is.Not.Null);
-        Assert.That(classDeclaration.Identifier, Is.EqualTo(expectedIdentifier));
-        Assert.That(classDeclaration.Methods, Is.Empty);
-        Assert.That(classDeclaration.Fields, Is.Empty);
-        Assert.That(classDeclaration.StaticFields, Is.Empty);
+        classDeclaration.Should().NotBeNull();
+        classDeclaration!.Identifier.Should().Be(expectedIdentifier);
+        classDeclaration.Methods.Should().BeEmpty();
+        classDeclaration.Fields.Should().BeEmpty();
+        classDeclaration.StaticFields.Should().BeEmpty();
 
-        Assert.That(classDeclaration.StaticMethods, Has.Count.EqualTo(1));
+        classDeclaration.StaticMethods.Should().HaveCount(1);
 
         var staticPrivateMethod = classDeclaration.StaticMethods[0];
-        Assert.That(staticPrivateMethod.Identifier, Is.EqualTo(expectedMethodIdentifier));
-        Assert.That(staticPrivateMethod.Parameters, Is.Empty);
-        Assert.That(staticPrivateMethod.Body.Statements, Is.Empty);
-        Assert.That(staticPrivateMethod.IsPrivate, Is.True);
+        staticPrivateMethod.Identifier.Should().Be(expectedMethodIdentifier);
+        staticPrivateMethod.Parameters.Should().BeEmpty();
+        staticPrivateMethod.Body.Statements.Should().BeEmpty();
+        staticPrivateMethod.IsPrivate.Should().BeTrue();
     }
 
     // Tests for AssignmentExpressions
@@ -1260,19 +1263,19 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
+        expressionStatement.Should().NotBeNull();
 
-        var assignmentExpression = expressionStatement.Expression as BasicAssignmentExpression;
-        Assert.That(assignmentExpression, Is.Not.Null);
+        var assignmentExpression = expressionStatement!.Expression as BasicAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
 
-        var identifier = assignmentExpression.Lhs as Identifier;
-        Assert.That(identifier, Is.Not.Null);
-        Assert.That(identifier.Name, Is.EqualTo(expectedIdentifier));
+        var identifier = assignmentExpression!.Lhs as Identifier;
+        identifier.Should().NotBeNull();
+        identifier!.Name.Should().Be(expectedIdentifier);
 
-        Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
+        assignmentExpression.Rhs.Should().BeOfType(expectedExpressionType);
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -1289,19 +1292,19 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
+        expressionStatement.Should().NotBeNull();
 
-        var assignmentExpression = expressionStatement.Expression as LogicalAndAssignmentExpression;
-        Assert.That(assignmentExpression, Is.Not.Null);
+        var assignmentExpression = expressionStatement!.Expression as LogicalAndAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
 
-        var identifier = assignmentExpression.Lhs as Identifier;
-        Assert.That(identifier, Is.Not.Null);
-        Assert.That(identifier.Name, Is.EqualTo(expectedIdentifier));
+        var identifier = assignmentExpression!.Lhs as Identifier;
+        identifier.Should().NotBeNull();
+        identifier!.Name.Should().Be(expectedIdentifier);
 
-        Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
+        assignmentExpression.Rhs.Should().BeOfType(expectedExpressionType);
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -1318,19 +1321,19 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
+        expressionStatement.Should().NotBeNull();
 
-        var assignmentExpression = expressionStatement.Expression as LogicalOrAssignmentExpression;
-        Assert.That(assignmentExpression, Is.Not.Null);
+        var assignmentExpression = expressionStatement!.Expression as LogicalOrAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
 
-        var identifier = assignmentExpression.Lhs as Identifier;
-        Assert.That(identifier, Is.Not.Null);
-        Assert.That(identifier.Name, Is.EqualTo(expectedIdentifier));
+        var identifier = assignmentExpression!.Lhs as Identifier;
+        identifier.Should().NotBeNull();
+        identifier!.Name.Should().Be(expectedIdentifier);
 
-        Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
+        assignmentExpression.Rhs.Should().BeOfType(expectedExpressionType);
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -1347,19 +1350,19 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
+        expressionStatement.Should().NotBeNull();
 
-        var assignmentExpression = expressionStatement.Expression as NullCoalescingAssignmentExpression;
-        Assert.That(assignmentExpression, Is.Not.Null);
+        var assignmentExpression = expressionStatement!.Expression as NullCoalescingAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
 
-        var identifier = assignmentExpression.Lhs as Identifier;
-        Assert.That(identifier, Is.Not.Null);
-        Assert.That(identifier.Name, Is.EqualTo(expectedIdentifier));
+        var identifier = assignmentExpression!.Lhs as Identifier;
+        identifier.Should().NotBeNull();
+        identifier!.Name.Should().Be(expectedIdentifier);
 
-        Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
+        assignmentExpression.Rhs.Should().BeOfType(expectedExpressionType);
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -1447,21 +1450,21 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
+        expressionStatement.Should().NotBeNull();
 
-        var assignmentExpression = expressionStatement.Expression as BinaryOpAssignmentExpression;
-        Assert.That(assignmentExpression, Is.Not.Null);
+        var assignmentExpression = expressionStatement!.Expression as BinaryOpAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
 
-        var identifier = assignmentExpression.Lhs as Identifier;
-        Assert.That(identifier, Is.Not.Null);
-        Assert.That(identifier.Name, Is.EqualTo(expectedIdentifier));
+        var identifier = assignmentExpression!.Lhs as Identifier;
+        identifier.Should().NotBeNull();
+        identifier!.Name.Should().Be(expectedIdentifier);
 
-        Assert.That(assignmentExpression.Op, Is.EqualTo(expectedOp));
+        assignmentExpression.Op.Should().Be(expectedOp);
 
-        Assert.That(assignmentExpression.Rhs, Is.TypeOf(expectedExpressionType));
+        assignmentExpression.Rhs.Should().BeOfType(expectedExpressionType);
     }
 
     // FIXME: More tests when we don't only parse empty object literals
@@ -1477,16 +1480,16 @@ internal sealed class ParserTests
         var rootNodes = parsedProgram.ScriptCode;
 
         // Assert
-        Assert.That(rootNodes, Has.Count.EqualTo(1));
+        rootNodes.Should().HaveCount(1);
 
         var expressionStatement = rootNodes[0] as ExpressionStatement;
-        Assert.That(expressionStatement, Is.Not.Null);
+        expressionStatement.Should().NotBeNull();
 
-        var assignmentExpression = expressionStatement.Expression as BasicAssignmentExpression;
-        Assert.That(assignmentExpression, Is.Not.Null);
+        var assignmentExpression = expressionStatement!.Expression as BasicAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
 
-        var objectLiteral = assignmentExpression.Rhs as ObjectLiteral;
-        Assert.That(objectLiteral, Is.Not.Null);
+        var objectLiteral = assignmentExpression!.Rhs as ObjectLiteral;
+        objectLiteral.Should().NotBeNull();
     }
 
     // Tests for SyntaxErrors
@@ -1659,6 +1662,7 @@ internal sealed class ParserTests
         "switch (1) {",
         "switch (1) { case",
         "switch (1) { case 1",
+        "switch (1) { case 1: 1",
         "switch (1) { default",
         "throw",
         "function",
@@ -1744,7 +1748,7 @@ internal sealed class ParserTests
     private void AssertThatSyntaxErrorMatchesExpected(Parser parser, SyntaxErrorException expectedException)
     {
         var actualException = Assert.Throws<SyntaxErrorException>(() => ParseScript(parser));
-        Assert.That(actualException.Message, Is.EqualTo(expectedException.Message));
+        actualException.Message.Should().Be(expectedException.Message);
     }
 
     static private Script ParseScript(Parser parser)
