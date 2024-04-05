@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace JSS.Lib.AST.Values;
 
-internal enum ValueType
+public enum ValueType
 {
     Undefined,
     Null,
@@ -18,7 +18,7 @@ internal enum ValueType
 
 // FIXME: This is a very inefficient way of storing JS values.
 // 6.1 ECMAScript Language Types, https://tc39.es/ecma262/#sec-ecmascript-language-types
-internal abstract class Value
+public abstract class Value
 {
     public static implicit operator Value(bool value) => new Boolean(value);
     public static implicit operator Value(double value) => new Number(value);
@@ -43,7 +43,7 @@ internal abstract class Value
         return (this as Reference)!;
     }
 
-    public Environment AsEnvironment()
+    internal Environment AsEnvironment()
     {
         Debug.Assert(IsEnvironment());
         return (this as Environment)!;
@@ -73,13 +73,13 @@ internal abstract class Value
         return (this as Object)!;
     }
 
-    public ICallable AsCallable()
+    internal ICallable AsCallable()
     {
         Debug.Assert(HasInternalCall());
         return (this as ICallable)!;
     }
 
-    public IConstructable AsConstructable()
+    internal IConstructable AsConstructable()
     {
         Debug.Assert(HasInternalConstruct());
         return (this as IConstructable)!;
@@ -91,7 +91,7 @@ internal abstract class Value
     abstract public ValueType Type();
 
     // 6.2.5.5 GetValue ( V ), https://tc39.es/ecma262/#sec-getvalue
-    public Completion GetValue()
+    internal Completion GetValue()
     {
         // 1. If V is not a Reference Record, return V.
         if (!IsReference())
@@ -137,7 +137,7 @@ internal abstract class Value
     }
 
     // 6.2.5.6 PutValue( V, W ), https://tc39.es/ecma262/#sec-putvalue
-    public Completion PutValue(VM vm, Value W)
+    internal Completion PutValue(VM vm, Value W)
     {
         // 1. If V is not a Reference Record, throw a ReferenceError exception.
         if (!IsReference())
@@ -197,7 +197,7 @@ internal abstract class Value
     }
 
     // 7.1.1 ToPrimitive ( input FIXME: [ , preferredType ] ), https://tc39.es/ecma262/#sec-toprimitive
-    public Completion ToPrimitive()
+    internal Completion ToPrimitive()
     {
         // FIXME: 1 .If input is an Object, then
         // FIXME: a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
@@ -220,7 +220,7 @@ internal abstract class Value
     }
 
     // 7.1.2 ToBoolean ( argument ), https://tc39.es/ecma262/#sec-toboolean
-    public Boolean ToBoolean()
+    internal Boolean ToBoolean()
     {
         // 1. If argument is a Boolean, return argument.
         if (IsBoolean())
@@ -259,7 +259,7 @@ internal abstract class Value
     }
 
     // 7.1.3 ToNumeric ( value ), https://tc39.es/ecma262/#sec-tonumeric
-    public Completion ToNumeric()
+    internal Completion ToNumeric()
     {
         // 1. Let primValue be ? ToPrimitive(value, FIXME: NUMBER).
         var primValue = ToPrimitive();
@@ -272,7 +272,7 @@ internal abstract class Value
     }
 
     // 7.1.4 ToNumber ( argument ), https://tc39.es/ecma262/#sec-tonumber
-    public Completion ToNumber()
+    internal Completion ToNumber()
     {
         // 1. If argument is a Number, return argument.
         if (IsNumber()) return this;
@@ -316,7 +316,7 @@ internal abstract class Value
     }
 
     // 7.1.17 ToString ( argument ), https://tc39.es/ecma262/#sec-tostring
-    public Completion ToStringJS()
+    internal Completion ToStringJS()
     {
         // 1. If argument is a String, return argument.
         if (IsString()) return this;
@@ -353,7 +353,7 @@ internal abstract class Value
     }
 
     // 7.1.18 ToObject ( argument ), https://tc39.es/ecma262/#sec-toobject
-    public Completion ToObject()
+    internal Completion ToObject()
     {
         // Undefined, FIXME: Throw a TypeError exception.
         if (IsUndefined())
@@ -374,7 +374,7 @@ internal abstract class Value
     }
 
     // 7.1.19 ToPropertyKey ( argument ), https://tc39.es/ecma262/#sec-topropertykey
-    public Completion ToPropertyKey()
+    internal Completion ToPropertyKey()
     {
         // 1. Let key be ? ToPrimitive(argument, string).
         var key = ToPrimitive();
@@ -392,7 +392,7 @@ internal abstract class Value
     }
 
     // 7.2.3 IsCallable ( argument ), https://tc39.es/ecma262/#sec-iscallable
-    public bool IsCallable()
+    internal bool IsCallable()
     {
         // 1. If argument is not an Object, return false.
         if (!IsObject()) return false;
@@ -405,7 +405,7 @@ internal abstract class Value
     }
 
     // 7.2.4 IsConstructor ( argument ), https://tc39.es/ecma262/#sec-isconstructor
-    public bool IsConstructor()
+    internal bool IsConstructor()
     {
         // 1. If argument is not an Object, return false.
         if (!IsObject()) return false;
@@ -418,7 +418,7 @@ internal abstract class Value
     }
 
     // 7.2.12 SameValueNonNumber( x, y ), https://tc39.es/ecma262/#sec-samevaluenonnumber
-    static public Boolean SameValueNonNumber(Value x, Value y)
+    static internal Boolean SameValueNonNumber(Value x, Value y)
     {
         // 1. Assert: Type(x) is Type(y).
         Debug.Assert(x.Type().Equals(y.Type()));
@@ -456,7 +456,7 @@ internal abstract class Value
     }
 
     // 7.2.13 IsLessThan ( x, y, LeftFirst )
-    static public Completion IsLessThan(Value x, Value y, bool leftFirst)
+    static internal Completion IsLessThan(Value x, Value y, bool leftFirst)
     {
         Completion px;
         Completion py;
@@ -561,7 +561,7 @@ internal abstract class Value
     }
 
     // 7.2.14 IsLooselyEqual ( x, y ), https://tc39.es/ecma262/#sec-islooselyequal
-    static public Completion IsLooselyEqual(Value x, Value y)
+    static internal Completion IsLooselyEqual(Value x, Value y)
     {
         // 1. If Type(x) is Type(y), then
         if (x.Type().Equals(y.Type()))
@@ -635,7 +635,7 @@ internal abstract class Value
     }
 
     // 7.2.15 IsStrictlyEqual ( x, y ), https://tc39.es/ecma262/#sec-isstrictlyequal
-    static public Boolean IsStrictlyEqual(Value x, Value y)
+    static internal Boolean IsStrictlyEqual(Value x, Value y)
     {
         // 1. If Type(x) is not Type(y), return false.
         if (!x.Type().Equals(y.Type()))

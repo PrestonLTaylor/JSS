@@ -1,8 +1,8 @@
 ﻿namespace JSS.Lib.AST.Values;
 
-internal sealed class Number : Value
+public sealed class Number : Value
 {
-    public Number(double value)
+    internal Number(double value)
     {
         Value = value;
     }
@@ -25,7 +25,7 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.1 Number::unaryMinus ( x ), https://tc39.es/ecma262/#sec-numeric-types-number-unaryMinus
-    static public Number UnaryMinus(Number x)
+    static internal Number UnaryMinus(Number x)
     {
         // 1. If x is NaN, return NaN.
         if (double.IsNaN(x.Value)) return x;
@@ -35,7 +35,7 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.2 Number::bitwiseNOT ( x ), https://tc39.es/ecma262/#sec-numeric-types-number-bitwiseNOT
-    static public Number BitwiseNOT(Number x)
+    static internal Number BitwiseNOT(Number x)
     {
         // FIXME: 1. Let oldValue be ! ToInt32(x).
 
@@ -46,7 +46,7 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.3 Number::exponentiate ( base, exponent ), https://tc39.es/ecma262/#sec-numeric-types-number-exponentiate
-    static public Number Exponentiate(Number expBase, Number exponent)
+    static internal Number Exponentiate(Number expBase, Number exponent)
     {
         // FIXME: 1. If exponent is NaN, return NaN.
         // FIXME: 2. If exponent is either + 0𝔽 or - 0𝔽, return 1𝔽.
@@ -82,7 +82,7 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.4 Number::multiply ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-multiply
-    static public Number Multiply(Number x, Number y)
+    static internal Number Multiply(Number x, Number y)
     {
         // FIXME: 1. If x is NaN or y is NaN, return NaN.
         // FIXME: 2. If x is either +∞𝔽 or -∞𝔽, then
@@ -105,7 +105,7 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.5 Number::divide ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-divide
-    static public Number Divide(Number x, Number y)
+    static internal Number Divide(Number x, Number y)
     {
         // FIXME: 1. If x is NaN or y is NaN, return NaN.
         // FIXME: 2. If x is either +∞𝔽 or -∞𝔽, then
@@ -130,7 +130,7 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.6 Number::remainder ( n, d ), https://tc39.es/ecma262/#sec-numeric-types-number-remainder
-    static public Number Remainder(Number n, Number d)
+    static internal Number Remainder(Number n, Number d)
     {
         // FIXME: 1. If n is NaN or d is NaN, return NaN.
         // FIXME: 2. If n is either +∞𝔽 or -∞𝔽, return NaN.
@@ -147,7 +147,7 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.7 Number::add ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-add
-    static public Number Add(Number x, Number y)
+    static internal Number Add(Number x, Number y)
     {
         // FIXME: 1. If x is NaN or y is NaN, return NaN.
         // FIXME: 2. If x is +∞𝔽 and y is -∞𝔽, return NaN.
@@ -162,13 +162,13 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.8 Number::subtract ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-subtract
-    static public Number Subtract(Number x, Number y)
+    static internal Number Subtract(Number x, Number y)
     {
         return Add(x, UnaryMinus(y));
     }
 
     // 6.1.6.1.9 Number::leftShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-leftShift
-    static public Number LeftShift(Number x, Number y)
+    static internal Number LeftShift(Number x, Number y)
     {
         // FIXME: 1. Let lnum be !ToInt32(x).
         // FIXME: 2. Let rnum be !ToUint32(y).
@@ -180,7 +180,7 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.10 Number::signedRightShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-signedRightShift
-    static public Number SignedRightShift(Number x, Number y)
+    static internal Number SignedRightShift(Number x, Number y)
     {
         // FIXME: 1. Let lnum be !ToInt32(x).
         // FIXME: 2. Let rnum be !ToUint32(y).
@@ -192,7 +192,7 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.11 Number::unsignedRightShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-unsignedRightShift
-    static public Number UnsignedRightShift(Number x, Number y)
+    static internal Number UnsignedRightShift(Number x, Number y)
     {
         // FIXME: 1. Let lnum be !ToUint32(x).
         // FIXME: 2. Let rnum be !ToUint32(y).
@@ -204,7 +204,7 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.12 Number::lessThan(x, y), https://tc39.es/ecma262/#sec-numeric-types-number-lessThan
-    static public Value LessThan(Number x, Number y)
+    static internal Value LessThan(Number x, Number y)
     {
         // FIXME: 1. If x is NaN, return undefined.
         // FIXME: 2. If y is NaN, return undefined.
@@ -222,7 +222,7 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.13 Number::equal ( x, y )
-    static public Boolean Equal(Number x, Number y)
+    static internal Boolean Equal(Number x, Number y)
     {
         // 1. If x is NaN, return false.
         if (double.IsNaN(x.Value))
@@ -257,7 +257,7 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.16 NumberBitwiseOp ( op, x, y ), https://tc39.es/ecma262/#sec-numberbitwiseop
-    static public Number NumberBitwiseOp(BitwiseOp op, Number x, Number y)
+    static internal Number NumberBitwiseOp(BitwiseOp op, Number x, Number y)
     {
         // FIXME: 1. Let lnum be !ToInt32(x).
         // FIXME: 2. Let rnum be !ToInt32(y).
@@ -284,27 +284,27 @@ internal sealed class Number : Value
     }
 
     // 6.1.6.1.17 Number::bitwiseAND ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-bitwiseAND
-    static public Number BitwiseAND(Number x, Number y)
+    static internal Number BitwiseAND(Number x, Number y)
     {
         // 1. Return NumberBitwiseOp(&, x, y).
         return NumberBitwiseOp(BitwiseOp.AND, x, y);
     }
 
     // 6.1.6.1.18 Number::bitwiseXOR ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-bitwiseXOR
-    static public Number BitwiseXOR(Number x, Number y)
+    static internal Number BitwiseXOR(Number x, Number y)
     {
         // 1. Return NumberBitwiseOp(^, x, y).
         return NumberBitwiseOp(BitwiseOp.XOR, x, y);
     }
 
     // 6.1.6.1.19 Number::bitwiseOR ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-bitwiseOR
-    static public Number BitwiseOR(Number x, Number y)
+    static internal Number BitwiseOR(Number x, Number y)
     {
         // 1. Return NumberBitwiseOp(|, x, y).
         return NumberBitwiseOp(BitwiseOp.OR, x, y);
     }
 
-    static public Number NaN
+    static internal Number NaN
     {
         get
         {

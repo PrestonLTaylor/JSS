@@ -1,8 +1,8 @@
 ﻿namespace JSS.Lib.AST.Values;
 
-internal sealed class String : Value
+public sealed class String : Value
 {
-    public String(string value)
+    internal String(string value)
     {
         Value = value;
     }

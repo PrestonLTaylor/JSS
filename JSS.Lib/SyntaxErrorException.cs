@@ -1,7 +1,7 @@
 ﻿namespace JSS.Lib;
 
 // NOTE: This is a exception used in the parser to "simulate" a SyntaxError being thrown in JS
-internal sealed class SyntaxErrorException : Exception
+public sealed class SyntaxErrorException : Exception
 {
     public SyntaxErrorException()
     {

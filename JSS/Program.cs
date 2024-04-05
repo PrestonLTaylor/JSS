@@ -2,7 +2,6 @@
 using JSS.CLI;
 using JSS.Lib.Execution;
 
-// FIXME: We currently use "InternalsVisibleTo" for JSS.Lib, we should fix that
 var completion = Realm.InitializeHostDefinedRealm(out VM globalVm);
 if (completion.IsAbruptCompletion())
 {

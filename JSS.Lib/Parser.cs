@@ -4,7 +4,7 @@ using JSS.Lib.Execution;
 
 namespace JSS.Lib;
 
-internal sealed class Parser
+public sealed class Parser
 {
     private readonly TokenConsumer _consumer;
 
