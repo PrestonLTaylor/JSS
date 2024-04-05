@@ -1,6 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
-using Boolean = JSS.Lib.AST.Values.Boolean;
 
 namespace JSS.Lib.AST;
 
@@ -37,10 +36,10 @@ internal sealed class LessThanExpression : IExpression
         if (r.IsAbruptCompletion()) return r;
 
         // 6. If r is undefined, return false. Otherwise, return r.
-        if (r.Value.IsUndefined()) return Completion.NormalCompletion(new Boolean(false));
+        if (r.Value.IsUndefined()) return false;
 
         var rAsBoolean = r.Value.AsBoolean();
-        return Completion.NormalCompletion(new Boolean(rAsBoolean.Value));
+        return rAsBoolean.Value;
     }
 
     public IExpression Lhs { get; }

@@ -1,6 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
-using String = JSS.Lib.AST.Values.String;
 
 namespace JSS.Lib.AST;
 
@@ -50,8 +49,7 @@ internal abstract class IExpression : INode
                 // iii. Return the string-concatenation of lstr and rstr.
                 var lstrValue = lstr.Value.AsString();
                 var rstrValue = rstr.Value.AsString();
-                var concatenation = lstrValue.Value + rstrValue.Value;
-                return Completion.NormalCompletion(new String(concatenation));
+                return lstrValue.Value + rstrValue.Value;
             }
 
             // d. Set lval to lprim.
@@ -99,7 +97,7 @@ internal abstract class IExpression : INode
         };
 
         var result = operation(lnum.Value.AsNumber(), rnum.Value.AsNumber());
-        return Completion.NormalCompletion(result);
+        return result;
     }
 
     // 13.15.4 EvaluateStringOrNumericBinaryExpression ( leftOperand, opText, rightOperand )

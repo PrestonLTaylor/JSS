@@ -1,9 +1,8 @@
-﻿using JSS.Lib.AST;
+﻿using FluentAssertions;
+using JSS.Lib.AST;
 using JSS.Lib.AST.Literal;
 using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
-using Boolean = JSS.Lib.AST.Values.Boolean;
-using String = JSS.Lib.AST.Values.String;
 
 namespace JSS.Lib.UnitTests;
 
@@ -12,15 +11,15 @@ internal sealed class AbstractOperationTests
     static private readonly List<Value> toPrimitiveIdentityTestCases = new()
     {
         Null.The,
-        new Boolean(false),
-        new Boolean(true),
-        new Number(0.0),
-        new Number(1.0),
-        new Number(123456789.0),
-        new String(""),
-        new String("'"),
-        new String("\""),
-        new String("This is a string literal"),
+        false,
+        true,
+        0.0,
+        1.0,
+        123456789.0,
+        "",
+        "'",
+        "\"",
+        "This is a string literal",
     };
 
     [TestCaseSource(nameof(toPrimitiveIdentityTestCases))]
@@ -32,11 +31,10 @@ internal sealed class AbstractOperationTests
         var completion = expected.ToPrimitive();
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
-        Assert.That(completion.Value, Is.SameAs(expected));
+        completion.IsNormalCompletion().Should().BeTrue();
+        completion.Value.Should().Be(expected);
     }
 
-    // FIXME: Replace other Dictionary test cases with object[]
     static private readonly object[] valueToExpectedStringTestCases =
     {
         new object[] { Null.The, "null" },
@@ -60,11 +58,11 @@ internal sealed class AbstractOperationTests
         var asString = testCase.ToStringJS();
 
         // Assert
-        Assert.That(asString.IsNormalCompletion(), Is.True);
+        asString.IsNormalCompletion().Should().BeTrue();
 
         var stringValue = asString.Value as String;
-        Assert.That(stringValue, Is.Not.Null);
-        Assert.That(stringValue.Value, Is.EqualTo(expectedString));
+        stringValue.Should().NotBeNull();
+        stringValue!.Value.Should().Be(expectedString);
     }
 
     static private readonly object[] valueToExpectedNumberTestCases = new object[]
@@ -89,11 +87,11 @@ internal sealed class AbstractOperationTests
         var asNumber = testCase.ToNumber();
 
         // Assert
-        Assert.That(asNumber.IsNormalCompletion(), Is.True);
+        asNumber.IsNormalCompletion().Should().BeTrue();
 
         var numberValue = asNumber.Value as Number;
-        Assert.That(numberValue, Is.Not.Null);
-        Assert.That(numberValue.Value, Is.EqualTo(expectedNumber));
+        numberValue.Should().NotBeNull();
+        numberValue!.Value.Should().Be(expectedNumber);
     }
 
     [TestCaseSource(nameof(valueToExpectedNumberTestCases))]
@@ -105,11 +103,11 @@ internal sealed class AbstractOperationTests
         var asNumeric = testCase.ToNumeric();
 
         // Assert
-        Assert.That(asNumeric.IsNormalCompletion(), Is.True);
+        asNumeric.IsNormalCompletion().Should().BeTrue();
 
         var numberValue = asNumeric.Value as Number;
-        Assert.That(numberValue, Is.Not.Null);
-        Assert.That(numberValue.Value, Is.EqualTo(expectedNumber));
+        numberValue.Should().NotBeNull();
+        numberValue!.Value.Should().Be(expectedNumber);
     }
 
     static private readonly object[] unaryMinusValueToExpectedNumberTestCases = new object[]
@@ -128,7 +126,7 @@ internal sealed class AbstractOperationTests
         var result = Number.UnaryMinus(testCase);
 
         // Assert
-        Assert.That(result?.Value, Is.EqualTo(expectedNumber));
+        result?.Value.Should().Be(expectedNumber);
     }
 
     // FIXME: Individual test cases for the underlying abstract operations in ApplyStringOrNumericBinaryOperator 
@@ -164,8 +162,8 @@ internal sealed class AbstractOperationTests
         var result = IExpression.ApplyStringOrNumericBinaryOperator(lhs, op, rhs);
 
         // Assert
-        Assert.That(result.IsNormalCompletion(), Is.True);
-        Assert.That(result.Value, Is.EqualTo(expectedValue));
+        result.IsNormalCompletion().Should().BeTrue();
+        result.Value.Should().Be(expectedValue);
     }
 
     static private readonly object[] binaryAstExpressionToExpectedValueTestCases =
@@ -201,8 +199,8 @@ internal sealed class AbstractOperationTests
         var result = IExpression.EvaluateStringOrNumericBinaryExpression(vm, lhs, op, rhs);
 
         // Assert
-        Assert.That(result.IsNormalCompletion(), Is.True);
-        Assert.That(result.Value, Is.EqualTo(expectedValue));
+        result.IsNormalCompletion().Should().BeTrue();
+        result.Value.Should().Be(expectedValue);
     }
 
     // FIXME: Tests for Number::lessThan
@@ -231,9 +229,9 @@ internal sealed class AbstractOperationTests
         var completion = Value.IsLessThan(lhs, rhs, false);
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
+        completion.IsNormalCompletion().Should().BeTrue();
 
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+        completion.Value.Should().Be(expectedValue);
     }
 
     static private readonly object[] toBooleanValueToExpectedResultTestCases =
@@ -261,7 +259,7 @@ internal sealed class AbstractOperationTests
         var result = testCase.ToBoolean();
 
         // Assert
-        Assert.That(result, Is.EqualTo(expectedValue));
+        result.Should().Be(expectedValue);
     }
 
     // FIXME: Tests for Number::equal and SameValueNonNumber
@@ -294,7 +292,7 @@ internal sealed class AbstractOperationTests
         var result = Value.IsStrictlyEqual(lhs, rhs);
 
         // Assert
-        Assert.That(result, Is.EqualTo(expectedValue));
+        result.Should().Be(expectedValue);
     }
 
     static private readonly object[] isLooselyEqualLhsAndRhsToExpectedResultTestCases =
@@ -326,9 +324,9 @@ internal sealed class AbstractOperationTests
         var completion = Value.IsLooselyEqual(lhs, rhs);
 
         // Assert
-        Assert.That(completion.IsNormalCompletion(), Is.True);
+        completion.IsNormalCompletion().Should().BeTrue();
 
-        Assert.That(completion.Value, Is.EqualTo(expectedValue));
+        completion.Value.Should().Be(expectedValue);
     }
 
     static private readonly object[] loopContinuesValueToExpectedResultTestCases =
@@ -350,6 +348,6 @@ internal sealed class AbstractOperationTests
         var result = completion.LoopContinues();
 
         // Assert
-        Assert.That(result, Is.EqualTo(expectedValue));
+        result.Should().Be(expectedValue);
     }
 }

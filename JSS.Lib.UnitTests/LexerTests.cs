@@ -1,4 +1,6 @@
-﻿namespace JSS.Lib.UnitTests;
+﻿using FluentAssertions;
+
+namespace JSS.Lib.UnitTests;
 
 internal sealed class LexerTests
 {
@@ -12,7 +14,7 @@ internal sealed class LexerTests
 		var tokens = lexer.Lex().ToList();
 
 		// Assert
-		Assert.That(tokens, Is.Empty);
+		tokens.Should().BeEmpty();
 	}
 
     // Test for 12.2 White Space, https://tc39.es/ecma262/#sec-white-space
@@ -27,7 +29,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Is.Empty);
+        tokens.Should().BeEmpty();
     }
 
     // Tests for 12.3 Line Terminators, https://tc39.es/ecma262/#table-white-space-code-points
@@ -43,7 +45,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.LineTerminator, lineTerminatorCodePoint);
     }
 
@@ -59,7 +61,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Is.Empty);
+        tokens.Should().BeEmpty();
     }
 
     [Test]
@@ -73,7 +75,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Is.Empty);
+        tokens.Should().BeEmpty();
     }
 
     [Test]
@@ -88,7 +90,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.LineTerminator, lineTerminatorCodePoint);
     }
 
@@ -103,7 +105,7 @@ internal sealed class LexerTests
 		var tokens = lexer.Lex().ToList();
 
 		// Assert
-		Assert.That(tokens, Is.Empty);
+		tokens.Should().BeEmpty();
 	}
 
 	[Test]
@@ -117,7 +119,7 @@ internal sealed class LexerTests
 		var tokens = lexer.Lex().ToList();
 
 		// Assert
-		Assert.That(tokens, Is.Empty);
+		tokens.Should().BeEmpty();
 	}
 
     // FIXME: See FIXME in Lexer about Line Terminators
@@ -132,7 +134,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Is.Empty);
+        tokens.Should().BeEmpty();
     }
 
     // Tests for 12.5 Hashbang Comments, https://tc39.es/ecma262/#sec-hashbang
@@ -147,7 +149,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Is.Empty);
+        tokens.Should().BeEmpty();
     }
 
     [Test]
@@ -161,7 +163,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Is.Empty);
+        tokens.Should().BeEmpty();
     }
 
     [Test]
@@ -176,7 +178,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.LineTerminator, lineTerminatorCodePoint);
     }
 
@@ -192,7 +194,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.PrivateIdentifier, lowerCaseLetter);
     }
 
@@ -207,7 +209,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.PrivateIdentifier, upperCaseLetter);
     }
 
@@ -222,7 +224,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.PrivateIdentifier, underscoreCodePoint);
     }
 
@@ -237,7 +239,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.PrivateIdentifier, dollarCodePoint);
     }
 
@@ -252,7 +254,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.PrivateIdentifier, validName);
     }
 
@@ -267,7 +269,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
         
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.Identifier, lowerCaseLetter);
     }
 
@@ -282,7 +284,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.Identifier, upperCaseLetter);
     }
 
@@ -297,7 +299,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.Identifier, underscoreCodePoint);
     }
 
@@ -312,7 +314,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.Identifier, dollarCodePoint);
     }
 
@@ -327,7 +329,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.Identifier, validName);
     }
 
@@ -342,7 +344,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.Identifier, awaitKeywordWithEd);
     }
 
@@ -404,7 +406,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], expectedTokenType, keywordString);
     }
 
@@ -420,7 +422,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], expectedTokenType, keywordString);
     }
 
@@ -498,7 +500,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], expectedTokenType, punctuatorString);
     }
 
@@ -515,7 +517,7 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.Number, numericLiteral);
     }
 
@@ -532,16 +534,13 @@ internal sealed class LexerTests
         var tokens = lexer.Lex().ToList();
 
         // Assert
-        Assert.That(tokens, Has.Count.EqualTo(1));
+        tokens.Should().HaveCount(1);
         AssertThatTokenIs(tokens[0], TokenType.String, stringLiteral);
     }
 
     private void AssertThatTokenIs(Token actual, TokenType expectedType, string expectedData)
     {
-        Assert.Multiple(() =>
-        {
-            Assert.That(actual.type, Is.EqualTo(expectedType));
-            Assert.That(actual.data, Is.EqualTo(expectedData));
-        });
+        actual.type.Should().Be(expectedType);
+        actual.data.Should().Be(expectedData);
     }
 }

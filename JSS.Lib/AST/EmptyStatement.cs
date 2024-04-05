@@ -10,6 +10,6 @@ internal sealed class EmptyStatement : INode
     override public Completion Evaluate(VM vm)
     {
         // 1. Return EMPTY.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 }

@@ -1,7 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
-using String = JSS.Lib.AST.Values.String;
-
 namespace JSS.Lib.AST;
 
 // 13.3.5 The new Operator, https://tc39.es/ecma262/#sec-new-operator
@@ -50,7 +48,7 @@ internal sealed class NewExpression : IExpression
         // 5. If IsConstructor(constructor) is false, FIXME: throw a TypeError exception.
         if (!constructor.Value.IsConstructor())
         {
-            return Completion.ThrowCompletion(new String("Tried to construct from a non-constructable"));
+            return Completion.ThrowCompletion("Tried to construct from a non-constructable");
         }
 
         // 6. Return ? Construct(constructor, argList).

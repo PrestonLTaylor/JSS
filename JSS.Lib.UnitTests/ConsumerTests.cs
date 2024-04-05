@@ -1,4 +1,6 @@
-﻿namespace JSS.Lib.UnitTests;
+﻿using FluentAssertions;
+
+namespace JSS.Lib.UnitTests;
 
 internal sealed class ConsumerTests
 {
@@ -11,7 +13,7 @@ internal sealed class ConsumerTests
         // Act
 
         // Assert
-        Assert.That(consumer.CanConsume(), Is.False);
+        consumer.CanConsume().Should().BeFalse();
     }
 
     [Test]
@@ -24,7 +26,7 @@ internal sealed class ConsumerTests
         // Act
 
         // Assert
-        Assert.That(consumer.CanConsume(), Is.True);
+        consumer.CanConsume().Should().BeTrue();
     }
 
     [Test]
@@ -38,7 +40,7 @@ internal sealed class ConsumerTests
         consumer.Consume();
 
         // Assert
-        Assert.That(consumer.CanConsume(), Is.False);
+        consumer.CanConsume().Should().BeFalse();
     }
 
     [Test]
@@ -52,7 +54,7 @@ internal sealed class ConsumerTests
         consumer.Consume();
 
         // Assert
-        Assert.That(consumer.CanConsume(), Is.True);
+        consumer.CanConsume().Should().BeTrue();
     }
 
     [Test]
@@ -65,7 +67,7 @@ internal sealed class ConsumerTests
         // Act
 
         // Assert
-        Assert.That(consumer.CanConsume(testString.Length + 1), Is.False);
+        consumer.CanConsume(testString.Length + 1).Should().BeFalse();
     }
 
     [Test]
@@ -79,7 +81,7 @@ internal sealed class ConsumerTests
         var consumed = consumer.Consume();
 
         // Assert
-        Assert.That(consumed, Is.EqualTo(testString[0]));
+        consumed.Should().Be(testString[0]);
     }
 
     [Test]
@@ -89,9 +91,9 @@ internal sealed class ConsumerTests
         var consumer = new Consumer("");
 
         // Act
-        
+
         // Assert
-        Assert.That(consumer.Consume, Throws.Exception.TypeOf<IndexOutOfRangeException>());
+        Assert.Throws<IndexOutOfRangeException>(() => consumer.Consume());
     }
 
     [Test]
@@ -109,7 +111,7 @@ internal sealed class ConsumerTests
         }
 
         // Assert
-        Assert.That(actualString, Is.EqualTo(expectedString));
+        actualString.Should().Be(expectedString);
     }
 
     [Test]
@@ -128,9 +130,9 @@ internal sealed class ConsumerTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(consumer.CanConsume(), Is.True);
-            Assert.That(consumed, Is.EqualTo("abcd"));
-            Assert.That(consumer.Peek(), Is.EqualTo('e'));
+            consumer.CanConsume().Should().BeTrue();
+            consumed.Should().Be("abcd");
+            consumer.Peek().Should().Be('e');
         });
     }
 
@@ -147,8 +149,8 @@ internal sealed class ConsumerTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(consumer.CanConsume(), Is.False);
-            Assert.That(consumed, Is.EqualTo(testString));
+            consumer.CanConsume().Should().BeFalse();
+            consumed.Should().Be(testString);
         });
     }
 
@@ -162,7 +164,7 @@ internal sealed class ConsumerTests
         var didConsume = consumer.TryConsumeString("");
 
         // Assert
-        Assert.That(didConsume, Is.True);
+        didConsume.Should().BeTrue();
     }
 
     [Test]
@@ -175,7 +177,7 @@ internal sealed class ConsumerTests
         var didConsume = consumer.TryConsumeString("");
 
         // Assert
-        Assert.That(didConsume, Is.True);
+        didConsume.Should().BeTrue();
     }
 
     [Test]
@@ -191,8 +193,8 @@ internal sealed class ConsumerTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(didConsume, Is.True);
-            Assert.That(consumer.CanConsume(), Is.False);
+            didConsume.Should().BeTrue();
+            consumer.CanConsume().Should().BeFalse();
         });
     }
 
@@ -210,8 +212,8 @@ internal sealed class ConsumerTests
         // Assert
         Assert.Multiple(() =>
         {
-            Assert.That(didConsume, Is.True);
-            Assert.That(consumer.CanConsume(), Is.True);
+            didConsume.Should().BeTrue();
+            consumer.CanConsume().Should().BeTrue();
         });
     }
 
@@ -226,7 +228,7 @@ internal sealed class ConsumerTests
         var didConsume = consumer.TryConsumeString("dcba");
 
         // Assert
-        Assert.That(didConsume, Is.False);
+        didConsume.Should().BeFalse();
     }
 
     [Test]
@@ -241,7 +243,7 @@ internal sealed class ConsumerTests
         var didConsume = consumer.TryConsumeString(testString);
 
         // Assert
-        Assert.That(didConsume, Is.False);
+        didConsume.Should().BeFalse();
     }
 
     [Test]
@@ -255,7 +257,7 @@ internal sealed class ConsumerTests
         var peeked = consumer.Peek();
 
         // Assert
-        Assert.That(peeked, Is.EqualTo(testString[0]));
+        peeked.Should().Be(testString[0]);
     }
 
 	[Test]
@@ -269,7 +271,7 @@ internal sealed class ConsumerTests
 		var peeked = consumer.Peek(1);
 
 		// Assert
-		Assert.That(peeked, Is.EqualTo(testString[1]));
+		peeked.Should().Be(testString[1]);
 	}
 
 	[Test]
@@ -284,7 +286,7 @@ internal sealed class ConsumerTests
         var secondPeek = consumer.Peek();
 
         // Assert
-        Assert.That(firstPeek, Is.EqualTo(secondPeek));
+        firstPeek.Should().Be(secondPeek);
     }
 
     [Test]
@@ -298,7 +300,7 @@ internal sealed class ConsumerTests
         consumer.Peek();
 
         // Assert
-        Assert.That(consumer.CanConsume(), Is.True);
+        consumer.CanConsume().Should().BeTrue();
     }
 
     [Test]
@@ -323,7 +325,7 @@ internal sealed class ConsumerTests
         var matches = consumer.Matches("");
 
         // Assert
-        Assert.That(matches, Is.True);
+        matches.Should().BeTrue();
     }
 
     [Test]
@@ -336,7 +338,7 @@ internal sealed class ConsumerTests
         var matches = consumer.Matches("");
 
         // Assert
-        Assert.That(matches, Is.True);
+        matches.Should().BeTrue();
     }
 
     [Test]
@@ -350,7 +352,7 @@ internal sealed class ConsumerTests
         var matches = consumer.Matches(testString);
 
         // Assert
-        Assert.That(matches, Is.True);
+        matches.Should().BeTrue();
     }
 
     [Test]
@@ -365,7 +367,7 @@ internal sealed class ConsumerTests
         var matches = consumer.Matches(subString);
 
         // Assert
-        Assert.That(matches, Is.True);
+        matches.Should().BeTrue();
     }
 
     [Test]
@@ -379,7 +381,7 @@ internal sealed class ConsumerTests
         var matches = consumer.Matches("dcba");
 
         // Assert
-        Assert.That(matches, Is.False);
+        matches.Should().BeFalse();
     }
 
     [Test]
@@ -393,7 +395,7 @@ internal sealed class ConsumerTests
         var matches = consumer.Matches("abcde");
 
         // Assert
-        Assert.That(matches, Is.False);
+        matches.Should().BeFalse();
     }
 
     [Test]
@@ -408,6 +410,6 @@ internal sealed class ConsumerTests
         var matches = consumer.Matches(testString);
 
         // Assert
-        Assert.That(matches, Is.False);
+        matches.Should().BeFalse();
     }
 }

@@ -47,7 +47,7 @@ internal sealed class WhileStatement : INode
             // c. If ToBoolean(exprValue) is false, return V.
             if (!exprValue.Value.ToBoolean().Value)
             {
-                return Completion.NormalCompletion(V);
+                return V;
             }
 
             // d. Let stmtResult be Completion(Evaluation of Statement).

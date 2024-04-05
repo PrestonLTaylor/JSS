@@ -1,6 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
-using static JSS.Lib.Execution.CompletionHelper;
 
 namespace JSS.Lib.AST;
 
@@ -43,7 +42,7 @@ internal sealed class LetDeclaration : Declaration
         MUST(asReference.InitializeReferencedBinding(Undefined.The));
 
         // 3. Return EMPTY.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     private Completion EvaluateWithInitializer(VM vm)
@@ -69,7 +68,7 @@ internal sealed class LetDeclaration : Declaration
         MUST(asReference.InitializeReferencedBinding(value.Value));
 
         // 6. Return EMPTY.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     public string Identifier { get; }

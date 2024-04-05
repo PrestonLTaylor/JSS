@@ -7,6 +7,9 @@ internal sealed class Boolean : Value
         Value = value;
     }
 
+    public static implicit operator Boolean(bool value) => new(value);
+    public static implicit operator bool(Boolean boolean) => boolean.Value;
+
     override public bool IsBoolean() { return true; }
     override public ValueType Type() { return ValueType.Boolean; }
 

@@ -26,7 +26,7 @@ internal sealed class PropertyExpression : IExpression
         // FIXME: 3. If the source text matched by this MemberExpression is strict mode code, let strict be true; else let strict be false.
 
         // 4. Return EvaluatePropertyAccessWithIdentifierKey(baseValue, IdentifierName, strict).
-        return Completion.NormalCompletion(EvaluatePropertyAccessWithIdentifierKey(baseValue.Value));
+        return EvaluatePropertyAccessWithIdentifierKey(baseValue.Value);
     }
 
     // 13.3.4 EvaluatePropertyAccessWithIdentifierKey, https://tc39.es/ecma262/#sec-evaluate-property-access-with-identifier-key

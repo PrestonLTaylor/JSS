@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using JSS.Lib.AST.Values;
 using JSS.Lib.Runtime;
-using Object = JSS.Lib.AST.Values.Object;
 
 namespace JSS.Lib.Execution;
 
@@ -82,7 +81,7 @@ internal sealed class Realm
         }
 
         // 3. Return global.
-        return Completion.NormalCompletion(GlobalObject);
+        return GlobalObject;
     }
 
     private Dictionary<string, Property> CreateGlobalProperties()
@@ -140,7 +139,7 @@ internal sealed class Realm
         // FIXME: 11. Create any host-defined global object properties on globalObj.
 
         // 12. Return UNUSED.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     public Agent Agent { get; }

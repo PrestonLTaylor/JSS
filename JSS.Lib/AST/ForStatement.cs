@@ -114,7 +114,7 @@ internal sealed class ForStatement : INode
                 // iii. If ToBoolean(testValue) is false, return V.
                 if (!testValue.Value.ToBoolean().Value)
                 {
-                    return Completion.NormalCompletion(V);
+                    return V;
                 }
             }
 

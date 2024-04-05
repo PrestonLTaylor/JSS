@@ -1,9 +1,6 @@
 ﻿using JSS.Lib.Execution;
 using JSS.Lib.Runtime;
 using System.Diagnostics;
-using Environment = JSS.Lib.Execution.Environment;
-using ExecutionContext = JSS.Lib.Execution.ExecutionContext;
-using static JSS.Lib.Execution.CompletionHelper;
 
 namespace JSS.Lib.AST.Values;
 
@@ -59,13 +56,13 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         vm.PopExecutionContext();
 
         // 8. If result.[[Type]] is RETURN, return result.[[Value]].
-        if (result.IsReturnCompletion()) return Completion.NormalCompletion(result.Value);
+        if (result.IsReturnCompletion()) return result.Value;
 
         // 9. ReturnIfAbrupt(result).
         if (result.IsAbruptCompletion()) return result;
 
         // 10. Return undefined.
-        return Completion.NormalCompletion(Undefined.The);
+        return Undefined.The;
     }
 
     // 10.2.1.1 PrepareForOrdinaryCall ( F, newTarget ), https://tc39.es/ecma262/#sec-prepareforordinarycall
@@ -224,13 +221,13 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         if (result.IsReturnCompletion())
         {
             // a. If result.[[Value]] is an Object, return result.[[Value]].
-            if (result.Value.IsObject()) return Completion.NormalCompletion(result.Value);
+            if (result.Value.IsObject()) return result.Value;
 
             // b. If kind is BASE, return thisArgument.
-            if (ConstructorKind == ConstructorKind.BASE) return Completion.NormalCompletion(thisArgument);
+            if (ConstructorKind == ConstructorKind.BASE) return thisArgument;
 
             // c. If result.[[Value]] is not undefined, throw a FIXME: TypeError exception.
-            if (!result.Value.IsUndefined()) return Completion.ThrowCompletion(new String("Function constructor without kind of base did not return an object/undefined"));
+            if (!result.Value.IsUndefined()) return Completion.ThrowCompletion("Function constructor without kind of base did not return an object/undefined");
         }
         // 11. Else,
         else
@@ -246,8 +243,8 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         // 13. Assert: thisBinding is an Object.
         Debug.Assert(thisBinding.Value is Object);
 
-        // FIXME: 14. Return thisBinding.
-        return Completion.NormalCompletion(thisBinding.Value);
+        // 14. Return thisBinding.
+        return thisBinding;
     }
 
     // 10.2.3 OrdinaryFunctionCreate ( FIXME: functionPrototype, FIXME: sourceText, ParameterList, Body, thisMode, env, FIXME: privateEnv ), https://tc39.es/ecma262/#sec-ordinaryfunctioncreate
@@ -372,7 +369,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         }
 
         // 6. Perform ! DefinePropertyOrThrow(F, "name", PropertyDescriptor { [[Value]]: name, [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: true }).
-        MUST(DefinePropertyOrThrow(this, "name", new Property(new String(name), new Attributes(false, false, true))));
+        MUST(DefinePropertyOrThrow(this, "name", new Property(name, new Attributes(false, false, true))));
 
         // 7. Return unused.
     }
@@ -637,7 +634,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         }
 
         // 37. Return UNUSED.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     // FIXME: We should have a Parameters parse node that we can call BoundNames on

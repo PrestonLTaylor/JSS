@@ -31,7 +31,7 @@ internal sealed class BitwiseNotExpression : IExpression
         {
             // a. Return Number::bitwiseNOT(oldValue).
             var asNumber = oldValue.Value.AsNumber();
-            return Completion.NormalCompletion(Number.BitwiseNOT(asNumber));
+            return Number.BitwiseNOT(asNumber);
         }
         // 4. Else,
         else

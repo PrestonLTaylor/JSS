@@ -23,7 +23,7 @@ internal sealed class VoidExpression : IExpression
         if (value.IsAbruptCompletion()) return value;
 
         // 3. Return undefined.
-        return Completion.NormalCompletion(Undefined.The);
+        return Undefined.The;
     }
 
     public IExpression Expression { get; }

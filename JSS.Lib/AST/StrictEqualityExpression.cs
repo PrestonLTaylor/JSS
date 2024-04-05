@@ -32,7 +32,7 @@ internal sealed class StrictEqualityExpression : IExpression
         if (rval.IsAbruptCompletion()) return rval;
 
         // 5. Return IsStrictlyEqual(rval, lval).
-        return Completion.NormalCompletion(Value.IsStrictlyEqual(rval.Value, lval.Value));
+        return Value.IsStrictlyEqual(rval.Value, lval.Value);
     }
 
     public IExpression Lhs { get; }

@@ -10,6 +10,6 @@ internal sealed class NullLiteral : IExpression
     override public Completion Evaluate(VM vm)
     {
         // 1. Return null.
-        return Completion.NormalCompletion(Null.The);
+        return Null.The;
     }
 }

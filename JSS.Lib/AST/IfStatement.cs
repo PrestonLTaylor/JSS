@@ -74,7 +74,7 @@ internal sealed class IfStatement : INode
         if (!exprValue.Value)
         {
             // a. Return undefined.
-            return Completion.NormalCompletion(Undefined.The);
+            return Undefined.The;
         }
         // 4. Else,
         else

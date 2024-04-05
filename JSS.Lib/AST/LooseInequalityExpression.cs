@@ -1,6 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
-using Boolean = JSS.Lib.AST.Values.Boolean;
 
 namespace JSS.Lib.AST;
 
@@ -38,7 +37,7 @@ internal sealed class LooseInequalityExpression : IExpression
 
         // 6. If r is true, return false. Otherwise, return true.
         var rAsBoolean = r.Value.AsBoolean().Value;
-        return Completion.NormalCompletion(new Boolean(!rAsBoolean));
+        return !rAsBoolean;
     }
 
     public IExpression Lhs { get; }

@@ -1,6 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
 using System.Diagnostics;
-using Boolean = JSS.Lib.AST.Values.Boolean;
 
 namespace JSS.Lib.Execution;
 
@@ -40,6 +39,12 @@ internal sealed class Completion
     {
         return new Completion(CompletionType.Normal, value, "");
     }
+
+    // NOTE: We use an implicit conversion operator as a syntaxic sugar for NormalCompletion in functions
+    public static implicit operator Completion(Value value) => NormalCompletion(value);
+    public static implicit operator Completion(bool value) => NormalCompletion(value);
+    public static implicit operator Completion(double value) => NormalCompletion(value);
+    public static implicit operator Completion(string value) => NormalCompletion(value);
 
     // 6.2.4.2 ThrowCompletion ( value ), https://tc39.es/ecma262/#sec-throwcompletion
     static public Completion ThrowCompletion(Value value)
@@ -81,25 +86,25 @@ internal sealed class Completion
         // 1. If completion.[[Type]] is NORMAL, return true.
         if (IsNormalCompletion())
         {
-            return new Boolean(true);
+            return true;
         }
 
         // 2. If completion.[[Type]] is not CONTINUE, return false.
         if (!IsContinueCompletion())
         {
-            return new Boolean(false);
+            return false;
         }
 
         // 3. If completion.[[Target]] is EMPTY, return true.
         if (Target.Length == 0)
         {
-            return new Boolean(true);
+            return true;
         }
 
         // FIXME: 4. If labelSet contains completion.[[Target]], return true.
 
         // 5. Return false.
-        return new Boolean(false);
+        return false;
     }
 
     public bool IsNormalCompletion() { return Type == CompletionType.Normal; }

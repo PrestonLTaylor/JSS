@@ -1,7 +1,5 @@
 ﻿using JSS.Lib.Execution;
 using JSS.Lib.AST.Values;
-using String = JSS.Lib.AST.Values.String;
-using Boolean = JSS.Lib.AST.Values.Boolean;
 using System.Diagnostics;
 
 namespace JSS.Lib.AST;
@@ -28,7 +26,7 @@ internal sealed class TypeOfExpression : IExpression
             var asReference = val.Value.AsReference();
             if (asReference.IsUnresolvableReference())
             {
-                return Completion.NormalCompletion(new String("undefined"));
+                return "undefined";
             }
         }
 
@@ -39,43 +37,43 @@ internal sealed class TypeOfExpression : IExpression
         // 4. If val is undefined, return "undefined".
         if (val.Value.IsUndefined())
         {
-            return Completion.NormalCompletion(new String("undefined"));
+            return "undefined";
         }
 
         // 5. If val is null, return "object".
         if (val.Value.IsNull())
         {
-            return Completion.NormalCompletion(new String("object"));
+            return "object";
         }
 
         // 6. If val is a String, return "string".
         if (val.Value.IsString())
         {
-            return Completion.NormalCompletion(new String("string"));
+            return "string";
         }
 
         // 7. If val is a Symbol, return "symbol".
         if (val.Value.IsSymbol())
         {
-            return Completion.NormalCompletion(new String("symbol"));
+            return "symbol";
         }
 
         // 8. If val is a Boolean, return "boolean".
         if (val.Value.IsBoolean())
         {
-            return Completion.NormalCompletion(new String("boolean"));
+            return "boolean";
         }
 
         // 9. If val is a Number, return "number".
         if (val.Value.IsNumber())
         {
-            return Completion.NormalCompletion(new String("number"));
+            return "number";
         }
 
         // 10. If val is a BigInt, return "bigint".
         if (val.Value.IsBigInt())
         {
-            return Completion.NormalCompletion(new String("bigint"));
+            return "bigint";
         }
 
         // 11. Assert: val is an Object.
@@ -86,11 +84,11 @@ internal sealed class TypeOfExpression : IExpression
         // 13. If val has a [[Call]] internal slot, return "function".
         if (val.Value.HasInternalCall())
         {
-            return Completion.NormalCompletion(new String("function"));
+            return "function";
         }
 
         // 14. Return "object".
-        return Completion.NormalCompletion(new String("object"));
+        return "object";
     }
 
     public IExpression Expression { get; }

@@ -1,5 +1,4 @@
 ﻿using JSS.Lib.Execution;
-using String = JSS.Lib.AST.Values.String;
 
 namespace JSS.Lib.AST.Literal;
 
@@ -8,14 +7,14 @@ internal sealed class StringLiteral : IExpression
 {
     public StringLiteral(string value)
     {
-        _value = new String(value);
+        _value = value;
     }
 
     // 13.2.3.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-literals-runtime-semantics-evaluation
     override public Completion Evaluate(VM _)
     {
         // 1. Return the SV of StringLiteral as defined in 12.9.4.2.
-        return Completion.NormalCompletion(_value);
+        return _value;
     }
 
     public string Value

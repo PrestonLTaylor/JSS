@@ -32,7 +32,7 @@ internal sealed class PostfixDecrementExpression : IExpression
         {
             // a. Let newValue be Number::subtract(oldValue, 1𝔽).
             var oldAsNumber = oldValue.Value.AsNumber();
-            newValue = Number.Subtract(oldAsNumber, new Number(1));
+            newValue = Number.Subtract(oldAsNumber, 1);
         }
         // 4. Else,
         else

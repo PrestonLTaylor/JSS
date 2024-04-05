@@ -1,8 +1,6 @@
 ﻿using JSS.Lib;
 using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
-using Boolean = JSS.Lib.AST.Values.Boolean;
-using String = JSS.Lib.AST.Values.String;
 
 namespace JSS.CLI;
 

@@ -1,6 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
-using Environment = JSS.Lib.Execution.Environment;
 
 namespace JSS.Lib.AST;
 
@@ -48,7 +47,7 @@ internal sealed class FunctionDeclaration : Declaration
     override public Completion Evaluate(VM vm)
     {
         // 1. Return EMPTY.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 
     public string Identifier { get; }

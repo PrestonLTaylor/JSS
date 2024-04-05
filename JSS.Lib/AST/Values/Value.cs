@@ -1,7 +1,5 @@
 ﻿using JSS.Lib.Execution;
 using System.Diagnostics;
-using Environment = JSS.Lib.Execution.Environment;
-using static JSS.Lib.Execution.CompletionHelper;
 
 namespace JSS.Lib.AST.Values;
 
@@ -22,6 +20,10 @@ internal enum ValueType
 // 6.1 ECMAScript Language Types, https://tc39.es/ecma262/#sec-ecmascript-language-types
 internal abstract class Value
 {
+    public static implicit operator Value(bool value) => new Boolean(value);
+    public static implicit operator Value(double value) => new Number(value);
+    public static implicit operator Value(string value) => new String(value);
+
     virtual public bool IsEmpty() { return false; }
     virtual public bool IsReference() { return false; }
     virtual public bool IsEnvironment() { return false; }
@@ -94,7 +96,7 @@ internal abstract class Value
         // 1. If V is not a Reference Record, return V.
         if (!IsReference())
         {
-            return Completion.NormalCompletion(this);
+            return this;
         }
 
         // FIXME: Throw an ReferenceError Object
@@ -102,7 +104,7 @@ internal abstract class Value
         var asReference = AsReference();
         if (asReference.IsUnresolvableReference())
         {
-            return Completion.ThrowCompletion(new String($"{asReference.ReferencedName} is not defined"));
+            return Completion.ThrowCompletion($"{asReference.ReferencedName} is not defined");
         }
 
         // 3. If IsPropertyReference(V) is true, then
@@ -141,7 +143,7 @@ internal abstract class Value
         if (!IsReference())
         {
             // FIXME: Throw an actual ReferenceError object
-            return Completion.ThrowCompletion(new String("Tried to put a value into a non-reference."));
+            return Completion.ThrowCompletion("Tried to put a value into a non-reference.");
         }
 
         var reference = AsReference();
@@ -159,7 +161,7 @@ internal abstract class Value
             if (setResult.IsAbruptCompletion()) return setResult;
 
             // d. Return UNUSED.
-            return Completion.NormalCompletion(Empty.The);
+            return Empty.The;
         }
         // 3. If IsPropertyReference(V) is true, then
         if (reference.IsPropertyReference())
@@ -177,7 +179,7 @@ internal abstract class Value
 
             // FIXME: d. If succeeded is false FIXME: (and V.[[Strict]] is true,) throw a TypeError exception.
             // e. Return UNUSED.
-            return Completion.NormalCompletion(Empty.The);
+            return Empty.The;
         }
         // 4. Else,
         else
@@ -214,7 +216,7 @@ internal abstract class Value
         // FIXME: d. Return? OrdinaryToPrimitive(input, preferredType).
 
         // 2. Return input.
-        return Completion.NormalCompletion(this);
+        return this;
     }
 
     // 7.1.2 ToBoolean ( argument ), https://tc39.es/ecma262/#sec-toboolean
@@ -229,7 +231,7 @@ internal abstract class Value
         // 2. If argument is one of undefined, null, +0𝔽, -0𝔽, NaN, 0ℤ, or the empty String, return false.
         if (IsUndefined() || IsNull())
         {
-            return new Boolean(false);
+            return false;
         }
 
         if (IsNumber())
@@ -237,7 +239,7 @@ internal abstract class Value
             var asNumber = AsNumber().Value;
             if (asNumber == 0 || double.IsNaN(asNumber))
             {
-                return new Boolean(false);
+                return false;
             }
         }
 
@@ -246,14 +248,14 @@ internal abstract class Value
             var asString = AsString().Value;
             if (asString.Length == 0)
             {
-                return new Boolean(false);
+                return false;
             }
         }
 
         // 3. NOTE: This step is replaced in section B.3.6.1.
 
         // 4. Return true.
-        return new Boolean(true);
+        return true;
     }
 
     // 7.1.3 ToNumeric ( value ), https://tc39.es/ecma262/#sec-tonumeric
@@ -273,21 +275,21 @@ internal abstract class Value
     public Completion ToNumber()
     {
         // 1. If argument is a Number, return argument.
-        if (IsNumber()) return Completion.NormalCompletion(this);
+        if (IsNumber()) return this;
 
         // FIXME: 2. If argument is either a Symbol or a BigInt, throw a TypeError exception.
 
         // FIXME: 3. If argument is undefined, return NaN.
 
         // 4. If argument is either null or false, return FIXME: +0𝔽.
-        if (IsNull()) return Completion.NormalCompletion(new Number(0.0));
+        if (IsNull()) return 0.0;
 
         if (IsBoolean())
         {
             // 5. If argument is true, return 1𝔽.
             var boolean = AsBoolean();
-            var asNumber = new Number(boolean.Value ? 1.0 : 0.0);
-            return Completion.NormalCompletion(asNumber);
+            var asNumber = boolean.Value ? 1.0 : 0.0;
+            return asNumber;
         }
 
         // FIXME: Implement StringToNumber instead of using double.Parse
@@ -297,12 +299,12 @@ internal abstract class Value
             try
             {
                 var asString = AsString(); 
-                var asNumber = new Number(double.Parse(asString.Value));
-                return Completion.NormalCompletion(asNumber);
+                var asNumber = double.Parse(asString.Value);
+                return asNumber;
             }
             catch (Exception)
             {
-                return Completion.NormalCompletion(Number.NaN);
+                return Number.NaN;
             }
         }
 
@@ -317,22 +319,21 @@ internal abstract class Value
     public Completion ToStringJS()
     {
         // 1. If argument is a String, return argument.
-        if (IsString()) return Completion.NormalCompletion(this);
+        if (IsString()) return this;
 
         // FIXME: 2. If argument is a Symbol, throw a TypeError exception.
 
         // FIXME: 3. If argument is undefined, return "undefined".
 
         // 4. If argument is null, return "null".
-        if (IsNull()) return Completion.NormalCompletion(new String("null"));
+        if (IsNull()) return "null";
 
         // 5. If argument is true, return "true".
         // 6. If argument is false, return "false".
         if (IsBoolean())
         {
             var boolean = AsBoolean();
-            var asString = new String(boolean.Value ? "true" : "false");
-            return Completion.NormalCompletion(asString);
+            return boolean.Value ? "true" : "false";
         }
 
         // FIXME: Follow the spec instead of using C#'s ToString
@@ -340,8 +341,7 @@ internal abstract class Value
         if (IsNumber())
         {
             var number = AsNumber();
-            var asString = new String(number.Value.ToString());
-            return Completion.NormalCompletion(asString);
+            return number.Value.ToString();
         }
 
         // FIXME: 8. If argument is a BigInt, return BigInt::toString(argument, 10).
@@ -358,19 +358,19 @@ internal abstract class Value
         // Undefined, FIXME: Throw a TypeError exception.
         if (IsUndefined())
         {
-            return Completion.ThrowCompletion(new String("Unable to convert undefined to an object"));
+            return Completion.ThrowCompletion("Unable to convert undefined to an object");
         }
 
         // Null, FIXME: Throw a TypeError exception.
         if (IsNull())
         {
-            return Completion.ThrowCompletion(new String("Unable to convert null to an object"));
+            return Completion.ThrowCompletion("Unable to convert null to an object");
         }
 
         // FIXME: Implement the rest of the conversions
 
         // Object, Return argument.
-        return Completion.NormalCompletion(this);
+        return this;
     }
 
     // 7.1.19 ToPropertyKey ( argument ), https://tc39.es/ecma262/#sec-topropertykey
@@ -388,7 +388,7 @@ internal abstract class Value
         }
 
         // 3. Return ! ToString(key).
-        return Completion.NormalCompletion(MUST(key.Value.ToStringJS()));
+        return MUST(key.Value.ToStringJS());
     }
 
     // 7.2.3 IsCallable ( argument ), https://tc39.es/ecma262/#sec-iscallable
@@ -426,7 +426,7 @@ internal abstract class Value
         // 2. If x is either null or undefined, return true.
         if (x.IsNull() || x.IsUndefined())
         {
-            return new Boolean(true);
+            return true;
         }
 
         // FIXME: 3. If x is a BigInt, then
@@ -438,7 +438,7 @@ internal abstract class Value
             // a. If x and y have the same length and the same code units in the same positions, return true; otherwise, return false.
             var xAsString = x.AsString().Value;
             var yAsString = y.AsString().Value;
-            return new Boolean(xAsString == yAsString);
+            return xAsString == yAsString;
         }
 
         // 5. If x is a Boolean, then
@@ -447,7 +447,7 @@ internal abstract class Value
             // 6. If x and y are both true or both false, return true; otherwise, return false.
             var xAsBoolean = x.AsBoolean().Value;
             var yAsBoolean = y.AsBoolean().Value;
-            return new Boolean(xAsBoolean == yAsBoolean);
+            return xAsBoolean == yAsBoolean;
         }
 
         // FIXME: 6. NOTE: All other ECMAScript language values are compared by identity.
@@ -509,18 +509,18 @@ internal abstract class Value
                 // iii. If cx < cy, return true.
                 if (cx < cy)
                 {
-                    return Completion.NormalCompletion(new Boolean(true));
+                    return true;
                 }
 
                 // iv. If cx > cy, return false.
                 if (cx > cy)
                 {
-                    return Completion.NormalCompletion(new Boolean(false));
+                    return false;
                 }
             }
 
             // d. If lx < ly, return true. Otherwise, return false.
-            return Completion.NormalCompletion(new Boolean(lx < ly));
+            return lx < ly;
         }
 
         // 4. Else,
@@ -548,7 +548,7 @@ internal abstract class Value
         // i. If nx is a Number, then
         // 1. Return Number::lessThan(nx, ny).
         var result = Number.LessThan(nx.Value.AsNumber(), ny.Value.AsNumber());
-        return Completion.NormalCompletion(result);
+        return result;
 
         // FIXME: ii. Else,
         // FIXME: 1. Assert: nx is a BigInt.
@@ -567,19 +567,19 @@ internal abstract class Value
         if (x.Type().Equals(y.Type()))
         {
             // a. Return IsStrictlyEqual(x, y).
-            return Completion.NormalCompletion(IsStrictlyEqual(x, y));
+            return IsStrictlyEqual(x, y);
         }
 
         // 2. If x is null and y is undefined, return true.
         if (x.IsNull() && y.IsUndefined())
         {
-            return Completion.NormalCompletion(new Boolean(true));
+            return true;
         }
 
         // 3. If x is undefined and y is null, return true.
         if (x.IsUndefined() && y.IsNull())
         {
-            return Completion.NormalCompletion(new Boolean(true));
+            return true;
         }
 
         // 4. NOTE: This step is replaced in section B.3.6.2.
@@ -587,13 +587,13 @@ internal abstract class Value
         // 5. If x is a Number and y is a String, return ! IsLooselyEqual(x, ! ToNumber(y)).
         if (x.IsNumber() && y.IsString())
         {
-            return Completion.NormalCompletion(MUST(IsLooselyEqual(x, MUST(y.ToNumber()))));
+            return MUST(IsLooselyEqual(x, MUST(y.ToNumber())));
         }
 
         // 6. If x is a String and y is a Number, return ! IsLooselyEqual(! ToNumber(x), y).
         if (x.IsString() && y.IsNumber())
         {
-            return Completion.NormalCompletion(MUST(IsLooselyEqual(MUST(x.ToNumber()), y)));
+            return MUST(IsLooselyEqual(MUST(x.ToNumber()), y));
         }
 
         // FIXME: 7. If x is a BigInt and y is a String, then
@@ -631,7 +631,7 @@ internal abstract class Value
         // FIXME: b. If ℝ(x) = ℝ(y), return true; otherwise return false.
 
         // 14. Return false.
-        return Completion.NormalCompletion(new Boolean(false));
+        return false;
     }
 
     // 7.2.15 IsStrictlyEqual ( x, y ), https://tc39.es/ecma262/#sec-isstrictlyequal
@@ -640,7 +640,7 @@ internal abstract class Value
         // 1. If Type(x) is not Type(y), return false.
         if (!x.Type().Equals(y.Type()))
         {
-            return new Boolean(false);
+            return false;
         }
 
         // 2. If x is a Number, then

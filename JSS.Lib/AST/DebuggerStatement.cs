@@ -17,11 +17,11 @@ internal sealed class DebuggerStatement : INode
             Debugger.Break();
 
             // b. Return a new implementation-defined Completion Record.
-            return Completion.NormalCompletion(Empty.The);
+            return Empty.The;
         }
 
         // 2. Else,
         // a. Return EMPTY.
-        return Completion.NormalCompletion(Empty.The);
+        return Empty.The;
     }
 }

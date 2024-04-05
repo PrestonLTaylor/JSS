@@ -7,6 +7,9 @@ internal sealed class Number : Value
         Value = value;
     }
 
+    public static implicit operator Number(double value) => new(value);
+    public static implicit operator double(Number number) => number.Value;
+
     public override bool IsNumber() { return true; }
     override public ValueType Type() { return ValueType.Number; }
 
@@ -28,7 +31,7 @@ internal sealed class Number : Value
         if (double.IsNaN(x.Value)) return x;
 
         // 2. Return the result of negating x; that is, compute a Number with the same magnitude but opposite sign.
-        return new Number(-x.Value);
+        return -x.Value;
     }
 
     // 6.1.6.1.2 Number::bitwiseNOT ( x ), https://tc39.es/ecma262/#sec-numeric-types-number-bitwiseNOT
@@ -39,7 +42,7 @@ internal sealed class Number : Value
         // 2. Return the result of applying bitwise complement to oldValue.
         // The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
         var result = ~(int)x.Value;
-        return new Number(result);
+        return result;
     }
 
     // 6.1.6.1.3 Number::exponentiate ( base, exponent ), https://tc39.es/ecma262/#sec-numeric-types-number-exponentiate
@@ -75,8 +78,7 @@ internal sealed class Number : Value
         // FIXME: 12. If base < -0𝔽 and exponent is not an integral Number, return NaN.
 
         // 13. Return an implementation-approximated Number value representing the result of raising ℝ(base) to the ℝ(exponent) power.
-        var result = Math.Pow(expBase.Value, exponent.Value);
-        return new Number(result);
+        return Math.Pow(expBase.Value, exponent.Value);
     }
 
     // 6.1.6.1.4 Number::multiply ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-multiply
@@ -99,8 +101,7 @@ internal sealed class Number : Value
         // FIXME: b. Else, return -0𝔽.
 
         // 6. Return 𝔽(ℝ(x) × ℝ(y)).
-        var result = x.Value * y.Value;
-        return new Number(result);
+        return x.Value * y.Value;
     }
 
     // 6.1.6.1.5 Number::divide ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-divide
@@ -125,8 +126,7 @@ internal sealed class Number : Value
         // FIXME: a. If x > +0𝔽, return -∞𝔽. Otherwise, return +∞𝔽.
 
         // 8. Return 𝔽(ℝ(x) / ℝ(y)).
-        var result = x.Value / y.Value;
-        return new Number(result);
+        return x.Value / y.Value;
     }
 
     // 6.1.6.1.6 Number::remainder ( n, d ), https://tc39.es/ecma262/#sec-numeric-types-number-remainder
@@ -143,8 +143,7 @@ internal sealed class Number : Value
         // FIXME: 9. Let r be ℝ(n) - (ℝ(d) × q).
         // FIXME: 10. If r = 0 and n< -0𝔽, return -0𝔽.
         // FIXME: 11. Return 𝔽(r).
-        var result = n.Value % d.Value;
-        return new Number(result);
+        return n.Value % d.Value;
     }
 
     // 6.1.6.1.7 Number::add ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-add
@@ -159,8 +158,7 @@ internal sealed class Number : Value
         // FIXME: 7. If x is -0𝔽 and y is -0𝔽, return -0𝔽.
 
         // 8. Return 𝔽(ℝ(x) + ℝ(y)).
-        var result = x.Value + y.Value;
-        return new Number(result);
+        return x.Value + y.Value;
     }
 
     // 6.1.6.1.8 Number::subtract ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-subtract
@@ -178,8 +176,7 @@ internal sealed class Number : Value
         // FIXME: 4. Return the result of left shifting lnum by shiftCount bits.
         // The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
 
-        var result = (int)x.Value << (int)y.Value;
-        return new Number(result);
+        return (int)x.Value << (int)y.Value;
     }
 
     // 6.1.6.1.10 Number::signedRightShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-signedRightShift
@@ -191,8 +188,7 @@ internal sealed class Number : Value
         // FIXME: 4. Return the result of performing a sign-extending right shift of lnum by shiftCount bits.
         // The most significant bit is propagated.The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
 
-        var result = (int)x.Value >> (int)y.Value;
-        return new Number(result);
+        return (int)x.Value >> (int)y.Value;
     }
 
     // 6.1.6.1.11 Number::unsignedRightShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-unsignedRightShift
@@ -204,8 +200,7 @@ internal sealed class Number : Value
         // FIXME: 4. Return the result of performing a zero-filling right shift of lnum by shiftCount bits.
         // Vacated bits are filled with zero. The mathematical value of the result is exactly representable as a 32-bit unsigned bit string.
 
-        var result = (int)x.Value >>> (int)y.Value;
-        return new Number(result);
+        return (int)x.Value >>> (int)y.Value;
     }
 
     // 6.1.6.1.12 Number::lessThan(x, y), https://tc39.es/ecma262/#sec-numeric-types-number-lessThan
@@ -223,7 +218,7 @@ internal sealed class Number : Value
         // FIXME: 10. Assert: x and y are finite.
 
         // 11. If ℝ(x) < ℝ(y), return true. Otherwise, return false.
-        return new Boolean(x.Value < y.Value);
+        return x.Value < y.Value;
     }
 
     // 6.1.6.1.13 Number::equal ( x, y )
@@ -232,26 +227,26 @@ internal sealed class Number : Value
         // 1. If x is NaN, return false.
         if (double.IsNaN(x.Value))
         {
-            return new Boolean(false);
+            return false;
         }
 
         // 2. If y is NaN, return false.
         if (double.IsNaN(y.Value))
         {
-            return new Boolean(false);
+            return false;
         }
 
         // 3. If x is y, return true.
         if (x.Value == y.Value)
         {
-            return new Boolean(true);
+            return true;
         }
 
         // FIXME: 4. If x is +0𝔽 and y is -0𝔽, return true.
         // FIXME: 5. If x is -0𝔽 and y is +0𝔽, return true.
 
         // 6. Return false.
-        return new Boolean(false);
+        return false;
     }
 
     internal enum BitwiseOp
@@ -285,7 +280,7 @@ internal sealed class Number : Value
         };
 
         // FIXME: 8. Return the Number value for the integer represented by the 32-bit two's complement bit string result.
-        return new Number(result);
+        return result;
     }
 
     // 6.1.6.1.17 Number::bitwiseAND ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-bitwiseAND
@@ -316,7 +311,7 @@ internal sealed class Number : Value
             return _nan;
         }
     }
-    static readonly private Number _nan = new(double.NaN);
+    static readonly private Number _nan = double.NaN;
 
     public double Value { get; }
 }

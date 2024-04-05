@@ -1,7 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
-using String = JSS.Lib.AST.Values.String;
-using Object = JSS.Lib.AST.Values.Object;
 
 namespace JSS.Lib.AST;
 
@@ -70,13 +68,13 @@ internal sealed class CallExpression : IExpression
         // 4. If func is not an Object, FIXME: throw a TypeError exception.
         if (!func.IsObject())
         {
-            return Completion.ThrowCompletion(new String($"Tried to call a {func.Type()}, expected an Object"));
+            return Completion.ThrowCompletion($"Tried to call a {func.Type()}, expected an Object");
         }
 
         // 5. If IsCallable(func) is false, throw a TypeError exception.
         if (!func.IsCallable())
         {
-            return Completion.ThrowCompletion(new String("Tried to call a non-callable Object"));
+            return Completion.ThrowCompletion("Tried to call a non-callable Object");
         }
 
         // FIXME: 6. If tailPosition is true, perform PrepareForTailCall().
@@ -105,7 +103,7 @@ internal sealed class CallExpression : IExpression
             precedingArgs.Add(arg.Value);
         }
 
-        return Completion.NormalCompletion(precedingArgs);
+        return precedingArgs;
     }
 
     public IExpression Lhs { get; }

@@ -1,5 +1,4 @@
 ﻿using JSS.Lib.Execution;
-using Boolean = JSS.Lib.AST.Values.Boolean;
 
 namespace JSS.Lib.AST;
 
@@ -26,7 +25,7 @@ internal sealed class LogicalNotExpression : IExpression
 
         // 3. If oldValue is true, return false.
         // 4. Return true.
-        return Completion.NormalCompletion(new Boolean(!oldValue.Value));
+        return !oldValue.Value;
     }
 
     public IExpression Expression { get; }
