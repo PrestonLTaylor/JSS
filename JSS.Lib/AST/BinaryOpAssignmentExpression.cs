@@ -13,7 +13,7 @@ internal sealed class BinaryOpAssignmentExpression : IExpression
         Rhs = rhs;
     }
 
-    // FIXME: 13.15.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-assignment-operators-runtime-semantics-evaluation
+    // 13.15.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-assignment-operators-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
         // 1. Let lref be ? Evaluation of LeftHandSideExpression.

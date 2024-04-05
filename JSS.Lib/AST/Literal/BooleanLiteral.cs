@@ -2,7 +2,6 @@
 
 namespace JSS.Lib.AST.Literal;
 
-// FIXME: This interface seems a bit clunky
 // 13.2.3 Literals
 internal sealed class BooleanLiteral : IExpression
 {
