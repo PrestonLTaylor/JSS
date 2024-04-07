@@ -37,11 +37,12 @@ public sealed class Number : Value
     // 6.1.6.1.2 Number::bitwiseNOT ( x ), https://tc39.es/ecma262/#sec-numeric-types-number-bitwiseNOT
     static internal Number BitwiseNOT(Number x)
     {
-        // FIXME: 1. Let oldValue be ! ToInt32(x).
+        // 1. Let oldValue be ! ToInt32(x).
+        var oldValue = MUST(x.ToInt32()).AsNumber(); ;
 
         // 2. Return the result of applying bitwise complement to oldValue.
         // The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
-        var result = ~(int)x.Value;
+        var result = ~(int)oldValue.Value;
         return result;
     }
 
@@ -170,25 +171,28 @@ public sealed class Number : Value
     // 6.1.6.1.9 Number::leftShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-leftShift
     static internal Number LeftShift(Number x, Number y)
     {
-        // FIXME: 1. Let lnum be !ToInt32(x).
+        // 1. Let lnum be !ToInt32(x).
+        var lnum = MUST(x.ToInt32()).AsNumber();
+
         // FIXME: 2. Let rnum be !ToUint32(y).
         // FIXME: 3. Let shiftCount be ℝ(rnum) modulo 32.
         // FIXME: 4. Return the result of left shifting lnum by shiftCount bits.
         // The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
-
-        return (int)x.Value << (int)y.Value;
+        return (int)lnum.Value << (int)y.Value;
     }
 
     // 6.1.6.1.10 Number::signedRightShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-signedRightShift
     static internal Number SignedRightShift(Number x, Number y)
     {
-        // FIXME: 1. Let lnum be !ToInt32(x).
+        // 1. Let lnum be !ToInt32(x).
+        var lnum = MUST(x.ToInt32()).AsNumber();
+
         // FIXME: 2. Let rnum be !ToUint32(y).
         // FIXME: 3. Let shiftCount be ℝ(rnum) modulo 32.
         // FIXME: 4. Return the result of performing a sign-extending right shift of lnum by shiftCount bits.
         // The most significant bit is propagated.The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
 
-        return (int)x.Value >> (int)y.Value;
+        return (int)lnum.Value >> (int)y.Value;
     }
 
     // 6.1.6.1.11 Number::unsignedRightShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-unsignedRightShift
@@ -259,27 +263,34 @@ public sealed class Number : Value
     // 6.1.6.1.16 NumberBitwiseOp ( op, x, y ), https://tc39.es/ecma262/#sec-numberbitwiseop
     static internal Number NumberBitwiseOp(BitwiseOp op, Number x, Number y)
     {
-        // FIXME: 1. Let lnum be !ToInt32(x).
-        // FIXME: 2. Let rnum be !ToInt32(y).
-        // FIXME: 3. Let lbits be the 32-bit two's complement bit string representing ℝ(lnum).
-        // FIXME: 4. Let rbits be the 32-bit two's complement bit string representing ℝ(rnum).
+        // 1. Let lnum be !ToInt32(x).
+        var lnum = MUST(x.ToInt32()).AsNumber();
+
+        // 2. Let rnum be !ToInt32(y).
+        var rnum = MUST(y.ToInt32()).AsNumber();
+
+        // 3. Let lbits be the 32-bit two's complement bit string representing ℝ(lnum).
+        var lbits = (int)lnum.Value;
+
+        // 4. Let rbits be the 32-bit two's complement bit string representing ℝ(rnum).
+        var rbits = (int)rnum.Value;
 
         // 5. If op is &, then
-        // FIXME: a. Let result be the result of applying the bitwise AND operation to lbits and rbits.
+        // a. Let result be the result of applying the bitwise AND operation to lbits and rbits.
         // 6. Else if op is ^, then
-        // FIXME: a. Let result be the result of applying the bitwise exclusive OR(XOR) operation to lbits and rbits.
+        // a. Let result be the result of applying the bitwise exclusive OR(XOR) operation to lbits and rbits.
         // 7. Else,
         // a. Assert: op is |.
-        // FIXME: b. Let result be the result of applying the bitwise inclusive OR operation to lbits and rbits.
+        // b. Let result be the result of applying the bitwise inclusive OR operation to lbits and rbits.
         var result = op switch
         {
-            BitwiseOp.AND => (int)x.Value & (int)y.Value,
-            BitwiseOp.XOR => (int)x.Value ^ (int)y.Value,
-            BitwiseOp.OR => (int)x.Value | (int)y.Value,
+            BitwiseOp.AND => lbits & rbits,
+            BitwiseOp.XOR => lbits ^ rbits,
+            BitwiseOp.OR => lbits | rbits,
             _ => throw new InvalidOperationException(),
         };
 
-        // FIXME: 8. Return the Number value for the integer represented by the 32-bit two's complement bit string result.
+        // 8. Return the Number value for the integer represented by the 32-bit two's complement bit string result.
         return result;
     }
 
