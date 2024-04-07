@@ -315,6 +315,31 @@ public abstract class Value
         throw new NotImplementedException();
     }
 
+    // 7.1.6 ToInt32 ( argument ), https://tc39.es/ecma262/#sec-toint32
+    internal Completion ToInt32()
+    {
+        const long TWO_TO_32 = (long)uint.MaxValue + 1;
+        const long TWO_TO_31 = (long)int.MaxValue + 1;
+
+        // 1. Let number be ? ToNumber(argument).
+        var number = ToNumber();
+        if (number.IsAbruptCompletion()) return number;
+
+        // 2. If number is FIXME: not finite or number is either +0𝔽 FIXME: or -0𝔽, return +0𝔽.
+        var numberValue = number.Value.AsNumber();
+        if (numberValue.Value == 0.0) return 0;
+
+        // 3. Let int be truncate(ℝ(number)).
+        var @int = (long)numberValue.Value;
+
+        // 4. Let int32bit be int modulo 2**32.
+        var int32bit = @int % TWO_TO_32;
+
+        // 5. If int32bit ≥ 2**31, return 𝔽(int32bit - 2**32); otherwise return 𝔽(int32bit).
+        if (int32bit >= TWO_TO_31) return (int)(int32bit - TWO_TO_32);
+        return (int)int32bit;
+    }
+
     // 7.1.17 ToString ( argument ), https://tc39.es/ecma262/#sec-tostring
     internal Completion ToStringJS()
     {
