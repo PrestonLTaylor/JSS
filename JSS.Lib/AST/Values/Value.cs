@@ -340,6 +340,29 @@ public abstract class Value
         return (int)int32bit;
     }
 
+    // 7.1.7 ToUint32 ( argument ), https://tc39.es/ecma262/#sec-touint32
+    internal Completion ToUint32()
+    {
+        const long TWO_TO_32 = (long)uint.MaxValue + 1;
+
+        // 1. Let number be ? ToNumber(argument).
+        var number = ToNumber();
+        if (number.IsAbruptCompletion()) return number;
+
+        // 2. If number is FIXME: not finite or number is either +0𝔽 FIXME: or -0𝔽, return +0𝔽.
+        var numberValue = number.Value.AsNumber();
+        if (numberValue.Value == 0.0) return 0;
+
+        // 3. Let int be truncate(ℝ(number)).
+        var @int = (long)numberValue.Value;
+
+        // 4. Let int32bit be int modulo 2**32.
+        var int32bit = @int % TWO_TO_32;
+
+        // 5. Return 𝔽(int32bit).
+        return (uint)int32bit;
+    }
+
     // 7.1.17 ToString ( argument ), https://tc39.es/ecma262/#sec-tostring
     internal Completion ToStringJS()
     {
