@@ -174,11 +174,15 @@ public sealed class Number : Value
         // 1. Let lnum be !ToInt32(x).
         var lnum = MUST(x.ToInt32()).AsNumber();
 
-        // FIXME: 2. Let rnum be !ToUint32(y).
-        // FIXME: 3. Let shiftCount be ℝ(rnum) modulo 32.
-        // FIXME: 4. Return the result of left shifting lnum by shiftCount bits.
+        // 2. Let rnum be !ToUint32(y).
+        var rnum = MUST(y.ToUint32()).AsNumber();
+
+        // 3. Let shiftCount be ℝ(rnum) modulo 32.
+        var shiftCount = (uint)rnum.Value % 32;
+
+        // 4. Return the result of left shifting lnum by shiftCount bits.
         // The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
-        return (int)lnum.Value << (int)y.Value;
+        return (int)lnum.Value << (int)shiftCount;
     }
 
     // 6.1.6.1.10 Number::signedRightShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-signedRightShift
@@ -187,24 +191,32 @@ public sealed class Number : Value
         // 1. Let lnum be !ToInt32(x).
         var lnum = MUST(x.ToInt32()).AsNumber();
 
-        // FIXME: 2. Let rnum be !ToUint32(y).
-        // FIXME: 3. Let shiftCount be ℝ(rnum) modulo 32.
-        // FIXME: 4. Return the result of performing a sign-extending right shift of lnum by shiftCount bits.
-        // The most significant bit is propagated.The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
+        // 2. Let rnum be !ToUint32(y).
+        var rnum = MUST(y.ToUint32()).AsNumber();
 
-        return (int)lnum.Value >> (int)y.Value;
+        // 3. Let shiftCount be ℝ(rnum) modulo 32.
+        var shiftCount = (uint)rnum.Value % 32;
+
+        // 4. Return the result of performing a sign-extending right shift of lnum by shiftCount bits.
+        // The most significant bit is propagated.The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
+        return (int)lnum.Value >> (int)shiftCount;
     }
 
     // 6.1.6.1.11 Number::unsignedRightShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-unsignedRightShift
     static internal Number UnsignedRightShift(Number x, Number y)
     {
-        // FIXME: 1. Let lnum be !ToUint32(x).
-        // FIXME: 2. Let rnum be !ToUint32(y).
-        // FIXME: 3. Let shiftCount be ℝ(rnum) modulo 32.
-        // FIXME: 4. Return the result of performing a zero-filling right shift of lnum by shiftCount bits.
-        // Vacated bits are filled with zero. The mathematical value of the result is exactly representable as a 32-bit unsigned bit string.
+        // 1. Let lnum be !ToUint32(x).
+        var lnum = MUST(x.ToUint32()).AsNumber();
 
-        return (int)x.Value >>> (int)y.Value;
+        // 2. Let rnum be !ToUint32(y).
+        var rnum = MUST(y.ToUint32()).AsNumber();
+
+        // 3. Let shiftCount be ℝ(rnum) modulo 32.
+        var shiftCount = (uint)rnum.Value % 32;
+
+        // 4. Return the result of performing a zero-filling right shift of lnum by shiftCount bits.
+        // Vacated bits are filled with zero. The mathematical value of the result is exactly representable as a 32-bit unsigned bit string.
+        return (int)lnum.Value >>> (int)shiftCount;
     }
 
     // 6.1.6.1.12 Number::lessThan(x, y), https://tc39.es/ecma262/#sec-numeric-types-number-lessThan
