@@ -16,4 +16,8 @@
             <_Parameter1>JSS.Benchmarks</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="OneOf" Version="3.0.263" />
+    </ItemGroup>
 </Project>
