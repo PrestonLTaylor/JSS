@@ -118,7 +118,7 @@ public abstract class Value
             // FIXME: i. Return ? PrivateGet(baseObj, V.[[ReferencedName]]).
 
             // c. Return ? baseObj.[[Get]](V.[[ReferencedName]], FIXME: GetThisValue(V)).
-            var obj = baseObj.Value.AsObject();
+            var obj = baseObj.Value;
             return obj.Get(asReference.ReferencedName, obj);
         }
         // 4. Else,
@@ -168,12 +168,13 @@ public abstract class Value
         {
             // a. Let baseObj be ? ToObject(V.[[Base]]).
             var baseObj = reference.Base!.ToObject();
+            if (baseObj.IsAbruptCompletion()) return baseObj;
 
             // FIXME: b. If IsPrivateReference(V) is true, then
             // FIXME: i. Return ? PrivateSet(baseObj, V.[[ReferencedName]], W).
 
             // FIXME: c. Let succeeded be ? baseObj.[[Set]](V.[[ReferencedName]], W, FIXME: GetThisValue(V)).
-            var obj = baseObj.Value.AsObject();
+            var obj = baseObj.Value;
             var succeeded = obj.Set(reference.ReferencedName, W, obj);
             if (succeeded.IsAbruptCompletion()) return succeeded;
 
@@ -401,7 +402,7 @@ public abstract class Value
     }
 
     // 7.1.18 ToObject ( argument ), https://tc39.es/ecma262/#sec-toobject
-    internal Completion ToObject()
+    internal AbruptOr<Object> ToObject()
     {
         // Undefined, FIXME: Throw a TypeError exception.
         if (IsUndefined())
@@ -418,7 +419,7 @@ public abstract class Value
         // FIXME: Implement the rest of the conversions
 
         // Object, Return argument.
-        return this;
+        return AsObject();
     }
 
     // 7.1.19 ToPropertyKey ( argument ), https://tc39.es/ecma262/#sec-topropertykey

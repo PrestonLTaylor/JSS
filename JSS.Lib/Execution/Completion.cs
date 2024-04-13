@@ -58,6 +58,12 @@ public sealed class Completion
         return abruptOr.Value;
     }
 
+    public static implicit operator Completion(AbruptOr<Object> abruptOr)
+    {
+        if (abruptOr.IsAbruptCompletion()) return abruptOr.Completion;
+        return abruptOr.Value;
+    }
+
     // 6.2.4.2 ThrowCompletion ( value ), https://tc39.es/ecma262/#sec-throwcompletion
     static public Completion ThrowCompletion(Value value)
     {
