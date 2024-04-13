@@ -87,11 +87,8 @@ internal sealed class AbstractOperationTests
         var asNumber = testCase.ToNumber();
 
         // Assert
-        asNumber.IsNormalCompletion().Should().BeTrue();
-
-        var numberValue = asNumber.Value as Number;
-        numberValue.Should().NotBeNull();
-        numberValue!.Value.Should().Be(expectedNumber);
+        asNumber.IsAbruptCompletion().Should().BeFalse();
+        asNumber.Value.Should().Be(expectedNumber);
     }
 
     [TestCaseSource(nameof(valueToExpectedNumberTestCases))]
