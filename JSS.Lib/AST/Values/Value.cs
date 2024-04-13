@@ -504,7 +504,7 @@ public abstract class Value
         throw new NotImplementedException();
     }
 
-    // 7.2.13 IsLessThan ( x, y, LeftFirst )
+    // 7.2.13 IsLessThan ( x, y, LeftFirst ), https://tc39.es/ecma262/#sec-islessthan
     static internal Completion IsLessThan(Value x, Value y, bool leftFirst)
     {
         Completion px;
