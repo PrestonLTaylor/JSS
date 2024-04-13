@@ -58,11 +58,8 @@ internal sealed class AbstractOperationTests
         var asString = testCase.ToStringJS();
 
         // Assert
-        asString.IsNormalCompletion().Should().BeTrue();
-
-        var stringValue = asString.Value as String;
-        stringValue.Should().NotBeNull();
-        stringValue!.Value.Should().Be(expectedString);
+        asString.IsAbruptCompletion().Should().BeFalse();
+        asString.Value.Should().Be(expectedString);
     }
 
     static private readonly object[] valueToExpectedNumberTestCases = new object[]

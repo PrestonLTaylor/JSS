@@ -47,9 +47,7 @@ internal abstract class IExpression : INode
                 if (rstr.IsAbruptCompletion()) return rstr;
 
                 // iii. Return the string-concatenation of lstr and rstr.
-                var lstrValue = lstr.Value.AsString();
-                var rstrValue = rstr.Value.AsString();
-                return lstrValue.Value + rstrValue.Value;
+                return lstr.Value + rstr.Value;
             }
 
             // d. Set lval to lprim.

@@ -364,10 +364,10 @@ public abstract class Value
     }
 
     // 7.1.17 ToString ( argument ), https://tc39.es/ecma262/#sec-tostring
-    internal Completion ToStringJS()
+    internal AbruptOr<string> ToStringJS()
     {
         // 1. If argument is a String, return argument.
-        if (IsString()) return this;
+        if (IsString()) return AsString().Value;
 
         // FIXME: 2. If argument is a Symbol, throw a TypeError exception.
 
