@@ -46,6 +46,24 @@ public sealed class Completion
     public static implicit operator Completion(double value) => NormalCompletion(value);
     public static implicit operator Completion(string value) => NormalCompletion(value);
 
+    public static implicit operator Completion(AbruptOr<double> abruptOr)
+    {
+        if (abruptOr.IsAbruptCompletion()) return abruptOr.Completion;
+        return abruptOr.Value;
+    }
+
+    public static implicit operator Completion(AbruptOr<string> abruptOr)
+    {
+        if (abruptOr.IsAbruptCompletion()) return abruptOr.Completion;
+        return abruptOr.Value;
+    }
+
+    public static implicit operator Completion(AbruptOr<Object> abruptOr)
+    {
+        if (abruptOr.IsAbruptCompletion()) return abruptOr.Completion;
+        return abruptOr.Value;
+    }
+
     // 6.2.4.2 ThrowCompletion ( value ), https://tc39.es/ecma262/#sec-throwcompletion
     static public Completion ThrowCompletion(Value value)
     {
@@ -135,5 +153,16 @@ internal static class CompletionHelper
 
         // 3. Set val to val.[[Value]].
         return completion.Value;
+    }
+
+    static public T MUST<T>(AbruptOr<T> abruptOr) where T : notnull
+    {
+        // 1. Let val be OperationName().
+
+        // 2. Assert: val is a normal completion.
+        Debug.Assert(!abruptOr.IsAbruptCompletion());
+
+        // 3. Set val to val.[[Value]].
+        return abruptOr.Value;
     }
 }

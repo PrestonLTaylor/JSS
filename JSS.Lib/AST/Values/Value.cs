@@ -118,7 +118,7 @@ public abstract class Value
             // FIXME: i. Return ? PrivateGet(baseObj, V.[[ReferencedName]]).
 
             // c. Return ? baseObj.[[Get]](V.[[ReferencedName]], FIXME: GetThisValue(V)).
-            var obj = baseObj.Value.AsObject();
+            var obj = baseObj.Value;
             return obj.Get(asReference.ReferencedName, obj);
         }
         // 4. Else,
@@ -168,12 +168,13 @@ public abstract class Value
         {
             // a. Let baseObj be ? ToObject(V.[[Base]]).
             var baseObj = reference.Base!.ToObject();
+            if (baseObj.IsAbruptCompletion()) return baseObj;
 
             // FIXME: b. If IsPrivateReference(V) is true, then
             // FIXME: i. Return ? PrivateSet(baseObj, V.[[ReferencedName]], W).
 
             // FIXME: c. Let succeeded be ? baseObj.[[Set]](V.[[ReferencedName]], W, FIXME: GetThisValue(V)).
-            var obj = baseObj.Value.AsObject();
+            var obj = baseObj.Value;
             var succeeded = obj.Set(reference.ReferencedName, W, obj);
             if (succeeded.IsAbruptCompletion()) return succeeded;
 
@@ -272,10 +273,10 @@ public abstract class Value
     }
 
     // 7.1.4 ToNumber ( argument ), https://tc39.es/ecma262/#sec-tonumber
-    internal Completion ToNumber()
+    internal AbruptOr<double> ToNumber()
     {
         // 1. If argument is a Number, return argument.
-        if (IsNumber()) return this;
+        if (IsNumber()) return AsNumber().Value;
 
         // FIXME: 2. If argument is either a Symbol or a BigInt, throw a TypeError exception.
 
@@ -304,7 +305,7 @@ public abstract class Value
             }
             catch (Exception)
             {
-                return Number.NaN;
+                return double.NaN;
             }
         }
 
@@ -316,21 +317,21 @@ public abstract class Value
     }
 
     // 7.1.6 ToInt32 ( argument ), https://tc39.es/ecma262/#sec-toint32
-    internal Completion ToInt32()
+    internal AbruptOr<int> ToInt32()
     {
         const long TWO_TO_32 = (long)uint.MaxValue + 1;
         const long TWO_TO_31 = (long)int.MaxValue + 1;
 
         // 1. Let number be ? ToNumber(argument).
         var number = ToNumber();
-        if (number.IsAbruptCompletion()) return number;
+        if (number.IsAbruptCompletion()) return number.Completion;
 
         // 2. If number is FIXME: not finite or number is either +0𝔽 FIXME: or -0𝔽, return +0𝔽.
-        var numberValue = number.Value.AsNumber();
-        if (numberValue.Value == 0.0) return 0;
+        var numberValue = number.Value;
+        if (numberValue == 0.0) return 0;
 
         // 3. Let int be truncate(ℝ(number)).
-        var @int = (long)numberValue.Value;
+        var @int = (long)numberValue;
 
         // 4. Let int32bit be int modulo 2**32.
         var int32bit = @int % TWO_TO_32;
@@ -341,20 +342,20 @@ public abstract class Value
     }
 
     // 7.1.7 ToUint32 ( argument ), https://tc39.es/ecma262/#sec-touint32
-    internal Completion ToUint32()
+    internal AbruptOr<uint> ToUint32()
     {
         const long TWO_TO_32 = (long)uint.MaxValue + 1;
 
         // 1. Let number be ? ToNumber(argument).
         var number = ToNumber();
-        if (number.IsAbruptCompletion()) return number;
+        if (number.IsAbruptCompletion()) return number.Completion;
 
         // 2. If number is FIXME: not finite or number is either +0𝔽 FIXME: or -0𝔽, return +0𝔽.
-        var numberValue = number.Value.AsNumber();
-        if (numberValue.Value == 0.0) return 0;
+        var numberValue = number.Value;
+        if (numberValue == 0.0) return 0;
 
         // 3. Let int be truncate(ℝ(number)).
-        var @int = (long)numberValue.Value;
+        var @int = (long)numberValue;
 
         // 4. Let int32bit be int modulo 2**32.
         var int32bit = @int % TWO_TO_32;
@@ -364,10 +365,10 @@ public abstract class Value
     }
 
     // 7.1.17 ToString ( argument ), https://tc39.es/ecma262/#sec-tostring
-    internal Completion ToStringJS()
+    internal AbruptOr<string> ToStringJS()
     {
         // 1. If argument is a String, return argument.
-        if (IsString()) return this;
+        if (IsString()) return AsString().Value;
 
         // FIXME: 2. If argument is a Symbol, throw a TypeError exception.
 
@@ -401,7 +402,7 @@ public abstract class Value
     }
 
     // 7.1.18 ToObject ( argument ), https://tc39.es/ecma262/#sec-toobject
-    internal Completion ToObject()
+    internal AbruptOr<Object> ToObject()
     {
         // Undefined, FIXME: Throw a TypeError exception.
         if (IsUndefined())
@@ -418,7 +419,7 @@ public abstract class Value
         // FIXME: Implement the rest of the conversions
 
         // Object, Return argument.
-        return this;
+        return AsObject();
     }
 
     // 7.1.19 ToPropertyKey ( argument ), https://tc39.es/ecma262/#sec-topropertykey
@@ -503,7 +504,7 @@ public abstract class Value
         throw new NotImplementedException();
     }
 
-    // 7.2.13 IsLessThan ( x, y, LeftFirst )
+    // 7.2.13 IsLessThan ( x, y, LeftFirst ), https://tc39.es/ecma262/#sec-islessthan
     static internal Completion IsLessThan(Value x, Value y, bool leftFirst)
     {
         Completion px;
@@ -653,23 +654,15 @@ public abstract class Value
         // 9. If x is a Boolean, return !IsLooselyEqual(!ToNumber(x), y).
         if (x.IsBoolean())
         {
-            var xAsNumber = x.ToNumber();
-            Debug.Assert(xAsNumber.IsNormalCompletion());
-
-            var result = IsLooselyEqual(xAsNumber.Value, y);
-            Debug.Assert(result.IsNormalCompletion());
-            return result;
+            var xAsNumber = MUST(x.ToNumber());
+            return MUST(IsLooselyEqual(xAsNumber, y));
         }
 
         // 10. If y is a Boolean, return !IsLooselyEqual(x, !ToNumber(y)).
         if (y.IsBoolean())
         {
-            var yAsNumber = y.ToNumber();
-            Debug.Assert(yAsNumber.IsNormalCompletion());
-
-            var result = IsLooselyEqual(x, yAsNumber.Value);
-            Debug.Assert(result.IsNormalCompletion());
-            return result;
+            var yAsNumber = MUST(y.ToNumber());
+            return MUST(IsLooselyEqual(x, yAsNumber));
         }
 
         // FIXME: 11. If x is either a String, a Number, a BigInt, or a Symbol and y is an Object, return !IsLooselyEqual(x, ? ToPrimitive(y)).

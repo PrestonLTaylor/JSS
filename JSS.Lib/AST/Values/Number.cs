@@ -38,12 +38,11 @@ public sealed class Number : Value
     static internal Number BitwiseNOT(Number x)
     {
         // 1. Let oldValue be ! ToInt32(x).
-        var oldValue = MUST(x.ToInt32()).AsNumber(); ;
+        var oldValue = MUST(x.ToInt32());
 
         // 2. Return the result of applying bitwise complement to oldValue.
         // The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
-        var result = ~(int)oldValue.Value;
-        return result;
+        return ~oldValue;
     }
 
     // 6.1.6.1.3 Number::exponentiate ( base, exponent ), https://tc39.es/ecma262/#sec-numeric-types-number-exponentiate
@@ -172,51 +171,51 @@ public sealed class Number : Value
     static internal Number LeftShift(Number x, Number y)
     {
         // 1. Let lnum be !ToInt32(x).
-        var lnum = MUST(x.ToInt32()).AsNumber();
+        var lnum = MUST(x.ToInt32());
 
         // 2. Let rnum be !ToUint32(y).
-        var rnum = MUST(y.ToUint32()).AsNumber();
+        var rnum = MUST(y.ToUint32());
 
         // 3. Let shiftCount be ℝ(rnum) modulo 32.
-        var shiftCount = (uint)rnum.Value % 32;
+        var shiftCount = rnum % 32;
 
         // 4. Return the result of left shifting lnum by shiftCount bits.
         // The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
-        return (int)lnum.Value << (int)shiftCount;
+        return lnum << (int)shiftCount;
     }
 
     // 6.1.6.1.10 Number::signedRightShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-signedRightShift
     static internal Number SignedRightShift(Number x, Number y)
     {
         // 1. Let lnum be !ToInt32(x).
-        var lnum = MUST(x.ToInt32()).AsNumber();
+        var lnum = MUST(x.ToInt32());
 
         // 2. Let rnum be !ToUint32(y).
-        var rnum = MUST(y.ToUint32()).AsNumber();
+        var rnum = MUST(y.ToUint32());
 
         // 3. Let shiftCount be ℝ(rnum) modulo 32.
-        var shiftCount = (uint)rnum.Value % 32;
+        var shiftCount = rnum % 32;
 
         // 4. Return the result of performing a sign-extending right shift of lnum by shiftCount bits.
         // The most significant bit is propagated.The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
-        return (int)lnum.Value >> (int)shiftCount;
+        return lnum >> (int)shiftCount;
     }
 
     // 6.1.6.1.11 Number::unsignedRightShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-unsignedRightShift
     static internal Number UnsignedRightShift(Number x, Number y)
     {
         // 1. Let lnum be !ToUint32(x).
-        var lnum = MUST(x.ToUint32()).AsNumber();
+        var lnum = MUST(x.ToUint32());
 
         // 2. Let rnum be !ToUint32(y).
-        var rnum = MUST(y.ToUint32()).AsNumber();
+        var rnum = MUST(y.ToUint32());
 
         // 3. Let shiftCount be ℝ(rnum) modulo 32.
-        var shiftCount = (uint)rnum.Value % 32;
+        var shiftCount = rnum % 32;
 
         // 4. Return the result of performing a zero-filling right shift of lnum by shiftCount bits.
         // Vacated bits are filled with zero. The mathematical value of the result is exactly representable as a 32-bit unsigned bit string.
-        return (int)lnum.Value >>> (int)shiftCount;
+        return lnum >>> (int)shiftCount;
     }
 
     // 6.1.6.1.12 Number::lessThan(x, y), https://tc39.es/ecma262/#sec-numeric-types-number-lessThan
@@ -276,16 +275,13 @@ public sealed class Number : Value
     static internal Number NumberBitwiseOp(BitwiseOp op, Number x, Number y)
     {
         // 1. Let lnum be !ToInt32(x).
-        var lnum = MUST(x.ToInt32()).AsNumber();
+        var lnum = MUST(x.ToInt32());
 
         // 2. Let rnum be !ToInt32(y).
-        var rnum = MUST(y.ToInt32()).AsNumber();
+        var rnum = MUST(y.ToInt32());
 
         // 3. Let lbits be the 32-bit two's complement bit string representing ℝ(lnum).
-        var lbits = (int)lnum.Value;
-
         // 4. Let rbits be the 32-bit two's complement bit string representing ℝ(rnum).
-        var rbits = (int)rnum.Value;
 
         // 5. If op is &, then
         // a. Let result be the result of applying the bitwise AND operation to lbits and rbits.
@@ -296,9 +292,9 @@ public sealed class Number : Value
         // b. Let result be the result of applying the bitwise inclusive OR operation to lbits and rbits.
         var result = op switch
         {
-            BitwiseOp.AND => lbits & rbits,
-            BitwiseOp.XOR => lbits ^ rbits,
-            BitwiseOp.OR => lbits | rbits,
+            BitwiseOp.AND => lnum & rnum,
+            BitwiseOp.XOR => lnum ^ rnum,
+            BitwiseOp.OR => lnum | rnum,
             _ => throw new InvalidOperationException(),
         };
 
