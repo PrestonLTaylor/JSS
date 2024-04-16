@@ -6,6 +6,7 @@ var completion = Realm.InitializeHostDefinedRealm(out VM globalVm);
 if (completion.IsAbruptCompletion())
 {
     Print.PrintCompletion(completion);
+    return;
 }
 
 while (true)
