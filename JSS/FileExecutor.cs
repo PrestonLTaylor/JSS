@@ -26,6 +26,7 @@ internal sealed class FileExecutor
             Print.PrintException(e);
         }
 
+        Console.WriteLine();
         Console.WriteLine("Press any key to exit.");
         Console.ReadKey();
     }
