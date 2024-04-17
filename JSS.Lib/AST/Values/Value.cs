@@ -13,7 +13,8 @@ public enum ValueType
     Number,
     BigInt,
     Object,
-    Function
+    Function,
+    Property
 }
 
 // FIXME: This is a very inefficient way of storing JS values.
@@ -36,6 +37,7 @@ public abstract class Value
     virtual public bool IsBigInt() { return false; }
     virtual public bool IsObject() { return false; }
     virtual public bool IsFunction() { return false; }
+    virtual public bool IsProperty() { return false; }
 
     public Reference AsReference()
     {
