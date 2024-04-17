@@ -75,6 +75,12 @@ public abstract class Value
         return (this as Object)!;
     }
 
+    internal Property AsProperty()
+    {
+        Debug.Assert(IsProperty());
+        return (this as Property)!;
+    }
+
     internal ICallable AsCallable()
     {
         Debug.Assert(HasInternalCall());
