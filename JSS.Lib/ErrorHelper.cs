@@ -3,6 +3,7 @@
 internal enum ErrorType
 {
     ConstWithoutInitializer,
+    IllegalNewLineAfterThrow,
     TryWithoutCatchOrFinally,
     UnaryLHSOfExponentiation,
     UnexpectedEOF,
@@ -35,10 +36,11 @@ internal sealed class ErrorHelper
     static private readonly Dictionary<ErrorType, string> errorTypeToFormatString = new()
     {
         { ErrorType.ConstWithoutInitializer, "SyntaxError: Missing initializer in const declaration" },
+        { ErrorType.IllegalNewLineAfterThrow, "SyntaxError: Illegal newline after throw" },
         { ErrorType.TryWithoutCatchOrFinally, "SyntaxError: Try statement without catch or finally blocks" },
         { ErrorType.UnaryLHSOfExponentiation, "SyntaxError: Unary operator as lhs of exponentiation expression. Consider using parenthesis to disambiguate precidence" },
-        { ErrorType.UnexpectedToken, "SyntaxError: Unexpected token '{0}'" },
         { ErrorType.UnexpectedEOF, "SyntaxError: Unexpected end of file" },
-        { ErrorType.UnknownSyntaxError, "SyntaxError: Unknown SyntaxError of type {0}" }
+        { ErrorType.UnexpectedToken, "SyntaxError: Unexpected token '{0}'" },
+        { ErrorType.UnknownSyntaxError, "SyntaxError: Unknown SyntaxError of type {0}" },
     };
 }

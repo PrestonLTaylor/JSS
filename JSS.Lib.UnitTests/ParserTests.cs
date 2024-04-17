@@ -897,6 +897,20 @@ internal sealed class ParserTests
         throwStatement!.ThrowExpression.Should().BeOfType(expectedExpressionType);
     }
 
+    [Test]
+    public void Parse_ThrowsSyntaxError_WhenProvidingThrow_WithNewLineBeforeExpression()
+    {
+        // Arrange
+        var parser = new Parser($"throw\n1");
+        var expectedError = ErrorHelper.CreateSyntaxError(ErrorType.IllegalNewLineAfterThrow);
+
+        // Act
+
+        // Assert
+        AssertThatSyntaxErrorMatchesExpected(parser, expectedError);
+    }
+
+
     // Tests for 14.15 The try Statement, https://tc39.es/ecma262/#sec-try-statement
     [Test]
     public void Parse_ReturnsTryStatement_WithParameterlessCatch_WhenProvidingTry_WithParameterlessCatch()

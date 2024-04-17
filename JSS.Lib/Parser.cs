@@ -1804,8 +1804,8 @@ public sealed class Parser
     {
         _consumer.ConsumeTokenOfType(TokenType.Throw);
 
-        // FIXME: throw [no LineTerminator here] Expression[+In, ?Yield, ?Await] ;
-        // Don't parse an expression if there is a line terminator after the return
+        if (_consumer.IsLineTerminator()) ErrorHelper.ThrowSyntaxError(ErrorType.IllegalNewLineAfterThrow);
+
         var throwExpression = ParseExpression();
 
         return new ThrowStatement(throwExpression);
