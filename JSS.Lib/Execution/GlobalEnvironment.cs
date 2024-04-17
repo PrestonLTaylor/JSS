@@ -165,7 +165,10 @@ internal sealed class GlobalEnvironment : Environment
         // 4. If existingProp is undefined, return false.
         if (existingProp.Value.IsUndefined()) return false;
 
-        // FIXME: 5. If existingProp.[[Configurable]] is true, return false.
+        // 5. If existingProp.[[Configurable]] is true, return false.
+        var asProperty = existingProp.Value.AsProperty();
+        if (asProperty.Attributes.Configurable) return false;
+
         // 6. Return true.
         return true;
     }
@@ -203,7 +206,10 @@ internal sealed class GlobalEnvironment : Environment
         // 4. If existingProp is undefined, FIXME: return ? IsExtensible(globalObject).
         if (existingProp.Value.IsUndefined()) return true;
 
-        // FIXME: 5. If existingProp.[[Configurable]] is true, return true.
+        // 5. If existingProp.[[Configurable]] is true, return true.
+        var asProperty = existingProp.Value.AsProperty();
+        if (asProperty.Attributes.Configurable) return true;
+
         // FIXME: 6. If IsDataDescriptor(existingProp) is true and existingProp has attribute values { [[Writable]]: true, [[Enumerable]]: true }, return true.
         // 7. Return false.
         return false;
@@ -256,9 +262,9 @@ internal sealed class GlobalEnvironment : Environment
         var existingProp = globalObject.GetOwnProperty(N);
         if (existingProp.IsAbruptCompletion()) return existingProp;
 
-        // 4. If existingProp is undefined FIXME: (or existingProp.[[Configurable]] is true), then
+        // 4. If existingProp is undefined or existingProp.[[Configurable]] is true, then
         Property desc;
-        if (existingProp.Value.IsUndefined())
+        if (existingProp.Value.IsUndefined() || existingProp.Value.AsProperty().Attributes.Configurable)
         {
             // a. Let desc be the PropertyDescriptor { [[Value]]: V, [[Writable]]: true, [[Enumerable]]: true, [[Configurable]]: D }.
             desc = new Property(V, new(true, true, D));
