@@ -754,6 +754,24 @@ internal sealed class ParserTests
         returnStatement!.ReturnExpression.Should().BeNull();
     }
 
+    [Test]
+    public void Parse_ReturnsReturnStatement_WithNoExpression_WhenProvidingReturn_WithNewLineThenExpression()
+    {
+        // Arrange
+        var parser = new Parser("return\n1");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(2);
+
+        var returnStatement = rootNodes[0] as ReturnStatement;
+        returnStatement.Should().NotBeNull();
+        returnStatement!.ReturnExpression.Should().BeNull();
+    }
+
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
     public void Parse_ReturnsReturnStatement_WhenProvidingReturn(KeyValuePair<string, Type> expressionToExpectedType)
     {
