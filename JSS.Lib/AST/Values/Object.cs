@@ -91,7 +91,7 @@ public class Object : Value
         return asCallable.Call(vm, V, (argumentsList as List)!);
     }
 
-    // 10.1.5 [[GetOwnProperty]] ( P )
+    // 10.1.5 [[GetOwnProperty]] ( P ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-getownproperty-p
     internal Completion GetOwnProperty(string P)
     {
         // 1. Return OrdinaryGetOwnProperty(O, P).
@@ -119,7 +119,7 @@ public class Object : Value
         // FIXME: 6. Set D.[[Enumerable]] to the value of X's [[Enumerable]] attribute.
         // FIXME: 7. Set D.[[Configurable]] to the value of X's [[Configurable]] attribute.
         // FIXME: 8. Return D.
-        return O.DataProperties[P].Value;
+        return O.DataProperties[P];
     }
 
     // 10.1.6 [[DefineOwnProperty]] ( P, Desc ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-defineownproperty-p-desc
