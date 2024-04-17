@@ -172,11 +172,18 @@ public class Object : Value
     // 10.1.8.1 OrdinaryGet ( O, P, Receiver ), https://tc39.es/ecma262/#sec-ordinaryget
     static internal Completion OrdinaryGet(Object O, string P, Object receiver)
     {
-        // FIXME: 1. Let desc be ? O.[[GetOwnProperty]](P).
-        // FIXME: 2. If desc is undefined, then
-        // FIXME: a. Let parent be ? O.[[GetPrototypeOf]]().
-        // FIXME: b. If parent is null, return undefined.
-        // FIXME: c. Return ? parent.[[Get]](P, Receiver).
+        // 1. Let desc be ? O.[[GetOwnProperty]](P).
+        var desc = O.GetOwnProperty(P);
+        if (desc.IsAbruptCompletion()) return desc;
+
+        // 2. If desc is undefined, then
+        if (desc.Value.IsUndefined())
+        {
+            // FIXME: a. Let parent be ? O.[[GetPrototypeOf]]().
+            // FIXME: b. If parent is null, return undefined.
+            // FIXME: c. Return ? parent.[[Get]](P, Receiver).
+            return Undefined.The;
+        }
 
         // FIXME: 3. If IsDataDescriptor(desc) is true, return desc.[[Value]].
         return O.DataProperties[P].Value;
