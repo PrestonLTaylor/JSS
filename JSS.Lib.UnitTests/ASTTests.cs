@@ -848,6 +848,38 @@ internal sealed class ASTTests
         shouldBeTrue!.Value.Should().BeTrue();
     }
 
+    [Test]
+    public void Properties_ShouldReturnUndefined_WhenReferecingProperty_ThatDoesntExist()
+    {
+        // Arrange
+        var script = ParseScript("let a = {}; a.b");
+
+        // Act
+        var actualCompletion = script.ScriptEvaluation();
+
+        // Assert
+        actualCompletion.IsNormalCompletion().Should().BeTrue();
+
+        var shouldBeTrue = actualCompletion.Value as Undefined;
+        shouldBeTrue.Should().NotBeNull();
+    }
+
+    [Test]
+    public void ComputedProperties_ShouldReturnUndefined_WhenReferecingProperty_ThatDoesntExist()
+    {
+        // Arrange
+        var script = ParseScript("let a = {}; a[\"b\"]");
+
+        // Act
+        var actualCompletion = script.ScriptEvaluation();
+
+        // Assert
+        actualCompletion.IsNormalCompletion().Should().BeTrue();
+
+        var shouldBeTrue = actualCompletion.Value as Undefined;
+        shouldBeTrue.Should().NotBeNull();
+    }
+
     // FIXME: We should have a different file for runtime tests
     [Test]
     public void TypeOf_ObjectConstructor_ReturnsAString_EqualToFunction()
