@@ -88,6 +88,11 @@ public sealed class Realm
     {
         Dictionary<string, Property> globalProperties = new();
 
+        // 19.1 Value Properties of the Global Object
+        // 19.1.4 undefined
+        globalProperties.Add("undefined", new Property(Undefined.The, new(false, false, false)));
+
+        // 19.3 Constructor Properties of the Global Object
         // 20.1.1 The Object Constructor, https://tc39.es/ecma262/#sec-object-constructor
         globalProperties.Add("Object", new Property(ObjectConstructor.The, new(true, false, true)));
 
