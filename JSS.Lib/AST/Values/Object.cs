@@ -153,13 +153,15 @@ public class Object : Value
         var hasOwn = O.GetOwnProperty(P);
         if (hasOwn.IsAbruptCompletion()) return hasOwn;
 
-        // FIXME: 2. If hasOwn is not undefined, return true.
-        return !hasOwn.Value.IsUndefined();
+        //  2. If hasOwn is not undefined, return true.
+        if (!hasOwn.Value.IsUndefined()) return true;
 
         // FIXME: 3. Let parent be ? O.[[GetPrototypeOf]]().
         // FIXME: 4. If parent is not null, then
         // FIXME: a. Return ? parent.[[HasProperty]](P).
-        // FIXME: 5. Return false.
+
+        // 5. Return false.
+        return false;
     }
 
     // 10.1.8 [[Get]] ( P, Receiver ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-get-p-receiver
