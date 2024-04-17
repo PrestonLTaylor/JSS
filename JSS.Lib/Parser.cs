@@ -1705,8 +1705,8 @@ public sealed class Parser
     {
         _consumer.ConsumeTokenOfType(TokenType.Return);
 
-        // FIXME: return [no LineTerminator here] Expression[+In, ?Yield, ?Await] ;
-        // Don't parse an expression if there is a line terminator after the return
+        if (_consumer.IsLineTerminator()) return new ReturnStatement(null);
+
         TryParseExpression(out IExpression? returnExpression);
         return new ReturnStatement(returnExpression);
     }
