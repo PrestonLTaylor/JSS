@@ -3,10 +3,11 @@ using JSS.Lib.Execution;
 
 namespace JSS.Lib.Runtime;
 
+// 20.1.2 Properties of the Object Constructor, https://tc39.es/ecma262/#sec-object-value
 internal class ObjectConstructor : Object, ICallable, IConstructable
 {
-    // FIXME: The Object constructor has a [[Prototype]] internal slot whose value is %Function.prototype%.
-    private ObjectConstructor() : base(null)
+    // The Object constructor has a [[Prototype]] internal slot whose value is %Function.prototype%.
+    private ObjectConstructor() : base(FunctionPrototype.The)
     {
         // The Object constructor has a "length" property whose value is 1𝔽.
         // FIXME: We should probably have a method for internally defining properties

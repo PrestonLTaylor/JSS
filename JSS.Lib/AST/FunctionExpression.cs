@@ -41,8 +41,8 @@ internal sealed class FunctionExpression : IExpression
 
         // FIXME: 4. Let sourceText be the source text matched by FunctionExpression.
 
-        // 5. Let closure be OrdinaryFunctionCreate(FIXME: %Function.prototype%, sourceText, FormalParameters, FunctionBody, NON-LEXICAL-THIS, env, privateEnv).
-        var closure = FunctionObject.OrdinaryFunctionCreate(ObjectPrototype.The, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, env!);
+        // 5. Let closure be OrdinaryFunctionCreate(%Function.prototype%, sourceText, FormalParameters, FunctionBody, NON-LEXICAL-THIS, env, privateEnv).
+        var closure = FunctionObject.OrdinaryFunctionCreate(FunctionPrototype.The, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, env!);
 
         // 6. Perform SetFunctionName(closure, name).
         closure.SetFunctionName(name);
@@ -73,8 +73,8 @@ internal sealed class FunctionExpression : IExpression
 
         // FIXME: 7. Let sourceText be the source text matched by FunctionExpression.
 
-        // 8. Let closure be OrdinaryFunctionCreate(FIXME: %Function.prototype%, sourceText, FormalParameters, FunctionBody, NON-LEXICAL-THIS, funcEnv, privateEnv).
-        var closure = FunctionObject.OrdinaryFunctionCreate(ObjectPrototype.The, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, funcEnv);
+        // 8. Let closure be OrdinaryFunctionCreate(%Function.prototype%, sourceText, FormalParameters, FunctionBody, NON-LEXICAL-THIS, funcEnv, privateEnv).
+        var closure = FunctionObject.OrdinaryFunctionCreate(FunctionPrototype.The, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, funcEnv);
 
         // 9. Perform SetFunctionName(closure, name).
         closure.SetFunctionName(name);
