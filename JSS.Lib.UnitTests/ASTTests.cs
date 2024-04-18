@@ -330,6 +330,10 @@ internal sealed class ASTTests
         CreateTryStatementTestCase("throw 1", "throw 2", "throw 3", 3, CompletionType.Throw),
         CreateTryStatementTestCase("1", "2", "throw 3", 3, CompletionType.Throw),
 
+        // Tests for TryStatements with a catch parameter
+        CreateTryCatchParameterTestCase("throw 1", "err", "err", 1, CompletionType.Normal),
+        CreateTryCatchParameterTestCase("throw 1", "err", "throw err", 1, CompletionType.Throw),
+
         // Tests for PostfixDecrementExpression
         CreatePostfixDecrementExpressionTestCase("null", 0),
         CreatePostfixDecrementExpressionTestCase("false", 0),
@@ -627,6 +631,12 @@ internal sealed class ASTTests
             testCode += $"finally {{ {finallyCode} }}";
         }
 
+        return new object[] { testCode, new Completion(type, expected, "") };
+    }
+
+    static private object[] CreateTryCatchParameterTestCase(string tryCode, string parameter, string catchCode, Value expected, CompletionType type)
+    {
+        string testCode = $"try {{ {tryCode} }} catch ({parameter}) {{ {catchCode} }}";
         return new object[] { testCode, new Completion(type, expected, "") };
     }
 
