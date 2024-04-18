@@ -170,9 +170,15 @@ public class Object : Value
         //  2. If hasOwn is not undefined, return true.
         if (!hasOwn.Value.IsUndefined()) return true;
 
-        // FIXME: 3. Let parent be ? O.[[GetPrototypeOf]]().
-        // FIXME: 4. If parent is not null, then
-        // FIXME: a. Return ? parent.[[HasProperty]](P).
+        // 3. Let parent be ? O.[[GetPrototypeOf]]().
+        var parent = O.GetPrototypeOf();
+
+        // 4. If parent is not null, then
+        if (parent is not null)
+        {
+            // a. Return ? parent.[[HasProperty]](P).
+            return parent.HasProperty(P);
+        }
 
         // 5. Return false.
         return false;
