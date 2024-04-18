@@ -201,10 +201,14 @@ public class Object : Value
         // 2. If desc is undefined, then
         if (desc.Value.IsUndefined())
         {
-            // FIXME: a. Let parent be ? O.[[GetPrototypeOf]]().
-            // FIXME: b. If parent is null, return undefined.
-            // FIXME: c. Return ? parent.[[Get]](P, Receiver).
-            return Undefined.The;
+            // a. Let parent be ? O.[[GetPrototypeOf]]().
+            var parent = O.GetPrototypeOf();
+
+            // b. If parent is null, return undefined.
+            if (parent is null) return Undefined.The;
+
+            // c. Return ? parent.[[Get]](P, Receiver).
+            return parent.Get(P, receiver);
         }
 
         // FIXME: 3. If IsDataDescriptor(desc) is true, return desc.[[Value]].
