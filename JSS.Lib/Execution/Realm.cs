@@ -120,6 +120,9 @@ public sealed class Realm
         Dictionary<string, Property> globalProperties = new();
 
         // 19.1 Value Properties of the Global Object
+        // 19.1.2 Infinity
+        globalProperties.Add("Infinity", new Property(Number.Infinity, new(false, false, false)));
+
         // 19.1.4 undefined
         globalProperties.Add("undefined", new Property(Undefined.The, new(false, false, false)));
 
