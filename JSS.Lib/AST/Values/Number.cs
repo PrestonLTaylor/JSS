@@ -332,5 +332,14 @@ public sealed class Number : Value
     }
     static readonly private Number _nan = double.NaN;
 
+    static internal Number Infinity
+    {
+        get
+        {
+            return _infinity;
+        }
+    }
+    static readonly private Number _infinity = double.PositiveInfinity;
+
     public double Value { get; }
 }
