@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using JSS.Lib.AST.Values;
+using System.Diagnostics;
 
 namespace JSS.Lib.Execution;
 
@@ -6,6 +7,30 @@ internal sealed class ScriptExecutionContext : ExecutionContext
 {
     public ScriptExecutionContext(Realm realm) : base(realm)
     {
+    }
+
+    // 8.6.2.1 InitializeBoundName ( name, value, environment ), https://tc39.es/ecma262/#sec-initializeboundname
+    static internal Completion InitializeBoundName(VM vm, string name, Value value, Value environment)
+    {
+        // 1. If environment is not undefined, then
+        if (!environment.IsUndefined())
+        {
+            // a. Perform ! environment.InitializeBinding(name, value).
+            var asEnvironment = environment.AsEnvironment();
+            MUST(asEnvironment.InitializeBinding(name, value));
+
+            // b. Return UNUSED.
+            return Empty.The;
+        }
+        else
+        {
+            // a. Let lhs be ? ResolveBinding(name).
+            var lhs = ResolveBinding(vm, name);
+            if (lhs.IsAbruptCompletion()) return lhs;
+
+            // b. Return ? PutValue(lhs, value).
+            return lhs.Value.PutValue(vm, value);
+        }
     }
 
     // 9.4.2 ResolveBinding ( name [ , env ] ), https://tc39.es/ecma262/#sec-resolvebinding

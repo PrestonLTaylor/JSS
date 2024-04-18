@@ -1,4 +1,5 @@
-﻿using JSS.Lib.Execution;
+﻿using JSS.Lib.AST.Values;
+using JSS.Lib.Execution;
 
 namespace JSS.Lib.AST;
 
@@ -15,6 +16,14 @@ internal sealed class Identifier : IExpression
     {
         // 1. Return a List whose sole element is the StringValue of Identifier.
         return new List<string> { Name };
+    }
+
+    // 8.6.2 Runtime Semantics: BindingInitialization, https://tc39.es/ecma262/#sec-runtime-semantics-bindinginitialization
+    public Completion BindingInitialization(VM vm, Value value, Value environment)
+    {
+        // 1. Let name be StringValue of Identifier.
+        // 2. Return ? InitializeBoundName(name, value, environment).
+        return ScriptExecutionContext.InitializeBoundName(vm, Name, value, environment);
     }
 
     // 13.1.3 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-identifiers-runtime-semantics-evaluation
