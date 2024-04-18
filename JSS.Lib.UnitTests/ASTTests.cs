@@ -1310,6 +1310,20 @@ internal sealed class ASTTests
         completion.Value.Should().Be(new String($"{identifier} is not defined"));
     }
 
+    [Test]
+    public void AssignmentExpreesion_ToFunctionExpression_SetsIdentifier_ToFunction()
+    {
+        // Arrange
+        var script = ParseScript("a = function() { return 1 }; a()");
+
+        // Act
+        var completion = script.ScriptEvaluation();
+
+        // Assert
+        completion.IsNormalCompletion().Should().BeTrue();
+        completion.Value.Should().Be(new Number(1));
+    }
+
     static private string EscapeString(string toEscape, char quote = '"')
     {
         return $"{quote}{toEscape}{quote}";
