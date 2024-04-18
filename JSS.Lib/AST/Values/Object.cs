@@ -7,7 +7,7 @@ public class Object : Value
 {
     internal Object(Object? prototype)
     {
-        Prototype = prototype ?? this;
+        Prototype = prototype;
         DataProperties = new();
     }
 
@@ -89,6 +89,20 @@ public class Object : Value
         // 3. Return ? F.[[Call]](V, argumentsList).
         var asCallable = F.AsCallable(); 
         return asCallable.Call(vm, V, (argumentsList as List)!);
+    }
+
+    // 10.1.1 [[GetPrototypeOf]] ( ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-getprototypeof
+    internal Object? GetPrototypeOf()
+    {
+        // 1. Return OrdinaryGetPrototypeOf(O).
+        return OrdinaryGetPrototypeOf(this);
+    }
+
+    // 10.1.1.1 OrdinaryGetPrototypeOf ( O ), https://tc39.es/ecma262/#sec-ordinarygetprototypeof
+    static internal Object? OrdinaryGetPrototypeOf(Object O)
+    {
+        // 1. Return O.[[Prototype]].
+        return O.Prototype;
     }
 
     // 10.1.5 [[GetOwnProperty]] ( P ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-getownproperty-p
@@ -222,6 +236,6 @@ public class Object : Value
     }
 
     // FIXME: Accessor Attributes
-    internal Object Prototype { get; }
+    internal Object? Prototype { get; }
     internal Dictionary<string, Property> DataProperties { get; }
 }
