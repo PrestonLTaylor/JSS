@@ -101,20 +101,42 @@ internal sealed class TryStatement : INode
 
     private Completion CatchClauseEvaluationWithParameter(VM vm, Value thrownValue)
     {
-        // FIXME: 1. Let oldEnv be the running execution context's LexicalEnvironment.
-        // FIXME: 2. Let catchEnv be NewDeclarativeEnvironment(oldEnv).
-        // FIXME: 3. For each element argName of the BoundNames of CatchParameter, do
-        // FIXME: a. Perform ! catchEnv.CreateMutableBinding(argName, false).
-        // FIXME: 4. Set the running execution context's LexicalEnvironment to catchEnv.
-        // FIXME: 5. Let status be Completion(BindingInitialization of CatchParameter with arguments thrownValue and catchEnv).
-        // FIXME: 6. If status is an abrupt completion, then
-        // FIXME: a. Set the running execution context's LexicalEnvironment to oldEnv.
-        // FIXME: b. Return ? status.
+        // 1. Let oldEnv be the running execution context's LexicalEnvironment.
+        var currentExecutionContext = (vm.CurrentExecutionContext as ScriptExecutionContext)!;
+        var oldEnv = currentExecutionContext.LexicalEnvironment;
+
+        // 2. Let catchEnv be NewDeclarativeEnvironment(oldEnv).
+        var catchEnv = new DeclarativeEnvironment(oldEnv);
+
+        // 3. For each element argName of the BoundNames of CatchParameter, do
+        var boundNames = CatchParameter!.BoundNames();
+        foreach (var argName in boundNames)
+        {
+            // a. Perform ! catchEnv.CreateMutableBinding(argName, false).
+            MUST(catchEnv.CreateMutableBinding(argName, false));
+        }
+
+        // 4. Set the running execution context's LexicalEnvironment to catchEnv.
+        currentExecutionContext.LexicalEnvironment = catchEnv;
+
+        // 5. Let status be Completion(BindingInitialization of CatchParameter with arguments thrownValue and catchEnv).
+        var status = CatchParameter.BindingInitialization(vm, thrownValue, catchEnv);
+
+        // 6. If status is an abrupt completion, then
+        if (status.IsAbruptCompletion())
+        {
+            // a. Set the running execution context's LexicalEnvironment to oldEnv.
+            currentExecutionContext.LexicalEnvironment = oldEnv;
+
+            // b. Return ? status.
+            return status;
+        }
 
         // 7. Let B be Completion(Evaluation of Block).
         var B = CatchBlock!.Evaluate(vm);
 
-        // FIXME: 8. Set the running execution context's LexicalEnvironment to oldEnv.
+        // 8. Set the running execution context's LexicalEnvironment to oldEnv.
+        currentExecutionContext.LexicalEnvironment = oldEnv;
 
         // 9. Return ? B.
         return B;
