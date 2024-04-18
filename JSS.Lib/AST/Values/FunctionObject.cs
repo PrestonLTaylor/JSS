@@ -187,7 +187,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         if (ConstructorKind == ConstructorKind.BASE)
         {
             // a. Let thisArgument be ? FIXME: OrdinaryCreateFromConstructor(newTarget, "%Object.prototype%").
-            thisArgument = new Object(ObjectPrototype.The);
+            thisArgument = new Object(vm.ObjectPrototype);
         }
 
         // 4. Let calleeContext be PrepareForOrdinaryCall(F, FIXME: newTarget).
@@ -314,7 +314,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
     }
 
     // 10.2.5 MakeConstructor ( F [ , writablePrototype [ , prototype ] ] ), https://tc39.es/ecma262/#sec-makeconstructor
-    public void MakeConstructor(bool? writiablePrototype = null, Object? prototype = null)
+    public void MakeConstructor(VM vm, bool? writiablePrototype = null, Object? prototype = null)
     {
         // NOTE: This is implemented using inheritance so these steps are done at compile time
         // FIXME: 1. If F is an ECMAScript function object, then
@@ -334,7 +334,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         if (prototype is null)
         {
             // a. Set prototype to OrdinaryObjectCreate(%Object.prototype%).
-            prototype = new Object(ObjectPrototype.The);
+            prototype = new Object(vm.ObjectPrototype);
 
             // b. Perform ! DefinePropertyOrThrow(prototype, "constructor", PropertyDescriptor { [[Value]]: F, [[Writable]]: writablePrototype, [[Enumerable]]: false, [[Configurable]]: true }).
             MUST(DefinePropertyOrThrow(prototype, "constructor", new(this, new(writiablePrototype.Value, false, true))));
@@ -630,7 +630,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             var fn = f.BoundNames().FirstOrDefault()!;
 
             // b. Let fo be InstantiateFunctionObject of f with arguments lexEnv and privateEnv.
-            var fo = f.InstantiateFunctionObject(lexEnv);
+            var fo = f.InstantiateFunctionObject(vm, lexEnv);
 
             // c. Perform ! varEnv.SetMutableBinding(fn, fo, false).
             MUST(varEnv.SetMutableBinding(fn, fo, false));

@@ -7,7 +7,11 @@ namespace JSS.Lib.Runtime;
 internal class ObjectConstructor : Object, ICallable, IConstructable
 {
     // The Object constructor has a [[Prototype]] internal slot whose value is %Function.prototype%.
-    private ObjectConstructor() : base(FunctionPrototype.The)
+    public ObjectConstructor(FunctionPrototype prototype) : base(prototype)
+    {
+    }
+
+    public void Initialize()
     {
         // The Object constructor has a "length" property whose value is 1𝔽.
         // FIXME: We should probably have a method for internally defining properties
@@ -30,19 +34,10 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
         var value = argumentList[0];
         if (value.IsUndefined() || value.IsNull())
         {
-            return new Object(ObjectPrototype.The);
+            return new Object(vm.ObjectPrototype);
         }
 
         // 3. Return ! ToObject(value).
         return MUST(value.ToObject());
     }
-
-    static public ObjectConstructor The
-    {
-        get
-        {
-            return _constructor;
-        }
-    }
-    static readonly private ObjectConstructor _constructor = new();
 }

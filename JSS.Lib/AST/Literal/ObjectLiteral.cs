@@ -1,5 +1,4 @@
 ﻿using JSS.Lib.Execution;
-using JSS.Lib.Runtime;
 
 namespace JSS.Lib.AST.Literal;
 
@@ -11,6 +10,6 @@ internal class ObjectLiteral : IExpression
     {
         // FIXME: Implement the rest of the evaluation when we parse property definitions
         // 1. Return OrdinaryObjectCreate(%Object.prototype%).
-        return new Object(ObjectPrototype.The);
+        return new Object(vm.ObjectPrototype);
     }
 }

@@ -23,7 +23,7 @@ internal sealed class FunctionDeclaration : Declaration
     }
 
     // 8.6.1 Runtime Semantics: InstantiateFunctionObject, https://tc39.es/ecma262/#sec-runtime-semantics-instantiatefunctionobject
-    public FunctionObject InstantiateFunctionObject(Environment env)
+    public FunctionObject InstantiateFunctionObject(VM vm, Environment env)
     {
         // NOTE/FIXME: This is the steps for InstantiateOrdinaryFunctionObject
 
@@ -32,13 +32,13 @@ internal sealed class FunctionDeclaration : Declaration
         // FIXME: 2. Let sourceText be the source text matched by FunctionDeclaration.
 
         // FIXME: 3. Let F be OrdinaryFunctionCreate(%Function.prototype%, sourceText, FormalParameters, FunctionBody, NON-LEXICAL-THIS, env, privateEnv).
-        var F = FunctionObject.OrdinaryFunctionCreate(FunctionPrototype.The, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, env);
+        var F = FunctionObject.OrdinaryFunctionCreate(vm.FunctionPrototype, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, env);
 
         // 4. Perform SetFunctionName(F, name).
         F.SetFunctionName(Identifier);
 
         // 5. Perform MakeConstructor(F).
-        F.MakeConstructor();
+        F.MakeConstructor(vm);
 
         // 6. Return F.
         return F;

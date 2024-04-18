@@ -21,7 +21,7 @@ internal sealed class Block : INode
         var blockEnv = new DeclarativeEnvironment(oldEnv);
 
         // 3. Perform BlockDeclarationInstantiation(StatementList, blockEnv).
-        BlockDeclarationInstantiation(blockEnv);
+        BlockDeclarationInstantiation(vm, blockEnv);
 
         // 4. Set the running execution context's LexicalEnvironment to blockEnv.
         currentExecutionContext.LexicalEnvironment = blockEnv;
@@ -37,7 +37,7 @@ internal sealed class Block : INode
     }
 
     // 14.2.3 BlockDeclarationInstantiation ( code, env ), https://tc39.es/ecma262/#sec-blockdeclarationinstantiation
-    private void BlockDeclarationInstantiation(DeclarativeEnvironment env)
+    private void BlockDeclarationInstantiation(VM vm, DeclarativeEnvironment env)
     {
         // 1. Let declarations be the LexicallyScopedDeclarations of code.
         var declarations = Statements.LexicallyScopedDeclarations();
@@ -72,7 +72,7 @@ internal sealed class Block : INode
 
                 // ii. Let fo be InstantiateFunctionObject of d with arguments env and privateEnv.
                 var f = d as FunctionDeclaration;
-                var fo = f!.InstantiateFunctionObject(env);
+                var fo = f!.InstantiateFunctionObject(vm, env);
 
                 // iii. Perform ! env.InitializeBinding(fn, fo). NOTE: This step is replaced in section B.3.2.6.
                 MUST(env.InitializeBinding(fn, fo));

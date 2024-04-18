@@ -68,7 +68,7 @@ internal sealed class BuiltinFunction : Object, ICallable, IConstructable
         realm ??= vm.Realm;
 
         // 2. If prototype is not present, set prototype to realm.[[Intrinsics]].[[%Function.prototype%]].
-        prototype ??= FunctionPrototype.The;
+        prototype ??= vm.FunctionPrototype;
 
         // 3. Let internalSlotsList be a List containing the names of all the internal slots that 10.3 requires for the built-in function object that is about to be created.
 
