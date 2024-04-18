@@ -1132,6 +1132,66 @@ internal sealed class ParserTests
         parameters[0].Name.Should().Be(expectedParameterIdentifier);
     }
 
+    // NOTE: Function expressions cannot be expression statements, so we have to also have an a node that parses an expression
+    [Test]
+    public void Parse_ReturnsAssignmentExpression_WithFunctionExpression_WhenProvidingAssignmentWithAFunctionExpression()
+    {
+        // Arrange
+        var parser = new Parser($"a = function() {{}}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var assignmentExpression = expressionStatement!.Expression as BasicAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
+
+        var functionExpression = assignmentExpression!.Rhs as FunctionExpression;
+        functionExpression.Should().NotBeNull();
+        functionExpression!.Identifier.Should().BeNull();
+        functionExpression.Body.Statements.Should().BeEmpty();
+
+        var parameters = functionExpression.Parameters;
+        parameters.Should().BeEmpty();
+    }
+
+    [Test]
+    public void Parse_ReturnsAssignmentExpression_WithFunctionExpression_WithAName_WhenProvidingAssignmentWithAFunctionExpression_WithAName()
+    {
+        // Arrange
+        const string expectedFunctionIdentifier = "expectedIdentifier";
+        const string expectedParameterIdentifier = "expectedFirstParameter";
+        var parser = new Parser($"a = function {expectedFunctionIdentifier}({expectedParameterIdentifier}) {{}}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var assignmentExpression = expressionStatement!.Expression as BasicAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
+
+        var functionExpression = assignmentExpression!.Rhs as FunctionExpression;
+        functionExpression.Should().NotBeNull();
+        functionExpression!.Identifier.Should().Be(expectedFunctionIdentifier);
+        functionExpression.Body.Statements.Should().BeEmpty();
+
+        var parameters = functionExpression.Parameters;
+        parameters.Should().HaveCount(1);
+        parameters[0].Name.Should().Be(expectedParameterIdentifier);
+    }
+
     // Tests for 15.7 Class Definitions, https://tc39.es/ecma262/#sec-class-definitions
     [Test]
     public void Parse_ReturnsEmptyClassDeclaration_WhenProvidingEmptyClass()
