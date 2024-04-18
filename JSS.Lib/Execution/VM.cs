@@ -1,4 +1,6 @@
-﻿namespace JSS.Lib.Execution;
+﻿using JSS.Lib.Runtime;
+
+namespace JSS.Lib.Execution;
 
 // NOTE: This isn't required in the spec but is a helper for executing code
 public sealed class VM
@@ -24,6 +26,10 @@ public sealed class VM
     }
 
     public Realm Realm { get; }
+
+    internal ObjectPrototype ObjectPrototype { get => Realm.ObjectPrototype; }
+    internal ObjectConstructor ObjectConstructor { get => Realm.ObjectConstructor; }
+    internal FunctionPrototype FunctionPrototype { get => Realm.FunctionPrototype; }
 
     internal ExecutionContext CurrentExecutionContext
     {

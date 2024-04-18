@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
+using JSS.Lib.Execution;
 
 namespace JSS.Lib.Runtime;
 
@@ -8,15 +9,10 @@ internal class ObjectPrototype : Object
     // The Object prototype object has a [[Prototype]] internal slot whose value is null.
     public ObjectPrototype() : base(null)
     {
-        DataProperties.Add("constructor", new Property(ObjectConstructor.The, new Attributes(true, false, true)));
     }
 
-    static public ObjectPrototype The
+    public void Initialize(Realm realm)
     {
-        get
-        {
-            return _prototype;
-        }
+        DataProperties.Add("constructor", new Property(realm.ObjectConstructor, new Attributes(true, false, true)));
     }
-    static readonly private ObjectPrototype _prototype = new();
 }

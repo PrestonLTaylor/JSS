@@ -227,7 +227,7 @@ public sealed class Script
             var fn = f.BoundNames().FirstOrDefault()!;
 
             // b. Let fo be InstantiateFunctionObject of f with arguments env FIXME: and privateEnv.
-            var fo = f.InstantiateFunctionObject(env);
+            var fo = f.InstantiateFunctionObject(VM, env);
 
             // c. Perform ? env.CreateGlobalFunctionBinding(fn, fo, false).
             var createResult = env.CreateGlobalFunctionBinding(fn, fo, false);

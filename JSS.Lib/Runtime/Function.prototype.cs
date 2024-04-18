@@ -4,16 +4,7 @@
 internal sealed class FunctionPrototype : Object
 {
     // The Function prototype has a [[Prototype]] internal slot whose value is %Object.prototype%.
-    public FunctionPrototype() : base(ObjectPrototype.The)
+    public FunctionPrototype(ObjectPrototype objectPrototype) : base(objectPrototype)
     {
     }
-
-    static public FunctionPrototype The
-    {
-        get
-        {
-            return _prototype;
-        }
-    }
-    static readonly private FunctionPrototype _prototype = new();
 }
