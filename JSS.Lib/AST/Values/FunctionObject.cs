@@ -336,7 +336,8 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             // a. Set prototype to OrdinaryObjectCreate(%Object.prototype%).
             prototype = new Object(ObjectPrototype.The);
 
-            // FIXME: b. Perform ! DefinePropertyOrThrow(prototype, "constructor", PropertyDescriptor { [[Value]]: F, [[Writable]]: writablePrototype, [[Enumerable]]: false, [[Configurable]]: true }).
+            // b. Perform ! DefinePropertyOrThrow(prototype, "constructor", PropertyDescriptor { [[Value]]: F, [[Writable]]: writablePrototype, [[Enumerable]]: false, [[Configurable]]: true }).
+            MUST(DefinePropertyOrThrow(prototype, "constructor", new(this, new(writiablePrototype.Value, false, true))));
         }
 
         // 6. Perform ! DefinePropertyOrThrow(F, "prototype", PropertyDescriptor { [[Value]]: prototype, [[Writable]]: writablePrototype, [[Enumerable]]: false, [[Configurable]]: false }).
