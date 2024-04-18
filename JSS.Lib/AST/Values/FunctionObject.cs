@@ -248,12 +248,13 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
     }
 
     // 10.2.3 OrdinaryFunctionCreate ( FIXME: functionPrototype, FIXME: sourceText, ParameterList, Body, thisMode, env, FIXME: privateEnv ), https://tc39.es/ecma262/#sec-ordinaryfunctioncreate
-    static public FunctionObject OrdinaryFunctionCreate(IReadOnlyList<Identifier> parameterList, StatementList body, LexicalThisMode thisMode, Environment env)
+    static public FunctionObject OrdinaryFunctionCreate(Object functionPrototype, IReadOnlyList<Identifier> parameterList, StatementList body, LexicalThisMode thisMode,
+        Environment env)
     {
         // 1. Let internalSlotsList be the internal slots listed in Table 30.
 
-        // FIXME: 2. Let F be OrdinaryObjectCreate(functionPrototype, internalSlotsList).
-        var f = new FunctionObject(null);
+        // 2. Let F be OrdinaryObjectCreate(functionPrototype, internalSlotsList).
+        var f = new FunctionObject(functionPrototype);
 
         // 3. Set F.[[Call]] to the definition specified in 10.2.1.
 
