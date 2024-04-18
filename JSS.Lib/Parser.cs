@@ -1262,6 +1262,11 @@ public sealed class Parser
             parsedExpression = ParseParenthesizedExpression();
             return true;
         }
+        if (IsFunctionDeclaration())
+        {
+            parsedExpression = ParseFunctionExpression();
+            return true;
+        }
 
         parsedExpression = null;
         return false;
@@ -1492,7 +1497,7 @@ public sealed class Parser
     // 14.5 Expression Statement, https://tc39.es/ecma262/#prod-ExpressionStatement
     private bool TryParseExpressionStatement(out INode? parsedExpressionStatement)
     {
-        if (IsAmbigiousForExpressionStatement())
+        if (IsAmbiguousForExpressionStatement())
         {
             parsedExpressionStatement = null;
             return false;
@@ -1508,7 +1513,8 @@ public sealed class Parser
         return true;
     }
 
-    private bool IsAmbigiousForExpressionStatement()
+    // For [lookahead ∉ { {, function, async [no LineTerminator here] function, class, let [ }]
+    private bool IsAmbiguousForExpressionStatement()
     {
         return _consumer.CanConsume() && _consumer.Peek().type switch
         {
@@ -1943,6 +1949,27 @@ public sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
         return new FunctionDeclaration(identifier.Name, parameters, body);
+    }
+
+    private FunctionExpression ParseFunctionExpression()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Function);
+
+        Identifier? identifier = IsIdentifier() ? ParseIdentifier() : null;
+
+        _consumer.ConsumeTokenOfType(TokenType.OpenParen);
+
+        var parameters = ParseFormalParameters();
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
+
+        _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
+
+        var body = ParseFunctionBody();
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
+
+        return new FunctionExpression(identifier?.Name, parameters, body);
     }
 
     private StatementList ParseFunctionBody()
