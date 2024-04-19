@@ -58,6 +58,36 @@ public sealed class Realm
         ErrorPrototype.Initialize(this);
         ErrorConstructor.Initialize(this);
 
+        EvalErrorPrototype = new(ErrorPrototype);
+        EvalErrorConstructor = new(ErrorConstructor);
+        EvalErrorPrototype.Initialize(EvalErrorConstructor, "EvalError");
+        EvalErrorConstructor.Initialize(EvalErrorPrototype, "EvalError");
+
+        RangeErrorPrototype = new(ErrorPrototype);
+        RangeErrorConstructor = new(ErrorConstructor);
+        RangeErrorPrototype.Initialize(RangeErrorConstructor, "RangeError");
+        RangeErrorConstructor.Initialize(RangeErrorPrototype, "RangeError");
+
+        ReferenceErrorPrototype = new(ErrorPrototype);
+        ReferenceErrorConstructor = new(ErrorConstructor);
+        ReferenceErrorPrototype.Initialize(ReferenceErrorConstructor, "ReferenceError");
+        ReferenceErrorConstructor.Initialize(ReferenceErrorPrototype, "ReferenceError");
+
+        SyntaxErrorPrototype = new(ErrorPrototype);
+        SyntaxErrorConstructor = new(ErrorConstructor);
+        SyntaxErrorPrototype.Initialize(SyntaxErrorConstructor, "SyntaxError");
+        SyntaxErrorConstructor.Initialize(SyntaxErrorPrototype, "SyntaxError");
+
+        TypeErrorPrototype = new(ErrorPrototype);
+        TypeErrorConstructor = new(ErrorConstructor);
+        TypeErrorPrototype.Initialize(TypeErrorConstructor, "TypeError");
+        TypeErrorConstructor.Initialize(TypeErrorPrototype, "TypeError");
+
+        URIErrorPrototype = new(ErrorPrototype);
+        URIErrorConstructor = new(ErrorConstructor);
+        URIErrorPrototype.Initialize(URIErrorConstructor, "URIError");
+        URIErrorConstructor.Initialize(URIErrorPrototype, "URIError");
+
         // FIMXE: 3. Perform AddRestrictedFunctionProperties(realmRec.[[Intrinsics]].[[%Function.prototype%]], realmRec).
 
         // 4. Return UNUSED.
@@ -135,6 +165,24 @@ public sealed class Realm
         // 20.5.1 The Error Constructor, https://tc39.es/ecma262/#sec-error-constructor
         globalProperties.Add("Error", new Property(ErrorConstructor, new(true, false, true)));
 
+        // 20.5.5.1 EvalError, https://tc39.es/ecma262/#sec-native-error-types-used-in-this-standard-evalerror
+        globalProperties.Add("EvalError", new Property(EvalErrorConstructor, new(true, false, true)));
+
+        // 20.5.5.2 RangeError, https://tc39.es/ecma262/#sec-native-error-types-used-in-this-standard-rangeerror
+        globalProperties.Add("RangeError", new Property(RangeErrorConstructor, new(true, false, true)));
+
+        // 20.5.5.3 ReferenceError, https://tc39.es/ecma262/#sec-native-error-types-used-in-this-standard-referenceerror
+        globalProperties.Add("ReferenceError", new Property(ReferenceErrorConstructor, new(true, false, true)));
+
+        // 20.5.5.4 SyntaxError, https://tc39.es/ecma262/#sec-native-error-types-used-in-this-standard-syntaxerror
+        globalProperties.Add("SyntaxError", new Property(SyntaxErrorConstructor, new(true, false, true)));
+
+        // 20.5.5.5 TypeError, https://tc39.es/ecma262/#sec-native-error-types-used-in-this-standard-typeerror
+        globalProperties.Add("TypeError", new Property(TypeErrorConstructor, new(true, false, true)));
+
+        // 20.5.5.6 URIError, https://tc39.es/ecma262/#sec-native-error-types-used-in-this-standard-urierror
+        globalProperties.Add("URIError", new Property(URIErrorConstructor, new(true, false, true)));
+
         // 20.1.1 The Object Constructor, https://tc39.es/ecma262/#sec-object-constructor
         globalProperties.Add("Object", new Property(ObjectConstructor, new(true, false, true)));
 
@@ -200,4 +248,16 @@ public sealed class Realm
     internal FunctionPrototype FunctionPrototype { get; private set; }
     internal ErrorPrototype ErrorPrototype { get; private set; }
     internal ErrorConstructor ErrorConstructor { get; private set; }
+    internal NativeErrorPrototype EvalErrorPrototype { get; private set; }
+    internal NativeErrorConstructor EvalErrorConstructor { get; private set; }
+    internal NativeErrorPrototype RangeErrorPrototype { get; private set; }
+    internal NativeErrorConstructor RangeErrorConstructor { get; private set; }
+    internal NativeErrorPrototype ReferenceErrorPrototype { get; private set; }
+    internal NativeErrorConstructor ReferenceErrorConstructor { get; private set; }
+    internal NativeErrorPrototype SyntaxErrorPrototype { get; private set; }
+    internal NativeErrorConstructor SyntaxErrorConstructor { get; private set; }
+    internal NativeErrorPrototype TypeErrorPrototype { get; private set; }
+    internal NativeErrorConstructor TypeErrorConstructor { get; private set; }
+    internal NativeErrorPrototype URIErrorPrototype { get; private set; }
+    internal NativeErrorConstructor URIErrorConstructor { get; private set; }
 }
