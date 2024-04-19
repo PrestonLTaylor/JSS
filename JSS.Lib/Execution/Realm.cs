@@ -31,7 +31,7 @@ public sealed class Realm
     }
 
     // 9.3.2 CreateIntrinsics ( realmRec ), https://tc39.es/ecma262/#sec-createintrinsics
-    [MemberNotNull(nameof(ObjectPrototype), nameof(FunctionPrototype), nameof(ObjectConstructor))]
+    [MemberNotNull(nameof(ObjectPrototype), nameof(FunctionPrototype), nameof(ObjectConstructor), nameof(ErrorPrototype))]
     private void CreateIntrinsics()
     {
         // 1. Set realmRec.[[Intrinsics]] to a new Record.
@@ -52,6 +52,9 @@ public sealed class Realm
 
         ObjectPrototype.Initialize(this);
         ObjectConstructor.Initialize();
+
+        ErrorPrototype = new(ObjectPrototype);
+        ErrorPrototype.Initialize();
 
         // FIMXE: 3. Perform AddRestrictedFunctionProperties(realmRec.[[Intrinsics]].[[%Function.prototype%]], realmRec).
 
@@ -190,4 +193,5 @@ public sealed class Realm
     internal ObjectPrototype ObjectPrototype { get; private set; }
     internal ObjectConstructor ObjectConstructor { get; private set; }
     internal FunctionPrototype FunctionPrototype { get; private set; }
+    internal ErrorPrototype ErrorPrototype { get; private set; }
 }
