@@ -20,7 +20,7 @@ internal sealed class ComputedPropertyExpression : IExpression
         if (baseReference.IsAbruptCompletion()) return baseReference;
 
         // 2. Let baseValue be ? GetValue(baseReference).
-        var baseValue = baseReference.Value.GetValue();
+        var baseValue = baseReference.Value.GetValue(vm);
         if (baseValue.IsAbruptCompletion()) return baseValue;
 
         // 3. If the source text matched by this MemberExpression is strict mode code, let strict be true; else let strict be false.
@@ -37,7 +37,7 @@ internal sealed class ComputedPropertyExpression : IExpression
         if (propertyNameReference.IsAbruptCompletion()) return propertyNameReference;
 
         // 2. Let propertyNameValue be ? GetValue(propertyNameReference).
-        var propertyNameValue = propertyNameReference.Value.GetValue();
+        var propertyNameValue = propertyNameReference.Value.GetValue(vm);
         if (propertyNameValue.IsAbruptCompletion()) return propertyNameValue;
 
         // 3. Let propertyKey be ? ToPropertyKey(propertyNameValue).

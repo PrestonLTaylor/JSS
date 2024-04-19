@@ -56,7 +56,7 @@ internal sealed class DoWhileStatement : INode
             if (exprRef.IsAbruptCompletion()) return exprRef;
 
             // e. Let exprValue be ? GetValue(exprRef).
-            var exprValue = exprRef.Value.GetValue();
+            var exprValue = exprRef.Value.GetValue(vm);
             if (exprValue.IsAbruptCompletion()) return exprValue;
             
             // f. If ToBoolean(exprValue) is false, return V.

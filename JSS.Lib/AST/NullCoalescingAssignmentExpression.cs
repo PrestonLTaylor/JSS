@@ -19,7 +19,7 @@ internal sealed class NullCoalescingAssignmentExpression : IExpression
         if (lref.IsAbruptCompletion()) return lref;
 
         // 2. Let lval be ? GetValue(lref).
-        var lval = lref.Value.GetValue();
+        var lval = lref.Value.GetValue(vm);
         if (lval.IsAbruptCompletion()) return lval;
 
         // 3. If lval is neither undefined nor null, return lval.
@@ -33,7 +33,7 @@ internal sealed class NullCoalescingAssignmentExpression : IExpression
         var rref = Rhs.Evaluate(vm);
 
         // b. Let rval be ? GetValue(rref).
-        var rval = rref.Value.GetValue();
+        var rval = rref.Value.GetValue(vm);
         if (rval.IsAbruptCompletion()) return rval;
 
         // 6. Perform ? PutValue(lref, rval).

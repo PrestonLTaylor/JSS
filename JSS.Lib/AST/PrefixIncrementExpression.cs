@@ -19,7 +19,7 @@ internal sealed class PrefixIncrementExpression : IExpression
         var expr = Expression.Evaluate(vm);
 
         // Let oldValue be ? ToNumeric(? GetValue(expr)).
-        var getResult = expr.Value.GetValue();
+        var getResult = expr.Value.GetValue(vm);
         if (getResult.IsAbruptCompletion()) return getResult;
 
         var oldValue = getResult.Value.ToNumeric();

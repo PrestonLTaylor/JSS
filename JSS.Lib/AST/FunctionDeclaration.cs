@@ -35,7 +35,7 @@ internal sealed class FunctionDeclaration : Declaration
         var F = FunctionObject.OrdinaryFunctionCreate(vm.FunctionPrototype, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, env);
 
         // 4. Perform SetFunctionName(F, name).
-        F.SetFunctionName(Identifier);
+        F.SetFunctionName(vm, Identifier);
 
         // 5. Perform MakeConstructor(F).
         F.MakeConstructor(vm);

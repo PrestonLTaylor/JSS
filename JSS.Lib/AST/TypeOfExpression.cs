@@ -31,7 +31,7 @@ internal sealed class TypeOfExpression : IExpression
         }
 
         // 3. Set val to ? GetValue(val).
-        val = val.Value.GetValue();
+        val = val.Value.GetValue(vm);
         if (val.IsAbruptCompletion()) return val;
 
         // 4. If val is undefined, return "undefined".

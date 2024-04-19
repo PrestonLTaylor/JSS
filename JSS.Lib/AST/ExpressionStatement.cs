@@ -18,7 +18,7 @@ internal sealed class ExpressionStatement : INode
         if (exprRef.IsAbruptCompletion()) return exprRef;
 
         // 2. Return ? GetValue(exprRef).
-        return exprRef.Value.GetValue();
+        return exprRef.Value.GetValue(vm);
     }
 
     public IExpression Expression { get; }

@@ -45,7 +45,7 @@ internal sealed class FunctionExpression : IExpression
         var closure = FunctionObject.OrdinaryFunctionCreate(vm.FunctionPrototype, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, env!);
 
         // 6. Perform SetFunctionName(closure, name).
-        closure.SetFunctionName(name);
+        closure.SetFunctionName(vm, name);
 
         // 7. Perform MakeConstructor(closure).
         closure.MakeConstructor(vm);
@@ -67,7 +67,7 @@ internal sealed class FunctionExpression : IExpression
         var funcEnv = new DeclarativeEnvironment(outerEnv);
 
         // 5. Perform ! funcEnv.CreateImmutableBinding(name, false).
-        MUST(funcEnv.CreateImmutableBinding(name, false));
+        MUST(funcEnv.CreateImmutableBinding(vm, name, false));
 
         // FIXME: 6. Let privateEnv be the running execution context's PrivateEnvironment.
 
@@ -77,13 +77,13 @@ internal sealed class FunctionExpression : IExpression
         var closure = FunctionObject.OrdinaryFunctionCreate(vm.FunctionPrototype, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, funcEnv);
 
         // 9. Perform SetFunctionName(closure, name).
-        closure.SetFunctionName(name);
+        closure.SetFunctionName(vm, name);
 
         // 10. Perform MakeConstructor(closure).
         closure.MakeConstructor(vm);
 
         // 11. Perform ! funcEnv.InitializeBinding(name, closure).
-        MUST(funcEnv.InitializeBinding(name, closure));
+        MUST(funcEnv.InitializeBinding(vm, name, closure));
 
         // 12. Return closure.
         return closure;

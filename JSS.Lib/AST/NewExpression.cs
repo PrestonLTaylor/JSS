@@ -26,7 +26,7 @@ internal sealed class NewExpression : IExpression
         if (constructorRef.IsAbruptCompletion()) return constructorRef;
 
         // 2. Let constructor be ? GetValue(ref).
-        var constructor = constructorRef.Value.GetValue();
+        var constructor = constructorRef.Value.GetValue(vm);
         if (constructor.IsAbruptCompletion()) return constructor;
 
         // FIXME: 3. If arguments is EMPTY, then
@@ -40,15 +40,15 @@ internal sealed class NewExpression : IExpression
             var argRef = argument.Evaluate(vm);
             if (argRef.IsAbruptCompletion()) return argRef;
 
-            var argValue = argRef.Value.GetValue();
+            var argValue = argRef.Value.GetValue(vm);
             if (argValue.IsAbruptCompletion()) return argValue;
             argList.Add(argValue.Value);
         }
 
-        // 5. If IsConstructor(constructor) is false, FIXME: throw a TypeError exception.
+        // 5. If IsConstructor(constructor) is false, throw a TypeError exception.
         if (!constructor.Value.IsConstructor())
         {
-            return Completion.ThrowCompletion("Tried to construct from a non-constructable");
+            return ThrowTypeError(vm, RuntimeErrorType.ConstructingFromNonConstructor, constructor.Value.GetType());
         }
 
         // 6. Return ? Construct(constructor, argList).

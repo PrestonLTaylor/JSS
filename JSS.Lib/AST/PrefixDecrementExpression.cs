@@ -20,7 +20,7 @@ internal sealed class PrefixDecrementExpression : IExpression
         if (expr.IsAbruptCompletion()) return expr;
 
         // 2. Let oldValue be ? ToNumeric(? GetValue(expr)).
-        var getResult = expr.Value.GetValue();
+        var getResult = expr.Value.GetValue(vm);
         if (getResult.IsAbruptCompletion()) return getResult;
 
         var oldValue = getResult.Value.ToNumeric();

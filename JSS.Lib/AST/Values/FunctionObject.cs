@@ -140,7 +140,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             else
             {
                 // i. Let thisValue be ! ToObject(thisArgument).
-                thisValue = MUST(thisArgument.ToObject());
+                thisValue = MUST(thisArgument.ToObject(vm));
 
                 // ii. NOTE: ToObject produces wrapper objects using calleeRealm.
             }
@@ -153,7 +153,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
 
         // 9. Perform ! localEnv.BindThisValue(thisValue).
         var localFunctionEnv = localEnv as FunctionEnvironment;
-        MUST(localFunctionEnv!.BindThisValue(thisValue));
+        MUST(localFunctionEnv!.BindThisValue(vm, thisValue));
 
         // 10. Return UNUSED.
     }
@@ -226,8 +226,8 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             // b. If kind is BASE, return thisArgument.
             if (ConstructorKind == ConstructorKind.BASE) return thisArgument;
 
-            // c. If result.[[Value]] is not undefined, throw a FIXME: TypeError exception.
-            if (!result.Value.IsUndefined()) return Completion.ThrowCompletion("Function constructor without kind of base did not return an object/undefined");
+            // c. If result.[[Value]] is not undefined, throw a TypeError exception.
+            if (!result.Value.IsUndefined()) return ThrowTypeError(vm, RuntimeErrorType.FunctionConstructWithKindBaseNotReturningObject);
         }
         // 11. Else,
         else
@@ -237,7 +237,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         }
 
         // 12. Let thisBinding be ? constructorEnv.GetThisBinding().
-        var thisBinding = constructorEnv!.GetThisBinding();
+        var thisBinding = constructorEnv!.GetThisBinding(vm);
         if (thisBinding.IsAbruptCompletion()) return thisBinding;
 
         // 13. Assert: thisBinding is an Object.
@@ -337,17 +337,17 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             prototype = new Object(vm.ObjectPrototype);
 
             // b. Perform ! DefinePropertyOrThrow(prototype, "constructor", PropertyDescriptor { [[Value]]: F, [[Writable]]: writablePrototype, [[Enumerable]]: false, [[Configurable]]: true }).
-            MUST(DefinePropertyOrThrow(prototype, "constructor", new(this, new(writiablePrototype.Value, false, true))));
+            MUST(DefinePropertyOrThrow(vm, prototype, "constructor", new(this, new(writiablePrototype.Value, false, true))));
         }
 
         // 6. Perform ! DefinePropertyOrThrow(F, "prototype", PropertyDescriptor { [[Value]]: prototype, [[Writable]]: writablePrototype, [[Enumerable]]: false, [[Configurable]]: false }).
-        MUST(DefinePropertyOrThrow(this, "prototype", new(prototype, new(writiablePrototype.Value, false, false))));
+        MUST(DefinePropertyOrThrow(vm, this, "prototype", new(prototype, new(writiablePrototype.Value, false, false))));
 
         // 7. Return UNUSED.
     }
 
     // 10.2.9 SetFunctionName ( F, name [ , prefix ] ), https://tc39.es/ecma262/#sec-setfunctionname
-    public void SetFunctionName(string name, string prefix = "")
+    public void SetFunctionName(VM vm, string name, string prefix = "")
     {
         // 1. Assert: FIXME: (F is an extensible object) that does not have a "name" own property.
         Debug.Assert(!DataProperties.ContainsKey("name"));
@@ -372,7 +372,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         }
 
         // 6. Perform ! DefinePropertyOrThrow(F, "name", PropertyDescriptor { [[Value]]: name, [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: true }).
-        MUST(DefinePropertyOrThrow(this, "name", new Property(name, new Attributes(false, false, true))));
+        MUST(DefinePropertyOrThrow(vm, this, "name", new Property(name, new Attributes(false, false, true))));
 
         // 7. Return unused.
     }
@@ -488,13 +488,13 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             if (!alreadyDeclared)
             {
                 // i. Perform ! env.CreateMutableBinding(paramName, false).
-                MUST(env.CreateMutableBinding(paramName, false));
+                MUST(env.CreateMutableBinding(vm, paramName, false));
 
                 // ii. If hasDuplicates is true, then
                 if (hasDuplicates)
                 {
                     // 1. Perform ! env.InitializeBinding(paramName, undefined).
-                    MUST(env.InitializeBinding(paramName, Undefined.The));
+                    MUST(env.InitializeBinding(vm, paramName, Undefined.The));
                 }
             }
         }
@@ -523,7 +523,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         // FIXME: a. Perform ? IteratorBindingInitialization of formals with arguments iteratorRecord and env.
         for (int i = 0; i < Math.Min(FormalParameters.Count, argumentsList.Values.Count); ++i)
         {
-            MUST(env.InitializeBinding(FormalParameters[i].Name, argumentsList.Values[i]));
+            MUST(env.InitializeBinding(vm, FormalParameters[i].Name, argumentsList.Values[i]));
         }
 
         // FIXME: 27. If hasParameterExpressions is false, then
@@ -557,7 +557,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
                 instantiatedVarNames.Add(n);
 
                 // 2. Perform ! varEnv.CreateMutableBinding(n, false).
-                MUST(varEnv.CreateMutableBinding(n, false));
+                MUST(varEnv.CreateMutableBinding(vm, n, false));
 
                 // 3. If parameterBindings does not contain n, or if functionNames contains n, then
                 Value initialValue;
@@ -570,11 +570,11 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
                 else
                 {
                     // a. Let initialValue be ! env.GetBindingValue(n, false).
-                    initialValue = MUST(env.GetBindingValue(n, false));
+                    initialValue = MUST(env.GetBindingValue(vm, n, false));
                 }
 
                 // 5. Perform ! varEnv.InitializeBinding(n, initialValue).
-                MUST(varEnv.InitializeBinding(n, initialValue));
+                MUST(varEnv.InitializeBinding(vm, n, initialValue));
 
                 // 6. NOTE: A var with the same name as a formal parameter initially has the same value as the corresponding initialized parameter.
             }
@@ -610,13 +610,13 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
                 if (d is ConstDeclaration)
                 {
                     // 1. Perform ! lexEnv.CreateImmutableBinding(dn, true).
-                    MUST(lexEnv.CreateImmutableBinding(dn, true));
+                    MUST(lexEnv.CreateImmutableBinding(vm, dn, true));
                 }
                 // ii. Else,
                 else
                 {
                     // 1. Perform ! lexEnv.CreateMutableBinding(dn, false).
-                    MUST(lexEnv.CreateMutableBinding(dn, false));
+                    MUST(lexEnv.CreateMutableBinding(vm, dn, false));
                 }
             }
         }
@@ -633,7 +633,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             var fo = f.InstantiateFunctionObject(vm, lexEnv);
 
             // c. Perform ! varEnv.SetMutableBinding(fn, fo, false).
-            MUST(varEnv.SetMutableBinding(fn, fo, false));
+            MUST(varEnv.SetMutableBinding(vm, fn, fo, false));
         }
 
         // 37. Return UNUSED.

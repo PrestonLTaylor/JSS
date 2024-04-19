@@ -29,7 +29,7 @@ internal sealed class BasicAssignmentExpression : IExpression
         if (rref.IsAbruptCompletion()) return rref;
 
         // ii. Let rval be ? GetValue(rref).
-        var rval = rref.Value.GetValue();
+        var rval = rref.Value.GetValue(vm);
         if (rval.IsAbruptCompletion()) return rval;
 
         // d. Perform ? PutValue(lref, rval).

@@ -113,7 +113,7 @@ internal sealed class TryStatement : INode
         foreach (var argName in boundNames)
         {
             // a. Perform ! catchEnv.CreateMutableBinding(argName, false).
-            MUST(catchEnv.CreateMutableBinding(argName, false));
+            MUST(catchEnv.CreateMutableBinding(vm, argName, false));
         }
 
         // 4. Set the running execution context's LexicalEnvironment to catchEnv.

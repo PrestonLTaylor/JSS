@@ -41,7 +41,7 @@ internal sealed class WhileStatement : INode
             if (exprRef.IsAbruptCompletion()) return exprRef;
 
             // b. Let exprValue be ? GetValue(exprRef).
-            var exprValue = exprRef.Value.GetValue();
+            var exprValue = exprRef.Value.GetValue(vm);
             if (exprValue.IsAbruptCompletion()) return exprValue;
 
             // c. If ToBoolean(exprValue) is false, return V.

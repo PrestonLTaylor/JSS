@@ -19,7 +19,7 @@ internal sealed class LogicalOrAssignmentExpression : IExpression
         if (lref.IsAbruptCompletion()) return lref;
 
         // 2. Let lval be ? GetValue(lref).
-        var lval = lref.Value.GetValue();
+        var lval = lref.Value.GetValue(vm);
         if (lval.IsAbruptCompletion()) return lval;
 
         // 3. Let lbool be ToBoolean(lval).
@@ -37,7 +37,7 @@ internal sealed class LogicalOrAssignmentExpression : IExpression
         if (rref.IsAbruptCompletion()) return rref;
 
         // b. Let rval be ? GetValue(rref).
-        var rval = rref.Value.GetValue();
+        var rval = rref.Value.GetValue(vm);
         if (rval.IsAbruptCompletion()) return rval;
 
         // 7. Perform ? PutValue(lref, rval).

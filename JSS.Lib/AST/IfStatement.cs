@@ -65,7 +65,7 @@ internal sealed class IfStatement : INode
         if (exprRef.IsAbruptCompletion()) return exprRef;
 
         // 2. Let exprValue be ToBoolean(? GetValue(exprRef)).
-        var getResult = exprRef.Value.GetValue();
+        var getResult = exprRef.Value.GetValue(vm);
         if (getResult.IsAbruptCompletion()) return getResult;
 
         var exprValue = getResult.Value.ToBoolean();
@@ -95,7 +95,7 @@ internal sealed class IfStatement : INode
         if (exprRef.IsAbruptCompletion()) return exprRef;
 
         // 2. Let exprValue be ToBoolean(? GetValue(exprRef)).
-        var getResult = exprRef.Value.GetValue();
+        var getResult = exprRef.Value.GetValue(vm);
         if (getResult.IsAbruptCompletion()) return getResult;
 
         var exprValue = getResult.Value.ToBoolean();

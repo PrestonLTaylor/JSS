@@ -37,7 +37,7 @@ internal sealed class ReturnStatement : INode
         if (exprRef.IsAbruptCompletion()) return exprRef;
 
         // 2. Let exprValue be ? GetValue(exprRef).
-        var exprValue = exprRef.Value.GetValue();
+        var exprValue = exprRef.Value.GetValue(vm);
         if (exprValue.IsAbruptCompletion()) return exprValue;
 
         // FIXME: 3. If GetGeneratorKind() is ASYNC, set exprValue to ? Await(exprValue).

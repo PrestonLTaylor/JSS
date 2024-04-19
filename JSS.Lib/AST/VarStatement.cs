@@ -70,7 +70,7 @@ internal sealed class VarStatement : INode
         if (rhs.IsAbruptCompletion()) return rhs;
 
         // b. Let value be ? GetValue(rhs).
-        var value = rhs.Value.GetValue();
+        var value = rhs.Value.GetValue(vm);
         if (value.IsAbruptCompletion()) return value;
 
         // 5. Perform ? PutValue(lhs, value).

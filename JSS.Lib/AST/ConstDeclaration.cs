@@ -35,12 +35,12 @@ internal sealed class ConstDeclaration : Declaration
         if (rhs.IsAbruptCompletion()) return rhs;
 
         // b. Let value be ? GetValue(rhs).
-        var value = rhs.Value.GetValue();
+        var value = rhs.Value.GetValue(vm);
         if (value.IsAbruptCompletion()) return value;
 
         // 5. Perform ! InitializeReferencedBinding(lhs, value).
         var asReference = lhs.AsReference();
-        MUST(asReference.InitializeReferencedBinding(value.Value));
+        MUST(asReference.InitializeReferencedBinding(vm, value.Value));
 
         // 6. Return EMPTY.
         return Empty.The;

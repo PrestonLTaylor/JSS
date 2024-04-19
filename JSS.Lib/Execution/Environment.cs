@@ -10,16 +10,16 @@ internal abstract class Environment : Value
 
     // Abstract Methods of Environment Records, https://tc39.es/ecma262/#table-abstract-methods-of-environment-records
     virtual public bool HasBinding(string N) { throw new NotImplementedException(); }
-    virtual public Completion CreateMutableBinding(string N, bool D) { throw new NotImplementedException(); }
-    virtual public Completion CreateImmutableBinding(string N, bool S) { throw new NotImplementedException(); }
-    virtual public Completion InitializeBinding(string N, Value V) { throw new NotImplementedException(); }
-    virtual public Completion SetMutableBinding(string N, Value V, bool S) { throw new NotImplementedException(); }
-    virtual public Completion GetBindingValue(string N, bool S) { throw new NotImplementedException(); }
+    virtual public Completion CreateMutableBinding(VM vm, string N, bool D) { throw new NotImplementedException(); }
+    virtual public Completion CreateImmutableBinding(VM vm, string N, bool S) { throw new NotImplementedException(); }
+    virtual public Completion InitializeBinding(VM vm, string N, Value V) { throw new NotImplementedException(); }
+    virtual public Completion SetMutableBinding(VM vm, string N, Value V, bool S) { throw new NotImplementedException(); }
+    virtual public Completion GetBindingValue(VM vm, string N, bool S) { throw new NotImplementedException(); }
     virtual public Completion DeleteBinding(string N) { throw new NotImplementedException(); }
     abstract public bool HasThisBinding();
     virtual public bool HasSuperBinding() { throw new NotImplementedException(); }
     virtual public Value WithBaseObject() { throw new NotImplementedException(); }
-    virtual public Completion GetThisBinding() { throw new InvalidOperationException(); }
+    virtual public Completion GetThisBinding(VM vm) { throw new InvalidOperationException(); }
 
     // 9.1.2.1 GetIdentifierReference( env, name, FIXME: strict ), https://tc39.es/ecma262/#sec-getidentifierreference
     static public Completion GetIdentifierReference(Environment? env, string name)

@@ -48,36 +48,36 @@ internal sealed class GlobalEnvironment : Environment
     }
 
     // 9.1.1.4.2 CreateMutableBinding ( N, D ), https://tc39.es/ecma262/#sec-global-environment-records-createimmutablebinding-n-s
-    override public Completion CreateMutableBinding(string N, bool D)
+    override public Completion CreateMutableBinding(VM vm, string N, bool D)
     {
         // 1. Let DclRec be envRec.[[DeclarativeRecord]].
         // 2. If ! DclRec.HasBinding(N) is true, throw a TypeError exception.
-        if (DeclarativeRecord.HasBinding(N)) return Completion.ThrowCompletion($"redeclaration of mutable binding {N}");
+        if (DeclarativeRecord.HasBinding(N)) return ThrowTypeError(vm, RuntimeErrorType.RedeclarationOfMutableBinding, N);
 
         // 3. Return ! DclRec.CreateMutableBinding(N, D).
-        return MUST(DeclarativeRecord.CreateMutableBinding(N, D));
+        return MUST(DeclarativeRecord.CreateMutableBinding(vm, N, D));
     }
 
     // 9.1.1.4.3 CreateImmutableBinding ( N, S ), https://tc39.es/ecma262/#sec-global-environment-records-createimmutablebinding-n-s
-    override public Completion CreateImmutableBinding(string N, bool S)
+    override public Completion CreateImmutableBinding(VM vm, string N, bool S)
     {
         // 1. Let DclRec be envRec.[[DeclarativeRecord]].
         // 2. If ! DclRec.HasBinding(N) is true, throw a TypeError exception.
-        if (DeclarativeRecord.HasBinding(N)) return Completion.ThrowCompletion($"redeclaration of immutable binding {N}");
+        if (DeclarativeRecord.HasBinding(N)) return ThrowTypeError(vm, RuntimeErrorType.RedeclarationOfImmutableBinding, N);
 
         // 3. Return ! DclRec.CreateImmutableBinding(N, S).
-        return MUST(DeclarativeRecord.CreateImmutableBinding(N, S));
+        return MUST(DeclarativeRecord.CreateImmutableBinding(vm, N, S));
     }
 
     // 9.1.1.4.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-global-environment-records-initializebinding-n-v
-    override public Completion InitializeBinding(string N, Value V)
+    override public Completion InitializeBinding(VM vm, string N, Value V)
     {
         // 1. Let DclRec be envRec.[[DeclarativeRecord]].
         // 2. If ! DclRec.HasBinding(N) is true, then
         if (DeclarativeRecord.HasBinding(N))
         {
             // a. Return ! DclRec.InitializeBinding(N, V).
-            return MUST(DeclarativeRecord.InitializeBinding(N, V));
+            return MUST(DeclarativeRecord.InitializeBinding(vm, N, V));
         }
 
         // 3. Assert: If the binding exists, it must be in the Object Environment Record.
@@ -85,39 +85,39 @@ internal sealed class GlobalEnvironment : Environment
 
         // 4. Let ObjRec be envRec.[[ObjectRecord]].
         // 5. Return ? ObjRec.InitializeBinding(N, V).
-        return ObjectRecord.InitializeBinding(N, V);
+        return ObjectRecord.InitializeBinding(vm, N, V);
     }
 
     // 9.1.1.4.5 SetMutableBinding ( N, V, S ), https://tc39.es/ecma262/#sec-global-environment-records-setmutablebinding-n-v-s
-    override public Completion SetMutableBinding(string N, Value V, bool S)
+    override public Completion SetMutableBinding(VM vm, string N, Value V, bool S)
     {
         // 1. Let DclRec be envRec.[[DeclarativeRecord]].
         // 2. If ! DclRec.HasBinding(N) is true, then
         if (DeclarativeRecord.HasBinding(N))
         {
             // a. Return ? DclRec.SetMutableBinding(N, V, S).
-            return DeclarativeRecord.SetMutableBinding(N, V, S);
+            return DeclarativeRecord.SetMutableBinding(vm, N, V, S);
         }
 
         // 3. Let ObjRec be envRec.[[ObjectRecord]].
         // 4. Return ? ObjRec.SetMutableBinding(N, V, S).
-        return ObjectRecord.SetMutableBinding(N, V, S);
+        return ObjectRecord.SetMutableBinding(vm, N, V, S);
     }
 
     // 9.1.1.4.6 GetBindingValue ( N, S ), https://tc39.es/ecma262/#sec-global-environment-records-getbindingvalue-n-s
-    override public Completion GetBindingValue(string N, bool S)
+    override public Completion GetBindingValue(VM vm, string N, bool S)
     {
         // 1. Let DclRec be envRec.[[DeclarativeRecord]].
         // 2. If ! DclRec.HasBinding(N) is true, then
         if (DeclarativeRecord.HasBinding(N))
         {
             // a. Return ? DclRec.GetBindingValue(N, S).
-            return DeclarativeRecord.GetBindingValue(N, S);
+            return DeclarativeRecord.GetBindingValue(vm, N, S);
         }
 
         // 3. Let ObjRec be envRec.[[ObjectRecord]].
         // 4. Return ? ObjRec.GetBindingValue(N, S).
-        return ObjectRecord.GetBindingValue(N, S);
+        return ObjectRecord.GetBindingValue(vm, N, S);
     }
 
     // 9.1.1.4.8 HasThisBinding ( ), https://tc39.es/ecma262/#sec-global-environment-records-hasthisbinding
@@ -128,7 +128,7 @@ internal sealed class GlobalEnvironment : Environment
     }
 
     // 9.1.1.4.11 GetThisBinding ( ), https://tc39.es/ecma262/#sec-global-environment-records-getthisbinding
-    public override Completion GetThisBinding()
+    public override Completion GetThisBinding(VM _)
     {
         // 1. Return envRec.[[GlobalThisValue]].
         return GlobalThisValue;
@@ -216,7 +216,7 @@ internal sealed class GlobalEnvironment : Environment
     }
 
     // 9.1.1.4.17 CreateGlobalVarBinding ( N, D ), https://tc39.es/ecma262/#sec-createglobalvarbinding
-    public Completion CreateGlobalVarBinding(string N, bool D)
+    public Completion CreateGlobalVarBinding(VM vm, string N, bool D)
     {
         // 1. Let ObjRec be envRec.[[ObjectRecord]].
         // 2. Let globalObject be ObjRec.[[BindingObject]].
@@ -232,11 +232,11 @@ internal sealed class GlobalEnvironment : Environment
         if (!asBoolean.Value)
         {
             // a. Perform ? ObjRec.CreateMutableBinding(N, D).
-            var createResult = ObjectRecord.CreateMutableBinding(N, D);
+            var createResult = ObjectRecord.CreateMutableBinding(vm, N, D);
             if (createResult.IsAbruptCompletion()) return createResult;
 
             // b. Perform ? ObjRec.InitializeBinding(N, undefined).
-            var initResult = ObjectRecord.InitializeBinding(N, Undefined.The);
+            var initResult = ObjectRecord.InitializeBinding(vm, N, Undefined.The);
             if (initResult.IsAbruptCompletion()) return initResult;
         }
 
@@ -252,7 +252,7 @@ internal sealed class GlobalEnvironment : Environment
     }
 
     // 9.1.1.4.18 CreateGlobalFunctionBinding ( N, V, D ), https://tc39.es/ecma262/#sec-createglobalfunctionbinding
-    public Completion CreateGlobalFunctionBinding(string N, Value V, bool D)
+    public Completion CreateGlobalFunctionBinding(VM vm, string N, Value V, bool D)
     {
         // 1. Let ObjRec be envRec.[[ObjectRecord]].
         // 2. Let globalObject be ObjRec.[[BindingObject]].
@@ -278,11 +278,11 @@ internal sealed class GlobalEnvironment : Environment
         }
 
         // 6. Perform ? DefinePropertyOrThrow(globalObject, N, desc).
-        var defineResult = Object.DefinePropertyOrThrow(globalObject, N, desc);
+        var defineResult = Object.DefinePropertyOrThrow(vm, globalObject, N, desc);
         if (defineResult.IsAbruptCompletion()) return defineResult;
 
         // 7. Perform ? Set(globalObject, N, V, false).
-        var setResult = Object.Set(globalObject, N, V, false);
+        var setResult = Object.Set(vm, globalObject, N, V, false);
         if (setResult.IsAbruptCompletion()) return setResult;
 
         // 8. If envRec.[[VarNames]] does not contain N, then

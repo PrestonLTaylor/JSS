@@ -19,7 +19,7 @@ internal sealed class VoidExpression : IExpression
         if (expr.IsAbruptCompletion()) return expr;
 
         // 2. Perform ? GetValue(expr).
-        var value = expr.Value.GetValue();
+        var value = expr.Value.GetValue(vm);
         if (value.IsAbruptCompletion()) return value;
 
         // 3. Return undefined.

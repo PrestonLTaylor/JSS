@@ -41,15 +41,15 @@ internal class FunctionEnvironment : DeclarativeEnvironment
     }
 
     // 9.1.1.3.1 BindThisValue ( V ), https://tc39.es/ecma262/#sec-bindthisvalue
-    public Completion BindThisValue(Value V)
+    public Completion BindThisValue(VM vm, Value V)
     {
         // 1. Assert: envRec.[[ThisBindingStatus]] is not LEXICAL.
         Debug.Assert(ThisBindingStatus != ThisBindingStatus.LEXICAL);
 
-        // 2. If envRec.[[ThisBindingStatus]] is INITIALIZED, throw a FIXKME: ReferenceError exception.
+        // 2. If envRec.[[ThisBindingStatus]] is INITIALIZED, throw a ReferenceError exception.
         if (ThisBindingStatus == ThisBindingStatus.INITIALIZED)
         {
-            return Completion.ThrowCompletion("Tried to bind a this value to already this-initialized function environment");
+            return ThrowReferenceError(vm, RuntimeErrorType.BindingThisToAlreadyThisInitializedEnvironment);
         }
 
         // 3. Set envRec.[[ThisValue]] to V.
@@ -70,15 +70,15 @@ internal class FunctionEnvironment : DeclarativeEnvironment
     }
 
     // 9.1.1.3.4 GetThisBinding ( ), https://tc39.es/ecma262/#sec-function-environment-records-getthisbinding
-    override public Completion GetThisBinding()
+    override public Completion GetThisBinding(VM vm)
     {
         // 1. Assert: envRec.[[ThisBindingStatus]] is not LEXICAL.
         Debug.Assert(ThisBindingStatus != ThisBindingStatus.LEXICAL);
 
-        // 2. If envRec.[[ThisBindingStatus]] is UNINITIALIZED, throw a FIXME: ReferenceError exception.
+        // 2. If envRec.[[ThisBindingStatus]] is UNINITIALIZED, throw a ReferenceError exception.
         if (ThisBindingStatus == ThisBindingStatus.UNINITIALIZED)
         {
-            return Completion.ThrowCompletion("Tried to get an uninitialized this value");
+            return ThrowReferenceError(vm, RuntimeErrorType.UninitializedThisValue);
         }
 
         // 3. Return envRec.[[ThisValue]].

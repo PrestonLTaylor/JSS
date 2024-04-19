@@ -396,10 +396,10 @@ internal sealed class ASTTests
 
         // FIXME: Add more tests for InExpressions when we have object literals
         // Tests for InExpressions
-        CreateThrowingInExpressionTestCase("1", "null", ValueType.Null),
-        CreateThrowingInExpressionTestCase("1", "2", ValueType.Number),
-        CreateThrowingInExpressionTestCase("1", EscapeString("2"), ValueType.String),
-        CreateThrowingInExpressionTestCase("1", "true", ValueType.Boolean),
+        CreateThrowingInExpressionTestCase("1", "null"),
+        CreateThrowingInExpressionTestCase("1", "2"),
+        CreateThrowingInExpressionTestCase("1", EscapeString("2")),
+        CreateThrowingInExpressionTestCase("1", "true"),
 
         // Tests for CallExpression
         CreateCallExpressionTestCase("null", Undefined.The),
@@ -586,7 +586,7 @@ internal sealed class ASTTests
 
     static private object[] CreateThrowingIdentifierTestCase(string identifier)
     {
-        return new object[] { identifier, Completion.ThrowCompletion($"{identifier} is not defined") };
+        return new object[] { identifier, Completion.ThrowCompletion(new Object(null)) };
     }
 
     static private object[] CreateVarStatementTestCase(string identifier, string initializer, Value expected)
@@ -686,10 +686,10 @@ internal sealed class ASTTests
         return new object[] { testCode, Completion.NormalCompletion(expected) };
     }
 
-    static private object[] CreateThrowingInExpressionTestCase(string lhs, string rhs, ValueType rhsType)
+    static private object[] CreateThrowingInExpressionTestCase(string lhs, string rhs)
     {
-        // FIXME: ThrowHelper so we dont have string literals spewed everywhere
-        return new object[] { $"{lhs} in {rhs}", Completion.ThrowCompletion($"rhs of 'in' should be an Object, but got {rhsType}") };
+        // FIXME: Actual Error objects
+        return new object[] { $"{lhs} in {rhs}", Completion.ThrowCompletion(new Object(null)) };
     }
 
     static private object[] CreateCallExpressionTestCase(string functionCode, Value expected)
@@ -727,7 +727,15 @@ internal sealed class ASTTests
         var actualCompletion = script.ScriptEvaluation();
 
         // Assert
-        actualCompletion.Should().Be(expectedCompletion);
+        if (actualCompletion.IsAbruptCompletion() && expectedCompletion.IsAbruptCompletion() && expectedCompletion.Value.IsObject())
+        {
+            // FIXME: Have a way to do equality of error objects
+            actualCompletion.Value.Type().Should().Be(ValueType.Object);
+        }
+        else
+        {
+            actualCompletion.Should().Be(expectedCompletion);
+        }
     }
 
     [Test]
@@ -1257,7 +1265,7 @@ internal sealed class ASTTests
 
         // Assert
         completion.IsThrowCompletion().Should().BeTrue();
-        completion.Value.Should().Be(new String($"{identifier} is not defined"));
+        completion.Value.Type().Should().Be(ValueType.Object);
     }
 
     [Test]
@@ -1272,7 +1280,7 @@ internal sealed class ASTTests
 
         // Assert
         completion.IsThrowCompletion().Should().BeTrue();
-        completion.Value.Should().Be(new String($"{identifier} is not defined"));
+        completion.Value.Type().Should().Be(ValueType.Object);
     }
 
     [Test]
@@ -1287,7 +1295,7 @@ internal sealed class ASTTests
 
         // Assert
         completion.IsThrowCompletion().Should().BeTrue();
-        completion.Value.Should().Be(new String($"invalid assignment to const {identifier}"));
+        completion.Value.Type().Should().Be(ValueType.Object);
     }
 
     [Test]
@@ -1302,7 +1310,7 @@ internal sealed class ASTTests
 
         // Assert
         completion.IsThrowCompletion().Should().BeTrue();
-        completion.Value.Should().Be(new String($"{identifier} is not defined"));
+        completion.Value.Type().Should().Be(ValueType.Object);
     }
 
     [Test]
@@ -1317,7 +1325,7 @@ internal sealed class ASTTests
 
         // Assert
         completion.IsThrowCompletion().Should().BeTrue();
-        completion.Value.Should().Be(new String($"{identifier} is not defined"));
+        completion.Value.Type().Should().Be(ValueType.Object);
     }
 
     [Test]

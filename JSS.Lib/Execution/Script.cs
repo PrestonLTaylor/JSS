@@ -84,12 +84,11 @@ public sealed class Script
         // 3. For each element name of lexNames, do
         foreach (var name in lexNames)
         {
-            // FIXME: Throw SyntaxError Objects
             // a. If env.HasVarDeclaration(name) is true, throw a SyntaxError exception.
-            if (env.HasVarDeclaration(name)) return Completion.ThrowCompletion($"redeclaration of var {name}");
+            if (env.HasVarDeclaration(name)) return ThrowSyntaxError(VM, RuntimeErrorType.RedeclarationOfVar, name);
 
             // b. If env.HasLexicalDeclaration(name) is true, throw a SyntaxError exception.
-            if (env.HasLexicalDeclaration(name)) return Completion.ThrowCompletion($"redeclaration of let {name}");
+            if (env.HasLexicalDeclaration(name)) return ThrowSyntaxError(VM, RuntimeErrorType.RedeclarationOfLet, name);
 
             // c. Let hasRestrictedGlobal be ? env.HasRestrictedGlobalProperty(name).
             var hasRestrictedGlobal = env.HasRestrictedGlobalProperty(name);
@@ -97,14 +96,14 @@ public sealed class Script
 
             // d. If hasRestrictedGlobal is true, throw a SyntaxError exception.
             var asBoolean = hasRestrictedGlobal.Value.AsBoolean();
-            if (asBoolean.Value) return Completion.ThrowCompletion($"redeclaration of Unconfigurable {name}");
+            if (asBoolean.Value) ThrowSyntaxError(VM, RuntimeErrorType.RedeclarationOfUnconfigurable, name);
         }
 
         // 4. For each element name of varNames, do
         foreach (var name in varNames)
         {
             // a. If env.HasLexicalDeclaration(name) is true, throw a SyntaxError exception.
-            if (env.HasLexicalDeclaration(name)) return Completion.ThrowCompletion($"redeclaration of let {name}");
+            if (env.HasLexicalDeclaration(name)) ThrowSyntaxError(VM, RuntimeErrorType.RedeclarationOfLet, name);
         }
 
         // 5. Let varDeclarations be the VarScopedDeclarations of script.
@@ -139,10 +138,9 @@ public sealed class Script
                     var fnDefinable = env.CanDeclareGlobalFunction(fn);
                     if (fnDefinable.IsAbruptCompletion()) return fnDefinable;
 
-                    // FIXME: Throw an actual TypeError Error
                     // 2. If fnDefinable is false, throw a TypeError exception.
                     var asBoolean = fnDefinable.Value.AsBoolean();
-                    if (!asBoolean.Value) return Completion.ThrowCompletion($"redeclaration of Unconfigurable function {fn}");
+                    if (!asBoolean.Value) return ThrowTypeError(VM, RuntimeErrorType.RedeclarationOfUnconfigurableFunction, fn);
 
                     // 3. Append fn to declaredFunctionNames.
                     declaredFunctionNames.Add(fn);
@@ -172,9 +170,9 @@ public sealed class Script
                         var vnDefinable = env.CanDeclareGlobalVar(vn);
                         if (vnDefinable.IsAbruptCompletion()) return vnDefinable;
 
-                        // b. If vnDefinable is false, FIXME: throw a TypeError exception.
+                        // b. If vnDefinable is false, throw a TypeError exception.
                         var asBoolean = vnDefinable.Value.AsBoolean();
-                        if (!asBoolean.Value) return Completion.ThrowCompletion($"redeclaration of Unextensible var {vn}");
+                        if (!asBoolean.Value) return ThrowTypeError(VM, RuntimeErrorType.RedeclarationOfUnextensibleVar, vn);
 
                         // c. If declaredVarNames does not contain vn, then
                         if (!declaredVarNames.Contains(vn))
@@ -207,14 +205,14 @@ public sealed class Script
                 if (d is ConstDeclaration)
                 {
                     // 1. Perform ? env.CreateImmutableBinding(dn, true).
-                    var createResult = env.CreateImmutableBinding(dn, true);
+                    var createResult = env.CreateImmutableBinding(VM, dn, true);
                     if (createResult.IsAbruptCompletion()) return createResult;
                 }
                 // ii. Else,
                 else
                 {
                     // 1. Perform ? env.CreateMutableBinding(dn, false).
-                    var createResult = env.CreateMutableBinding(dn, false);
+                    var createResult = env.CreateMutableBinding(VM, dn, false);
                     if (createResult.IsAbruptCompletion()) return createResult;
                 }
             }
@@ -230,7 +228,7 @@ public sealed class Script
             var fo = f.InstantiateFunctionObject(VM, env);
 
             // c. Perform ? env.CreateGlobalFunctionBinding(fn, fo, false).
-            var createResult = env.CreateGlobalFunctionBinding(fn, fo, false);
+            var createResult = env.CreateGlobalFunctionBinding(VM, fn, fo, false);
             if (createResult.IsAbruptCompletion()) return createResult;
         }
 
@@ -238,7 +236,7 @@ public sealed class Script
         foreach (var vn in declaredVarNames)
         {
             // a. Perform ? env.CreateGlobalVarBinding(vn, false).
-            var createResult = env.CreateGlobalVarBinding(vn, false);
+            var createResult = env.CreateGlobalVarBinding(VM, vn, false);
             if (createResult.IsAbruptCompletion()) return createResult;
         }
 

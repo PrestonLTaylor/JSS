@@ -19,7 +19,7 @@ internal sealed class PostfixIncrementExpression : IExpression
         var lhs = Expression.Evaluate(vm);
 
         // 2. Let oldValue be ? ToNumeric(? GetValue(lhs)).
-        var getResult = lhs.Value.GetValue();
+        var getResult = lhs.Value.GetValue(vm);
         if (getResult.IsAbruptCompletion()) return getResult;
 
         var oldValue = getResult.Value.ToNumeric();
