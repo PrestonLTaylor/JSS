@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
+using JSS.Lib.Execution;
 
 namespace JSS.Lib.Runtime;
 
@@ -10,8 +11,11 @@ internal sealed class ErrorPrototype : Object
     }
 
     // 20.5.3 Properties of the Error Prototype Object, https://tc39.es/ecma262/#sec-properties-of-the-error-prototype-object
-    public void Initialize()
+    public void Initialize(Realm realm)
     {
+        // 20.5.3.1 Error.prototype.constructor, The initial value of Error.prototype.constructor is %Error%.
+        DataProperties.Add("constructor", new Property(realm.ErrorConstructor, new(true, false, false)));
+
         // 20.5.3.2 Error.prototype.message, The initial value of Error.prototype.message is the empty String.
         DataProperties.Add("message", new Property("", new(true, false, false)));
 
