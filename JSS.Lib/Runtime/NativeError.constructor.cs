@@ -50,7 +50,8 @@ internal class NativeErrorConstructor : Object, ICallable, IConstructable
 
         // 4. Perform ? InstallErrorCause(O, options).
         var options = argumentsList[1];
-        ErrorConstructor.InstallErrorCause(O, options);
+        var installResult = ErrorConstructor.InstallErrorCause(O, options);
+        if (installResult.IsAbruptCompletion()) return installResult;
 
         // 5. Return O.
         return O;

@@ -47,7 +47,8 @@ internal sealed class ErrorConstructor : Object, ICallable, IConstructable
 
         // 4. Perform ? InstallErrorCause(O, options).
         var options = argumentsList[1];
-        InstallErrorCause(O, options);
+        var installResult = InstallErrorCause(O, options);
+        if (installResult.IsAbruptCompletion()) return installResult;
 
         // 5. Return O.
         return O;
