@@ -55,7 +55,7 @@ public sealed class Realm
 
         ErrorPrototype = new(ObjectPrototype);
         ErrorConstructor = new(FunctionPrototype);
-        ErrorPrototype.Initialize();
+        ErrorPrototype.Initialize(this);
         ErrorConstructor.Initialize(this);
 
         // FIMXE: 3. Perform AddRestrictedFunctionProperties(realmRec.[[Intrinsics]].[[%Function.prototype%]], realmRec).
