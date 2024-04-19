@@ -51,13 +51,31 @@ public sealed class Number : Value
         // FIXME: 1. If exponent is NaN, return NaN.
         // FIXME: 2. If exponent is either + 0𝔽 or - 0𝔽, return 1𝔽.
         // FIXME: 3. If base is NaN, return NaN.
-        // FIXME: 4. If base is +∞𝔽, then
-        // FIXME: a. If exponent > +0𝔽, return +∞𝔽. Otherwise, return +0𝔽.
-        // FIXME: 5. If base is -∞𝔽, then
-        // FIXME: a. If exponent > +0𝔽, then
-        // FIXME: i. If exponent is an odd integral Number, return -∞𝔽. Otherwise, return +∞𝔽.
-        // FIXME: b. Else,
-        // FIXME: i. If exponent is an odd integral Number, return -0𝔽. Otherwise, return +0𝔽.
+
+        // 4. If base is +∞𝔽, then
+        if (expBase.Value == double.PositiveInfinity)
+        {
+            // a. If exponent > +0𝔽, return +∞𝔽. Otherwise, return +0𝔽.
+            return exponent.Value > 0 ? double.PositiveInfinity : 0;
+        }
+
+        // 5. If base is -∞𝔽, then
+        if (expBase.Value == double.NegativeInfinity)
+        {
+            // a. If exponent > +0𝔽, then
+            if (exponent.Value > 0)
+            {
+                // i. If exponent is an odd integral Number, return -∞𝔽. Otherwise, return +∞𝔽.
+                return double.IsOddInteger(exponent.Value) ? double.NegativeInfinity : double.PositiveInfinity;
+            }
+            // b. Else,
+            else
+            {
+                // FIXME: i. If exponent is an odd integral Number, return -0𝔽. Otherwise, return +0𝔽.
+                return 0;
+            }
+        }
+
         // FIXME: 6. If base is +0𝔽, then
         // FIXME: a. If exponent > +0𝔽, return +0𝔽. Otherwise, return +∞𝔽.
         // FIXME: 7. If base is -0𝔽, then
@@ -66,14 +84,35 @@ public sealed class Number : Value
         // FIXME: b. Else,
         // FIXME: i. If exponent is an odd integral Number, return -∞𝔽. Otherwise, return +∞𝔽.
         // FIXME: 8. Assert: base is finite and is neither + 0𝔽 nor - 0𝔽.
-        // FIXME: 9. If exponent is +∞𝔽, then
-        // FIXME: a. If abs(ℝ(base)) > 1, return +∞𝔽.
-        // FIXME: b. If abs(ℝ(base)) = 1, return NaN.
-        // FIXME: c. If abs(ℝ(base)) < 1, return +0𝔽.
-        // FIXME: 10. If exponent is -∞𝔽, then
-        // FIXME: a. If abs(ℝ(base)) > 1, return +0𝔽.
-        // FIXME: b. If abs(ℝ(base)) = 1, return NaN.
-        // FIXME: c. If abs(ℝ(base)) < 1, return +∞𝔽.
+
+        // 9. If exponent is +∞𝔽, then
+        if (exponent.Value == double.PositiveInfinity)
+        {
+            // a. If abs(ℝ(base)) > 1, return +∞𝔽.
+            var absBase = Math.Abs(expBase.Value);
+            if (absBase > 1) return double.PositiveInfinity;
+
+            // b. If abs(ℝ(base)) = 1, return NaN.
+            if (absBase == 1) return double.NaN;
+
+            // c. If abs(ℝ(base)) < 1, return +0𝔽.
+            if (absBase < 1) return 0;
+        }
+
+        // 10. If exponent is -∞𝔽, then
+        if (exponent.Value == double.PositiveInfinity)
+        {
+            // a. If abs(ℝ(base)) > 1, return +0𝔽.
+            var absBase = Math.Abs(expBase.Value);
+            if (absBase > 1) return 0;
+
+            // b. If abs(ℝ(base)) = 1, return NaN.
+            if (absBase == 1) return double.NaN;
+
+            // c. If abs(ℝ(base)) < 1, return +∞𝔽.
+            if (absBase < 1) return double.PositiveInfinity;
+        }
+
         // FIXME: 11. Assert: exponent is finite and is neither + 0𝔽 nor - 0𝔽.
         // FIXME: 12. If base < -0𝔽 and exponent is not an integral Number, return NaN.
 
@@ -85,14 +124,33 @@ public sealed class Number : Value
     static internal Number Multiply(Number x, Number y)
     {
         // FIXME: 1. If x is NaN or y is NaN, return NaN.
-        // FIXME: 2. If x is either +∞𝔽 or -∞𝔽, then
-        // FIXME: a. If y is either + 0𝔽 or -0𝔽, return NaN.
-        // FIXME: b. If y > +0𝔽, return x.
-        // FIXME: c. Return -x.
-        // FIXME: 3. If y is either +∞𝔽 or -∞𝔽, then
-        // FIXME: a. If x is either +0𝔽 or -0𝔽, return NaN.
-        // FIXME: b. If x > +0𝔽, return y.
-        // FIXME: c. Return -y.
+
+        // 2. If x is either +∞𝔽 or -∞𝔽, then
+        if (double.IsInfinity(x.Value))
+        {
+            // a. If y is either +0𝔽 or -0𝔽, return NaN.
+            if (y.Value == 0) return double.NaN;
+
+            // b. If y > +0𝔽, return x.
+            if (y.Value > 0) return x;
+
+            // c. Return -x.
+            return -x.Value;
+        }
+
+        // 3. If y is either +∞𝔽 or -∞𝔽, then
+        if (double.IsInfinity(y.Value))
+        {
+            // a. If x is either +0𝔽 or -0𝔽, return NaN.
+            if (x.Value == 0) return double.NaN;
+
+            // b. If x > +0𝔽, return y.
+            if (x.Value > 0) return y;
+
+            // c. Return -y.
+            return -y.Value;
+        }
+
         // FIXME: 4. If x is -0𝔽, then
         // FIXME: a. If y is -0𝔽 or y < -0𝔽, return +0𝔽.
         // FIXME: b. Else, return -0𝔽.
@@ -108,14 +166,35 @@ public sealed class Number : Value
     static internal Number Divide(Number x, Number y)
     {
         // FIXME: 1. If x is NaN or y is NaN, return NaN.
-        // FIXME: 2. If x is either +∞𝔽 or -∞𝔽, then
-        // FIXME: a. If y is either +∞𝔽 or -∞𝔽, return NaN.
-        // FIXME: b. If y is +0𝔽 or y > +0𝔽, return x.
-        // FIXME: c. Return -x.
-        // FIXME: 3. If y is +∞𝔽, then
-        // FIXME: a. If x is +0𝔽 or x > +0𝔽, return +0𝔽. Otherwise, return -0𝔽.
-        // FIXME: 4. If y is -∞𝔽, then
-        // FIXME: a. If x is +0𝔽 or x > +0𝔽, return -0𝔽. Otherwise, return +0𝔽.
+
+        // 2. If x is either +∞𝔽 or -∞𝔽, then
+        if (double.IsInfinity(x))
+        {
+            // a. If y is either +∞𝔽 or -∞𝔽, return NaN.
+            if (double.IsInfinity(y.Value)) return double.NaN;
+
+            // FIXME: Handle direct comparisons to +0F, making sure -0F isn't matched
+            // b. If y is +0𝔽 or y > +0𝔽, return x.
+            if (y.Value >= 0) return x;
+
+            // c. Return -x.
+            return -x.Value;
+        }
+
+        // 3. If y is +∞𝔽, then
+        if (y.Value == double.PositiveInfinity)
+        {
+            // FIXME: a. If x is +0𝔽 or x > +0𝔽, return +0𝔽. Otherwise, return -0𝔽.
+            return 0;
+        }
+
+        // 4. If y is -∞𝔽, then
+        if (y.Value == double.NegativeInfinity)
+        {
+            // FIXME: a. If x is +0𝔽 or x > +0𝔽, return -0𝔽. Otherwise, return +0𝔽.
+            return 0;
+        }
+
         // FIXME: 5. If x is either + 0𝔽 or -0𝔽, then
         // FIXME: a. If y is either + 0𝔽 or -0𝔽, return NaN.
         // FIXME: b. If y > +0𝔽, return x.
@@ -133,8 +212,13 @@ public sealed class Number : Value
     static internal Number Remainder(Number n, Number d)
     {
         // FIXME: 1. If n is NaN or d is NaN, return NaN.
-        // FIXME: 2. If n is either +∞𝔽 or -∞𝔽, return NaN.
-        // FIXME: 3. If d is either +∞𝔽 or -∞𝔽, return n.
+
+        // 2. If n is either +∞𝔽 or -∞𝔽, return NaN.
+        if (double.IsInfinity(n.Value)) return double.NaN;
+
+        // 3. If d is either +∞𝔽 or -∞𝔽, return n.
+        if (double.IsInfinity(d)) return n;
+
         // FIXME: 4. If d is either + 0𝔽 or -0𝔽, return NaN.
         // FIXME: 5. If n is either + 0𝔽 or -0𝔽, return n.
         // FIXME: 6. Assert: n and d are finite and non-zero.
@@ -150,10 +234,19 @@ public sealed class Number : Value
     static internal Number Add(Number x, Number y)
     {
         // FIXME: 1. If x is NaN or y is NaN, return NaN.
-        // FIXME: 2. If x is +∞𝔽 and y is -∞𝔽, return NaN.
-        // FIXME: 3. If x is -∞𝔽 and y is +∞𝔽, return NaN.
-        // FIXME: 4. If x is either +∞𝔽 or -∞𝔽, return x.
-        // FIXME: 5. If y is either +∞𝔽 or -∞𝔽, return y.
+
+        // 2. If x is +∞𝔽 and y is -∞𝔽, return NaN.
+        if (x.Value == double.PositiveInfinity && y.Value == double.NegativeInfinity) return double.NaN;
+
+        // 3. If x is -∞𝔽 and y is +∞𝔽, return NaN.
+        if (x.Value == double.NegativeInfinity && y.Value == double.PositiveInfinity) return double.NaN;
+
+        // 4. If x is either +∞𝔽 or -∞𝔽, return x.
+        if (double.IsInfinity(x)) return x;
+
+        // 5. If y is either +∞𝔽 or -∞𝔽, return y.
+        if (double.IsInfinity(y)) return y;
+
         // FIXME: 6. Assert: x and y are both finite.
         // FIXME: 7. If x is -0𝔽 and y is -0𝔽, return -0𝔽.
 
@@ -226,10 +319,19 @@ public sealed class Number : Value
         // FIXME: 3. If x is y, return false.
         // FIXME: 4. If x is +0𝔽 and y is -0𝔽, return false.
         // FIXME: 5. If x is -0𝔽 and y is +0𝔽, return false.
-        // FIXME: 6. If x is +∞𝔽, return false.
-        // FIXME: 7. If y is +∞𝔽, return true.
-        // FIXME: 8. If y is -∞𝔽, return false.
-        // FIXME: 9. If x is -∞𝔽, return true.
+
+        // 6. If x is +∞𝔽, return false.
+        if (x.Value == double.PositiveInfinity) return false;
+
+        // 7. If y is +∞𝔽, return true.
+        if (y.Value == double.PositiveInfinity) return true;
+
+        // 8. If y is -∞𝔽, return false.
+        if (y.Value == double.NegativeInfinity) return false;
+
+        // 9. If x is -∞𝔽, return true.
+        if (x.Value == double.NegativeInfinity) return true;
+
         // FIXME: 10. Assert: x and y are finite.
 
         // 11. If ℝ(x) < ℝ(y), return true. Otherwise, return false.
