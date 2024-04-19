@@ -9,6 +9,7 @@ namespace JSS.Lib.Execution;
 public sealed class Realm
 {
     // 9.3.1 CreateRealm ( ), https://tc39.es/ecma262/#sec-createrealm
+#pragma warning disable CS8618 // All properties are initialised in CreateIntrinsics
     internal Realm()
     {
         // 1. Let realmRec be a new Realm Record.
@@ -29,9 +30,9 @@ public sealed class Realm
 
         // 7. Return realmRec.
     }
+#pragma warning restore CS8618 // All properties are initialised in CreateIntrinsics
 
     // 9.3.2 CreateIntrinsics ( realmRec ), https://tc39.es/ecma262/#sec-createintrinsics
-    [MemberNotNull(nameof(ObjectPrototype), nameof(FunctionPrototype), nameof(ObjectConstructor), nameof(ErrorPrototype), nameof(ErrorConstructor))]
     private void CreateIntrinsics()
     {
         // 1. Set realmRec.[[Intrinsics]] to a new Record.
