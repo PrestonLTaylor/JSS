@@ -77,7 +77,7 @@ internal sealed class ForStatement : INode
             if (exprRef.IsAbruptCompletion()) return exprRef;
 
             // b. Perform ? GetValue(exprRef).
-            var exprValue = exprRef.Value.GetValue();
+            var exprValue = exprRef.Value.GetValue(vm);
             if (exprValue.IsAbruptCompletion()) return exprValue;
         }
 
@@ -108,7 +108,7 @@ internal sealed class ForStatement : INode
                 if (testRef.IsAbruptCompletion()) return testRef;
 
                 // ii. Let testValue be ? GetValue(testRef).
-                var testValue = testRef.Value.GetValue();
+                var testValue = testRef.Value.GetValue(vm);
                 if (testValue.IsAbruptCompletion()) return testValue;
 
                 // iii. If ToBoolean(testValue) is false, return V.
@@ -144,7 +144,7 @@ internal sealed class ForStatement : INode
                 if (incRef.IsAbruptCompletion()) return incRef;
 
                 // ii. Perform ? GetValue(incRef).
-                var incValue = incRef.Value.GetValue();
+                var incValue = incRef.Value.GetValue(vm);
                 if (incValue.IsAbruptCompletion()) return incValue;
             }
         }

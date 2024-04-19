@@ -18,7 +18,7 @@ internal sealed class UnaryPlusExpression : IExpression
         if (expr.IsAbruptCompletion()) return expr;
 
         // 2. Return ? ToNumber(? GetValue(expr)).
-        var exprValue = expr.Value.GetValue();
+        var exprValue = expr.Value.GetValue(vm);
         if (exprValue.IsAbruptCompletion()) return exprValue;
 
         return exprValue.Value.ToNumber();

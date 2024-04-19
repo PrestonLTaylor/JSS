@@ -99,7 +99,7 @@ public abstract class Value
     abstract public ValueType Type();
 
     // 6.2.5.5 GetValue ( V ), https://tc39.es/ecma262/#sec-getvalue
-    internal Completion GetValue()
+    internal Completion GetValue(VM vm)
     {
         // 1. If V is not a Reference Record, return V.
         if (!IsReference())
@@ -107,19 +107,18 @@ public abstract class Value
             return this;
         }
 
-        // FIXME: Throw an ReferenceError Object
         // 2. If IsUnresolvableReference(V) is true, throw a ReferenceError exception.
         var asReference = AsReference();
         if (asReference.IsUnresolvableReference())
         {
-            return Completion.ThrowCompletion($"{asReference.ReferencedName} is not defined");
+            return ThrowReferenceError(vm, RuntimeErrorType.BindingNotDefined, asReference.ReferencedName);
         }
 
         // 3. If IsPropertyReference(V) is true, then
         if (asReference.IsPropertyReference())
         {
             // a. Let baseObj be ? ToObject(V.[[Base]]).
-            var baseObj = asReference.Base!.ToObject();
+            var baseObj = asReference.Base!.ToObject(vm);
             if (baseObj.IsAbruptCompletion()) return baseObj;
 
             // FIXME: b. If IsPrivateReference(V) is true, then
@@ -140,7 +139,7 @@ public abstract class Value
 
             // c. Return ? base.GetBindingValue(V.[[ReferencedName]], FIXME: V.[[Strict]]) (see 9.1).
             var environment = @base.AsEnvironment();
-            return environment.GetBindingValue(asReference.ReferencedName, false);
+            return environment.GetBindingValue(vm, asReference.ReferencedName, false);
         }
     }
 
@@ -150,8 +149,7 @@ public abstract class Value
         // 1. If V is not a Reference Record, throw a ReferenceError exception.
         if (!IsReference())
         {
-            // FIXME: Throw an actual ReferenceError object
-            return Completion.ThrowCompletion("Tried to put a value into a non-reference.");
+            return ThrowReferenceError(vm, RuntimeErrorType.PuttingValueInNonReference);
         }
 
         var reference = AsReference();
@@ -165,7 +163,7 @@ public abstract class Value
             var globalObj = Realm.GetGlobalObject(vm);
 
             // c. Perform ? Set(globalObj, V.[[ReferencedName]], W, false).
-            var setResult = Object.Set(globalObj, reference.ReferencedName, W, false);
+            var setResult = Object.Set(vm, globalObj, reference.ReferencedName, W, false);
             if (setResult.IsAbruptCompletion()) return setResult;
 
             // d. Return UNUSED.
@@ -175,7 +173,7 @@ public abstract class Value
         if (reference.IsPropertyReference())
         {
             // a. Let baseObj be ? ToObject(V.[[Base]]).
-            var baseObj = reference.Base!.ToObject();
+            var baseObj = reference.Base!.ToObject(vm);
             if (baseObj.IsAbruptCompletion()) return baseObj;
 
             // FIXME: b. If IsPrivateReference(V) is true, then
@@ -201,7 +199,7 @@ public abstract class Value
 
             // c. Return ? base.SetMutableBinding(V.[[ReferencedName]], W, FIXME: V.[[Strict]]) (see 9.1).
             var environment = @base.AsEnvironment();
-            return environment.SetMutableBinding(reference.ReferencedName, W, false);
+            return environment.SetMutableBinding(vm, reference.ReferencedName, W, false);
         }
     }
 
@@ -410,18 +408,18 @@ public abstract class Value
     }
 
     // 7.1.18 ToObject ( argument ), https://tc39.es/ecma262/#sec-toobject
-    internal AbruptOr<Object> ToObject()
+    internal AbruptOr<Object> ToObject(VM vm)
     {
-        // Undefined, FIXME: Throw a TypeError exception.
+        // Undefined, Throw a TypeError exception.
         if (IsUndefined())
         {
-            return Completion.ThrowCompletion("Unable to convert undefined to an object");
+            return ThrowTypeError(vm, RuntimeErrorType.UnableToConvertToObject, "undefined");
         }
 
-        // Null, FIXME: Throw a TypeError exception.
+        // Null, Throw a TypeError exception.
         if (IsNull())
         {
-            return Completion.ThrowCompletion("Unable to convert null to an object");
+            return ThrowTypeError(vm, RuntimeErrorType.UnableToConvertToObject, "null");
         }
 
         // FIXME: Implement the rest of the conversions

@@ -23,18 +23,17 @@ public class Object : Value
     }
 
     // 7.3.4 Set ( O, P, V, Throw ), https://tc39.es/ecma262/#sec-set-o-p-v-throw
-    static internal Completion Set(Object O, string P, Value V, bool Throw)
+    static internal Completion Set(VM vm, Object O, string P, Value V, bool Throw)
     {
         // 1. Let success be ? O.[[Set]](P, V, O).
         var success = O.Set(P, V, O);
         if (success.IsAbruptCompletion()) return success;
 
-        // FIXME: Throw an actual TypeError object
         // 2. If success is false and Throw is true, throw a TypeError exception.
         var asBoolean = success.Value.AsBoolean();
         if (!asBoolean.Value && Throw)
         {
-            return Completion.ThrowCompletion($"Failed to set {P}");
+            return ThrowTypeError(vm, RuntimeErrorType.FailedToSet, P);
         }
 
         // 3. Return UNUSED.
@@ -42,7 +41,7 @@ public class Object : Value
     }
 
     // 7.3.7 CreateNonEnumerableDataPropertyOrThrow ( O, P, V ), https://tc39.es/ecma262/#sec-createnonenumerabledatapropertyorthrow
-    static internal void CreateNonEnumerableDataPropertyOrThrow(Object O, string P, Value V)
+    static internal void CreateNonEnumerableDataPropertyOrThrow(VM vm, Object O, string P, Value V)
     {
         // 1. Assert: O is an ordinary, FIXME: extensible object with no non-configurable properties.
         Debug.Assert(O.IsObject());
@@ -51,21 +50,21 @@ public class Object : Value
         var newDesc = new Property(V, new(true, false, true));
 
         // 3. Perform ! DefinePropertyOrThrow(O, P, newDesc).
-        MUST(DefinePropertyOrThrow(O, P, newDesc));
+        MUST(DefinePropertyOrThrow(vm, O, P, newDesc));
 
         // 4. Return UNUSED.
     }
 
     // 7.3.8 DefinePropertyOrThrow ( O, P, desc ), https://tc39.es/ecma262/#sec-definepropertyorthrow
-    static internal Completion DefinePropertyOrThrow(Object O, string P, Property desc)
+    static internal Completion DefinePropertyOrThrow(VM vm, Object O, string P, Property desc)
     {
         // 1. Let success be ? O.[[DefineOwnProperty]](P, desc).
         var success = O.DefineOwnProperty(P, desc);
         if (success.IsAbruptCompletion()) return success;
 
-        // 2. If success is false, FIXME: throw a TypeError exception.
+        // 2. If success is false, throw a TypeError exception.
         var asBoolean = success.Value.AsBoolean();
-        if (!asBoolean.Value) return Completion.ThrowCompletion($"Should not define property of name {P} with a value of {desc.Value}");
+        if (!asBoolean.Value) return ThrowTypeError(vm, RuntimeErrorType.CouldNotDefineProperty, P, desc.Value);
 
         // 3. Return UNUSED.
         return Empty.The;
@@ -96,10 +95,10 @@ public class Object : Value
         // 1. If argumentsList is not present, set argumentsList to a new empty List.
         argumentsList ??= new List();
 
-        // 2. If IsCallable(F) is false, FIXME: throw a TypeError exception.
+        // 2. If IsCallable(F) is false, throw a TypeError exception.
         if (!F.IsCallable())
         {
-            return Completion.ThrowCompletion("Tried to call a non-callable object");
+            return ThrowTypeError(vm, RuntimeErrorType.CallingANonFunction, F.Type());
         }
 
         // 3. Return ? F.[[Call]](V, argumentsList).

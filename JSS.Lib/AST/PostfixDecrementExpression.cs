@@ -20,7 +20,7 @@ internal sealed class PostfixDecrementExpression : IExpression
         if (lhs.IsAbruptCompletion()) return lhs;
 
         // 2. Let oldValue be ? ToNumeric(? GetValue(lhs)).
-        var getResult = lhs.Value.GetValue();
+        var getResult = lhs.Value.GetValue(vm);
         if (getResult.IsAbruptCompletion()) return getResult;
 
         var oldValue = getResult.Value.ToNumeric();

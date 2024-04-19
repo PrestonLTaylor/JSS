@@ -44,7 +44,7 @@ public class Reference : Value
     }
 
     // 6.2.5.8 InitializeReferencedBinding ( V, W ), https://tc39.es/ecma262/#sec-initializereferencedbinding
-    public Completion InitializeReferencedBinding(Value W)
+    public Completion InitializeReferencedBinding(VM vm, Value W)
     {
         // 1. Assert: IsUnresolvableReference(V) is false.
         Debug.Assert(!IsUnresolvableReference());
@@ -56,7 +56,7 @@ public class Reference : Value
 
         // 4. Return ? base.InitializeBinding(V.[[ReferencedName]], W).
         var environment = Base.AsEnvironment();
-        return environment.InitializeBinding(ReferencedName, W);
+        return environment.InitializeBinding(vm, ReferencedName, W);
     }
 
     // FIXME: Base can have a ECMAScript language value

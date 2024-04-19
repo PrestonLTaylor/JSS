@@ -45,12 +45,12 @@ internal class NativeErrorConstructor : Object, ICallable, IConstructable
             if (msg.IsAbruptCompletion()) return msg;
 
             // b. Perform CreateNonEnumerableDataPropertyOrThrow(O, "message", msg).
-            CreateNonEnumerableDataPropertyOrThrow(O, "message", msg.Value);
+            CreateNonEnumerableDataPropertyOrThrow(vm, O, "message", msg.Value);
         }
 
         // 4. Perform ? InstallErrorCause(O, options).
         var options = argumentsList[1];
-        var installResult = ErrorConstructor.InstallErrorCause(O, options);
+        var installResult = ErrorConstructor.InstallErrorCause(vm, O, options);
         if (installResult.IsAbruptCompletion()) return installResult;
 
         // 5. Return O.

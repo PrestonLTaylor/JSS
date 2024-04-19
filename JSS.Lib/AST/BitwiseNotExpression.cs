@@ -20,7 +20,7 @@ internal sealed class BitwiseNotExpression : IExpression
         if (expr.IsAbruptCompletion()) return expr;
 
         // 2. Let oldValue be ? ToNumeric(? GetValue(expr)).
-        var exprValue = expr.Value.GetValue();
+        var exprValue = expr.Value.GetValue(vm);
         if (exprValue.IsAbruptCompletion()) return exprValue;
 
         var oldValue = exprValue.Value.ToNumeric();

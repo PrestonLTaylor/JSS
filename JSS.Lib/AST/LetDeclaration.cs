@@ -39,7 +39,7 @@ internal sealed class LetDeclaration : Declaration
 
         // 2. Perform ! InitializeReferencedBinding(lhs, undefined).
         var asReference = lhs.AsReference();
-        MUST(asReference.InitializeReferencedBinding(Undefined.The));
+        MUST(asReference.InitializeReferencedBinding(vm, Undefined.The));
 
         // 3. Return EMPTY.
         return Empty.The;
@@ -60,12 +60,12 @@ internal sealed class LetDeclaration : Declaration
         if (rhs.IsAbruptCompletion()) return rhs;
 
         // b. Let value be ? GetValue(rhs).
-        var value = rhs.Value.GetValue();
+        var value = rhs.Value.GetValue(vm);
         if (value.IsAbruptCompletion()) return value;
 
         // 5. Perform ! InitializeReferencedBinding(lhs, value).
         var asReference = lhs.AsReference();
-        MUST(asReference.InitializeReferencedBinding(value.Value));
+        MUST(asReference.InitializeReferencedBinding(vm, value.Value));
 
         // 6. Return EMPTY.
         return Empty.The;

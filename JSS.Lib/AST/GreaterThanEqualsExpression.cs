@@ -20,7 +20,7 @@ internal sealed class GreaterThanEqualsExpression : IExpression
         if (lref.IsAbruptCompletion()) return lref;
 
         // 2. Let lval be ? GetValue(lref).
-        var lval = lref.Value.GetValue();
+        var lval = lref.Value.GetValue(vm);
         if (lval.IsAbruptCompletion()) return lval;
 
         // 3. Let rref be ? Evaluation of ShiftExpression.
@@ -28,7 +28,7 @@ internal sealed class GreaterThanEqualsExpression : IExpression
         if (rref.IsAbruptCompletion()) return rref;
 
         // 4. Let rval be ? GetValue(rref).
-        var rval = rref.Value.GetValue();
+        var rval = rref.Value.GetValue(vm);
         if (rval.IsAbruptCompletion()) return rval;
 
         // 5. Let r be ? IsLessThan(lval, rval, true).

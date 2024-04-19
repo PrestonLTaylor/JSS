@@ -26,7 +26,7 @@ internal class DeclarativeEnvironment : Environment
     }
 
     // 9.1.1.1.2 CreateMutableBinding ( N, D ), https://tc39.es/ecma262/#sec-declarative-environment-records-createmutablebinding-n-d
-    override public Completion CreateMutableBinding(string N, bool D)
+    override public Completion CreateMutableBinding(VM _, string N, bool D)
     {
         // 1. Assert: envRec does not already have a binding for N.
         Debug.Assert(!_identifierToBinding.ContainsKey(N));
@@ -40,7 +40,7 @@ internal class DeclarativeEnvironment : Environment
     }
 
     // 9.1.1.1.3 CreateImmutableBinding ( N, S ), https://tc39.es/ecma262/#sec-declarative-environment-records-createimmutablebinding-n-s
-    override public Completion CreateImmutableBinding(string N, bool S)
+    override public Completion CreateImmutableBinding(VM _, string N, bool S)
     {
         // 1. Assert: envRec does not already have a binding for N.
         Debug.Assert(!_identifierToBinding.ContainsKey(N));
@@ -54,7 +54,7 @@ internal class DeclarativeEnvironment : Environment
     }
 
     // 9.1.1.1.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-declarative-environment-records-initializebinding-n-v
-    public override Completion InitializeBinding(string N, Value V)
+    public override Completion InitializeBinding(VM _, string N, Value V)
     {
         // FIXME: 1. Assert: envRec must have an uninitialized binding for N.
 
@@ -69,8 +69,8 @@ internal class DeclarativeEnvironment : Environment
         return Empty.The;
     }
 
-    // 9.1.1.1.5 SetMutableBinding ( N, V, S ), https://tc39.es/ecma262/#sec-declarative-environment-records-getbindingvalue-n-s
-    public override Completion SetMutableBinding(string N, Value V, bool S)
+    // 9.1.1.1.5 SetMutableBinding ( N, V, S ), https://tc39.es/ecma262/#sec-declarative-environment-records-setmutablebinding-n-v-s
+    public override Completion SetMutableBinding(VM vm, string N, Value V, bool S)
     {
         // 1. If envRec does not have a binding for N, then
         if (!_identifierToBinding.ContainsKey(N))
@@ -78,14 +78,14 @@ internal class DeclarativeEnvironment : Environment
             // a. If S is true, throw a ReferenceError exception.
             if (S)
             {
-                return Completion.ThrowCompletion($"{N} is not defined.");
+                return ThrowReferenceError(vm, RuntimeErrorType.BindingNotDefined, N);
             }
 
             // b. Perform ! envRec.CreateMutableBinding(N, true).
-            MUST(CreateMutableBinding(N, true));
+            MUST(CreateMutableBinding(vm, N, true));
 
             // c. Perform ! envRec.InitializeBinding(N, V).
-            MUST(InitializeBinding(N, V));
+            MUST(InitializeBinding(vm, N, V));
 
             // d. Return UNUSED.
             return Empty.The;
@@ -113,8 +113,8 @@ internal class DeclarativeEnvironment : Environment
             // NOTE: This assert is intrinsic
             // a. Assert: This is an attempt to change the value of an immutable binding.
 
-            // b. If S is true, FIXME: throw a TypeError exception.
-            if (S) return Completion.ThrowCompletion($"invalid assignment to const {N}");
+            // b. If S is true, throw a TypeError exception.
+            if (S) return ThrowTypeError(vm, RuntimeErrorType.AssignmentToConst, N);
         }
 
         // 6. Return UNUSED.
@@ -122,7 +122,7 @@ internal class DeclarativeEnvironment : Environment
     }
 
     // 9.1.1.1.6 GetBindingValue ( N, S ), https://tc39.es/ecma262/#sec-declarative-environment-records-getbindingvalue-n-s
-    override public Completion GetBindingValue(string N, bool S)
+    override public Completion GetBindingValue(VM _, string N, bool S)
     {
         // 1. Assert: envRec has a binding for N.
         Debug.Assert(_identifierToBinding.ContainsKey(N));

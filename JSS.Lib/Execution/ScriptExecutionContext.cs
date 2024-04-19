@@ -17,7 +17,7 @@ internal sealed class ScriptExecutionContext : ExecutionContext
         {
             // a. Perform ! environment.InitializeBinding(name, value).
             var asEnvironment = environment.AsEnvironment();
-            MUST(asEnvironment.InitializeBinding(name, value));
+            MUST(asEnvironment.InitializeBinding(vm, name, value));
 
             // b. Return UNUSED.
             return Empty.The;
@@ -90,7 +90,7 @@ internal sealed class ScriptExecutionContext : ExecutionContext
         var envRec = GetThisEnvironment(vm);
 
         // 2. Return ? envRec.GetThisBinding().
-        return envRec.GetThisBinding();
+        return envRec.GetThisBinding(vm);
     }
 
     public Environment? LexicalEnvironment { get; set; }

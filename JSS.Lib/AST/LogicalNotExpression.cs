@@ -18,7 +18,7 @@ internal sealed class LogicalNotExpression : IExpression
         if (expr.IsAbruptCompletion()) return expr;
 
         // 2. Let oldValue be ToBoolean(? GetValue(expr)).
-        var value = expr.Value.GetValue();
+        var value = expr.Value.GetValue(vm);
         if (value.IsAbruptCompletion()) return value;
 
         var oldValue = value.Value.ToBoolean();

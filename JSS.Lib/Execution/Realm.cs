@@ -127,7 +127,7 @@ public sealed class Realm
     }
 
     // 9.3.4 SetDefaultGlobalBindings ( realmRec ), https://tc39.es/ecma262/#sec-setdefaultglobalbindings
-    private Completion SetDefaultGlobalBindings()
+    private Completion SetDefaultGlobalBindings(VM vm)
     {
         // 1. Let global be realmRec.[[GlobalObject]].
 
@@ -143,7 +143,7 @@ public sealed class Realm
             var desc = property.Value;
 
             // c. Perform ? DefinePropertyOrThrow(global, name, desc).
-            var defineResult = Object.DefinePropertyOrThrow(GlobalObject, name, desc);
+            var defineResult = Object.DefinePropertyOrThrow(vm, GlobalObject, name, desc);
             if (defineResult.IsAbruptCompletion()) return defineResult;
         }
 
@@ -229,7 +229,7 @@ public sealed class Realm
         realm.SetRealmGlobalObject(global, thisValue);
 
         // 10. Let globalObj be ? SetDefaultGlobalBindings(realm).
-        var globalObj = realm.SetDefaultGlobalBindings();
+        var globalObj = realm.SetDefaultGlobalBindings(vm);
         if (globalObj.IsAbruptCompletion()) return globalObj;
 
         // FIXME: 11. Create any host-defined global object properties on globalObj.

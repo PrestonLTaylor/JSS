@@ -38,6 +38,6 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
         }
 
         // 3. Return ! ToObject(value).
-        return MUST(value.ToObject());
+        return MUST(value.ToObject(vm));
     }
 }

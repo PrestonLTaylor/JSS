@@ -23,7 +23,7 @@ internal sealed class CallExpression : IExpression
         if (lref.IsAbruptCompletion()) return lref;
 
         // 5. Let func be ? GetValue(ref).
-        var func = lref.Value.GetValue();
+        var func = lref.Value.GetValue(vm);
         if (func.IsAbruptCompletion()) return func;
 
         // 6. If ref is a Reference Record, FIXME: (IsPropertyReference(ref) is false), and ref.[[ReferencedName]] is "eval", then
@@ -65,16 +65,16 @@ internal sealed class CallExpression : IExpression
         // 3. Let argList be ? ArgumentListEvaluation of arguments.
         var argList = ArgumentListEvaluation(vm);
 
-        // 4. If func is not an Object, FIXME: throw a TypeError exception.
+        // 4. If func is not an Object, throw a TypeError exception.
         if (!func.IsObject())
         {
-            return Completion.ThrowCompletion($"Tried to call a {func.Type()}, expected an Object");
+            return ThrowTypeError(vm, RuntimeErrorType.CallingANonFunction, func.Type());
         }
 
         // 5. If IsCallable(func) is false, throw a TypeError exception.
         if (!func.IsCallable())
         {
-            return Completion.ThrowCompletion("Tried to call a non-callable Object");
+            return ThrowTypeError(vm, RuntimeErrorType.CallingANonFunction, func.Type());
         }
 
         // FIXME: 6. If tailPosition is true, perform PrepareForTailCall().
@@ -96,7 +96,7 @@ internal sealed class CallExpression : IExpression
             if (aref.IsAbruptCompletion()) return aref;
 
             // 3. Let arg be ? GetValue(ref).
-            var arg = aref.Value.GetValue();
+            var arg = aref.Value.GetValue(vm);
             if (arg.IsAbruptCompletion()) return arg;
 
             // 4. Return the list-concatenation of precedingArgs and « arg ».

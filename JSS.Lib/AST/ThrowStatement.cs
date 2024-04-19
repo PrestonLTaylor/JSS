@@ -18,7 +18,7 @@ internal sealed class ThrowStatement : INode
         if (exprRef.IsAbruptCompletion()) return exprRef;
 
         // 2. Let exprValue be ? GetValue(exprRef).
-        var exprValue = exprRef.Value.GetValue();
+        var exprValue = exprRef.Value.GetValue(vm);
         if (exprValue.IsAbruptCompletion()) return exprValue;
 
         // 3. Return ThrowCompletion(exprValue).

@@ -42,11 +42,11 @@ internal sealed class ObjectEnvironment : Environment
     }
 
     // 9.1.1.2.2 CreateMutableBinding ( N, D ), https://tc39.es/ecma262/#sec-object-environment-records-createmutablebinding-n-d
-    override public Completion CreateMutableBinding(string N, bool D)
+    override public Completion CreateMutableBinding(VM vm, string N, bool D)
     {
         // 1. Let bindingObject be envRec.[[BindingObject]].
         // 2. Perform ? DefinePropertyOrThrow(bindingObject, N, PropertyDescriptor { [[Value]]: undefined, [[Writable]]: true, [[Enumerable]]: true, [[Configurable]]: D }).
-        var defineResult = Object.DefinePropertyOrThrow(BindingObject, N, new Property(Undefined.The, new(true, true, D)));
+        var defineResult = Object.DefinePropertyOrThrow(vm, BindingObject, N, new Property(Undefined.The, new(true, true, D)));
         if (defineResult.IsAbruptCompletion()) return defineResult;
 
         // 3. Return UNUSED.
@@ -54,10 +54,10 @@ internal sealed class ObjectEnvironment : Environment
     }
 
     // 9.1.1.2.4 InitializeBinding ( N, V ), https://tc39.es/ecma262/#sec-object-environment-records-initializebinding-n-v
-    override public Completion InitializeBinding(string N, Value V)
+    override public Completion InitializeBinding(VM vm, string N, Value V)
     {
         // 1. Perform ? envRec.SetMutableBinding(N, V, false).
-        var setResult = SetMutableBinding(N, V, false);
+        var setResult = SetMutableBinding(vm, N, V, false);
         if (setResult.IsAbruptCompletion()) return setResult;
 
         // 2. Return UNUSED.
@@ -65,7 +65,7 @@ internal sealed class ObjectEnvironment : Environment
     }
 
     // 9.1.1.2.5 SetMutableBinding ( N, V, S ), https://tc39.es/ecma262/#sec-object-environment-records-getbindingvalue-n-s
-    override public Completion SetMutableBinding(string N, Value V, bool S)
+    override public Completion SetMutableBinding(VM vm, string N, Value V, bool S)
     {
         // 1. Let bindingObject be envRec.[[BindingObject]].
         // 2. Let stillExists be ? HasProperty(bindingObject, N).
@@ -76,12 +76,11 @@ internal sealed class ObjectEnvironment : Environment
         var asBoolean = stillExists.Value.AsBoolean();
         if (!asBoolean.Value && S)
         {
-            // FIXME: Throw a ReferenceError object
-            return Completion.ThrowCompletion($"{N} is not defined");
+            return ThrowReferenceError(vm, RuntimeErrorType.BindingNotDefined, N);
         }
 
         // 4. Perform ? Set(bindingObject, N, V, S).
-        var setResult = Object.Set(BindingObject, N, V, S);
+        var setResult = Object.Set(vm, BindingObject, N, V, S);
         if (setResult.IsAbruptCompletion()) return setResult;
 
         // 5. Return UNUSED.
@@ -89,7 +88,7 @@ internal sealed class ObjectEnvironment : Environment
     }
 
     // 9.1.1.2.6 GetBindingValue ( N, S ), https://tc39.es/ecma262/#sec-object-environment-records-getbindingvalue-n-s
-    override public Completion GetBindingValue(string N, bool S)
+    override public Completion GetBindingValue(VM vm, string N, bool S)
     {
         // 1. Let bindingObject be envRec.[[BindingObject]].
         // 2. Let value be ? HasProperty(bindingObject, N).
@@ -100,10 +99,10 @@ internal sealed class ObjectEnvironment : Environment
         var asBoolean = value.Value.AsBoolean();
         if (!asBoolean.Value)
         {
-            // a. If S is false, return undefined; otherwise FIXME: throw a ReferenceError exception.
+            // a. If S is false, return undefined; otherwise throw a ReferenceError exception.
             if (S)
             {
-                return Completion.ThrowCompletion($"{N} is not defined.");
+                return ThrowReferenceError(vm, RuntimeErrorType.BindingNotDefined, N);
             }
             else
             {

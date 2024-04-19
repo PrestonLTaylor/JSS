@@ -42,12 +42,12 @@ internal sealed class ErrorConstructor : Object, ICallable, IConstructable
             if (msg.IsAbruptCompletion()) return msg;
 
             // b. Perform CreateNonEnumerableDataPropertyOrThrow(O, "message", msg).
-            CreateNonEnumerableDataPropertyOrThrow(O, "message", msg.Value);
+            CreateNonEnumerableDataPropertyOrThrow(vm, O, "message", msg.Value);
         }
 
         // 4. Perform ? InstallErrorCause(O, options).
         var options = argumentsList[1];
-        var installResult = InstallErrorCause(O, options);
+        var installResult = InstallErrorCause(vm, O, options);
         if (installResult.IsAbruptCompletion()) return installResult;
 
         // 5. Return O.
@@ -55,7 +55,7 @@ internal sealed class ErrorConstructor : Object, ICallable, IConstructable
     }
 
     // 20.5.8.1 InstallErrorCause ( O, options ), https://tc39.es/ecma262/#sec-installerrorcause
-    static public Completion InstallErrorCause(Object O, Value options)
+    static public Completion InstallErrorCause(VM vm, Object O, Value options)
     {
         // 1. If options is an Object and ? HasProperty(options, "cause") is true, then
         if (options.IsObject())
@@ -71,7 +71,7 @@ internal sealed class ErrorConstructor : Object, ICallable, IConstructable
                 if (cause.IsAbruptCompletion()) return cause;
 
                 // b. Perform CreateNonEnumerableDataPropertyOrThrow(O, "cause", cause).
-                CreateNonEnumerableDataPropertyOrThrow(O, "cause", cause.Value);
+                CreateNonEnumerableDataPropertyOrThrow(vm, O, "cause", cause.Value);
             }
         }
 

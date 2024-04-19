@@ -32,6 +32,13 @@ public sealed class VM
     internal FunctionPrototype FunctionPrototype { get => Realm.FunctionPrototype; }
     internal ErrorPrototype ErrorPrototype { get => Realm.ErrorPrototype; }
 
+    internal NativeErrorConstructor EvalErrorConstructor { get => Realm.EvalErrorConstructor; }
+    internal NativeErrorConstructor RangeErrorConstructor { get => Realm.RangeErrorConstructor; }
+    internal NativeErrorConstructor ReferenceErrorConstructor { get => Realm.ReferenceErrorConstructor; }
+    internal NativeErrorConstructor SyntaxErrorConstructor { get => Realm.SyntaxErrorConstructor; }
+    internal NativeErrorConstructor TypeErrorConstructor { get => Realm.TypeErrorConstructor; }
+    internal NativeErrorConstructor URIErrorConstructor { get => Realm.URIErrorConstructor; }
+
     internal ExecutionContext CurrentExecutionContext
     {
         get

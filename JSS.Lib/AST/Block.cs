@@ -54,13 +54,13 @@ internal sealed class Block : INode
                 if (d is ConstDeclaration)
                 {
                     // 1. Perform ! env.CreateImmutableBinding(dn, true).
-                    MUST(env.CreateImmutableBinding(dn, true));
+                    MUST(env.CreateImmutableBinding(vm, dn, true));
                 }
                 // ii. Else,
                 else
                 {
                     // 1. Perform ! env.CreateMutableBinding(dn, false). NOTE: This step is replaced in section B.3.2.6.
-                    MUST(env.CreateMutableBinding(dn, true));
+                    MUST(env.CreateMutableBinding(vm, dn, true));
                 }
             }
 
@@ -75,7 +75,7 @@ internal sealed class Block : INode
                 var fo = f!.InstantiateFunctionObject(vm, env);
 
                 // iii. Perform ! env.InitializeBinding(fn, fo). NOTE: This step is replaced in section B.3.2.6.
-                MUST(env.InitializeBinding(fn, fo));
+                MUST(env.InitializeBinding(vm, fn, fo));
             }
         }
 
