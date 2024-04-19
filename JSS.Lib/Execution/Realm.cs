@@ -31,7 +31,7 @@ public sealed class Realm
     }
 
     // 9.3.2 CreateIntrinsics ( realmRec ), https://tc39.es/ecma262/#sec-createintrinsics
-    [MemberNotNull(nameof(ObjectPrototype), nameof(FunctionPrototype), nameof(ObjectConstructor), nameof(ErrorPrototype))]
+    [MemberNotNull(nameof(ObjectPrototype), nameof(FunctionPrototype), nameof(ObjectConstructor), nameof(ErrorPrototype), nameof(ErrorConstructor))]
     private void CreateIntrinsics()
     {
         // 1. Set realmRec.[[Intrinsics]] to a new Record.
@@ -54,7 +54,9 @@ public sealed class Realm
         ObjectConstructor.Initialize();
 
         ErrorPrototype = new(ObjectPrototype);
+        ErrorConstructor = new(FunctionPrototype);
         ErrorPrototype.Initialize();
+        ErrorConstructor.Initialize(this);
 
         // FIMXE: 3. Perform AddRestrictedFunctionProperties(realmRec.[[Intrinsics]].[[%Function.prototype%]], realmRec).
 
@@ -130,6 +132,9 @@ public sealed class Realm
         globalProperties.Add("undefined", new Property(Undefined.The, new(false, false, false)));
 
         // 19.3 Constructor Properties of the Global Object
+        // 20.5.1 The Error Constructor, https://tc39.es/ecma262/#sec-error-constructor
+        globalProperties.Add("Error", new Property(ErrorConstructor, new(true, false, true)));
+
         // 20.1.1 The Object Constructor, https://tc39.es/ecma262/#sec-object-constructor
         globalProperties.Add("Object", new Property(ObjectConstructor, new(true, false, true)));
 
@@ -194,4 +199,5 @@ public sealed class Realm
     internal ObjectConstructor ObjectConstructor { get; private set; }
     internal FunctionPrototype FunctionPrototype { get; private set; }
     internal ErrorPrototype ErrorPrototype { get; private set; }
+    internal ErrorConstructor ErrorConstructor { get; private set; }
 }
