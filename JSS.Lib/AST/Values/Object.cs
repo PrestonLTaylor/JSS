@@ -1,4 +1,5 @@
 ﻿using JSS.Lib.Execution;
+using System.Diagnostics;
 
 namespace JSS.Lib.AST.Values;
 
@@ -40,7 +41,22 @@ public class Object : Value
         return Empty.The;
     }
 
-    // 7.3.9 DefinePropertyOrThrow ( O, P, desc ), https://tc39.es/ecma262/#sec-definepropertyorthrow
+    // 7.3.7 CreateNonEnumerableDataPropertyOrThrow ( O, P, V ), https://tc39.es/ecma262/#sec-createnonenumerabledatapropertyorthrow
+    static internal void CreateNonEnumerableDataPropertyOrThrow(Object O, string P, Value V)
+    {
+        // 1. Assert: O is an ordinary, FIXME: extensible object with no non-configurable properties.
+        Debug.Assert(O.IsObject());
+
+        // 2. Let newDesc be the PropertyDescriptor { [[Value]]: V, [[Writable]]: true, [[Enumerable]]: false, [[Configurable]]: true }.
+        var newDesc = new Property(V, new(true, false, true));
+
+        // 3. Perform ! DefinePropertyOrThrow(O, P, newDesc).
+        MUST(DefinePropertyOrThrow(O, P, newDesc));
+
+        // 4. Return UNUSED.
+    }
+
+    // 7.3.8 DefinePropertyOrThrow ( O, P, desc ), https://tc39.es/ecma262/#sec-definepropertyorthrow
     static internal Completion DefinePropertyOrThrow(Object O, string P, Property desc)
     {
         // 1. Let success be ? O.[[DefineOwnProperty]](P, desc).
