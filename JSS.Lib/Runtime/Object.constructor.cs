@@ -11,11 +11,15 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
     {
     }
 
-    public void Initialize()
+    public void Initialize(Realm realm)
     {
         // The Object constructor has a "length" property whose value is 1𝔽.
         // FIXME: We should probably have a method for internally defining properties
         DataProperties.Add("length", new Property(1, new Attributes(true, false, true)));
+
+        // 20.1.2.21 Object.prototype, The initial value of Object.prototype is the Object prototype object.
+        // This property has the attributes { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: false }.
+        DataProperties.Add("prototype", new Property(realm.ObjectPrototype, new(false, false, false)));
     }
 
     // 20.1.1.1 Object ( [ value ] ), https://tc39.es/ecma262/#sec-object-value
