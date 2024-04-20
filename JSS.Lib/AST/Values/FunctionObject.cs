@@ -172,7 +172,8 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         return EvaluateBody(vm, argumentsList);
     }
 
-    // 10.2.2 [[Construct]] ( argumentsList, FIXME: newTarget ), https://tc39.es/ecma262/#sec-ecmascript-function-objects-construct-argumentslist-newtarget
+    // NOTE: newTarget is the constructor being used, so for this function object, it is the C# this
+    // 10.2.2 [[Construct]] ( argumentsList, newTarget ), https://tc39.es/ecma262/#sec-ecmascript-function-objects-construct-argumentslist-newtarget
     public Completion Construct(VM vm, List argumentsList)
     {
         // 1. Let callerContext be the running execution context.
@@ -186,7 +187,10 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         if (ConstructorKind == ConstructorKind.BASE)
         {
             // a. Let thisArgument be ? FIXME: OrdinaryCreateFromConstructor(newTarget, "%Object.prototype%").
-            thisArgument = new Object(vm.ObjectPrototype);
+            var getResult = Get(this, "prototype");
+            if (getResult.IsAbruptCompletion()) return getResult;
+            var prototype = getResult.Value.IsObject() ? getResult.Value.AsObject() : vm.ObjectPrototype;
+            thisArgument = new Object(prototype);
         }
 
         // 4. Let calleeContext be PrepareForOrdinaryCall(F, FIXME: newTarget).
