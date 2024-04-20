@@ -26,7 +26,6 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
     }
 #pragma warning restore CS8618
 
-    override public bool IsFunction() { return true; }
     override public ValueType Type() { return ValueType.Function; }
 
     // 10.2.1 [[Call]] ( thisArgument, argumentsList ), https://tc39.es/ecma262/#sec-ecmascript-function-objects-call-thisargument-argumentslist

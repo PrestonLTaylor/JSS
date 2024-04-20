@@ -15,6 +15,21 @@ public class Object : Value
     override public bool IsObject() { return true; }
     override public ValueType Type() {  return ValueType.Object; }
 
+    public string ToString(VM vm)
+    {
+        var toString = Get(this, "toString");
+        if (toString.IsAbruptCompletion()) return "Object";
+
+        if (toString.Value.HasInternalCall())
+        {
+            var toStringFunc = toString.Value.AsCallable();
+            var completion = toStringFunc.Call(vm, this, new List());
+            if (completion.IsNormalCompletion()) return completion.Value.AsString();
+        }
+
+        return "Object";
+    }
+
     // 7.3.2 Get ( O, P ), https://tc39.es/ecma262/#sec-get-o-p
     static internal Completion Get(Object O, string P)
     {

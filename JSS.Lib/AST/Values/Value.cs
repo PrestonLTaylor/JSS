@@ -36,7 +36,6 @@ public abstract class Value
     virtual public bool IsNumber() { return false; }
     virtual public bool IsBigInt() { return false; }
     virtual public bool IsObject() { return false; }
-    virtual public bool IsFunction() { return false; }
     virtual public bool IsProperty() { return false; }
 
     public Reference AsReference()

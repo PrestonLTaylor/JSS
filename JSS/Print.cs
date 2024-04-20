@@ -6,9 +6,9 @@ namespace JSS.CLI;
 
 internal sealed class Print
 {
-    static public void PrintCompletion(Completion completion)
+    static public void PrintCompletion(VM vm, Completion completion)
     {
-        var completionAsString = CompletionToString(completion);
+        var completionAsString = CompletionToString(vm, completion);
         if (completion.IsAbruptCompletion())
         {
             SetToErrorColors();
@@ -20,20 +20,19 @@ internal sealed class Print
         Console.ResetColor();
     }
 
-    static private string CompletionToString(Completion completion)
+    static private string CompletionToString(VM vm, Completion completion)
     {
         if (completion.IsThrowCompletion())
         {
-            // FIXME: Print the exception type
-            return $"Uncaught {ValueToString(completion.Value)}";
+            return $"Uncaught {ValueToString(vm, completion.Value)}";
         }
         else
         {
-            return ValueToString(completion.Value);
+            return ValueToString(vm, completion.Value);
         }
     }
 
-    static private string ValueToString(Value value)
+    static private string ValueToString(VM vm, Value value)
     {
         if (value.IsEmpty())
         {
@@ -65,6 +64,11 @@ internal sealed class Print
         else if (value.HasInternalCall())
         {
             return "Function";
+        }
+        else if (value.IsObject())
+        {
+            var asObject = value.AsObject();
+            return asObject.ToString(vm);
         }
 
         return value.Type().ToString();

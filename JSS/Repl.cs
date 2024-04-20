@@ -27,7 +27,7 @@ internal sealed class Repl
             var parser = new Parser(input);
             var script = parser.Parse(_vm);
             var result = script.ScriptEvaluation();
-            Print.PrintCompletion(result);
+            Print.PrintCompletion(_vm, result);
         }
         catch (Exception e)
         {
