@@ -121,6 +121,16 @@ internal sealed class ObjectEnvironment : Environment
         return false;
     }
 
+    // 9.1.1.2.10 WithBaseObject ( ), https://tc39.es/ecma262/#sec-object-environment-records-withbaseobject
+    public override Value WithBaseObject()
+    {
+        // 1. If envRec.[[IsWithEnvironment]] is true, return envRec.[[BindingObject]].
+        if (IsWithEnvironment) return BindingObject;
+
+        // 2. Otherwise, return undefined.
+        return Undefined.The;
+    }
+
     public Object BindingObject { get; }
     public bool IsWithEnvironment { get; }
 }
