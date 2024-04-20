@@ -127,6 +127,13 @@ internal sealed class GlobalEnvironment : Environment
         return true;
     }
 
+    // 9.1.1.4.10 WithBaseObject ( ), https://tc39.es/ecma262/#sec-global-environment-records-withbaseobject
+    public override Value WithBaseObject()
+    {
+        // 1. Return undefined.
+        return Undefined.The;
+    }
+
     // 9.1.1.4.11 GetThisBinding ( ), https://tc39.es/ecma262/#sec-global-environment-records-getthisbinding
     public override Completion GetThisBinding(VM _)
     {

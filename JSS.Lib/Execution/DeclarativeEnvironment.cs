@@ -141,5 +141,12 @@ internal class DeclarativeEnvironment : Environment
         return false;
     }
 
+    // 9.1.1.1.10 WithBaseObject ( ), https://tc39.es/ecma262/#sec-declarative-environment-records-withbaseobject
+    public override Value WithBaseObject()
+    {
+        // 1. Return undefined.
+        return Undefined.The;
+    }
+
     private readonly Dictionary<string, Binding> _identifierToBinding = new();
 }
