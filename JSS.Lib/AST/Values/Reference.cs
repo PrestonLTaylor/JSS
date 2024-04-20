@@ -43,6 +43,16 @@ public class Reference : Value
         return Base is null;
     }
 
+    // 6.2.5.7 GetThisValue ( V ), https://tc39.es/ecma262/#sec-getthisvalue
+    internal Value GetThisValue()
+    {
+        // 1. Assert: IsPropertyReference(V) is true.
+        Debug.Assert(IsPropertyReference());
+
+        // FIXME: (2. If IsSuperReference(V) is true, return V.[[ThisValue]];) otherwise return V.[[Base]].
+        return Base ?? Undefined.The;
+    }
+
     // 6.2.5.8 InitializeReferencedBinding ( V, W ), https://tc39.es/ecma262/#sec-initializereferencedbinding
     public Completion InitializeReferencedBinding(VM vm, Value W)
     {
