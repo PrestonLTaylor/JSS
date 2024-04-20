@@ -2,6 +2,16 @@
 
 namespace JSS.Lib.Execution;
 
-internal record struct Binding(Value Value, bool Mutable, bool Strict)
+internal class Binding
 {
+    public Binding(Value value, bool mutable, bool strict)
+    {
+        Value = value;
+        Mutable = mutable;
+        Strict = strict;
+    }
+
+    public Value Value { get; set; }
+    public bool Mutable { get; }
+    public bool Strict { get; }
 }
