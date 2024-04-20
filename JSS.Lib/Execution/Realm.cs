@@ -10,12 +10,14 @@ public sealed class Realm
 {
     // 9.3.1 CreateRealm ( ), https://tc39.es/ecma262/#sec-createrealm
 #pragma warning disable CS8618 // All properties are initialised in CreateIntrinsics
-    internal Realm()
+    internal Realm(out VM vm)
     {
+        vm = new(this);
+
         // 1. Let realmRec be a new Realm Record.
 
         // 2. Perform CreateIntrinsics(realmRec).
-        CreateIntrinsics();
+        CreateIntrinsics(vm);
 
         // 3. Set realmRec.[[AgentSignifier]] to AgentSignifier(). 
         Agent = Agent.AgentSignifier();
@@ -33,7 +35,7 @@ public sealed class Realm
 #pragma warning restore CS8618 // All properties are initialised in CreateIntrinsics
 
     // 9.3.2 CreateIntrinsics ( realmRec ), https://tc39.es/ecma262/#sec-createintrinsics
-    private void CreateIntrinsics()
+    private void CreateIntrinsics(VM vm)
     {
         // 1. Set realmRec.[[Intrinsics]] to a new Record.
 
@@ -56,7 +58,7 @@ public sealed class Realm
 
         ErrorPrototype = new(ObjectPrototype);
         ErrorConstructor = new(FunctionPrototype);
-        ErrorPrototype.Initialize(this);
+        ErrorPrototype.Initialize(this, vm);
         ErrorConstructor.Initialize(this);
 
         EvalErrorPrototype = new(ErrorPrototype);
@@ -204,8 +206,7 @@ public sealed class Realm
     static public Completion InitializeHostDefinedRealm(out VM vm)
     {
         // 1. Let realm be CreateRealm().
-        var realm = new Realm();
-        vm = new VM(realm);
+        var realm = new Realm(out vm);
 
         // 2. Let newContext be a new execution context.
         // FIXME: 3. Set the Function of newContext to null.

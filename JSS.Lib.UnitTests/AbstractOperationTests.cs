@@ -186,8 +186,7 @@ internal sealed class AbstractOperationTests
     public void EvaluateStringOrNumericBinaryExpression_ReturnsNormalCompletion_WithExpectedValue(IExpression lhs, BinaryOpType op, IExpression rhs, Value expectedValue)
     {
         // Arrange
-        var realm = new Realm();
-        var vm = new VM(realm);
+        var realm = new Realm(out VM vm);
 
         // Act
         var result = IExpression.EvaluateStringOrNumericBinaryExpression(vm, lhs, op, rhs);
