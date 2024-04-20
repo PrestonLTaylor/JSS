@@ -56,6 +56,8 @@ public sealed class Realm
         ObjectPrototype.Initialize(this);
         ObjectConstructor.Initialize();
 
+        StringConstructor = new(FunctionPrototype);
+
         ErrorPrototype = new(ObjectPrototype);
         ErrorConstructor = new(FunctionPrototype);
         ErrorPrototype.Initialize(this, vm);
@@ -189,6 +191,9 @@ public sealed class Realm
         // 20.1.1 The Object Constructor, https://tc39.es/ecma262/#sec-object-constructor
         globalProperties.Add("Object", new Property(ObjectConstructor, new(true, false, true)));
 
+        // 22.1.1 The String Constructor, https://tc39.es/ecma262/#sec-string-constructor
+        globalProperties.Add("String", new Property(StringConstructor, new(true, false, true)));
+
         return globalProperties;
     }
 
@@ -248,6 +253,7 @@ public sealed class Realm
     internal ObjectPrototype ObjectPrototype { get; private set; }
     internal ObjectConstructor ObjectConstructor { get; private set; }
     internal FunctionPrototype FunctionPrototype { get; private set; }
+    internal StringConstructor StringConstructor { get; private set; }
     internal ErrorPrototype ErrorPrototype { get; private set; }
     internal ErrorConstructor ErrorConstructor { get; private set; }
     internal NativeErrorPrototype EvalErrorPrototype { get; private set; }
