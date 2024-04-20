@@ -1,5 +1,6 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
+using System.Diagnostics;
 
 namespace JSS.Lib.AST;
 
@@ -51,15 +52,36 @@ internal sealed class CallExpression : IExpression
     private Completion EvaluateCall(VM vm, Value func, Value lref)
     {
         // 1. If ref is a Reference Record, then
-        // FIXME: a. If IsPropertyReference(ref) is true, then
-        // FIXME: i. Let thisValue be GetThisValue(ref).
-        // FIXME: b. Else,
-        // FIXME: i. Let refEnv be ref.[[Base]].
-        // FIXME: ii. Assert: refEnv is an Environment Record.
-        // FIXME: iii. Let thisValue be refEnv.WithBaseObject().
-        // FIXME: 2. Else,
-        // a. Let thisValue be undefined.
-        Value thisValue = Undefined.The;
+        Value thisValue;
+        if (lref.IsReference())
+        {
+            // a. If IsPropertyReference(ref) is true, then
+            var asReference = lref.AsReference();
+            if (asReference.IsPropertyReference())
+            {
+                // i. Let thisValue be GetThisValue(ref).
+                thisValue = asReference.GetThisValue();
+            }
+            // b. Else,
+            else
+            {
+                // i. Let refEnv be ref.[[Base]].
+                var refEnv = asReference.Base;
+
+                // ii. Assert: refEnv is an Environment Record.
+                Debug.Assert(refEnv is Environment);
+
+                // iii. Let thisValue be refEnv.WithBaseObject().
+                var asEnvironment = refEnv as Environment;
+                thisValue = asEnvironment!.WithBaseObject();
+            }
+        }
+        // 2. Else,
+        else
+        {
+            // a. Let thisValue be undefined.
+            thisValue = Undefined.The;
+        }
 
         // FIXME: Make a ArgumentList class
         // 3. Let argList be ? ArgumentListEvaluation of arguments.
