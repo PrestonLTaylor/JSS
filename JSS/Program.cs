@@ -5,7 +5,7 @@ using JSS.Lib.Execution;
 var completion = Realm.InitializeHostDefinedRealm(out VM globalVm);
 if (completion.IsAbruptCompletion())
 {
-    Print.PrintCompletion(completion);
+    Print.PrintCompletion(globalVm, completion);
     return;
 }
 
