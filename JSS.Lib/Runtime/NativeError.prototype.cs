@@ -7,6 +7,7 @@ internal class NativeErrorPrototype : Object
     {
     }
 
+    // 20.5.6.3 Properties of the NativeError Prototype Objects, https://tc39.es/ecma262/#sec-properties-of-the-nativeerror-prototype-objects
     public void Initialize(Object constructor, string name)
     {
         // 20.5.6.3.1 NativeError.prototype.constructor, The initial value of the "constructor" property of the prototype for a given NativeError constructor is the constructor itself.
