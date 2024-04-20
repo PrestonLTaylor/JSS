@@ -21,6 +21,7 @@ internal class ObjectPrototype : Object
         DataProperties.Add("toString", new Property(toStringBuiltin, new Attributes(true, false, true)));
     }
 
+    // 20.1.3.6 Object.prototype.toString ( ), https://tc39.es/ecma262/#sec-object.prototype.tostring
     private Completion toString(VM vm, Value? thisValue, List argumentList)
     {
         // 1. If the this value is undefined, return "[object Undefined]".
