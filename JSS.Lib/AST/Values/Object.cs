@@ -105,7 +105,7 @@ public class Object : Value
     }
 
     // 7.3.14 Call ( F, V [ , argumentsList ] )
-    static internal Completion Call(VM vm, Value F, Value V, Value? argumentsList = null)
+    static internal Completion Call(VM vm, Value F, Value V, List? argumentsList = null)
     {
         // 1. If argumentsList is not present, set argumentsList to a new empty List.
         argumentsList ??= new List();
@@ -118,7 +118,7 @@ public class Object : Value
 
         // 3. Return ? F.[[Call]](V, argumentsList).
         var asCallable = F.AsCallable(); 
-        return asCallable.Call(vm, V, (argumentsList as List)!);
+        return asCallable.Call(vm, V, argumentsList);
     }
 
     // 10.1.1 [[GetPrototypeOf]] ( ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-getprototypeof
