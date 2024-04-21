@@ -506,9 +506,10 @@ public abstract class Value
             return xAsBoolean == yAsBoolean;
         }
 
-        // FIXME: 6. NOTE: All other ECMAScript language values are compared by identity.
-        // FIXME: 7. If x is y, return true; otherwise, return false.
-        throw new NotImplementedException();
+        // NOTE: x and y should be reference types, comparing values by identity is the same as the reference equality between the two values
+        // 6. NOTE: All other ECMAScript language values are compared by identity.
+        // 7. If x is y, return true; otherwise, return false.
+        return ReferenceEquals(x, y);
     }
 
     // 7.2.13 IsLessThan ( x, y, LeftFirst ), https://tc39.es/ecma262/#sec-islessthan
