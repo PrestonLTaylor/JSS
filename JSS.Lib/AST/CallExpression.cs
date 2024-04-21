@@ -86,6 +86,7 @@ internal sealed class CallExpression : IExpression
         // FIXME: Make a ArgumentList class
         // 3. Let argList be ? ArgumentListEvaluation of arguments.
         var argList = ArgumentListEvaluation(vm);
+        if (argList.IsAbruptCompletion()) return argList;
 
         // 4. If func is not an Object, throw a TypeError exception.
         if (!func.IsObject())
