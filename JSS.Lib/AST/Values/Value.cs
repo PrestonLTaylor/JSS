@@ -378,7 +378,8 @@ public abstract class Value
 
         // FIXME: 2. If argument is a Symbol, throw a TypeError exception.
 
-        // FIXME: 3. If argument is undefined, return "undefined".
+        // 3. If argument is undefined, return "undefined".
+        if (IsUndefined()) return "undefined";
 
         // 4. If argument is null, return "null".
         if (IsNull()) return "null";
