@@ -121,7 +121,7 @@ public sealed class Script
             var d = varDeclarations[i];
 
             // a. If d is not either a VariableDeclaration, a ForBinding, or a BindingIdentifier, then
-            if (d is not VarStatement or Identifier)
+            if (d is not VarDeclaration or Identifier)
             {
                 // i. Assert: d is either a FunctionDeclaration, FIXME: a GeneratorDeclaration, an AsyncFunctionDeclaration, or an AsyncGeneratorDeclaration.
                 Debug.Assert(d is FunctionDeclaration);
@@ -158,7 +158,7 @@ public sealed class Script
         foreach (var d in varDeclarations)
         {
             // a. If d is either a VariableDeclaration, a ForBinding, or a BindingIdentifier, then
-            if (d is VarStatement or Identifier)
+            if (d is VarDeclaration or Identifier)
             {
                 // i. For each String vn of the BoundNames of d, do
                 foreach (var vn in d.BoundNames())

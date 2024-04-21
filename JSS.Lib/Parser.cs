@@ -1451,17 +1451,44 @@ public sealed class Parser
     {
         _consumer.ConsumeTokenOfType(TokenType.Var);
 
+        var declarationList = ParseVarDeclarationList();
+
+        return new VarStatement(declarationList);
+    }
+
+    private List<VarDeclaration> ParseVarDeclarationList()
+    {
+        List<VarDeclaration> declarationList = new();
+
+        while (true)
+        {
+            var declaration = ParseVarDeclaration();
+            declarationList.Add(declaration);
+
+            // We want to keep parsing declarations every time there is a comma
+            if (!_consumer.IsTokenOfType(TokenType.Comma))
+            {
+                break;
+            }
+
+            _consumer.ConsumeTokenOfType(TokenType.Comma);
+        }
+
+        return declarationList;
+    }
+
+    private VarDeclaration ParseVarDeclaration()
+    {
         // FIXME: Allow let/await/yield to be used as an indentifier when specified in the spec
         var identifierToken = _consumer.ConsumeTokenOfType(TokenType.Identifier);
 
-        // FIXME: We should allow parsing multiple bindings in a single var statement 
         INode? initializer = null;
         if (IsInitializer())
         {
             initializer = ParseInitializer();
         }
 
-        return new VarStatement(identifierToken.data, initializer);
+        return new(identifierToken.data, initializer);
     }
 
     private bool IsInitializer()
