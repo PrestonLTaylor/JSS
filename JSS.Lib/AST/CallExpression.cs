@@ -86,7 +86,7 @@ internal sealed class CallExpression : IExpression
         // FIXME: Make a ArgumentList class
         // 3. Let argList be ? ArgumentListEvaluation of arguments.
         var argList = ArgumentListEvaluation(vm);
-        if (argList.IsAbruptCompletion()) return argList;
+        if (argList.IsAbruptCompletion()) return argList.Completion;
 
         // 4. If func is not an Object, throw a TypeError exception.
         if (!func.IsObject())
@@ -107,7 +107,7 @@ internal sealed class CallExpression : IExpression
     }
 
     // 13.3.8.1 Runtime Semantics: ArgumentListEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-argumentlistevaluation
-    private Completion ArgumentListEvaluation(VM vm)
+    private AbruptOr<List> ArgumentListEvaluation(VM vm)
     {
         // 1. Let precedingArgs be ? ArgumentListEvaluation of ArgumentList.
         List precedingArgs = new();
