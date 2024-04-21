@@ -420,7 +420,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             var d = varDeclarations[i];
 
             // a. If d is neither a VariableDeclaration nor a ForBinding nor a BindingIdentifier, then
-            if (d is not Identifier)
+            if (d is not VarDeclaration or Identifier)
             {
                 // i. Assert: d is either a FunctionDeclaration, a GeneratorDeclaration, an AsyncFunctionDeclaration, or an AsyncGeneratorDeclaration.
                 Debug.Assert(d is FunctionDeclaration);
