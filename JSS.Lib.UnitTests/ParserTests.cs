@@ -404,8 +404,34 @@ internal sealed class ParserTests
 
         var varStatement = rootNodes[0] as VarStatement;
         varStatement.Should().NotBeNull();
-        varStatement!.Identifier.Should().Be(expectedIdentifier);
-        varStatement!.Initializer.Should().BeNull();
+        varStatement!.Declarations.Should().HaveCount(1);
+
+        var varDeclaration = varStatement.Declarations[0];
+        varDeclaration.Identifier.Should().Be(expectedIdentifier);
+        varDeclaration.Initializer.Should().BeNull();
+    }
+
+    [Test]
+    public void Parse_ReturnsVarStatement_WithMultipleDeclarations_WhenProvidingVarStatement_WithMultipleDeclarations()
+    {
+        // Arrange
+        const string expectedFirstIdentifier = "expectedFirstIdentifier";
+        const string expectedSecondIdentifier = "expectedSecondIdentifier";
+        var parser = new Parser($"var {expectedFirstIdentifier}, {expectedSecondIdentifier}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var varStatement = rootNodes[0] as VarStatement;
+        varStatement.Should().NotBeNull();
+        varStatement!.Declarations.Should().HaveCount(2);
+
+        varStatement.Declarations[0].Identifier.Should().Be(expectedFirstIdentifier);
+        varStatement.Declarations[1].Identifier.Should().Be(expectedSecondIdentifier);
     }
 
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -426,8 +452,11 @@ internal sealed class ParserTests
 
         var varStatement = rootNodes[0] as VarStatement;
         varStatement.Should().NotBeNull();
-        varStatement!.Identifier.Should().Be(expectedIdentifier);
-        varStatement.Initializer.Should().BeOfType(expectedInitializerType);
+        varStatement!.Declarations.Should().HaveCount(1);
+
+        var varDeclaration = varStatement.Declarations[0];
+        varDeclaration.Identifier.Should().Be(expectedIdentifier);
+        varDeclaration.Initializer.Should().BeOfType(expectedInitializerType);
     }
 
     // Tests for 14.4 Empty Statement, https://tc39.es/ecma262/#sec-empty-statement
@@ -602,7 +631,10 @@ internal sealed class ParserTests
 
         var varStatement = forStatement.InitializationExpression as VarStatement;
         varStatement.Should().NotBeNull();
-        varStatement!.Identifier.Should().Be(expectedIdentifier);
+        varStatement!.Declarations.Should().HaveCount(1);
+
+        var varDeclaration = varStatement.Declarations[0];
+        varDeclaration.Identifier.Should().Be(expectedIdentifier);
     }
 
     [Test]
@@ -1636,6 +1668,7 @@ internal sealed class ParserTests
         {"super.", "}"},
         {"let", "}"},
         {"let a = ", "}"},
+        {"var a,", "}" },
         {"for (1 ", "1"},
         {"for (1; 1 ", "1"},
         {"for (1; 1; 1 ", "1"},
@@ -1744,6 +1777,7 @@ internal sealed class ParserTests
         "let",
         "let a = ",
         "let a = {",
+        "var a,",
         "for (1 ",
         "for (1; 1 ",
         "for (1; 1; 1 ",
