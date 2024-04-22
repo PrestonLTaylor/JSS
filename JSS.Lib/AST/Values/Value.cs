@@ -202,6 +202,42 @@ public abstract class Value
         }
     }
 
+    // 6.2.6.4 FromPropertyDescriptor ( Desc ), https://tc39.es/ecma262/#sec-frompropertydescriptor
+    public Value FromPropertyDescriptor(VM vm)
+    {
+        // 1. If Desc is undefined, return undefined.
+        if (IsUndefined()) return Undefined.The;
+        var desc = AsProperty();
+
+        // FIXME: 2. Let obj be OrdinaryObjectCreate(%Object.prototype%).
+        var obj = new Object(vm.ObjectPrototype);
+
+        // FIXME: 3. Assert: obj is an extensible ordinary object with no own properties.
+
+        // FIXME: 4. If Desc has a [[Value]] field, then
+        // a. Perform ! CreateDataPropertyOrThrow(obj, "value", Desc.[[Value]]).
+        MUST(Object.CreateDataPropertyOrThrow(vm, obj, "value", desc.Value));
+
+        // FIXME: 5. If Desc has a [[Writable]] field, then
+        // a. Perform ! CreateDataPropertyOrThrow(obj, "writable", Desc.[[Writable]]).
+        MUST(Object.CreateDataPropertyOrThrow(vm, obj, "writable", desc.Attributes.Writable));
+
+        // FIXME: 6. If Desc has a [[Get]] field, then
+        // FIXME: a. Perform ! CreateDataPropertyOrThrow(obj, "get", Desc.[[Get]]).
+        // FIXME: 7. If Desc has a [[Set]] field, then
+        // FIXME: a. Perform ! CreateDataPropertyOrThrow(obj, "set", Desc.[[Set]]).
+
+        // FIXME: 8. If Desc has an [[Enumerable]] field, then
+        // a. Perform ! CreateDataPropertyOrThrow(obj, "enumerable", Desc.[[Enumerable]]).
+        MUST(Object.CreateDataPropertyOrThrow(vm, obj, "enumerable", desc.Attributes.Enumerable));
+
+        // FIXME: 9. If Desc has a [[Configurable]] field, then
+        // a. Perform ! CreateDataPropertyOrThrow(obj, "configurable", Desc.[[Configurable]]).
+        MUST(Object.CreateDataPropertyOrThrow(vm, obj, "configurable", desc.Attributes.Configurable));
+
+        // 10. Return obj.
+        return obj;
+    }
 
     // 7.1.1 ToPrimitive ( input FIXME: [ , preferredType ] ), https://tc39.es/ecma262/#sec-toprimitive
     internal Completion ToPrimitive()
