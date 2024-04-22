@@ -1,4 +1,5 @@
-﻿global using Boolean = JSS.Lib.AST.Values.Boolean; 
+﻿global using Array = JSS.Lib.AST.Values.Array;
+global using Boolean = JSS.Lib.AST.Values.Boolean;
 global using Environment = JSS.Lib.Execution.Environment;
 global using ExecutionContext = JSS.Lib.Execution.ExecutionContext;
 global using Object = JSS.Lib.AST.Values.Object;

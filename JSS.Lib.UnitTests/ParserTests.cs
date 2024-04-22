@@ -1591,6 +1591,31 @@ internal sealed class ParserTests
         assignmentExpression.Rhs.Should().BeOfType(expectedExpressionType);
     }
 
+    // FIXME: More tests when we don't only parse empty array literals
+    // Tests for ArrayLiteral
+    [Test]
+    public void Parse_ReturnsAssignment_WithArrayLiteralRHS_WhenProvidingAssignment_WithArrayLiteralRHS()
+    {
+        // Arrange
+        var parser = new Parser("a = []");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var assignmentExpression = expressionStatement!.Expression as BasicAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
+
+        var objectLiteral = assignmentExpression!.Rhs as ArrayLiteral;
+        objectLiteral.Should().NotBeNull();
+    }
+
     // FIXME: More tests when we don't only parse empty object literals
     // Tests for ObjectLiteral
     [Test]
