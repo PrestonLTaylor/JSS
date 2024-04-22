@@ -55,6 +55,30 @@ public class Object : Value
         return Empty.The;
     }
 
+    // 7.3.5 CreateDataProperty ( O, P, V ), https://tc39.es/ecma262/#sec-createdataproperty
+    static public AbruptOr<bool> CreateDataProperty(Object O, string P, Value V)
+    {
+        // 1. Let newDesc be the PropertyDescriptor { [[Value]]: V, [[Writable]]: true, [[Enumerable]]: true, [[Configurable]]: true }.
+        var newDesc = new Property(V, new(true, true, true));
+
+        // 2. Return ? O.[[DefineOwnProperty]](P, newDesc).
+        return O.DefineOwnProperty(P, newDesc);
+    }
+
+    // 7.3.6 CreateDataPropertyOrThrow ( O, P, V ), https://tc39.es/ecma262/#sec-createdatapropertyorthrow
+    static public Completion CreateDataPropertyOrThrow(VM vm, Object O, string P, Value V)
+    {
+        // 1. Let success be ? CreateDataProperty(O, P, V).
+        var success = CreateDataProperty(O, P, V);
+        if (success.IsAbruptCompletion()) return success.Completion;
+
+        // 2. If success is false, throw a TypeError exception.
+        if (!success.Value) return ThrowTypeError(vm, RuntimeErrorType.CouldNotCreateDataProperty, P);
+
+        // 3. Return UNUSED.
+        return Empty.The;
+    }
+
     // 7.3.7 CreateNonEnumerableDataPropertyOrThrow ( O, P, V ), https://tc39.es/ecma262/#sec-createnonenumerabledatapropertyorthrow
     static internal void CreateNonEnumerableDataPropertyOrThrow(VM vm, Object O, string P, Value V)
     {
