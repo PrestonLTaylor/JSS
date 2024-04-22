@@ -1,5 +1,4 @@
 ﻿using JSS.Lib.Execution;
-using JSS.Lib.Runtime;
 using System.Diagnostics;
 
 namespace JSS.Lib.AST.Values;
@@ -445,12 +444,15 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         // 15. Let argumentsObjectNeeded be true.
         var argumentsObjectNeeded = true;
 
-        // FIXME: 16. If func.[[ThisMode]] is LEXICAL, then
-        // FIXME: a. NOTE: Arrow functions never have an arguments object.
-        // FIXME: b. Set argumentsObjectNeeded to false.
-
+        // 16. If func.[[ThisMode]] is LEXICAL, then
+        if (ThisMode == ThisMode.LEXICAL)
+        {
+            // a. NOTE: Arrow functions never have an arguments object.
+            // b. Set argumentsObjectNeeded to false.
+            argumentsObjectNeeded = false;
+        }
         // 17. Else if parameterNames contains "arguments", then
-        if (parameterNames.Contains("arguments"))
+        else if (parameterNames.Contains("arguments"))
         {
             // a. Set argumentsObjectNeeded to false.
             argumentsObjectNeeded = false;
@@ -502,22 +504,41 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             }
         }
 
-        // FIXME: 22. If argumentsObjectNeeded is true, then
-        // FIXME: a. If strict is true or simpleParameterList is false, then
-        // FIXME: i. Let ao be CreateUnmappedArgumentsObject(argumentsList).
-        // FIXME: b. Else,
-        // FIXME: i. NOTE: A mapped argument object is only provided for non - strict functions that don't have a rest parameter, any parameter default value initializers, or any destructured parameters.
-        // FIXME: ii. Let ao be CreateMappedArgumentsObject(func, formals, argumentsList, env).
-        // FIXME: c. If strict is true, then
-        // FIXME: i. Perform ! env.CreateImmutableBinding("arguments", false).
-        // FIXME: ii. NOTE: In strict mode code early errors prevent attempting to assign to this binding, so its mutability is not observable.
-        // FIXME: d. Else,
-        // FIXME: i. Perform ! env.CreateMutableBinding("arguments", false).
-        // FIXME: e. Perform ! env.InitializeBinding("arguments", ao).
-        // FIXME: f. Let parameterBindings be the list - concatenation of parameterNames and « "arguments" ».
-        // FIXME: 23. Else,
-        // a. Let parameterBindings be parameterNames.
-        var parameterBindings = parameterNames;
+        // 22. If argumentsObjectNeeded is true, then
+        List<string> parameterBindings;
+        if (argumentsObjectNeeded)
+        {
+            // FIXME: a. If strict is true or simpleParameterList is false, then
+            // FIXME: i. Let ao be CreateUnmappedArgumentsObject(argumentsList).
+            // FIXME: b. Else,
+
+            // i. NOTE: A mapped argument object is only provided for non - strict functions that don't have a rest parameter, any parameter default value initializers, or any destructured parameters.
+            // ii. Let ao be CreateMappedArgumentsObject(func, formals, argumentsList, env).
+            var ao = CreateMappedArgumentsObject(vm, argumentsList, env);
+
+            // FIXME: c. If strict is true, then
+            // FIXME: i. Perform ! env.CreateImmutableBinding("arguments", false).
+            // FIXME: ii. NOTE: In strict mode code early errors prevent attempting to assign to this binding, so its mutability is not observable.
+
+            // d. Else,
+            // i. Perform ! env.CreateMutableBinding("arguments", false).
+            MUST(env.CreateMutableBinding(vm, "arguments", false));
+
+            // e. Perform ! env.InitializeBinding("arguments", ao).
+            MUST(env.InitializeBinding(vm, "arguments", ao));
+
+            // f. Let parameterBindings be the list - concatenation of parameterNames and « "arguments" ».
+            // FIXME: We mutate the parameter names variable, but it is not used after these steps.
+            // However, when we support .NET 8 collection expressions, use the spread operator
+            parameterNames.Add("arguments");
+            parameterBindings = parameterNames;
+        }
+        // 23. Else,
+        else
+        {
+            // a. Let parameterBindings be parameterNames.
+            parameterBindings = parameterNames;
+        }
 
         // FIXME: 24. Let iteratorRecord be CreateListIteratorRecord(argumentsList).
         // FIXME: 25. If hasDuplicates is true, then
