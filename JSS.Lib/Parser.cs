@@ -1252,6 +1252,11 @@ public sealed class Parser
             parsedExpression = ParseStringLiteral();
             return true;
         }
+        if (IsArrayLiteral())
+        {
+            parsedExpression = ParseArrayLiteral();
+            return true;
+        }
         if (IsObjectLiteral())
         {
             parsedExpression = ParseObjectLiteral();
@@ -1363,6 +1368,21 @@ public sealed class Parser
         var stringLiteral = _consumer.ConsumeTokenOfType(TokenType.String);
         var stringValue = stringLiteral.data[1..^1];
         return new StringLiteral(stringValue);
+    }
+
+    // 13.2.4 Array Initializer, https://tc39.es/ecma262/#sec-array-initializer
+    private bool IsArrayLiteral()
+    {
+        return _consumer.IsTokenOfType(TokenType.OpenSquare);
+    }
+
+    private ArrayLiteral ParseArrayLiteral()
+    {
+        // FIXME: Implement parsing of ElementList
+        _consumer.ConsumeTokenOfType(TokenType.OpenSquare);
+        _consumer.ConsumeTokenOfType(TokenType.ClosedSquare);
+
+        return new ArrayLiteral();
     }
 
     // 13.2.5 Object Initializer, https://tc39.es/ecma262/#prod-ObjectLiteral
