@@ -658,6 +658,27 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         return names;
     }
 
+    // FIXME: Have a seperate arguments object class to support the all of the arguments functionality
+    // 10.4.4.7 CreateMappedArgumentsObject ( func, formals, argumentsList, env ), https://tc39.es/ecma262/#sec-createmappedargumentsobject
+    private Object CreateMappedArgumentsObject(VM vm, List argumentsList, Environment _)
+    {
+        // FIXME: Other steps are ommited due to brevity, but need to be implemented
+
+        // 2. Let len be the number of elements in argumentsList.
+        var len = argumentsList.Count;
+
+        // FIXME: 3. Let obj be MakeBasicObject(« [[Prototype]], [[Extensible]], [[ParameterMap]] »).
+        // 9. Set obj.[[Prototype]] to %Object.prototype%.
+        var obj = new Object(vm.ObjectPrototype);
+
+        // 16. Perform ! DefinePropertyOrThrow(obj, "length", PropertyDescriptor { [[Value]]: 𝔽(len), [[Writable]]: true, [[Enumerable]]: false, [[Configurable]]: true }).
+        MUST(DefinePropertyOrThrow(vm, obj, "length", new(len, new(true, false, true))));
+
+        // 22. Return obj.
+        return obj;
+    }
+
+
     public IReadOnlyList<Identifier> FormalParameters { get; private set; }
     public StatementList ECMAScriptCode { get; private set; }
     public Environment Environment { get; private set; }
