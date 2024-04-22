@@ -11,7 +11,7 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
     {
     }
 
-    public void Initialize(Realm realm)
+    public void Initialize(Realm realm, VM vm)
     {
         // The Object constructor has a "length" property whose value is 1𝔽.
         // FIXME: We should probably have a method for internally defining properties
@@ -20,6 +20,10 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
         // 20.1.2.21 Object.prototype, The initial value of Object.prototype is the Object prototype object.
         // This property has the attributes { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: false }.
         DataProperties.Add("prototype", new Property(realm.ObjectPrototype, new(false, false, false)));
+
+        // 20.1.2.8 Object.getOwnPropertyDescriptor ( O, P ), https://tc39.es/ecma262/#sec-object.getownpropertydescriptor
+        var getOwnPropertyDescriptorBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, getOwnPropertyDescriptor);
+        DataProperties.Add("getOwnPropertyDescriptor", new Property(getOwnPropertyDescriptorBuiltin, new(true, false, true)));
     }
 
     // 20.1.1.1 Object ( [ value ] ), https://tc39.es/ecma262/#sec-object-value
@@ -43,5 +47,25 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
 
         // 3. Return ! ToObject(value).
         return MUST(value.ToObject(vm));
+    }
+
+    // 20.1.2.8 Object.getOwnPropertyDescriptor ( O, P ), https://tc39.es/ecma262/#sec-object.getownpropertydescriptor
+    private Completion getOwnPropertyDescriptor(VM vm, Value? thisArgument, List argumentList)
+    {
+        // 1. Let obj be ? ToObject(O).
+        var obj = argumentList[0].ToObject(vm);
+        if (obj.IsAbruptCompletion()) return obj.Completion;
+
+        // 2. Let key be ? ToPropertyKey(P).
+        var key = argumentList[1].ToPropertyKey();
+        if (key.IsAbruptCompletion()) return key;
+
+        // 3. Let desc be ? obj.[[GetOwnProperty]](key).
+        // FIXME: When we implement symbols, we can't rely on AsString here
+        var desc = obj.Value.GetOwnProperty(key.Value.AsString());
+        if (desc.IsAbruptCompletion()) return desc;
+
+        // 4. Return FromPropertyDescriptor(desc).
+        return desc.Value.FromPropertyDescriptor(vm);
     }
 }

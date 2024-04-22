@@ -54,7 +54,7 @@ public sealed class Realm
         ObjectConstructor = new(FunctionPrototype);
 
         ObjectPrototype.Initialize(this, vm);
-        ObjectConstructor.Initialize(this);
+        ObjectConstructor.Initialize(this, vm);
 
         FunctionPrototype.Initialize(vm);
 
