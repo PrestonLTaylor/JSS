@@ -13,6 +13,8 @@ internal sealed class List : Value
     public void Add(Value value) => Values.Add(value);
     public void ListConcatenation(List list) => Values.AddRange(list.Values);
 
+    public int Count => Values.Count;
+
     public Value this[int i]
     {
         get
