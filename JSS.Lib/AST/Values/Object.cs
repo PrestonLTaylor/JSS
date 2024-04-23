@@ -167,7 +167,7 @@ public class Object : Value
     }
 
     // 10.1.5.1 OrdinaryGetOwnProperty ( O, P ), https://tc39.es/ecma262/#sec-ordinarygetownproperty
-    private Completion OrdinaryGetOwnProperty(Object O, string P)
+    protected Completion OrdinaryGetOwnProperty(Object O, string P)
     {
         // 1. If O does not have an own property with key P, return undefined.
         if (!O.DataProperties.ContainsKey(P))
