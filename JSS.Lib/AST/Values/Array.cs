@@ -10,6 +10,65 @@ internal sealed class Array : Object
     {
     }
 
+    // 10.4.2.1 [[DefineOwnProperty]] ( P, Desc ), https://tc39.es/ecma262/#sec-array-exotic-objects-defineownproperty-p-desc
+    internal override Completion DefineOwnProperty(string P, Property desc)
+    {
+        // 1. If P is "length", then
+        if (P == "length")
+        {
+            // a. Return ? ArraySetLength(A, Desc).
+            return ArraySetLength(desc);
+        }
+        // 2. Else if P is an array index, then
+        else if (IsArrayIndex(P))
+        {
+            // a. Let lengthDesc be OrdinaryGetOwnProperty(A, "length").
+            var lengthDesc = OrdinaryGetOwnProperty(this, "length").Value.AsProperty();
+
+            // FIXME: b. Assert: IsDataDescriptor(lengthDesc) is true.
+            // c. Assert: lengthDesc.[[Configurable]] is false.
+            Debug.Assert(!lengthDesc.Attributes.Configurable);
+
+            // d. Let length be lengthDesc.[[Value]].
+            var length = lengthDesc.Value.AsNumber();
+
+            // e. Assert: length is a non-negative integral Number.
+            Debug.Assert(length >= 0 && double.IsInteger(length));
+
+            // f. Let index be ! ToUint32(P).
+            var pString = new String(P);
+            var index = MUST(pString.ToUint32());
+
+            // g. If index ≥ length and lengthDesc.[[Writable]] is false, return false.
+            if (index >= length && !lengthDesc.Attributes.Writable) return false;
+
+            // h. Let succeeded be ! OrdinaryDefineOwnProperty(A, P, Desc).
+            var succeeded = MUST(OrdinaryDefineOwnProperty(this, P, desc)).AsBoolean();
+
+            // i. If succeeded is false, return false.
+            if (!succeeded) return false;
+
+            // j. If index ≥ length, then
+            if (index >= length)
+            {
+                // i. Set lengthDesc.[[Value]] to index + 1𝔽.
+                lengthDesc.Value = index + 1;
+
+                // ii. Set succeeded to ! OrdinaryDefineOwnProperty(A, "length", lengthDesc).
+                succeeded = MUST(OrdinaryDefineOwnProperty(this, "length", lengthDesc)).AsBoolean();
+
+                // iii. Assert: succeeded is true.
+                Debug.Assert(succeeded);
+            }
+
+            // k. Return true.
+            return true;
+        }
+
+        // 3. Return ? OrdinaryDefineOwnProperty(A, P, Desc).
+        return OrdinaryDefineOwnProperty(this, P, desc);
+    }
+
     // 10.4.2.2 ArrayCreate ( length [ , proto ] )
     static public AbruptOr<Array> ArrayCreate(int length, Object? prototype = null)
     {
@@ -82,5 +141,12 @@ internal sealed class Array : Object
         // FIXME: a. Set succeeded to ! OrdinaryDefineOwnProperty(A, "length", PropertyDescriptor { [[Writable]]: false }).
         // FIXME: b. Assert: succeeded is true.
         // FIXME: 19. Return true.
+    }
+
+    // array index, https://tc39.es/ecma262/#array-index
+    private bool IsArrayIndex(string P)
+    {
+        // FIXME: An array index is an integer index n such that CanonicalNumericIndexString(n) returns an integral Number in the inclusive interval from +0𝔽 to 𝔽(2**32 - 2).
+        return P.All(char.IsAsciiDigit);
     }
 }
