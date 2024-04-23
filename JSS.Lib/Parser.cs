@@ -39,8 +39,10 @@ public sealed class Parser
     {
         List<INode> nodes = new();
 
-        while (shouldParse())
+        while (true)
         {
+            _consumer.IgnoreLineTerminators();
+            if (!shouldParse()) break;
             nodes.Add(ParseStatementListItem());
         }
 

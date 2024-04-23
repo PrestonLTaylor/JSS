@@ -15,25 +15,25 @@ internal sealed class TokenConsumer
 
     public Token Consume()
     {
-        IgnoreLineTerminator();
+        IgnoreLineTerminators();
         return _toConsume[_index++];
     }
 
     public Token Peek(int offset = 0)
     {
-        IgnoreLineTerminator();
+        IgnoreLineTerminators();
         return _toConsume[_index + offset];
     }
 
     public bool IsTokenOfType(TokenType type)
     {
-        IgnoreLineTerminator();
+        IgnoreLineTerminators();
         return CanConsume() && Peek().type == type;
     }
 
     public Token ConsumeTokenOfType(TokenType type)
     {
-        IgnoreLineTerminator();
+        IgnoreLineTerminators();
         if (!CanConsume()) ErrorHelper.ThrowSyntaxError(ErrorType.UnexpectedEOF);
         if (!IsTokenOfType(type)) ErrorHelper.ThrowSyntaxError(ErrorType.UnexpectedToken, Peek().data);
         return Consume();
@@ -45,7 +45,7 @@ internal sealed class TokenConsumer
         return _toConsume[_index].type == TokenType.LineTerminator;
     }
 
-    private void IgnoreLineTerminator()
+    public void IgnoreLineTerminators()
     {
         while (CanConsume() && _toConsume[_index].type == TokenType.LineTerminator) ++_index;
     }
