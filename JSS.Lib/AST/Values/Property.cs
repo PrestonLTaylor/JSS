@@ -16,6 +16,11 @@ internal sealed class Property : Value
     override public bool IsProperty() { return true; }
     override public ValueType Type() { throw new InvalidOperationException("Tried to get the Type of Property"); }
 
+    public Property Copy()
+    {
+        return (MemberwiseClone() as Property)!;
+    }
+
     public Value Value { get; set; }
     public Attributes Attributes { get; }
 }
