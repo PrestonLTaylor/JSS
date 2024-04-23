@@ -29,7 +29,7 @@ internal class ObjectPrototype : Object
     private Completion hasOwnProperty(VM vm, Value? thisValue, List argumentList)
     {
         // 1. Let P be ? ToPropertyKey(V).
-        var P = argumentList[0].ToPropertyKey();
+        var P = argumentList[0].ToPropertyKey(vm);
         if (P.IsAbruptCompletion()) return P;
 
         // 2. Let O be ? ToObject(this value).

@@ -38,7 +38,7 @@ internal sealed class ErrorConstructor : Object, ICallable, IConstructable
         if (!message.IsUndefined())
         {
             // a. Let msg be ? ToString(message).
-            var msg = message.ToStringJS();
+            var msg = message.ToStringJS(vm);
             if (msg.IsAbruptCompletion()) return msg;
 
             // b. Perform CreateNonEnumerableDataPropertyOrThrow(O, "message", msg).

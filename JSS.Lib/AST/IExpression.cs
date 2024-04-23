@@ -22,28 +22,28 @@ internal enum BinaryOpType
 internal abstract class IExpression : INode
 {
     // 13.15.3 ApplyStringOrNumericBinaryOperator ( lval, opText, rval ), https://tc39.es/ecma262/#sec-applystringornumericbinaryoperator
-    static public Completion ApplyStringOrNumericBinaryOperator(Value lval, BinaryOpType op, Value rval)
+    static public Completion ApplyStringOrNumericBinaryOperator(VM vm, Value lval, BinaryOpType op, Value rval)
     {
         // 1. If opText is +, then
         if (op == BinaryOpType.Add)
         {
             // a. Let lprim be ? ToPrimitive(lval).
-            var lprim = lval.ToPrimitive();
+            var lprim = lval.ToPrimitive(vm);
             if (lprim.IsAbruptCompletion()) return lprim;
 
             // b. Let rprim be ? ToPrimitive(rval).
-            var rprim = rval.ToPrimitive();
+            var rprim = rval.ToPrimitive(vm);
             if (rprim.IsAbruptCompletion()) return rprim;
 
             // c. If lprim is a String or rprim is a String, then
             if (lprim.Value.IsString() || rprim.Value.IsString())
             {
                 // i. Let lstr be ? ToString(lprim).
-                var lstr = lprim.Value.ToStringJS();
+                var lstr = lprim.Value.ToStringJS(vm);
                 if (lstr.IsAbruptCompletion()) return lstr;
 
                 // ii. Let rstr be ? ToString(rprim).
-                var rstr = rprim.Value.ToStringJS();
+                var rstr = rprim.Value.ToStringJS(vm);
                 if (rstr.IsAbruptCompletion()) return rstr;
 
                 // iii. Return the string-concatenation of lstr and rstr.
@@ -60,11 +60,11 @@ internal abstract class IExpression : INode
         // 2. NOTE: At this point, it must be a numeric operation.
 
         // 3. Let lnum be ? ToNumeric(lval).
-        var lnum = lval.ToNumeric();
+        var lnum = lval.ToNumeric(vm);
         if (lnum.IsAbruptCompletion()) return lnum;
 
         // 4. Let rnum be ? ToNumeric(rval).
-        var rnum = rval.ToNumeric();
+        var rnum = rval.ToNumeric(vm);
         if (rnum.IsAbruptCompletion()) return rnum;
 
         // NOTE: This only happens when one side is a BigInt and the other is a Number
@@ -118,6 +118,6 @@ internal abstract class IExpression : INode
         if (rval.IsAbruptCompletion()) return rval;
 
         // 5. Return ? ApplyStringOrNumericBinaryOperator(lval, opText, rval).
-        return ApplyStringOrNumericBinaryOperator(lval.Value, op, rval.Value);
+        return ApplyStringOrNumericBinaryOperator(vm, lval.Value, op, rval.Value);
     }
 }
