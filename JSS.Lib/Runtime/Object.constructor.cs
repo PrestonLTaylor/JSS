@@ -68,4 +68,30 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
         // 4. Return FromPropertyDescriptor(desc).
         return desc.Value.FromPropertyDescriptor(vm);
     }
+
+    // 20.1.2.11.1 GetOwnPropertyKeys ( O, FIXME: type ), https://tc39.es/ecma262/#sec-getownpropertykeys
+    private AbruptOr<List> GetOwnPropertyKeys(VM vm, Value? _, List argumentList)
+    {
+        // 1. Let obj be ? ToObject(O).
+        var obj = argumentList[0].ToObject(vm);
+        if (obj.IsAbruptCompletion()) return obj.Completion;
+
+        // 2. Let keys be ? obj.[[OwnPropertyKeys]]().
+        var keys = obj.Value.OwnPropertyKeys();
+        if (keys.IsAbruptCompletion()) return keys;
+
+        // 3. Let nameList be a new empty List.
+        var nameList = new List();
+
+        // 4. For each element nextKey of keys, do
+        foreach (var nextKey in keys.Value.Values)
+        {
+            // FIXME: a. If nextKey is a Symbol and type is SYMBOL, or if nextKey is a String and type is STRING, then
+            // i. Append nextKey to nameList.
+            nameList.Add(nextKey);
+        }
+
+        // 5. Return nameList.
+        return nameList;
+    }
 }
