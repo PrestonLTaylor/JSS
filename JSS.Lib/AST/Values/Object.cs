@@ -203,7 +203,15 @@ public class Object : Value
         // FIXME: 1. Let current be ? O.[[GetOwnProperty]](P).
         // FIXME: 2. Let extensible be ? IsExtensible(O).
         // FIXME: 3. Return ValidateAndApplyPropertyDescriptor(O, P, extensible, Desc, current).
-        O.DataProperties.Add(P, desc);
+        if (O.DataProperties.ContainsKey(P))
+        {
+            O.DataProperties[P] = desc;
+        }
+        else
+        {
+            O.DataProperties.Add(P, desc);
+        }
+
         return true;
     }
 
