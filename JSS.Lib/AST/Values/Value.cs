@@ -17,6 +17,12 @@ public enum ValueType
     Property
 }
 
+enum PreferredType
+{
+    STRING,
+    NUMBER
+}
+
 // FIXME: This is a very inefficient way of storing JS values.
 // 6.1 ECMAScript Language Types, https://tc39.es/ecma262/#sec-ecmascript-language-types
 public abstract class Value

@@ -30,6 +30,47 @@ public class Object : Value
         return "Object";
     }
 
+    // 7.1.1.1 OrdinaryToPrimitive ( O, hint ), https://tc39.es/ecma262/#sec-ordinarytoprimitive
+    internal Completion OrdinaryToPrimitive(VM vm, PreferredType hint)
+    {
+        // 1. If hint is STRING, then
+        List<string> methodNames;
+        if (hint == PreferredType.STRING)
+        {
+            // a. Let methodNames be « "toString", "valueOf" ».
+            methodNames = new() { "toString", "valueOf" };
+        }
+        // 2. Else,
+        else
+        {
+            // a. Let methodNames be « "valueOf", "toString" ».
+            methodNames = new() { "valueOf", "toString" };
+        }
+
+        // 3. For each element name of methodNames, do
+        foreach (var name in methodNames)
+        {
+            // a. Let method be ? Get(O, name).
+            var method = Get(this, name);
+            if (method.IsAbruptCompletion()) return method;
+
+            // b. If IsCallable(method) is true, then
+            if (method.Value.IsCallable())
+            {
+                // i. Let result be ? Call(method, O).
+                var callable = method.Value.AsCallable();
+                var result = callable.Call(vm, this, new());
+                if (result.IsAbruptCompletion()) return result;
+
+                // ii. If result is not an Object, return result.
+                if (!result.Value.IsObject()) return result;
+            }
+        }
+
+        // 4. Throw a TypeError exception.
+        return ThrowTypeError(vm, RuntimeErrorType.UnableToConvertObjectToPrimitive);
+    }
+
     // 7.3.2 Get ( O, P ), https://tc39.es/ecma262/#sec-get-o-p
     static internal Completion Get(Object O, string P)
     {
