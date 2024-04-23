@@ -53,8 +53,7 @@ internal sealed class ForStatement : INode
     {
         if (InitializationExpression is VarStatement)
         {
-            // FIXME: for loop execution with var statements
-            throw new NotImplementedException();
+            return EvaluationWithVarStatement(vm);
         }
         else if (InitializationExpression is LetDeclaration or ConstDeclaration)
         {
@@ -65,6 +64,20 @@ internal sealed class ForStatement : INode
         {
             return EvaluationWithExpression(vm);
         }
+    }
+
+    public Completion EvaluationWithVarStatement(VM vm)
+    {
+        // 1. Perform ? Evaluation of VariableDeclarationList.
+        var varResult = InitializationExpression!.Evaluate(vm);
+        if (varResult.IsAbruptCompletion()) return varResult;
+
+        // NOTE: These steps are implicit
+        // 2. If the first Expression is present, let test be the first Expression; otherwise, let test be EMPTY.
+        // 3. If the second Expression is present, let increment be the second Expression; otherwise, let increment be EMPTY.
+
+        // 4. Return ? ForBodyEvaluation(test, increment, Statement, « », labelSet).
+        return ForBodyEvaluation(vm);
     }
 
     public Completion EvaluationWithExpression(VM vm)
