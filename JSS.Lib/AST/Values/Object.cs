@@ -191,7 +191,7 @@ public class Object : Value
     }
 
     // 10.1.6 [[DefineOwnProperty]] ( P, Desc ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-defineownproperty-p-desc
-    internal Completion DefineOwnProperty(string P, Property desc)
+    virtual internal Completion DefineOwnProperty(string P, Property desc)
     {
         // 1. Return ? OrdinaryDefineOwnProperty(O, P, Desc).
         return OrdinaryDefineOwnProperty(this, P, desc);
