@@ -25,7 +25,7 @@ internal class StringConstructor : Object, ICallable, IConstructable
 
             // b. Let s be ? ToString(value).
             var value = argumentList.Values[0];
-            var abruptOrS = value.ToStringJS();
+            var abruptOrS = value.ToStringJS(vm);
             if (abruptOrS.IsAbruptCompletion()) return abruptOrS.Completion;
             s = abruptOrS.Value;
         }

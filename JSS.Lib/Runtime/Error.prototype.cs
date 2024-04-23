@@ -48,7 +48,7 @@ internal sealed class ErrorPrototype : Object
         }
         else
         {
-            var toString = getName.Value.ToStringJS();
+            var toString = getName.Value.ToStringJS(vm);
             if (toString.IsAbruptCompletion()) return toString.Completion;
             name = toString.Value;
         }
@@ -65,7 +65,7 @@ internal sealed class ErrorPrototype : Object
         }
         else
         {
-            var toString = getMsg.Value.ToStringJS();
+            var toString = getMsg.Value.ToStringJS(vm);
             if (toString.IsAbruptCompletion()) return toString.Completion;
             msg = toString.Value;
         }

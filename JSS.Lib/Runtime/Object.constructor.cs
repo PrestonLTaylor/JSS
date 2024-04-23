@@ -61,7 +61,7 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
         if (obj.IsAbruptCompletion()) return obj.Completion;
 
         // 2. Let key be ? ToPropertyKey(P).
-        var key = argumentList[1].ToPropertyKey();
+        var key = argumentList[1].ToPropertyKey(vm);
         if (key.IsAbruptCompletion()) return key;
 
         // 3. Let desc be ? obj.[[GetOwnProperty]](key).

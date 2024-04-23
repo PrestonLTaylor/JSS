@@ -26,9 +26,10 @@ internal sealed class AbstractOperationTests
     public void ToPrimitive_ReturnsNormalCompletion_WithTheSameValue_WhenNotProvidingAnObject(Value expected)
     {
         // Arrange
+        var _ = new Realm(out VM vm);
 
         // Act
-        var completion = expected.ToPrimitive();
+        var completion = expected.ToPrimitive(vm);
 
         // Assert
         completion.IsNormalCompletion().Should().BeTrue();
@@ -53,9 +54,10 @@ internal sealed class AbstractOperationTests
     public void ToString_ReturnsNormalCompletion_WithExpectedString_WhenProvidingValue(Value testCase, string expectedString)
     {
         // Arrange
+        var _ = new Realm(out VM vm);
 
         // Act
-        var asString = testCase.ToStringJS();
+        var asString = testCase.ToStringJS(vm);
 
         // Assert
         asString.IsAbruptCompletion().Should().BeFalse();
@@ -92,9 +94,10 @@ internal sealed class AbstractOperationTests
     public void ToNumeric_ReturnsNormalCompletion_WithExpectedNumber_WhenProvidingValue(Value testCase, double expectedNumber)
     {
         // Arrange
+        var _ = new Realm(out VM vm);
 
         // Act
-        var asNumeric = testCase.ToNumeric();
+        var asNumeric = testCase.ToNumeric(vm);
 
         // Assert
         asNumeric.IsNormalCompletion().Should().BeTrue();
@@ -151,9 +154,10 @@ internal sealed class AbstractOperationTests
     public void ApplyStringOrNumericBinaryOperator_ReturnsNormalCompletion_WithExpectedValue(Value lhs, BinaryOpType op, Value rhs, Value expectedValue)
     {
         // Arrange
+        var _ = new Realm(out VM vm);
 
         // Act
-        var result = IExpression.ApplyStringOrNumericBinaryOperator(lhs, op, rhs);
+        var result = IExpression.ApplyStringOrNumericBinaryOperator(vm, lhs, op, rhs);
 
         // Assert
         result.IsNormalCompletion().Should().BeTrue();
@@ -215,11 +219,12 @@ internal sealed class AbstractOperationTests
     public void IsLessThan_ReturnsNormalCompletion_WithExpectedResult(Value lhs, Value rhs, bool expectedResult)
     {
         // Arrange
+        var _ = new Realm(out VM vm);
         var expectedValue = new Boolean(expectedResult);
 
         // Act
         // NOTE: leftFirst has no visiable side effect in these tests
-        var completion = Value.IsLessThan(lhs, rhs, false);
+        var completion = Value.IsLessThan(vm, lhs, rhs, false);
 
         // Assert
         completion.IsNormalCompletion().Should().BeTrue();

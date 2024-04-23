@@ -41,7 +41,7 @@ internal sealed class ComputedPropertyExpression : IExpression
         if (propertyNameValue.IsAbruptCompletion()) return propertyNameValue;
 
         // 3. Let propertyKey be ? ToPropertyKey(propertyNameValue).
-        var propertyKey = propertyNameValue.Value.ToPropertyKey();
+        var propertyKey = propertyNameValue.Value.ToPropertyKey(vm);
         if (propertyKey.IsAbruptCompletion()) return propertyKey;
 
         // 4. Return the Reference Record { [[Base]]: baseValue, [[ReferencedName]]: propertyKey, [[Strict]]: strict, [[ThisValue]]: EMPTY }.

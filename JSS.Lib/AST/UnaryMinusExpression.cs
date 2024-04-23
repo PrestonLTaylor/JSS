@@ -23,7 +23,7 @@ internal sealed class UnaryMinusExpression : IExpression
         var exprValue = expr.Value.GetValue(vm);
         if (exprValue.IsAbruptCompletion()) return exprValue;
 
-        var oldValue = exprValue.Value.ToNumeric();
+        var oldValue = exprValue.Value.ToNumeric(vm);
         if (oldValue.IsAbruptCompletion()) return oldValue;
 
         // 3. If oldValue is a Number, then

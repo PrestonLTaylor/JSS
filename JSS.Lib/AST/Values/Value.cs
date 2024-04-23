@@ -245,24 +245,34 @@ public abstract class Value
         return obj;
     }
 
-    // 7.1.1 ToPrimitive ( input FIXME: [ , preferredType ] ), https://tc39.es/ecma262/#sec-toprimitive
-    internal Completion ToPrimitive()
+    // 7.1.1 ToPrimitive ( input [ , preferredType ] ), https://tc39.es/ecma262/#sec-toprimitive
+
+    internal Completion ToPrimitive(VM vm, PreferredType? preferredType = null)
     {
-        // FIXME: 1 .If input is an Object, then
-        // FIXME: a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
-        // FIXME: b. If exoticToPrim is not undefined, then
-        // FIXME: i. If preferredType is not present, then
-        // FIXME: 1. Let hint be "default".
-        // FIXME: ii. Else if preferredType is STRING, then
-        // FIXME: 1. Let hint be "string".
-        // FIXME: iii. Else,
-        // FIXME: 1. Assert: preferredType is NUMBER.
-        // FIXME: 2. Let hint be "number".
-        // FIXME: iv. Let result be ? Call(exoticToPrim, input, « hint »).
-        // FIXME: v. If result is not an Object, return result.
-        // FIXME:  vi. Throw a TypeError exception.
-        // FIXME: c. If preferredType is not present, let preferredType be NUMBER.
-        // FIXME: d. Return? OrdinaryToPrimitive(input, preferredType).
+        // 1. If input is an Object, then
+        if (IsObject())
+        {
+            var O = AsObject();
+
+            // FIXME: a. Let exoticToPrim be ? GetMethod(input, @@toPrimitive).
+            // FIXME: b. If exoticToPrim is not undefined, then
+            // FIXME: i. If preferredType is not present, then
+            // FIXME: 1. Let hint be "default".
+            // FIXME: ii. Else if preferredType is STRING, then
+            // FIXME: 1. Let hint be "string".
+            // FIXME: iii. Else,
+            // FIXME: 1. Assert: preferredType is NUMBER.
+            // FIXME: 2. Let hint be "number".
+            // FIXME: iv. Let result be ? Call(exoticToPrim, input, « hint »).
+            // FIXME: v. If result is not an Object, return result.
+            // FIXME: vi. Throw a TypeError exception.
+
+            // c. If preferredType is not present, let preferredType be NUMBER.
+            preferredType ??= PreferredType.NUMBER;
+
+            // d. Return ? OrdinaryToPrimitive(input, preferredType).
+            return O.OrdinaryToPrimitive(vm, preferredType.Value);
+        }
 
         // 2. Return input.
         return this;
@@ -308,10 +318,10 @@ public abstract class Value
     }
 
     // 7.1.3 ToNumeric ( value ), https://tc39.es/ecma262/#sec-tonumeric
-    internal Completion ToNumeric()
+    internal Completion ToNumeric(VM vm)
     {
-        // 1. Let primValue be ? ToPrimitive(value, FIXME: NUMBER).
-        var primValue = ToPrimitive();
+        // 1. Let primValue be ? ToPrimitive(value, NUMBER).
+        var primValue = ToPrimitive(vm, PreferredType.NUMBER);
         if (primValue.IsAbruptCompletion()) { return primValue; }
 
         // FIXME: 2. If primValue is a BigInt, return primValue.
@@ -413,7 +423,7 @@ public abstract class Value
     }
 
     // 7.1.17 ToString ( argument ), https://tc39.es/ecma262/#sec-tostring
-    internal AbruptOr<string> ToStringJS()
+    internal AbruptOr<string> ToStringJS(VM vm)
     {
         // 1. If argument is a String, return argument.
         if (IsString()) return AsString().Value;
@@ -443,11 +453,19 @@ public abstract class Value
         }
 
         // FIXME: 8. If argument is a BigInt, return BigInt::toString(argument, 10).
-        // FIXME: 9. Assert: argument is an Object.
-        // FIXME: 10. Let primValue be ? ToPrimitive(argument, STRING).
-        // FIXME: 11. Assert: primValue is not an Object.
-        // FIXME: 12. Return ? ToString(primValue).
-        throw new NotImplementedException();
+
+        // 9. Assert: argument is an Object.
+        Debug.Assert(IsObject());
+
+        // 10. Let primValue be ? ToPrimitive(argument, STRING).
+        var primValue = ToPrimitive(vm, PreferredType.STRING);
+        if (primValue.IsAbruptCompletion()) return primValue;
+
+        // 11. Assert: primValue is not an Object.
+        Debug.Assert(!primValue.Value.IsObject());
+
+        // 12. Return ? ToString(primValue).
+        return primValue.Value.ToStringJS(vm);
     }
 
     // 7.1.18 ToObject ( argument ), https://tc39.es/ecma262/#sec-toobject
@@ -472,10 +490,10 @@ public abstract class Value
     }
 
     // 7.1.19 ToPropertyKey ( argument ), https://tc39.es/ecma262/#sec-topropertykey
-    internal Completion ToPropertyKey()
+    internal Completion ToPropertyKey(VM vm)
     {
         // 1. Let key be ? ToPrimitive(argument, string).
-        var key = ToPrimitive();
+        var key = ToPrimitive(vm, PreferredType.STRING);
         if (key.IsAbruptCompletion()) return key;
 
         // 2. If key is a Symbol, then
@@ -486,7 +504,7 @@ public abstract class Value
         }
 
         // 3. Return ! ToString(key).
-        return MUST(key.Value.ToStringJS());
+        return MUST(key.Value.ToStringJS(vm));
     }
 
     // 7.2.3 IsCallable ( argument ), https://tc39.es/ecma262/#sec-iscallable
@@ -555,7 +573,7 @@ public abstract class Value
     }
 
     // 7.2.13 IsLessThan ( x, y, LeftFirst ), https://tc39.es/ecma262/#sec-islessthan
-    static internal Completion IsLessThan(Value x, Value y, bool leftFirst)
+    static internal Completion IsLessThan(VM vm, Value x, Value y, bool leftFirst)
     {
         Completion px;
         Completion py;
@@ -563,12 +581,12 @@ public abstract class Value
         // 1. If LeftFirst is true, then
         if (leftFirst)
         {
-            // a. Let px be ? ToPrimitive(x, FIXME: NUMBER).
-            px = x.ToPrimitive();
+            // a. Let px be ? ToPrimitive(x, NUMBER).
+            px = x.ToPrimitive(vm, PreferredType.NUMBER);
             if (px.IsAbruptCompletion()) return px;
 
-            // b. Let py be ? ToPrimitive(y, FIXME: NUMBER).
-            py = y.ToPrimitive();
+            // b. Let py be ? ToPrimitive(y, NUMBER).
+            py = y.ToPrimitive(vm, PreferredType.NUMBER);
             if (py.IsAbruptCompletion()) return py;
         }
         // 2. Else,
@@ -576,12 +594,12 @@ public abstract class Value
         {
             // a. NOTE: The order of evaluation needs to be reversed to preserve left to right evaluation.
 
-            // b. Let py be ? ToPrimitive(y, FIXME: NUMBER).
-            py = y.ToPrimitive();
+            // b. Let py be ? ToPrimitive(y, NUMBER).
+            py = y.ToPrimitive(vm, PreferredType.NUMBER);
             if (py.IsAbruptCompletion()) return py;
 
-            // c. Let px be ? ToPrimitive(x, FIXME: NUMBER).
-            px = x.ToPrimitive();
+            // c. Let px be ? ToPrimitive(x, NUMBER).
+            px = x.ToPrimitive(vm, PreferredType.NUMBER);
             if (px.IsAbruptCompletion()) return px;
         }
 
@@ -635,11 +653,11 @@ public abstract class Value
         // c. NOTE: Because px and py are primitive values, evaluation order is not important.
 
         // d. Let nx be ? ToNumeric(px).
-        var nx = px.Value.ToNumeric();
+        var nx = px.Value.ToNumeric(vm);
         if (nx.IsAbruptCompletion()) return nx;
 
         // e. Let ny be ? ToNumeric(py).
-        var ny = py.Value.ToNumeric();
+        var ny = py.Value.ToNumeric(vm);
         if (ny.IsAbruptCompletion()) return ny;
 
         // FIXME: f. If Type(nx) is Type(ny), then
