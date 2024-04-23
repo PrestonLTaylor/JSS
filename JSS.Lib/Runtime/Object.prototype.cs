@@ -16,9 +16,28 @@ internal class ObjectPrototype : Object
         // 20.1.3.1 Object.prototype.constructor, The initial value of Object.prototype.constructor is %Object%.
         DataProperties.Add("constructor", new Property(realm.ObjectConstructor, new Attributes(true, false, true)));
 
+        // 20.1.3.2 Object.prototype.hasOwnProperty ( V ), https://tc39.es/ecma262/#sec-object.prototype.hasownproperty
+        var hasOwnPropertyBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, hasOwnProperty);
+        DataProperties.Add("hasOwnProperty", new Property(hasOwnPropertyBuiltin, new Attributes(true, false, true)));
+
         // 20.1.3.6 Object.prototype.toString ( ), https://tc39.es/ecma262/#sec-object.prototype.tostring
         var toStringBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toString);
         DataProperties.Add("toString", new Property(toStringBuiltin, new Attributes(true, false, true)));
+    }
+
+    // 20.1.3.2 Object.prototype.hasOwnProperty ( V ), https://tc39.es/ecma262/#sec-object.prototype.hasownproperty
+    private Completion hasOwnProperty(VM vm, Value? thisValue, List argumentList)
+    {
+        // 1. Let P be ? ToPropertyKey(V).
+        var P = argumentList[0].ToPropertyKey();
+        if (P.IsAbruptCompletion()) return P;
+
+        // 2. Let O be ? ToObject(this value).
+        var O = thisValue!.ToObject(vm);
+        if (O.IsAbruptCompletion()) return O.Completion;
+
+        // 3. Return ? HasOwnProperty(O, P).
+        return HasOwnProperty(O.Value, P.Value.AsString());
     }
 
     // 20.1.3.6 Object.prototype.toString ( ), https://tc39.es/ecma262/#sec-object.prototype.tostring
