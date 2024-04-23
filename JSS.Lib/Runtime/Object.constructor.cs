@@ -24,6 +24,10 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
         // 20.1.2.8 Object.getOwnPropertyDescriptor ( O, P ), https://tc39.es/ecma262/#sec-object.getownpropertydescriptor
         var getOwnPropertyDescriptorBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, getOwnPropertyDescriptor);
         DataProperties.Add("getOwnPropertyDescriptor", new Property(getOwnPropertyDescriptorBuiltin, new(true, false, true)));
+
+        // 20.1.2.10 Object.getOwnPropertyNames ( O ), https://tc39.es/ecma262/#sec-object.getownpropertynames
+        var getOwnPropertyNamesBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, getOwnPropertyNames);
+        DataProperties.Add("getOwnPropertyNames", new Property(getOwnPropertyNamesBuiltin, new(true, false, true)));
     }
 
     // 20.1.1.1 Object ( [ value ] ), https://tc39.es/ecma262/#sec-object-value
@@ -69,11 +73,20 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
         return desc.Value.FromPropertyDescriptor(vm);
     }
 
+    // 20.1.2.10 Object.getOwnPropertyNames ( O ), https://tc39.es/ecma262/#sec-object.getownpropertynames
+    private Completion getOwnPropertyNames(VM vm, Value? thisArgument, List argumentList)
+    {
+        // 1. Return CreateArrayFromList(? GetOwnPropertyKeys(O, STRING)).
+        var ownPropertyKeys = GetOwnPropertyKeys(vm, argumentList[0]);
+        if (ownPropertyKeys.IsAbruptCompletion()) return ownPropertyKeys.Completion;
+        return ownPropertyKeys.Value.CreateArrayFromList(vm);
+    }
+
     // 20.1.2.11.1 GetOwnPropertyKeys ( O, FIXME: type ), https://tc39.es/ecma262/#sec-getownpropertykeys
-    private AbruptOr<List> GetOwnPropertyKeys(VM vm, Value? _, List argumentList)
+    private AbruptOr<List> GetOwnPropertyKeys(VM vm, Value O)
     {
         // 1. Let obj be ? ToObject(O).
-        var obj = argumentList[0].ToObject(vm);
+        var obj = O.ToObject(vm);
         if (obj.IsAbruptCompletion()) return obj.Completion;
 
         // 2. Let keys be ? obj.[[OwnPropertyKeys]]().
