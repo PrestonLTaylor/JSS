@@ -299,6 +299,35 @@ public class Object : Value
         return true;
     }
 
+    // 10.1.11 [[OwnPropertyKeys]] ( ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys
+    internal List OwnPropertyKeys()
+    {
+        // 1. Return OrdinaryOwnPropertyKeys(O).
+        return OrdinaryOwnPropertyKeys(this);
+    }
+
+    // 10.1.11.1 OrdinaryOwnPropertyKeys ( O ), https://tc39.es/ecma262/#sec-ordinaryownpropertykeys
+    static internal List OrdinaryOwnPropertyKeys(Object O)
+    {
+        // 1. Let keys be a new empty List.
+        var keys = new List();
+
+        // FIXME: 2. For each own property key P of O such that P is an array index, in ascending numeric index order, do
+        // FIXME: a. Append P to keys.
+        // FIXME: 3. For each own property key P of O such that P is a String and P is not an array index, in ascending chronological order of property creation, do
+        // FIXME: a. Append P to keys.
+        // FIXME: 4. For each own property key P of O such that P is a Symbol, in ascending chronological order of property creation, do
+        // FIXME: a. Append P to keys.
+
+        foreach (var (P, _)  in O.DataProperties)
+        {
+            keys.Add(P);
+        }
+
+        // 5. Return keys.
+        return keys;
+    }
+
     // FIXME: Accessor Attributes
     internal Object? Prototype { get; }
     internal Dictionary<string, Property> DataProperties { get; }
