@@ -6,6 +6,7 @@ namespace JSS.Lib.Execution;
 enum RuntimeErrorType
 {
     AssignmentToConst,
+    ArrayLengthTooLarge,
     BindingNotDefined,
     BindingThisToAlreadyThisInitializedEnvironment,
     CallingANonFunction,
@@ -86,6 +87,7 @@ internal static class ThrowHelper
     static private readonly Dictionary<RuntimeErrorType, string> errorTypeToFormatString = new()
     {
         { RuntimeErrorType.AssignmentToConst, "invalid assignment to const {0}" },
+        { RuntimeErrorType.ArrayLengthTooLarge, "length {0} too large for array" },
         { RuntimeErrorType.BindingNotDefined, "{0} is not defined" },
         { RuntimeErrorType.BindingThisToAlreadyThisInitializedEnvironment, "tried to bind a this value to already this-initialized function environment" },
         { RuntimeErrorType.CallingANonFunction, "{0} is not a function" },
