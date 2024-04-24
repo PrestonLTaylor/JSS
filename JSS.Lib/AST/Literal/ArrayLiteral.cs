@@ -9,7 +9,7 @@ internal sealed class ArrayLiteral : IExpression
     {
         // FIXME: Implement the rest of the evaluation when we parse element lists
         // 1. Let array be ! ArrayCreate(0).
-        var array = MUST(Array.ArrayCreate(0));
+        var array = MUST(Array.ArrayCreate(vm, 0));
 
         // 3. Return array.
         return array;

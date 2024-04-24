@@ -20,7 +20,7 @@ internal sealed class List : Value
     public Array CreateArrayFromList(VM vm)
     {
         // 1. Let array be ! ArrayCreate(0).
-        var array = MUST(Array.ArrayCreate(0));
+        var array = MUST(Array.ArrayCreate(vm, 0));
 
         // 2. Let n be 0.
         var n = 0;

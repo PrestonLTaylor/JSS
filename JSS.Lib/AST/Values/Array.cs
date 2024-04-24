@@ -70,10 +70,12 @@ internal sealed class Array : Object
     }
 
     // 10.4.2.2 ArrayCreate ( length [ , proto ] )
-    static public AbruptOr<Array> ArrayCreate(int length, Object? prototype = null)
+    static public AbruptOr<Array> ArrayCreate(VM vm, int length, Object? prototype = null)
     {
         // FIXME: 1. If length > 2**32 - 1, throw a RangeError exception.
-        // FIXME: 2. If proto is not present, set proto to %Array.prototype%.
+
+        // 2. If proto is not present, set proto to %Array.prototype%.
+        prototype ??= vm.ArrayPrototype;
 
         // 3. Let A be MakeBasicObject(« [[Prototype]], [[Extensible]] »).
         // 4. Set A.[[Prototype]] to proto.
