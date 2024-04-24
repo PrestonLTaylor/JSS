@@ -61,6 +61,7 @@ public sealed class Realm
         StringConstructor = new(FunctionPrototype);
 
         ArrayPrototype = new(ObjectPrototype);
+        ArrayPrototype.Initialize(vm);
 
         ErrorPrototype = new(ObjectPrototype);
         ErrorConstructor = new(FunctionPrototype);
