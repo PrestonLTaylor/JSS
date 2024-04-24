@@ -30,6 +30,7 @@ public sealed class VM
     internal ObjectPrototype ObjectPrototype { get => Realm.ObjectPrototype; }
     internal ObjectConstructor ObjectConstructor { get => Realm.ObjectConstructor; }
     internal FunctionPrototype FunctionPrototype { get => Realm.FunctionPrototype; }
+    internal ArrayPrototype ArrayPrototype { get => Realm.ArrayPrototype; }
     internal ErrorPrototype ErrorPrototype { get => Realm.ErrorPrototype; }
 
     internal NativeErrorConstructor EvalErrorConstructor { get => Realm.EvalErrorConstructor; }
