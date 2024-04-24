@@ -3,6 +3,7 @@ using JSS.Lib.Execution;
 
 namespace JSS.Lib.Runtime;
 
+// 23.1.3 Properties of the Array Prototype Object, https://tc39.es/ecma262/#sec-properties-of-the-array-prototype-object
 internal sealed class ArrayPrototype : Object
 {
     // The Array prototype object has a [[Prototype]] internal slot whose value is %Object.prototype%.
