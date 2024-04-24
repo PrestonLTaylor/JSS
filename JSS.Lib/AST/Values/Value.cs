@@ -374,6 +374,26 @@ public abstract class Value
         throw new NotImplementedException();
     }
 
+    // 7.1.5 ToIntegerOrInfinity ( argument ), https://tc39.es/ecma262/#sec-tointegerorinfinity
+    internal AbruptOr<double> ToIntegerOrInfinity()
+    {
+        // 1. Let number be ? ToNumber(argument).
+        var number = ToNumber();
+        if (number.IsAbruptCompletion()) return number;
+
+        // 2. If number is one of NaN, +0𝔽, FIXME: (or -0𝔽), return 0.
+        if (number.Value is double.NaN or 0) return 0;
+
+        // 3. If number is +∞𝔽, return +∞.
+        if (number.Value == double.PositiveInfinity) return double.PositiveInfinity;
+
+        // 4. If number is -∞𝔽, return -∞.
+        if (number.Value == double.NegativeInfinity) return double.NegativeInfinity;
+
+        // 5. Return truncate(ℝ(number)).
+        return Math.Truncate(number.Value);
+    }
+
     // 7.1.6 ToInt32 ( argument ), https://tc39.es/ecma262/#sec-toint32
     internal AbruptOr<int> ToInt32()
     {
