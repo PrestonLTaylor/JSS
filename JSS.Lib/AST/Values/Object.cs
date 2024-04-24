@@ -186,6 +186,17 @@ public class Object : Value
         return asCallable.Call(vm, V, argumentsList);
     }
 
+
+    // 7.3.18 LengthOfArrayLike ( obj ), https://tc39.es/ecma262/#sec-lengthofarraylike
+    internal AbruptOr<double> LengthOfArrayLike()
+    {
+        // 1. Return ℝ(? ToLength(? Get(obj, "length"))).
+        var getResult = Get(this, "length");
+        if (getResult.IsAbruptCompletion()) return getResult;
+
+        return getResult.Value.ToLength();
+    }
+
     // 10.1.1 [[GetPrototypeOf]] ( ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-getprototypeof
     internal Object? GetPrototypeOf()
     {
