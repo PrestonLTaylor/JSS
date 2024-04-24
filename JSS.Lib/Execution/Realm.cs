@@ -60,6 +60,8 @@ public sealed class Realm
 
         StringConstructor = new(FunctionPrototype);
 
+        ArrayPrototype = new(ObjectPrototype);
+
         ErrorPrototype = new(ObjectPrototype);
         ErrorConstructor = new(FunctionPrototype);
         ErrorPrototype.Initialize(this, vm);
@@ -256,6 +258,7 @@ public sealed class Realm
     internal ObjectConstructor ObjectConstructor { get; private set; }
     internal FunctionPrototype FunctionPrototype { get; private set; }
     internal StringConstructor StringConstructor { get; private set; }
+    internal ArrayPrototype ArrayPrototype { get; private set; }
     internal ErrorPrototype ErrorPrototype { get; private set; }
     internal ErrorConstructor ErrorConstructor { get; private set; }
     internal NativeErrorPrototype EvalErrorPrototype { get; private set; }
