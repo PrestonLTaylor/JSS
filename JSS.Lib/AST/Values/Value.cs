@@ -782,4 +782,17 @@ public abstract class Value
         // 3. Return SameValueNonNumber(x, y).
         return SameValueNonNumber(x, y);
     }
+
+    // 7.1.20 ToLength ( argument ), https://tc39.es/ecma262/#sec-tolength
+    internal AbruptOr<double> ToLength()
+    {
+        // 1. Let len be ? ToIntegerOrInfinity(argument).
+        var len = ToIntegerOrInfinity();
+
+        // 2. If len ≤ 0, return +0𝔽.
+        if (len.Value <= 0) return 0;
+
+        // 3. Return 𝔽(min(len, 2**53 - 1)).
+        return Math.Min(len.Value, Math.Pow(2, 53) - 1);
+    }
 }
