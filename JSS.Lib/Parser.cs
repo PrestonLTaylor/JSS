@@ -208,6 +208,16 @@ public sealed class Parser
     }
 
     // AssignmentExpression, https://tc39.es/ecma262/#prod-AssignmentExpression
+    private IExpression ParseAssignmentExpression()
+    {
+        if (!TryParseAssignmentExpression(out var assignmentExpression))
+        {
+            return ThrowUnexpectedTokenSyntaxError<IExpression>()!;
+        }
+
+        return assignmentExpression!;
+    }
+
     private bool TryParseAssignmentExpression(out IExpression? parsedExpression)
     {
         if (!TryParseConditionalExpression(out IExpression? lhs))
@@ -378,14 +388,33 @@ public sealed class Parser
     // ConditionalExpression, https://tc39.es/ecma262/#prod-ConditionalExpression
     private bool TryParseConditionalExpression(out IExpression? parsedExpression)
     {
-        // FIXME: Implement the '?' operator
-        if (TryParseShortCircuitExpression(out parsedExpression))
+        if (!TryParseShortCircuitExpression(out var shortCircuitExpression))
         {
+            parsedExpression = null;
+            return false;
+        }
+
+        if (!IsTernaryOperator())
+        {
+            parsedExpression = shortCircuitExpression;
             return true;
         }
 
-        parsedExpression = null;
-        return false;
+        _consumer.ConsumeTokenOfType(TokenType.Ternary);
+
+        var trueCaseExpression = ParseAssignmentExpression();
+
+        _consumer.ConsumeTokenOfType(TokenType.Colon);
+
+        var falseCaseExpression = ParseAssignmentExpression();
+
+        parsedExpression = new TernaryExpression(shortCircuitExpression!, trueCaseExpression, falseCaseExpression);
+        return true;
+    }
+
+    private bool IsTernaryOperator()
+    {
+        return _consumer.IsTokenOfType(TokenType.Ternary);
     }
 
     // ShortCircuitExpression, https://tc39.es/ecma262/#prod-ShortCircuitExpression
