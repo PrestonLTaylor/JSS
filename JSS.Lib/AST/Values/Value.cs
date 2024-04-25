@@ -553,6 +553,19 @@ public abstract class Value
         return false;
     }
 
+    // 7.2.9 SameValue ( x, y ), https://tc39.es/ecma262/#sec-samevalue
+    static internal Boolean SameValue(Value x, Value y)
+    {
+        // 1. If Type(x) is not Type(y), return false.
+        if (x.Type() != y.Type()) return false;
+
+        // FIXME: 2. If x is a Number, then
+        // FIXME: a. Return Number::sameValue(x, y).
+
+        // 3. Return SameValueNonNumber(x, y).
+        return SameValueNonNumber(x, y);
+    }
+
     // 7.2.12 SameValueNonNumber( x, y ), https://tc39.es/ecma262/#sec-samevaluenonnumber
     static internal Boolean SameValueNonNumber(Value x, Value y)
     {
