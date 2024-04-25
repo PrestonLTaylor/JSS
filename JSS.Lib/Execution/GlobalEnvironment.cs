@@ -120,6 +120,49 @@ internal sealed class GlobalEnvironment : Environment
         return ObjectRecord.GetBindingValue(vm, N, S);
     }
 
+    // 9.1.1.4.7 DeleteBinding ( N ), https://tc39.es/ecma262/#sec-global-environment-records-deletebinding-n
+    public override Completion DeleteBinding(string N)
+    {
+        // 1. Let DclRec be envRec.[[DeclarativeRecord]].
+
+        // 2. If ! DclRec.HasBinding(N) is true, then
+        if (DeclarativeRecord.HasBinding(N))
+        {
+            // a. Return ! DclRec.DeleteBinding(N).
+            return MUST(DeclarativeRecord.DeleteBinding(N));
+        }
+
+        // 3. Let ObjRec be envRec.[[ObjectRecord]].
+
+        // 4. Let globalObject be ObjRec.[[BindingObject]].
+
+        // 5. Let existingProp be ? HasOwnProperty(globalObject, N).
+        var existingProp = Object.HasOwnProperty(ObjectRecord.BindingObject, N);
+        if (existingProp.IsAbruptCompletion()) return existingProp;
+
+        // 6. If existingProp is true, then
+        var asBoolean = existingProp.Value.AsBoolean();
+        if (asBoolean)
+        {
+            // a. Let status be ? ObjRec.DeleteBinding(N).
+            var status = ObjectRecord.DeleteBinding(N);
+            if (status.IsAbruptCompletion()) return status;
+
+            // b. If status is true and envRec.[[VarNames]] contains N, then
+            if (status.Value.AsBoolean() && VarNames.Contains(N))
+            {
+                // i. Remove N from envRec.[[VarNames]].
+                VarNames.Remove(N);
+            }
+
+            // c. Return status.
+            return status;
+        }
+
+        // 7. Return true.
+        return true;
+    }
+
     // 9.1.1.4.8 HasThisBinding ( ), https://tc39.es/ecma262/#sec-global-environment-records-hasthisbinding
     public override bool HasThisBinding()
     {
