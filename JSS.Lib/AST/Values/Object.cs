@@ -13,7 +13,7 @@ public class Object : Value
     }
 
     override public bool IsObject() { return true; }
-    override public ValueType Type() {  return ValueType.Object; }
+    override public ValueType Type() { return ValueType.Object; }
 
     public string ToString(VM vm)
     {
@@ -182,7 +182,7 @@ public class Object : Value
         }
 
         // 3. Return ? F.[[Call]](V, argumentsList).
-        var asCallable = F.AsCallable(); 
+        var asCallable = F.AsCallable();
         return asCallable.Call(vm, V, argumentsList);
     }
 
@@ -357,6 +357,38 @@ public class Object : Value
         }
 
         return true;
+    }
+
+    // 10.1.10 [[Delete]] ( P ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-delete-p
+    internal AbruptOr<bool> Delete(string P)
+    {
+        // 1. Return ? OrdinaryDelete(O, P).
+        return OrdinaryDelete(P);
+    }
+
+    // 10.1.10.1 OrdinaryDelete ( O, P ), https://tc39.es/ecma262/#sec-ordinarydelete
+    internal AbruptOr<bool> OrdinaryDelete(string P)
+    {
+        // 1. Let desc be ? O.[[GetOwnProperty]](P).
+        var desc = GetOwnProperty(P);
+        if (desc.IsAbruptCompletion()) return desc;
+
+        // 2. If desc is undefined, return true.
+        if (desc.Value.IsUndefined()) return true;
+
+        // 3. If desc.[[Configurable]] is true, then
+        var asProperty = desc.Value.AsProperty();
+        if (asProperty.Attributes.Configurable)
+        {
+            // a. Remove the own property with name P from O.
+            DataProperties.Remove(P);
+
+            // b. Return true.
+            return true;
+        }
+
+        // 4. Return false.
+        return false;
     }
 
     // 10.1.11 [[OwnPropertyKeys]] ( ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys
