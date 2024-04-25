@@ -134,6 +134,21 @@ internal class DeclarativeEnvironment : Environment
         return binding.Value;
     }
 
+    // 9.1.1.1.7 DeleteBinding ( N ), https://tc39.es/ecma262/#sec-declarative-environment-records-deletebinding-n
+    public override Completion DeleteBinding(string N)
+    {
+        // 1. Assert: envRec has a binding for N.
+        Debug.Assert(_identifierToBinding.ContainsKey(N));
+
+        // 2. If the binding for N in envRec cannot be deleted, return false.
+
+        // 3. Remove the binding for N from envRec.
+        _identifierToBinding.Remove(N);
+
+        // 4. Return true.
+        return true;
+    }
+
     // 9.1.1.1.8 HasThisBinding ( ), https://tc39.es/ecma262/#sec-declarative-environment-records-hasthisbinding
     override public bool HasThisBinding()
     {

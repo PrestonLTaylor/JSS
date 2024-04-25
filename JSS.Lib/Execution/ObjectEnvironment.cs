@@ -114,6 +114,16 @@ internal sealed class ObjectEnvironment : Environment
         return Object.Get(BindingObject, N);
     }
 
+    // 9.1.1.2.7 DeleteBinding ( N ), https://tc39.es/ecma262/#sec-object-environment-records-deletebinding-n
+    public override Completion DeleteBinding(string N)
+    {
+        // 1. Let bindingObject be envRec.[[BindingObject]].
+        // 2. Return ? bindingObject.[[Delete]](N).
+        var result = BindingObject.Delete(N);
+        if (result.IsAbruptCompletion()) return result.Completion;
+        return result.Value;
+    }
+
     // 9.1.1.2.8 HasThisBinding ( ), https://tc39.es/ecma262/#sec-object-environment-records-hasthisbinding
     override public bool HasThisBinding()
     {
