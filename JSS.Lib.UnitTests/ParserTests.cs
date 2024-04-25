@@ -54,6 +54,7 @@ internal sealed class ParserTests
         { "this", typeof(ThisExpression) },
         { "(this)", typeof(ThisExpression) },
         { "null", typeof(NullLiteral) },
+        { "1 ? 2 : 3", typeof(TernaryExpression) },
     };
 
     // Tests for Expression, https://tc39.es/ecma262/#prod-Expression
@@ -1757,6 +1758,9 @@ internal sealed class ParserTests
         {"a &=", "}"},
         {"a ^=", "}"},
         {"a |=", "}"},
+        {"a ?", "}"},
+        {"a ? b", "}"},
+        {"a ? b :", "}"},
     };
 
     [TestCaseSource(nameof(unexpectedTokenTestCases))]
@@ -1866,6 +1870,9 @@ internal sealed class ParserTests
         "a &=",
         "a ^=",
         "a |=",
+        "a ?",
+        "a ? b",
+        "a ? b :",
     };
 
     [TestCaseSource(nameof(unexpectedEofTestCases))]
