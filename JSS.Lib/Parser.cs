@@ -1663,11 +1663,52 @@ public sealed class Parser
         return _consumer.IsTokenOfType(TokenType.For);
     }
 
-    private ForStatement ParseForStatement()
+    private INode ParseForStatement()
     {
         _consumer.ConsumeTokenOfType(TokenType.For);
         _consumer.ConsumeTokenOfType(TokenType.OpenParen);
 
+        var isNormalForLoop = IsNormalForLoop();
+
+        if (isNormalForLoop)
+        {
+            return ParseNormalForLoop();
+        }
+        else
+        {
+            return ParseForInOfLoop();
+        }
+
+    }
+
+    private bool IsNormalForLoop()
+    {
+        // If we find a semi-colon in the head of a for loop, that means it's a normal for loop
+        // Otherwise, it is a for-in/for-of
+        int offset = 0;
+        int parenDepth = 1;
+        while (_consumer.CanConsume(offset))
+        {
+            var current = _consumer.Peek(offset).type;
+
+            if (current == TokenType.OpenParen) ++parenDepth;
+            if (current == TokenType.ClosedParen)
+            {
+                --parenDepth;
+                if (parenDepth == 0) return false;
+            }
+
+            if (current == TokenType.SemiColon) return true;
+            ++offset;
+        }
+
+        // NOTE: We have a syntax error here, but we'll let the other parsing code handle the syntax errors
+        return true;
+    }
+
+    // 14.7.4 The for Statement, https://tc39.es/ecma262/#sec-for-statement
+    private ForStatement ParseNormalForLoop()
+    {
         TryParseForInitializationExpression(out INode? initializationExpression);
 
         _consumer.ConsumeTokenOfType(TokenType.SemiColon);
@@ -1710,6 +1751,35 @@ public sealed class Parser
 
         initializationExpression = null;
         return false;
+    }
+
+    // 14.7.5 The for-in, for-of, and for-await-of Statements, https://tc39.es/ecma262/#sec-for-in-and-for-of-statements
+    private ForInStatement ParseForInOfLoop()
+    {
+        // FIXME: Early errors
+        // FIXME: Implement parsing for the rest of the for-in, for-of and for-await-of statements
+        _consumer.ConsumeTokenOfType(TokenType.Var);
+
+        var identifier = ParseIdentifier();
+
+        ParseIn();
+
+        var expression = ParseExpression();
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
+
+        var iterationStatement = ParseStatement();
+
+        return new ForInStatement(identifier, expression, iterationStatement);
+    }
+
+    private void ParseIn()
+    {
+        var identifier = _consumer.Peek();
+
+        if (identifier.data != "in") ThrowUnexpectedTokenSyntaxError<ForInStatement>();
+
+        _consumer.Consume();
     }
 
     // 14.8 The continue Statement, https://tc39.es/ecma262/#sec-continue-statement

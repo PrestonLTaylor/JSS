@@ -687,6 +687,30 @@ internal sealed class ParserTests
         varStatement!.Identifier.Should().Be(expectedIdentifier);
     }
 
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsForInStatement_WhenProvidingForIn_WithVarBinding(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"for (var {expectedIdentifier} in {expression}) {{ }}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var forInStatement = rootNodes[0] as ForInStatement;
+        forInStatement.Should().NotBeNull();
+        forInStatement!.Identifier.Name.Should().Be(expectedIdentifier);
+        forInStatement.Expression.Should().BeOfType(expectedExpressionType);
+        forInStatement.IterationStatement.Should().NotBeNull();
+    }
+
+
     // Tests for 14.8 The continue Statement, https://tc39.es/ecma262/#sec-continue-statement
     [Test]
     public void Parse_ReturnsContinueStatement_WhenProvidingContinue()
