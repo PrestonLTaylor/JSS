@@ -808,4 +808,40 @@ public abstract class Value
         // 3. Return 𝔽(min(len, 2**53 - 1)).
         return Math.Min(len.Value, Math.Pow(2, 53) - 1);
     }
+
+    // 7.3.21 OrdinaryHasInstance ( C, O ), https://tc39.es/ecma262/#sec-ordinaryhasinstance
+    internal Completion OrdinaryHasInstance(VM vm, Value O)
+    {
+        // 1. If IsCallable(C) is false, return false.
+        if (!IsCallable()) return false;
+
+        // FIXME: 2. If C has a [[BoundTargetFunction]] internal slot, then
+        // FIXME: a. Let BC be C.[[BoundTargetFunction]].
+        // FIXME: b. Return ? InstanceofOperator(O, BC).
+
+        // 3. If O is not an Object, return false.
+        if (!O.IsObject()) return false;
+
+        // 4. Let P be ? Get(C, "prototype").
+        var C = AsObject();
+        var P = Object.Get(C, "prototype");
+        if (P.IsAbruptCompletion()) return P;
+
+        // 5. If P is not an Object, throw a TypeError exception.
+        if (!P.Value.IsObject()) return ThrowTypeError(vm, RuntimeErrorType.InstanceOfConstructorPrototypeIsNotAnObject, P.Value.Type());
+
+        // 6. Repeat,
+        Object? obj = O.AsObject();
+        while (true)
+        {
+            // a. Set O to ? O.[[GetPrototypeOf]]().
+            obj = obj.AsObject().GetPrototypeOf();
+
+            // b. If O is null, return false.
+            if (obj is null) return false;
+
+            // c. If SameValue(P, O) is true, return true.
+            if (SameValue(P.Value, obj)) return true;
+        }
+    }
 }
