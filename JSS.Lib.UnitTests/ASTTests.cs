@@ -437,6 +437,10 @@ internal sealed class ASTTests
         CreateComputedPropertyExpressionTestCase("true", true),
         CreateComputedPropertyExpressionTestCase("1", 1),
         CreateComputedPropertyExpressionTestCase(EscapeString("1"), "1"),
+
+        // Tests for TernaryExpression
+        CreateTernaryTestCase("true", "1", "2", 1),
+        CreateTernaryTestCase("false", "1", "2", 2),
     };
 
     static private object[] CreateBooleanLiteralTestCase(bool value)
@@ -715,6 +719,11 @@ internal sealed class ASTTests
     static private object[] CreateComputedPropertyExpressionTestCase(string propertyValue, Value expected)
     {
         return new object[] { $"let a = {{}}; a[\"b\"] = {propertyValue}; a[\"b\"]", Completion.NormalCompletion(expected) };
+    }
+
+    static private object[] CreateTernaryTestCase(string testExpression, string trueCase, string falseCase, Value expected)
+    {
+        return new object[] { $"{testExpression} ? {trueCase} : {falseCase}", Completion.NormalCompletion(expected) };
     }
 
     [TestCaseSource(nameof(astTestCases))]
