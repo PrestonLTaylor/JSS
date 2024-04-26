@@ -527,6 +527,25 @@ public abstract class Value
         return MUST(key.Value.ToStringJS(vm));
     }
 
+    // 7.2.2 IsArray ( argument ), https://tc39.es/ecma262/#sec-isarray
+    internal bool IsArray()
+    {
+        // 1. If argument is not an Object, return false.
+        if (!IsObject()) return false;
+
+        // 2. If argument is an Array exotic object, return true.
+        if (this is Array) return true;
+
+        // FIXME: 3. If argument is a Proxy exotic object, then
+        // FIXME: a. Perform ? ValidateNonRevokedProxy(argument).
+        // FIXME: b. Let proxyTarget be argument.[[ProxyTarget]].
+        // FIXME: c. Return ? IsArray(proxyTarget).
+
+        // 4. Return false.
+        return false;
+    }
+
+
     // 7.2.3 IsCallable ( argument ), https://tc39.es/ecma262/#sec-iscallable
     internal bool IsCallable()
     {
