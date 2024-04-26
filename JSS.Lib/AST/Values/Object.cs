@@ -344,19 +344,12 @@ public class Object : Value
     // 10.1.9.1 OrdinarySet ( O, P, V, Receiver ), https://tc39.es/ecma262/#sec-ordinaryset
     static internal Completion OrdinarySet(Object O, string P, Value V, Object receiver)
     {
-        // FIXME: 1. Let ownDesc be ? O.[[GetOwnProperty]](P).
-        // FIXME: 2. Return ? OrdinarySetWithOwnDescriptor(O, P, V, Receiver, ownDesc).
-        if (receiver.DataProperties.ContainsKey(P))
-        {
-            var property = receiver.DataProperties[P];
-            property.Value = V;
-        }
-        else
-        {
-            receiver.DataProperties[P] = new Property(V, new Attributes(true, false, false));
-        }
+        // 1. Let ownDesc be ? O.[[GetOwnProperty]](P).
+        var ownDesc = O.GetOwnProperty(P);
+        if (ownDesc.IsAbruptCompletion()) return ownDesc;
 
-        return true;
+        // 2. Return ? OrdinarySetWithOwnDescriptor(O, P, V, Receiver, ownDesc).
+        return O.OrdinarySetWithOwnDescriptor(P, V, receiver, ownDesc.Value);
     }
 
     // 10.1.9.2 OrdinarySetWithOwnDescriptor ( O, P, V, Receiver, ownDesc ), https://tc39.es/ecma262/#sec-ordinarysetwithowndescriptor
