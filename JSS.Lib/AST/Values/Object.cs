@@ -97,7 +97,7 @@ public class Object : Value
     }
 
     // 7.3.5 CreateDataProperty ( O, P, V ), https://tc39.es/ecma262/#sec-createdataproperty
-    static public AbruptOr<bool> CreateDataProperty(Object O, string P, Value V)
+    static internal AbruptOr<bool> CreateDataProperty(Object O, string P, Value V)
     {
         // 1. Let newDesc be the PropertyDescriptor { [[Value]]: V, [[Writable]]: true, [[Enumerable]]: true, [[Configurable]]: true }.
         var newDesc = new Property(V, new(true, true, true));
@@ -107,7 +107,7 @@ public class Object : Value
     }
 
     // 7.3.6 CreateDataPropertyOrThrow ( O, P, V ), https://tc39.es/ecma262/#sec-createdatapropertyorthrow
-    static public Completion CreateDataPropertyOrThrow(VM vm, Object O, string P, Value V)
+    static internal Completion CreateDataPropertyOrThrow(VM vm, Object O, string P, Value V)
     {
         // 1. Let success be ? CreateDataProperty(O, P, V).
         var success = CreateDataProperty(O, P, V);
@@ -357,6 +357,76 @@ public class Object : Value
         }
 
         return true;
+    }
+
+    // 10.1.9.2 OrdinarySetWithOwnDescriptor ( O, P, V, Receiver, ownDesc ), https://tc39.es/ecma262/#sec-ordinarysetwithowndescriptor
+    internal Completion OrdinarySetWithOwnDescriptor(string P, Value V, Object receiver, Value ownDesc)
+    {
+        // 1. If ownDesc is undefined, then
+        if (ownDesc.IsUndefined())
+        {
+            // a. Let parent be ? O.[[GetPrototypeOf]]().
+            var parent = GetPrototypeOf();
+
+            // b. If parent is not null, then
+            if (parent is not null)
+            {
+                // i. Return ? parent.[[Set]](P, V, Receiver).
+                return parent.Set(P, V, receiver);
+            }
+            // c. Else,
+            else
+            {
+                // i. Set ownDesc to the PropertyDescriptor { [[Value]]: undefined, [[Writable]]: true, [[Enumerable]]: true, [[Configurable]]: true }.
+                ownDesc = new Property(Undefined.The, new(true, true, true));
+            }
+        }
+
+        // FIXME: 2. If IsDataDescriptor(ownDesc) is true, then
+        var desc = ownDesc.AsProperty();
+
+        // a. If ownDesc.[[Writable]] is false, return false.
+        if (!desc.Attributes.Writable) return false;
+
+        // b. If Receiver is not an Object, return false.
+        if (!receiver.IsObject()) return false;
+
+        // c. Let existingDescriptor be ? Receiver.[[GetOwnProperty]](P).
+        var existingDescriptor = receiver.GetOwnProperty(P);
+        if (existingDescriptor.IsAbruptCompletion()) return existingDescriptor;
+
+        // d. If existingDescriptor is not undefined, then
+        if (!existingDescriptor.Value.IsUndefined())
+        {
+            // FIXME: i. If IsAccessorDescriptor(existingDescriptor) is true, return false.
+
+            // ii. If existingDescriptor.[[Writable]] is false, return false.
+            var existingDesc = existingDescriptor.Value.AsProperty();
+            if (!existingDesc.Attributes.Writable) return false;
+
+            // FIXME: iii. Let valueDesc be the PropertyDescriptor { [[Value]]: V }.
+            existingDesc.Value = V;
+
+            // iv. Return ? Receiver.[[DefineOwnProperty]](P, valueDesc).
+            return receiver.DefineOwnProperty(P, existingDesc);
+        }
+        // e. Else,
+        else
+        {
+            // i. Assert: Receiver does not currently have a property P.
+            Debug.Assert(!receiver.DataProperties.ContainsKey(P));
+
+            // ii. Return ? CreateDataProperty(Receiver, P, V).
+            var result = CreateDataProperty(receiver, P, V);
+            if (result.IsAbruptCompletion()) return result.Completion;
+            return result.Value;
+        }
+
+        // FIXME: 3. Assert: IsAccessorDescriptor(ownDesc) is true.
+        // FIXME: 4.Let setter be ownDesc.[[Set]].
+        // FIXME: 5. If setter is undefined, return false.
+        // FIXME: 6. Perform ? Call(setter, Receiver, « V »).
+        // FIXME: 7.Return true.
     }
 
     // 10.1.10 [[Delete]] ( P ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-delete-p
