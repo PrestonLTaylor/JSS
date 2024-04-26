@@ -102,6 +102,7 @@ public sealed class Realm
         URIErrorConstructor.Initialize(URIErrorPrototype, "URIError");
 
         MathObject = new(ObjectPrototype);
+        MathObject.Initialize(vm);
 
         // FIMXE: 3. Perform AddRestrictedFunctionProperties(realmRec.[[Intrinsics]].[[%Function.prototype%]], realmRec).
 
