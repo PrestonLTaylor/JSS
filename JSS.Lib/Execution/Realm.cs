@@ -101,6 +101,8 @@ public sealed class Realm
         URIErrorPrototype.Initialize(URIErrorConstructor, "URIError");
         URIErrorConstructor.Initialize(URIErrorPrototype, "URIError");
 
+        MathObject = new(ObjectPrototype);
+
         // FIMXE: 3. Perform AddRestrictedFunctionProperties(realmRec.[[Intrinsics]].[[%Function.prototype%]], realmRec).
 
         // 4. Return UNUSED.
@@ -205,6 +207,10 @@ public sealed class Realm
         // 23.1.1 The Array Constructor, https://tc39.es/ecma262/#sec-array-constructor
         globalProperties.Add("Array", new Property(ArrayConstructor, new(true, false, true)));
 
+        // 19.4 Other Properties of the Global Object, https://tc39.es/ecma262/#sec-other-properties-of-the-global-object
+        // 21.3 The Math Object, https://tc39.es/ecma262/#sec-math-object
+        globalProperties.Add("Math", new Property(MathObject, new(true, false, true)));
+
         return globalProperties;
     }
 
@@ -281,4 +287,5 @@ public sealed class Realm
     internal NativeErrorConstructor TypeErrorConstructor { get; private set; }
     internal NativeErrorPrototype URIErrorPrototype { get; private set; }
     internal NativeErrorConstructor URIErrorConstructor { get; private set; }
+    internal MathObject MathObject { get; private set; }
 }
