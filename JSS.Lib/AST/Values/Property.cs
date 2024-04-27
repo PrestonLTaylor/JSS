@@ -2,7 +2,19 @@
 
 // 6.1.7.1 Property Attributes, https://tc39.es/ecma262/#sec-property-attributes
 // FIXME: [[Get]] [[Set]]
-internal sealed record Attributes(bool Writable, bool Enumerable, bool Configurable);
+internal sealed class Attributes
+{
+    public Attributes(bool writable, bool enumerable, bool configurable)
+    {
+        Writable = writable;
+        Enumerable = enumerable;
+        Configurable = configurable;
+    }
+
+    public bool Writable { get; set;  }
+    public bool Enumerable { get; set; }
+    public bool Configurable { get; set; }
+}
 
 // 6.2.6 The Property Descriptor Specification Type, https://tc39.es/ecma262/#sec-property-descriptor-specification-type
 internal sealed class Property : Value
@@ -22,5 +34,5 @@ internal sealed class Property : Value
     }
 
     public Value Value { get; set; }
-    public Attributes Attributes { get; }
+    public Attributes Attributes { get; set; }
 }
