@@ -17,6 +17,10 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
         // FIXME: We should probably have a method for internally defining properties
         DataProperties.Add("length", new Property(1, new Attributes(true, false, true)));
 
+        // 20.1.2.4 Object.defineProperty ( O, P, Attributes ), https://tc39.es/ecma262/#sec-object.defineproperty
+        var definePropertyBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, defineProperty);
+        DataProperties.Add("defineProperty", new Property(definePropertyBuiltin, new(true, false, true)));
+
         // 20.1.2.21 Object.prototype, The initial value of Object.prototype is the Object prototype object.
         // This property has the attributes { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: false }.
         DataProperties.Add("prototype", new Property(realm.ObjectPrototype, new(false, false, false)));
@@ -51,6 +55,28 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
 
         // 3. Return ! ToObject(value).
         return MUST(value.ToObject(vm));
+    }
+
+    // 20.1.2.4 Object.defineProperty ( O, P, Attributes ), https://tc39.es/ecma262/#sec-object.defineproperty
+    private Completion defineProperty(VM vm, Value? thisArgument, List argumentList)
+    {
+        // 1. If O is not an Object, throw a TypeError exception.
+        var O = argumentList[0];
+        if (!O.IsObject()) return ThrowTypeError(vm, RuntimeErrorType.TriedToDefinePropertyOnNonObject, O.Type());
+
+        // 2. Let key be ? ToPropertyKey(P).
+        var key = argumentList[1].ToPropertyKey(vm);
+        if (key.IsAbruptCompletion()) return key;
+
+        // 3. Let desc be ? ToPropertyDescriptor(Attributes).
+        var desc = argumentList[2].ToPropertyDescriptor(vm);
+
+        // 4. Perform ? DefinePropertyOrThrow(O, key, desc).
+        var defineResult = DefinePropertyOrThrow(vm, O.AsObject(), key.Value.AsString(), desc.Value);
+        if (defineResult.IsAbruptCompletion()) return defineResult;
+
+        // 5. Return O.
+        return O;
     }
 
     // 20.1.2.8 Object.getOwnPropertyDescriptor ( O, P ), https://tc39.es/ecma262/#sec-object.getownpropertydescriptor
