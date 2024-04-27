@@ -245,8 +245,101 @@ public abstract class Value
         return obj;
     }
 
-    // 7.1.1 ToPrimitive ( input [ , preferredType ] ), https://tc39.es/ecma262/#sec-toprimitive
+    // 6.2.6.5 ToPropertyDescriptor ( Obj ), https://tc39.es/ecma262/#sec-topropertydescriptor
+    internal AbruptOr<Property> ToPropertyDescriptor(VM vm)
+    {
+        // 1. If Obj is not an Object, throw a TypeError exception.
+        if (!IsObject()) return ThrowTypeError(vm, RuntimeErrorType.ThisIsNotAnObject);
+        var obj = AsObject();
 
+        // FIXME: 2. Let desc be a new Property Descriptor that initially has no fields.
+        // FIXME: Property fields should be nullable
+        var desc = new Property(null!, new(false, false, false));
+
+        // 3. Let hasEnumerable be ? HasProperty(Obj, "enumerable").
+        var hasEnumerable = Object.HasProperty(obj, "enumerable");
+        if (hasEnumerable.IsAbruptCompletion()) return hasEnumerable;
+
+        // 4. If hasEnumerable is true, then
+        if (hasEnumerable.Value.AsBoolean())
+        {
+            // a. Let enumerable be ToBoolean(? Get(Obj, "enumerable")).
+            var getResult = Object.Get(obj, "enumerable");
+            if (getResult.IsAbruptCompletion()) return getResult;
+
+            var enumerable = getResult.Value.ToBoolean();
+
+            // b. Set desc.[[Enumerable]] to enumerable.
+            desc.Attributes.Enumerable = enumerable;
+        }
+
+        // 5. Let hasConfigurable be ? HasProperty(Obj, "configurable").
+        var hasConfigurable = Object.HasProperty(obj, "configurable");
+        if (hasConfigurable.IsAbruptCompletion()) return hasConfigurable;
+
+        // 6. If hasConfigurable is true, then
+        if (hasConfigurable.Value.AsBoolean())
+        {
+            // a. Let configurable be ToBoolean(? Get(Obj, "configurable")).
+            var getResult = Object.Get(obj, "configurable");
+            if (getResult.IsAbruptCompletion()) return getResult;
+
+            var configurable = getResult.Value.ToBoolean();
+
+            // b. Set desc.[[Configurable]] to configurable.
+            desc.Attributes.Configurable = configurable;
+        }
+
+        // 7. Let hasValue be ? HasProperty(Obj, "value").
+        var hasValue = Object.HasProperty(obj, "value");
+        if (hasValue.IsAbruptCompletion()) return hasValue;
+
+        // 8. If hasValue is true, then
+        if (hasValue.Value.AsBoolean())
+        {
+            // a. Let value be ? Get(Obj, "value").
+            var getResult = Object.Get(obj, "value");
+            if (getResult.IsAbruptCompletion()) return getResult;
+
+            // b. Set desc.[[Value]] to value.
+            desc.Value = getResult.Value;
+        }
+
+        // 9. Let hasWritable be ? HasProperty(Obj, "writable").
+        var hasWritable = Object.HasProperty(obj, "writable");
+        if (hasWritable.IsAbruptCompletion()) return hasWritable;
+
+        // 10. If hasWritable is true, then
+        if (hasWritable.Value.AsBoolean())
+        {
+            // a. Let writable be ToBoolean(? Get(Obj, "writable")).
+            var getResult = Object.Get(obj, "writable");
+            if (getResult.IsAbruptCompletion()) return getResult;
+
+            var writable = getResult.Value.ToBoolean();
+
+            // b. Set desc.[[Writable]] to writable.
+            desc.Attributes.Writable = writable;
+        }
+
+        // FIXME: 11. Let hasGet be ? HasProperty(Obj, "get").
+        // FIXME: 12. If hasGet is true, then
+        // FIXME: a. Let getter be ? Get(Obj, "get").
+        // FIXME: b. If IsCallable(getter) is false and getter is not undefined, throw a TypeError exception.
+        // FIXME: c. Set desc.[[Get]] to getter.
+        // FIXME: 13. Let hasSet be ? HasProperty(Obj, "set").
+        // FIXME: 14. If hasSet is true, then
+        // FIXME: a. Let setter be ? Get(Obj, "set").
+        // FIXME: b. If IsCallable(setter) is false and setter is not undefined, throw a TypeError exception.
+        // FIXME: c. Set desc.[[Set]] to setter.
+        // FIXME: 15. If desc has a [[Get]] field or desc has a [[Set]] field, then
+        // FIXME: a. If desc has a [[Value]] field or desc has a [[Writable]] field, throw a TypeError exception.
+
+        // 16. Return desc.
+        return desc;
+    }
+
+    // 7.1.1 ToPrimitive ( input [ , preferredType ] ), https://tc39.es/ecma262/#sec-toprimitive
     internal Completion ToPrimitive(VM vm, PreferredType? preferredType = null)
     {
         // 1. If input is an Object, then
