@@ -3,6 +3,13 @@ using JSS.Lib.Execution;
 
 namespace JSS.Test262Runner;
 
+// FIXME: Add more test results based on the type of failure (e.g. if the harness file failed to execute or parsing failed etc.)
+enum TestResult
+{
+    SUCCESS,
+    FAILURE,
+}
+
 // FIXME: Accept a filter from the command line to filter the tests being executed
 /// <summary>
 /// Our implementation for a runner for the test-262 test suite using the "test262" git repository that should be in the same directory.
@@ -40,7 +47,47 @@ internal sealed class Test262Runner
     /// </summary>
     public void StartRunner()
     {
-        var testCaseVm = CreateTestCaseVM();
+        const string TEST_DIRECTORY = "./test262/test";
+        const string TEST_FILTER = "*.js";
+
+        var testSuccessCount = 0;
+        var testFiles = Directory.EnumerateFiles(TEST_DIRECTORY, TEST_FILTER, SearchOption.AllDirectories);
+        foreach (var testFile in testFiles)
+        {
+            var testCase = File.ReadAllText(testFile);
+            var testResult = ExecuteTestCase(testCase);
+
+            if (testResult == TestResult.SUCCESS) ++testSuccessCount;
+
+            LogTestResult(testFile, testResult);
+        }
+
+        var testCount = testFiles.Count();
+        var testSuccessPercent = testSuccessCount / (double)testCount * 100;
+        Console.WriteLine($"{testCount} test cases executed.\n{testSuccessPercent}% ({testSuccessCount} / {testCount}) of tests passed.");
+    }
+
+    /// <summary>
+    /// Executes a test case and reports the result of executing the provided test case.
+    /// </summary>
+    /// <param name="testCase">The test case code to be executed as a string.</param>
+    /// <returns>The result of executing the test case.</returns>
+    private TestResult ExecuteTestCase(string testCase)
+    {
+        try
+        {
+            var testCaseVm = CreateTestCaseVM();
+            var testCaseScript = ParseAsGlobalCode(testCaseVm, testCase);
+            var testCompletion = testCaseScript.ScriptEvaluation();
+
+            if (testCompletion.IsAbruptCompletion()) return TestResult.FAILURE;
+
+            return TestResult.SUCCESS;
+        }
+        catch
+        {
+            return TestResult.FAILURE;
+        }
     }
 
     /// <summary>
@@ -91,6 +138,28 @@ internal sealed class Test262Runner
     {
         var parser = new Parser(scriptString);
         return parser.Parse(vm);
+    }
+
+    /// <summary>
+    /// Logs the result of a test case, currently, we only log to the console.
+    /// </summary>
+    /// <param name="testPath">The un-pretty file path to the executed test.</param>
+    /// <param name="testResult">The result of the executed test.</param>
+    static private void LogTestResult(string testPath, TestResult testResult)
+    {
+        var prettyPath = Path.GetRelativePath(Directory.GetCurrentDirectory(), testPath);
+        var resultAsString = testResult == TestResult.FAILURE ? "failed" : "passed";
+        if (testResult == TestResult.SUCCESS)
+        {
+            Console.ForegroundColor = ConsoleColor.Green;
+        }
+        else
+        {
+            Console.ForegroundColor = ConsoleColor.Red ;
+        }
+
+        Console.WriteLine($"{prettyPath}: {resultAsString}");
+        Console.ResetColor();
     }
 
     // FIXME: Implement a YAML parser and only execute harness files needed for each test
