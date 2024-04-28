@@ -12,7 +12,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSS.Lib", "JSS.Lib\JSS.Lib.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSS.Lib.UnitTests", "JSS.Lib.UnitTests\JSS.Lib.UnitTests.csproj", "{DC388CFD-CBBC-47B8-A23D-C46A9926E32B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSS.Benchmarks", "JSS.Benchmarks\JSS.Benchmarks.csproj", "{7AFEECCF-18D0-4BBE-B81D-B92FAB677E73}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "JSS.Benchmarks", "JSS.Benchmarks\JSS.Benchmarks.csproj", "{7AFEECCF-18D0-4BBE-B81D-B92FAB677E73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JSS.Test262Runner", "JSS.Test262Runner\JSS.Test262Runner.csproj", "{67D5BFBD-DF61-4044-A41F-A2CB3696F205}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,6 +38,10 @@ Global
 		{7AFEECCF-18D0-4BBE-B81D-B92FAB677E73}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AFEECCF-18D0-4BBE-B81D-B92FAB677E73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AFEECCF-18D0-4BBE-B81D-B92FAB677E73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67D5BFBD-DF61-4044-A41F-A2CB3696F205}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67D5BFBD-DF61-4044-A41F-A2CB3696F205}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67D5BFBD-DF61-4044-A41F-A2CB3696F205}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67D5BFBD-DF61-4044-A41F-A2CB3696F205}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
