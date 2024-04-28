@@ -1,1 +1,5 @@
-﻿throw new NotImplementedException();
+﻿// TODO: Setup ILogger (or something similar) that we can use for this project
+using JSS.Test262Runner;
+
+var test262RepositoryCloner = new GitHubCloner("tc39/test262");
+test262RepositoryCloner.CloneRepositoryIfNotAlreadyPresent();
