@@ -6,3 +6,4 @@ test262RepositoryCloner.CloneRepositoryIfNotAlreadyPresent();
 
 Console.WriteLine("\nStarting the test-262 runner...");
 var test262Runner = new Test262Runner();
+test262Runner.StartRunner();
