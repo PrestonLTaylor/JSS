@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using JSS.CLI;
+using JSS.Common;
 using JSS.Lib.Execution;
 
 var completion = Realm.InitializeHostDefinedRealm(out VM globalVm);

@@ -2,9 +2,9 @@
 using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
 
-namespace JSS.CLI;
+namespace JSS.Common;
 
-internal sealed class Print
+public sealed class Print
 {
     static public void PrintCompletion(VM vm, Completion completion)
     {
