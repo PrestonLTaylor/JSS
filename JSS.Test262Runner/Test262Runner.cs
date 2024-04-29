@@ -3,12 +3,13 @@ using JSS.Lib.Execution;
 
 namespace JSS.Test262Runner;
 
-// FIXME: Add more test results based on the type of failure (e.g. if the harness file failed to execute or parsing failed etc.)
 enum TestResult
 {
     SUCCESS,
+    HARNESS_EXECUTION_FAILURE,
     FAILURE,
 }
+
 
 // FIXME: Accept a filter from the command line to filter the tests being executed
 /// <summary>
@@ -50,21 +51,32 @@ internal sealed class Test262Runner
         const string TEST_DIRECTORY = "./test262/test";
         const string TEST_FILTER = "*.js";
 
-        var testSuccessCount = 0;
+        var testResults = CreateTestResultsDictionary();
         var testFiles = Directory.EnumerateFiles(TEST_DIRECTORY, TEST_FILTER, SearchOption.AllDirectories);
         foreach (var testFile in testFiles)
         {
             var testCase = File.ReadAllText(testFile);
             var testResult = ExecuteTestCase(testCase);
 
-            if (testResult == TestResult.SUCCESS) ++testSuccessCount;
+            ++testResults[testResult];
 
             LogTestResult(testFile, testResult);
         }
 
-        var testCount = testFiles.Count();
-        var testSuccessPercent = testSuccessCount / (double)testCount * 100;
-        Console.WriteLine($"{testCount} test cases executed.\n{testSuccessPercent}% ({testSuccessCount} / {testCount}) of tests passed.");
+        LogTestRunStatistics(testFiles.Count(), testResults);
+    }
+
+    /// <summary>
+    /// Creates a zeroed dictionary for test results.
+    /// </summary>
+    static private Dictionary<TestResult, int> CreateTestResultsDictionary()
+    {
+        return new()
+        {
+            { TestResult.SUCCESS, 0 },
+            { TestResult.FAILURE, 0 },
+            { TestResult.HARNESS_EXECUTION_FAILURE, 0 }
+        };
     }
 
     /// <summary>
@@ -84,6 +96,10 @@ internal sealed class Test262Runner
 
             return TestResult.SUCCESS;
         }
+        catch (HarnessExecutionFailureException)
+        {
+            return TestResult.HARNESS_EXECUTION_FAILURE;
+        }
         catch
         {
             return TestResult.FAILURE;
@@ -99,8 +115,7 @@ internal sealed class Test262Runner
         var completion = Realm.InitializeHostDefinedRealm(out VM testCaseVm);
         if (completion.IsAbruptCompletion())
         {
-            // FIXME: Replace InvalidOperationException with specific exceptions for each step of running a test.
-            throw new InvalidOperationException("Unable to initialize a host defined realm for a test case.");
+            throw new HarnessExecutionFailureException(testCaseVm, completion);
         }
 
         ExecuteRequiredHarnessFiles(testCaseVm);
@@ -114,15 +129,24 @@ internal sealed class Test262Runner
     /// <param name="vm">The VM to execute the required harness files on.</param>
     private void ExecuteRequiredHarnessFiles(VM vm)
     {
-        foreach (var requiredHarnessFile in REQUIRED_HARNESS_FILE_NAMES)
+        try
         {
-            var harnessScriptString = _harnessNameToContent[requiredHarnessFile];
-            var harnessScript = ParseAsGlobalCode(vm, harnessScriptString);
-            var harnessCompletion = harnessScript.ScriptEvaluation();
-            if (harnessCompletion.IsAbruptCompletion())
+            foreach (var requiredHarnessFile in REQUIRED_HARNESS_FILE_NAMES)
             {
-                throw new InvalidOperationException($"The harness file {requiredHarnessFile} returned an abrupt completion.");
+                var harnessScriptString = _harnessNameToContent[requiredHarnessFile];
+                var harnessScript = ParseAsGlobalCode(vm, harnessScriptString);
+                var harnessCompletion = harnessScript.ScriptEvaluation();
+                if (harnessCompletion.IsAbruptCompletion())
+                {
+                    throw new HarnessExecutionFailureException(vm, harnessCompletion);
+                }
             }
+        }
+        // NOTE: We want to rethrow syntax errors as harness execution failures
+        // FIXME: If we want to print stack traces in the future, we need to preverse the original exception
+        catch (SyntaxErrorException ex)
+        {
+            throw new HarnessExecutionFailureException(ex.Message);
         }
     }
 
@@ -148,7 +172,7 @@ internal sealed class Test262Runner
     static private void LogTestResult(string testPath, TestResult testResult)
     {
         var prettyPath = Path.GetRelativePath(Directory.GetCurrentDirectory(), testPath);
-        var resultAsString = testResult == TestResult.FAILURE ? "failed" : "passed";
+        var emoji = TEST_RESULT_TO_EMOJIS[testResult];
         if (testResult == TestResult.SUCCESS)
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -158,13 +182,34 @@ internal sealed class Test262Runner
             Console.ForegroundColor = ConsoleColor.Red ;
         }
 
-        Console.WriteLine($"{prettyPath}: {resultAsString}");
+        Console.WriteLine($"{prettyPath}: {emoji}");
         Console.ResetColor();
+    }
+
+    static private void LogTestRunStatistics(int testCount, Dictionary<TestResult, int> testResults)
+    {
+        var testSuccessCount = testResults[TestResult.SUCCESS];
+        var testSuccessPercent = testSuccessCount / (double)testCount * 100;
+        Console.WriteLine($"{testCount} test cases executed.");
+        Console.WriteLine($"{testSuccessPercent}% of tests passed.");
+
+        foreach (var (result, count) in testResults)
+        {
+            var emoji = TEST_RESULT_TO_EMOJIS[result];
+            Console.Write($"{emoji}: {count}\t");
+        }
     }
 
     // FIXME: Implement a YAML parser and only execute harness files needed for each test
     // https://github.com/tc39/test262/blob/main/INTERPRETING.md states that assert.js and sta.js must be evaluted before each test file is executed.
     static private readonly string[] REQUIRED_HARNESS_FILE_NAMES = ["assert.js", "sta.js", "propertyHelper.js"];
+
+    static private readonly Dictionary<TestResult, string> TEST_RESULT_TO_EMOJIS = new()
+    {
+        { TestResult.SUCCESS, "✅" },
+        { TestResult.HARNESS_EXECUTION_FAILURE, "⚙️" },
+        { TestResult.FAILURE, "❌" },
+    };
 
     private readonly Dictionary<string, string> _harnessNameToContent;
 }

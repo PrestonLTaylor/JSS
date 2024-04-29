@@ -10,6 +10,8 @@ namespace JSS.Test262Runner;
 /// </summary>
 internal class Test262Exception : Exception
 {
+    protected Test262Exception(string message) : base(message) { }
+
     protected Test262Exception(VM vm, Completion abruptCompletion) : base(CreateTest262ExceptionMessage(vm, abruptCompletion))
     {
         Debug.Assert(abruptCompletion.IsAbruptCompletion());
@@ -33,3 +35,11 @@ internal class Test262Exception : Exception
     }
 }
 
+/// <summary>
+/// Indicated that parsing/execution of a required harness file failed.
+/// </summary>
+internal class HarnessExecutionFailureException : Test262Exception
+{
+    public HarnessExecutionFailureException(string message) : base(message) { }
+    public HarnessExecutionFailureException(VM vm, Completion completion) : base(vm, completion) { }
+}
