@@ -8,6 +8,7 @@ enum TestResult
     SUCCESS,
     HARNESS_EXECUTION_FAILURE,
     PARSING_FAILURE,
+    CRASH_FAILURE,
     FAILURE,
 }
 
@@ -77,6 +78,7 @@ internal sealed class Test262Runner
             { TestResult.SUCCESS, 0 },
             { TestResult.HARNESS_EXECUTION_FAILURE, 0 },
             { TestResult.PARSING_FAILURE, 0 },
+            { TestResult.CRASH_FAILURE, 0 },
             { TestResult.FAILURE, 0 },
         };
     }
@@ -106,9 +108,10 @@ internal sealed class Test262Runner
         {
             return TestResult.PARSING_FAILURE;
         }
+        // NOTE: If we catch an exception that we don't expect, that means that process would crash, if not caught.
         catch
         {
-            return TestResult.FAILURE;
+            return TestResult.CRASH_FAILURE;
         }
     }
 
@@ -215,6 +218,7 @@ internal sealed class Test262Runner
         { TestResult.SUCCESS, "✅" },
         { TestResult.HARNESS_EXECUTION_FAILURE, "⚙️" },
         { TestResult.PARSING_FAILURE, "✍️" },
+        { TestResult.CRASH_FAILURE, "💥" },
         { TestResult.FAILURE, "❌" },
     };
 
