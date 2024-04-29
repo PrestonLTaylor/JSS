@@ -1,9 +1,10 @@
-﻿using JSS.Lib;
+﻿using JSS.Common;
+using JSS.Lib;
 using JSS.Lib.Execution;
 
 namespace JSS.Test262Runner;
 
-enum TestResult
+enum TestResultType
 {
     SUCCESS,
     HARNESS_EXECUTION_FAILURE,
@@ -45,6 +46,9 @@ internal sealed class Test262Runner
         return harnessNameToContent;
     }
 
+    // FIXME: Use OneOf instead of throwing exceptions to indicate failures
+    record TestResult(TestResultType Type, string FailureReason = "");
+
     /// <summary>
     /// Starts the <see cref="Test262Runner"/> instance.
     /// </summary>
@@ -60,7 +64,7 @@ internal sealed class Test262Runner
             var testCase = File.ReadAllText(testFile);
             var testResult = ExecuteTestCase(testCase);
 
-            ++testResults[testResult];
+            ++testResults[testResult.Type];
 
             LogTestResult(testFile, testResult);
         }
@@ -71,15 +75,15 @@ internal sealed class Test262Runner
     /// <summary>
     /// Creates a zeroed dictionary for test results.
     /// </summary>
-    static private Dictionary<TestResult, int> CreateTestResultsDictionary()
+    static private Dictionary<TestResultType, int> CreateTestResultsDictionary()
     {
         return new()
         {
-            { TestResult.SUCCESS, 0 },
-            { TestResult.HARNESS_EXECUTION_FAILURE, 0 },
-            { TestResult.PARSING_FAILURE, 0 },
-            { TestResult.CRASH_FAILURE, 0 },
-            { TestResult.FAILURE, 0 },
+            { TestResultType.SUCCESS, 0 },
+            { TestResultType.HARNESS_EXECUTION_FAILURE, 0 },
+            { TestResultType.PARSING_FAILURE, 0 },
+            { TestResultType.CRASH_FAILURE, 0 },
+            { TestResultType.FAILURE, 0 },
         };
     }
 
@@ -96,22 +100,25 @@ internal sealed class Test262Runner
             var testCaseScript = ParseAsGlobalCode(testCaseVm, testCase);
             var testCompletion = testCaseScript.ScriptEvaluation();
 
-            if (testCompletion.IsAbruptCompletion()) return TestResult.FAILURE;
+            if (testCompletion.IsAbruptCompletion())
+            {
+                return new(TestResultType.FAILURE, Print.CompletionToString(testCaseVm, testCompletion));
+            }
 
-            return TestResult.SUCCESS;
+            return new(TestResultType.SUCCESS);
         }
-        catch (HarnessExecutionFailureException)
+        catch (HarnessExecutionFailureException ex)
         {
-            return TestResult.HARNESS_EXECUTION_FAILURE;
+            return new(TestResultType.HARNESS_EXECUTION_FAILURE, ex.Message);
         }
-        catch (SyntaxErrorException)
+        catch (SyntaxErrorException ex)
         {
-            return TestResult.PARSING_FAILURE;
+            return new(TestResultType.PARSING_FAILURE, ex.Message);
         }
         // NOTE: If we catch an exception that we don't expect, that means that process would crash, if not caught.
-        catch
+        catch (Exception ex)
         {
-            return TestResult.CRASH_FAILURE;
+            return new(TestResultType.CRASH_FAILURE, ex.Message);
         }
     }
 
@@ -181,8 +188,8 @@ internal sealed class Test262Runner
     static private void LogTestResult(string testPath, TestResult testResult)
     {
         var prettyPath = Path.GetRelativePath(Directory.GetCurrentDirectory(), testPath);
-        var emoji = TEST_RESULT_TO_EMOJIS[testResult];
-        if (testResult == TestResult.SUCCESS)
+        var emoji = TEST_RESULT_TYPE_TO_EMOJI[testResult.Type];
+        if (testResult.Type == TestResultType.SUCCESS)
         {
             Console.ForegroundColor = ConsoleColor.Green;
         }
@@ -192,19 +199,20 @@ internal sealed class Test262Runner
         }
 
         Console.WriteLine($"{prettyPath}: {emoji}");
+        if (testResult.FailureReason != "") Console.WriteLine(testResult.FailureReason);
         Console.ResetColor();
     }
 
-    static private void LogTestRunStatistics(int testCount, Dictionary<TestResult, int> testResults)
+    static private void LogTestRunStatistics(int testCount, Dictionary<TestResultType, int> testResults)
     {
-        var testSuccessCount = testResults[TestResult.SUCCESS];
+        var testSuccessCount = testResults[TestResultType.SUCCESS];
         var testSuccessPercent = testSuccessCount / (double)testCount * 100;
         Console.WriteLine($"{testCount} test cases executed.");
         Console.WriteLine($"{testSuccessPercent}% of tests passed.");
 
         foreach (var (result, count) in testResults)
         {
-            var emoji = TEST_RESULT_TO_EMOJIS[result];
+            var emoji = TEST_RESULT_TYPE_TO_EMOJI[result];
             Console.Write($"{emoji}: {count}\t");
         }
     }
@@ -213,13 +221,13 @@ internal sealed class Test262Runner
     // https://github.com/tc39/test262/blob/main/INTERPRETING.md states that assert.js and sta.js must be evaluted before each test file is executed.
     static private readonly string[] REQUIRED_HARNESS_FILE_NAMES = ["assert.js", "sta.js", "propertyHelper.js"];
 
-    static private readonly Dictionary<TestResult, string> TEST_RESULT_TO_EMOJIS = new()
+    static private readonly Dictionary<TestResultType, string> TEST_RESULT_TYPE_TO_EMOJI = new()
     {
-        { TestResult.SUCCESS, "✅" },
-        { TestResult.HARNESS_EXECUTION_FAILURE, "⚙️" },
-        { TestResult.PARSING_FAILURE, "✍️" },
-        { TestResult.CRASH_FAILURE, "💥" },
-        { TestResult.FAILURE, "❌" },
+        { TestResultType.SUCCESS, "✅" },
+        { TestResultType.HARNESS_EXECUTION_FAILURE, "⚙️" },
+        { TestResultType.PARSING_FAILURE, "✍️" },
+        { TestResultType.CRASH_FAILURE, "💥" },
+        { TestResultType.FAILURE, "❌" },
     };
 
     private readonly Dictionary<string, string> _harnessNameToContent;
