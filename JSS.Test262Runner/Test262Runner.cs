@@ -7,6 +7,7 @@ enum TestResult
 {
     SUCCESS,
     HARNESS_EXECUTION_FAILURE,
+    PARSING_FAILURE,
     FAILURE,
 }
 
@@ -74,8 +75,9 @@ internal sealed class Test262Runner
         return new()
         {
             { TestResult.SUCCESS, 0 },
+            { TestResult.HARNESS_EXECUTION_FAILURE, 0 },
+            { TestResult.PARSING_FAILURE, 0 },
             { TestResult.FAILURE, 0 },
-            { TestResult.HARNESS_EXECUTION_FAILURE, 0 }
         };
     }
 
@@ -99,6 +101,10 @@ internal sealed class Test262Runner
         catch (HarnessExecutionFailureException)
         {
             return TestResult.HARNESS_EXECUTION_FAILURE;
+        }
+        catch (SyntaxErrorException)
+        {
+            return TestResult.PARSING_FAILURE;
         }
         catch
         {
@@ -208,6 +214,7 @@ internal sealed class Test262Runner
     {
         { TestResult.SUCCESS, "✅" },
         { TestResult.HARNESS_EXECUTION_FAILURE, "⚙️" },
+        { TestResult.PARSING_FAILURE, "✍️" },
         { TestResult.FAILURE, "❌" },
     };
 
