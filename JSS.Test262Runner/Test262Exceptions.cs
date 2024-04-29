@@ -22,7 +22,7 @@ internal class Test262Exception : Exception
         var completionType = CompletionTypeToString(abruptCompletion);
         var completionValue = Print.CompletionToString(vm, abruptCompletion);
 
-        return $"Completion Type: {completionType}\nCompletion Value:{completionValue}";
+        return $"Completion Type: {completionType} Value: {completionValue}";
     }
 
     static private string CompletionTypeToString(Completion completion)
