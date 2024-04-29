@@ -20,7 +20,7 @@ public sealed class Print
         Console.ResetColor();
     }
 
-    static private string CompletionToString(VM vm, Completion completion)
+    static public string CompletionToString(VM vm, Completion completion)
     {
         if (completion.IsThrowCompletion())
         {

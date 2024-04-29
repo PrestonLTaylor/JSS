@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\JSS.Common\JSS.Common.csproj" />
     <ProjectReference Include="..\JSS.Lib\JSS.Lib.csproj" />
   </ItemGroup>
 
