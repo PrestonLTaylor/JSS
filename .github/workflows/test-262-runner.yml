@@ -32,4 +32,4 @@ jobs:
       run: dotnet build --no-restore --configuration Release JSS.Test262Runner/JSS.Test262Runner.csproj
     - name: Start our Test262Runner
     # NOTE: the "|| cd ." is a hack so the error code is always 0, see the NOTE on continue-on-error
-      run: dotnet run --no-build --configuration Release --project JSS.Test262Runner/JSS.Test262Runner.csproj || cd .
+      run: dotnet run --no-build --configuration Release --project JSS.Test262Runner/JSS.Test262Runner.csproj -- -q || cd .
