@@ -1,0 +1,35 @@
+name: test-262 Runner
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+    
+    runs-on: windows-latest
+
+    # NOTE: We don't want failures for our Test262Runner to count towards CI failures.
+    continue-on-error: true
+    
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+    # NOTE: We can't use git checkout from the runner, so we checkout using this step.
+    - name: Checkout test-262 repository
+      uses: actions/checkout@v4
+      with:
+        repository: 'tc39/test262'
+        path: './test262'
+    - name: Restore dependencies
+      run: dotnet restore JSS.Test262Runner/JSS.Test262Runner.csproj
+    - name: Build our Test262Runner
+      run: dotnet build --no-restore --configuration Release JSS.Test262Runner/JSS.Test262Runner.csproj
+    - name: Start our Test262Runner
+    # NOTE: the "|| cd ." is a hack so the error code is always 0, see the NOTE on continue-on-error
+      run: dotnet run --no-build --configuration Release --project JSS.Test262Runner/JSS.Test262Runner.csproj || cd .
