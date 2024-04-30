@@ -7,6 +7,7 @@ namespace JSS.Test262Runner;
 enum TestResultType
 {
     SUCCESS,
+    METADATA_PARSING_FAILURE,
     HARNESS_EXECUTION_FAILURE,
     PARSING_FAILURE,
     CRASH_FAILURE,
@@ -80,6 +81,7 @@ internal sealed class Test262Runner
         return new()
         {
             { TestResultType.SUCCESS, 0 },
+            { TestResultType.METADATA_PARSING_FAILURE, 0 },
             { TestResultType.HARNESS_EXECUTION_FAILURE, 0 },
             { TestResultType.PARSING_FAILURE, 0 },
             { TestResultType.CRASH_FAILURE, 0 },
@@ -94,8 +96,10 @@ internal sealed class Test262Runner
     /// <returns>The result of executing the test case.</returns>
     private TestResult ExecuteTestCase(string testCase)
     {
+        Test262Metadata testCaseMetadata;
         try
         {
+            testCaseMetadata = Test262Metadata.Create(testCase);
             var testCaseVm = CreateTestCaseVM();
             var testCaseScript = ParseAsGlobalCode(testCaseVm, testCase);
             var testCompletion = testCaseScript.ScriptEvaluation();
@@ -106,6 +110,10 @@ internal sealed class Test262Runner
             }
 
             return new(TestResultType.SUCCESS);
+        }
+        catch (MetadataParsingFailureException ex)
+        {
+            return new(TestResultType.METADATA_PARSING_FAILURE, ex.Message);
         }
         catch (HarnessExecutionFailureException ex)
         {
@@ -224,6 +232,7 @@ internal sealed class Test262Runner
     static private readonly Dictionary<TestResultType, string> TEST_RESULT_TYPE_TO_EMOJI = new()
     {
         { TestResultType.SUCCESS, "✅" },
+        { TestResultType.METADATA_PARSING_FAILURE, "📝️" },
         { TestResultType.HARNESS_EXECUTION_FAILURE, "⚙️" },
         { TestResultType.PARSING_FAILURE, "✍️" },
         { TestResultType.CRASH_FAILURE, "💥" },

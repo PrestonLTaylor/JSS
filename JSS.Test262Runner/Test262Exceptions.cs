@@ -26,3 +26,11 @@ internal class HarnessExecutionFailureException : Test262Exception
     public HarnessExecutionFailureException(string message) : base(message) { }
     public HarnessExecutionFailureException(VM vm, Completion completion) : base(vm, completion) { }
 }
+
+/// <summary>
+/// Indicated that parsing of a test-262 test case metadata failed.
+/// </summary>
+internal class MetadataParsingFailureException : Test262Exception
+{
+    public MetadataParsingFailureException(string message) : base(message) { }
+}
