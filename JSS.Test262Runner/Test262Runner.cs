@@ -55,11 +55,17 @@ internal sealed class Test262Runner
     /// </summary>
     public void StartRunner()
     {
+        // Modules, Test262 includes tests for ECMAScript 2015 module code, denoted by the "module" metadata flag.
+        // Files bearing a name which includes the sequence _FIXTURE MUST NOT be interpreted as standalone tests; they are intended to be referenced by test files.
+        const string TEST_FIXTURE = "_FIXTURE";
         const string TEST_DIRECTORY = "./test262/test";
         const string TEST_FILTER = "*.js";
 
         var testResults = CreateTestResultsDictionary();
-        var testFiles = Directory.EnumerateFiles(TEST_DIRECTORY, TEST_FILTER, SearchOption.AllDirectories);
+
+        var testFiles = Directory.EnumerateFiles(TEST_DIRECTORY, TEST_FILTER, SearchOption.AllDirectories)
+            .Where(x => !x.Contains(TEST_FIXTURE));
+
         foreach (var testFile in testFiles)
         {
             var testCase = File.ReadAllText(testFile);
@@ -252,14 +258,14 @@ internal sealed class Test262Runner
     static private void LogTestRunStatistics(int testCount, Dictionary<TestResultType, int> testResults)
     {
         var testSuccessCount = testResults[TestResultType.SUCCESS];
-        var testSuccessPercent = testSuccessCount / (double)testCount * 100;
+        var testSuccessPercent = testSuccessCount / (double)Math.Min(testCount, 1) * 100;
         Console.WriteLine($"{testCount} test cases executed.");
         Console.WriteLine($"{testSuccessPercent}% of tests passed.");
 
         foreach (var (result, count) in testResults)
         {
             var emoji = TEST_RESULT_TYPE_TO_EMOJI[result];
-            Console.Write($"{emoji}: {count}\t");
+            Console.Write($"{emoji}: {count}    ");
         }
     }
 
