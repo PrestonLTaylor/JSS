@@ -100,7 +100,7 @@ internal sealed class Test262Runner
         try
         {
             testCaseMetadata = Test262Metadata.Create(testCase);
-            var testCaseVm = CreateTestCaseVM();
+            var testCaseVm = CreateTestCaseVM(testCaseMetadata);
             var testCaseScript = ParseAsGlobalCode(testCaseVm, testCase);
             var testCompletion = testCaseScript.ScriptEvaluation();
 
@@ -134,7 +134,7 @@ internal sealed class Test262Runner
     /// Creates an isolated VM for running a single test-262 test file.
     /// </summary>
     /// <returns>An isolated VM with its own dedicated ECMAScript realm as specified in INTERPRETING.md</returns>
-    private VM CreateTestCaseVM()
+    private VM CreateTestCaseVM(Test262Metadata metadata)
     {
         var completion = Realm.InitializeHostDefinedRealm(out VM testCaseVm);
         if (completion.IsAbruptCompletion())
@@ -142,7 +142,12 @@ internal sealed class Test262Runner
             throw new HarnessExecutionFailureException(testCaseVm, completion);
         }
 
-        ExecuteRequiredHarnessFiles(testCaseVm);
+        // raw: The test source code must not be modified in any way, files from the harness/directory must not be evaluated,
+        // FIXME: and the test must be executed just once (in non-strict mode, only).
+        if (!metadata.HasFlag("raw"))
+        {
+            ExecuteRequiredHarnessFiles(testCaseVm, metadata);
+        }
 
         return testCaseVm;
     }
@@ -151,12 +156,18 @@ internal sealed class Test262Runner
     /// Executes the required harness files needed to run tests on the provided <paramref name="vm"/>.
     /// </summary>
     /// <param name="vm">The VM to execute the required harness files on.</param>
-    private void ExecuteRequiredHarnessFiles(VM vm)
+    private void ExecuteRequiredHarnessFiles(VM vm, Test262Metadata metadata)
     {
         try
         {
-            foreach (var requiredHarnessFile in REQUIRED_HARNESS_FILE_NAMES)
+            // includes: One or more files whose content must be evaluated in the test realm's global scope prior to test execution.
+            string[] requiredHarnessFiles = [..REQUIRED_HARNESS_FILE_NAMES, ..metadata.Includes];
+            foreach (var requiredHarnessFile in requiredHarnessFiles)
             {
+                // NOTE: We throw the base Exception to signify that this would be a crash failure if executed.
+                // FIXME: Test cases using tcoHelper will check to prove TCO works, however, we have no TCO functionality and will cause the runner to crash with a stack overflow exception.
+                if (requiredHarnessFile == "tcoHelper.js") throw new Exception("tcoHelper.js was included, this test case will probably cause a stack overflow exception.");
+
                 var harnessScriptString = _harnessNameToContent[requiredHarnessFile];
                 var harnessScript = ParseAsGlobalCode(vm, harnessScriptString);
                 var harnessCompletion = harnessScript.ScriptEvaluation();
@@ -225,14 +236,13 @@ internal sealed class Test262Runner
         }
     }
 
-    // FIXME: Implement a YAML parser and only execute harness files needed for each test
     // https://github.com/tc39/test262/blob/main/INTERPRETING.md states that assert.js and sta.js must be evaluted before each test file is executed.
-    static private readonly string[] REQUIRED_HARNESS_FILE_NAMES = ["assert.js", "sta.js", "propertyHelper.js"];
+    static private readonly string[] REQUIRED_HARNESS_FILE_NAMES = ["assert.js", "sta.js"];
 
     static private readonly Dictionary<TestResultType, string> TEST_RESULT_TYPE_TO_EMOJI = new()
     {
         { TestResultType.SUCCESS, "✅" },
-        { TestResultType.METADATA_PARSING_FAILURE, "📝️" },
+        { TestResultType.METADATA_PARSING_FAILURE, "📝" },
         { TestResultType.HARNESS_EXECUTION_FAILURE, "⚙️" },
         { TestResultType.PARSING_FAILURE, "✍️" },
         { TestResultType.CRASH_FAILURE, "💥" },
