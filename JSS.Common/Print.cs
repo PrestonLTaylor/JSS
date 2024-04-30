@@ -98,4 +98,17 @@ public sealed class Print
         Console.BackgroundColor = ConsoleColor.Red;
         Console.ForegroundColor = ConsoleColor.White;
     }
+
+    static public string GetErrorNameFromValue(Value value)
+    {
+        if (!value.IsObject()) return "";
+
+        var asObject = value.AsObject();
+        if (!asObject.DataProperties.TryGetValue("name", out var errorProperty)) return "";
+
+        var errorName = errorProperty.Value;
+        if (!errorName.IsString()) return "";
+
+        return errorName.AsString();
+    }
 }

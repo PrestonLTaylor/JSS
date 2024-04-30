@@ -69,16 +69,18 @@ internal sealed record Test262Metadata
         public required string Type { get; set; }
     }
 
+    public bool IsNegativeTestCase => _metadata.Negative is not null;
+    public string NegativeTestCaseType => _metadata.Negative!.Type;
     public TestResultType ExpectedTestResultType => _metadata.Negative?.Phase switch
     {
         NegativeTestPhase.Parse => TestResultType.PARSING_FAILURE,
-        NegativeTestPhase.Resolution => throw new MetadataParsingFailureException("Found negative module resolution test case, but there is no support for modules yet."),
+        NegativeTestPhase.Resolution => TestResultType.PARSING_FAILURE, // FIXME: When we have support for modules, determine if this is right
         NegativeTestPhase.Runtime => TestResultType.FAILURE,
         null => TestResultType.SUCCESS,
         _ => throw new MetadataParsingFailureException($"Found invalid negative test case phase of {_metadata.Negative!.Phase}."),
     };
 
-    public bool IsExpectedNegativeErrorType(string actualType) => actualType == _metadata.Negative!.Type;
+    public bool IsExpectedNegativeErrorType(string actualType) => actualType == (_metadata.Negative?.Type ?? "");
 
     public List<string> Includes => _metadata.Includes ?? [];
 

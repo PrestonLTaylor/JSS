@@ -96,7 +96,7 @@ internal sealed class Test262Runner
     /// <returns>The result of executing the test case.</returns>
     private TestResult ExecuteTestCase(string testCase)
     {
-        Test262Metadata testCaseMetadata;
+        Test262Metadata? testCaseMetadata = null;
         try
         {
             testCaseMetadata = Test262Metadata.Create(testCase);
@@ -104,12 +104,7 @@ internal sealed class Test262Runner
             var testCaseScript = ParseAsGlobalCode(testCaseVm, testCase);
             var testCompletion = testCaseScript.ScriptEvaluation();
 
-            if (testCompletion.IsAbruptCompletion())
-            {
-                return new(TestResultType.FAILURE, Print.CompletionToString(testCaseVm, testCompletion));
-            }
-
-            return new(TestResultType.SUCCESS);
+            return CreateTestCaseResult(testCaseVm, testCaseMetadata, testCompletion);
         }
         catch (MetadataParsingFailureException ex)
         {
@@ -121,6 +116,8 @@ internal sealed class Test262Runner
         }
         catch (SyntaxErrorException ex)
         {
+            if (testCaseMetadata!.ExpectedTestResultType == TestResultType.PARSING_FAILURE
+                && testCaseMetadata!.IsExpectedNegativeErrorType("SyntaxError")) return new(TestResultType.SUCCESS);
             return new(TestResultType.PARSING_FAILURE, ex.Message);
         }
         // NOTE: If we catch an exception that we don't expect, that means that process would crash, if not caught.
@@ -197,6 +194,36 @@ internal sealed class Test262Runner
     {
         var parser = new Parser(scriptString);
         return parser.Parse(vm);
+    }
+
+    /// <summary>
+    /// Creates a test case result based on the metadata of the test and the completion of the test.
+    /// </summary>
+    /// <param name="vm">The VM that executed the test case.</param>
+    /// <param name="metadata">The metadata of the test case.</param>
+    /// <param name="completion">The completion from executing the test case.</param>
+    /// <returns>A test case based on the metadata and completion of the test.</returns>
+    private TestResult CreateTestCaseResult(VM vm, Test262Metadata metadata, Completion completion)
+    {
+        if (metadata.IsNegativeTestCase)
+        {
+            if (completion.IsNormalCompletion()) return new(TestResultType.FAILURE, "Negative test case was executed successfully.");
+
+            var errorType = Print.GetErrorNameFromValue(completion.Value);
+            if (metadata.ExpectedTestResultType != TestResultType.FAILURE || !metadata.IsExpectedNegativeErrorType(errorType))
+            {
+                return new TestResult(metadata.ExpectedTestResultType,
+                    $"Negative test case expected an error type of \"{metadata.NegativeTestCaseType}\" but got a completion of {Print.CompletionToString(vm, completion)}.");
+            }
+
+            return new TestResult(TestResultType.SUCCESS);
+        }
+        else
+        {
+            if (completion.IsAbruptCompletion()) return new(TestResultType.FAILURE, Print.CompletionToString(vm, completion));
+
+            return new(TestResultType.SUCCESS);
+        }
     }
 
     /// <summary>
