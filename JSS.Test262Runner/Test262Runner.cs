@@ -21,8 +21,9 @@ enum TestResultType
 /// </summary>
 internal sealed class Test262Runner
 {
-    public Test262Runner()
+    public Test262Runner(CommandLineOptions options)
     {
+        _options = options;
         _harnessNameToContent = ReadHarnessFiles();
     }
 
@@ -66,17 +67,27 @@ internal sealed class Test262Runner
         var testFiles = Directory.EnumerateFiles(TEST_DIRECTORY, TEST_FILTER, SearchOption.AllDirectories)
             .Where(x => !x.Contains(TEST_FIXTURE));
 
+        var testCounter = 0;
+        var testCount = testFiles.Count();
         foreach (var testFile in testFiles)
         {
             var testCase = File.ReadAllText(testFile);
             var testResult = ExecuteTestCase(testCase);
 
             ++testResults[testResult.Type];
+            ++testCounter;
 
-            LogTestResult(testFile, testResult);
+            if (_options.Quiet)
+            {
+                QuietlyLogTestProgress(testCount, testCounter);
+            }
+            else
+            {
+                LogTestResult(testFile, testResult);
+            }
         }
 
-        LogTestRunStatistics(testFiles.Count(), testResults);
+        LogTestRunStatistics(testCount, testResults);
     }
 
     /// <summary>
@@ -233,6 +244,21 @@ internal sealed class Test262Runner
     }
 
     /// <summary>
+    /// Prevents spamming console output by only printing an update message every 100 tests.
+    /// </summary>
+    /// <param name="testCount">The total number of test-262 tests to execute.</param>
+    /// <param name="testsCompleted">The number of completed test-262 tests</param>
+    static private void QuietlyLogTestProgress(int testCount, int testsCompleted)
+    {
+        const int TESTS_BETWEEN_QUIET_PRINT = 100;
+        if (testsCompleted % TESTS_BETWEEN_QUIET_PRINT == 0)
+        {
+            var testSuccessPercent = testsCompleted / (double)testCount * 100;
+            Console.WriteLine($"{testSuccessPercent:0.##}% ({testsCompleted}/{testCount}) of tests completed.");
+        }
+    }
+
+    /// <summary>
     /// Logs the result of a test case, currently, we only log to the console.
     /// </summary>
     /// <param name="testPath">The un-pretty file path to the executed test.</param>
@@ -260,7 +286,7 @@ internal sealed class Test262Runner
         var testSuccessCount = testResults[TestResultType.SUCCESS];
         var testSuccessPercent = testSuccessCount / (double)Math.Max(testCount, 1) * 100;
         Console.WriteLine($"{testCount} test cases executed.");
-        Console.WriteLine($"{testSuccessPercent}% of tests passed.");
+        Console.WriteLine($"{testSuccessPercent:0.##}% of tests passed.");
 
         foreach (var (result, count) in testResults)
         {
@@ -282,5 +308,6 @@ internal sealed class Test262Runner
         { TestResultType.FAILURE, "❌" },
     };
 
+    private readonly CommandLineOptions _options;
     private readonly Dictionary<string, string> _harnessNameToContent;
 }

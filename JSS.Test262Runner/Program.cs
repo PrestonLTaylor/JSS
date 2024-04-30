@@ -1,4 +1,5 @@
 ﻿// TODO: Setup ILogger (or something similar) that we can use for this project
+using CommandLine;
 using JSS.Test262Runner;
 using System.Text;
 
@@ -7,6 +8,10 @@ test262RepositoryCloner.CloneRepositoryIfNotAlreadyPresent();
 
 Console.OutputEncoding = Encoding.UTF8;
 
-Console.WriteLine("\nStarting the test-262 runner...");
-var test262Runner = new Test262Runner();
-test262Runner.StartRunner();
+Parser.Default.ParseArguments<CommandLineOptions>(args)
+    .WithParsed(options =>
+    {
+        Console.WriteLine("\nStarting the test-262 runner...");
+        var test262Runner = new Test262Runner(options);
+        test262Runner.StartRunner();
+    });
