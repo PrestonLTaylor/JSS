@@ -16,6 +16,9 @@ internal sealed class Test262Object : Object
 
         var evalScriptBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, evalScript);
         DataProperties.Add("evalScript", new Property(evalScriptBuiltin, new(true, false, true)));
+
+        var gcBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, gc);
+        DataProperties.Add("gc", new Property(gcBuiltin, new(true, false, true)));
     }
 
     private Completion createRealm(VM _, Value? thisValue, List argumentList)
@@ -58,5 +61,11 @@ internal sealed class Test262Object : Object
         // 5. Let status be ScriptEvaluation(s).
         // 6. Return Completion(status).
         return s!.ScriptEvaluation();
+    }
+
+    private Completion gc(VM vm, Value? thisValue, List argumentList)
+    {
+        GC.Collect();
+        return Undefined.The;
     }
 }
