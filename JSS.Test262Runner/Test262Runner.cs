@@ -1,6 +1,7 @@
 ﻿using JSS.Common;
 using JSS.Lib;
 using JSS.Lib.Execution;
+using System.Text.Json.Nodes;
 
 namespace JSS.Test262Runner;
 
@@ -49,7 +50,7 @@ internal sealed class Test262Runner
     }
 
     // FIXME: Use OneOf instead of throwing exceptions to indicate failures
-    record TestResult(TestResultType Type, string FailureReason = "");
+    record TestResult(TestResultType Type, string TestPath, string FailureReason = "");
 
     /// <summary>
     /// Starts the <see cref="Test262Runner"/> instance.
@@ -64,10 +65,10 @@ internal sealed class Test262Runner
         var testCount = testFiles.Count();
         foreach (var testFile in testFiles)
         {
-            var testCase = File.ReadAllText(testFile);
-            var testResult = ExecuteTestCase(testCase);
+            var testPath = Path.GetRelativePath(Directory.GetCurrentDirectory(), testFile);
+            var testResult = ExecuteTestCase(testPath);
 
-            ++testResults[testResult.Type];
+            testResults[testResult.Type].Add(testResult);
             ++testCounter;
 
             if (_options.Quiet)
@@ -112,18 +113,18 @@ internal sealed class Test262Runner
     }
 
     /// <summary>
-    /// Creates a zeroed dictionary for test results.
+    /// Creates an empty dictionary for test results.
     /// </summary>
-    static private Dictionary<TestResultType, int> CreateTestResultsDictionary()
+    static private Dictionary<TestResultType, List<TestResult>> CreateTestResultsDictionary()
     {
         return new()
         {
-            { TestResultType.SUCCESS, 0 },
-            { TestResultType.METADATA_PARSING_FAILURE, 0 },
-            { TestResultType.HARNESS_EXECUTION_FAILURE, 0 },
-            { TestResultType.PARSING_FAILURE, 0 },
-            { TestResultType.CRASH_FAILURE, 0 },
-            { TestResultType.FAILURE, 0 },
+            { TestResultType.SUCCESS, [] },
+            { TestResultType.METADATA_PARSING_FAILURE, [] },
+            { TestResultType.HARNESS_EXECUTION_FAILURE, [] },
+            { TestResultType.PARSING_FAILURE, [] },
+            { TestResultType.CRASH_FAILURE, [] },
+            { TestResultType.FAILURE, [] },
         };
     }
 
@@ -132,8 +133,10 @@ internal sealed class Test262Runner
     /// </summary>
     /// <param name="testCase">The test case code to be executed as a string.</param>
     /// <returns>The result of executing the test case.</returns>
-    private TestResult ExecuteTestCase(string testCase)
+    private TestResult ExecuteTestCase(string testPath)
     {
+        var testCase = File.ReadAllText(testPath);
+
         Test262Metadata? testCaseMetadata = null;
         try
         {
@@ -142,26 +145,26 @@ internal sealed class Test262Runner
             var testCaseScript = ParseAsGlobalCode(testCaseVm, testCase);
             var testCompletion = testCaseScript.ScriptEvaluation();
 
-            return CreateTestCaseResult(testCaseVm, testCaseMetadata, testCompletion);
+            return CreateTestCaseResult(testPath, testCaseVm, testCaseMetadata, testCompletion);
         }
         catch (MetadataParsingFailureException ex)
         {
-            return new(TestResultType.METADATA_PARSING_FAILURE, ex.Message);
+            return new(TestResultType.METADATA_PARSING_FAILURE, testPath, ex.Message);
         }
         catch (HarnessExecutionFailureException ex)
         {
-            return new(TestResultType.HARNESS_EXECUTION_FAILURE, ex.Message);
+            return new(TestResultType.HARNESS_EXECUTION_FAILURE, testPath, ex.Message);
         }
         catch (SyntaxErrorException ex)
         {
             if (testCaseMetadata!.ExpectedTestResultType == TestResultType.PARSING_FAILURE
-                && testCaseMetadata!.IsExpectedNegativeErrorType("SyntaxError")) return new(TestResultType.SUCCESS);
-            return new(TestResultType.PARSING_FAILURE, ex.Message);
+                && testCaseMetadata!.IsExpectedNegativeErrorType("SyntaxError")) return new(TestResultType.SUCCESS, testPath);
+            return new(TestResultType.PARSING_FAILURE, testPath, ex.Message);
         }
         // NOTE: If we catch an exception that we don't expect, that means that process would crash, if not caught.
         catch (Exception ex)
         {
-            return new(TestResultType.CRASH_FAILURE, ex.Message);
+            return new(TestResultType.CRASH_FAILURE, testPath, ex.Message);
         }
     }
 
@@ -243,30 +246,31 @@ internal sealed class Test262Runner
     /// <summary>
     /// Creates a test case result based on the metadata of the test and the completion of the test.
     /// </summary>
+    /// <param name="testPath">The file path of the test case.</param>
     /// <param name="vm">The VM that executed the test case.</param>
     /// <param name="metadata">The metadata of the test case.</param>
     /// <param name="completion">The completion from executing the test case.</param>
     /// <returns>A test case based on the metadata and completion of the test.</returns>
-    private TestResult CreateTestCaseResult(VM vm, Test262Metadata metadata, Completion completion)
+    static private TestResult CreateTestCaseResult(string testPath, VM vm, Test262Metadata metadata, Completion completion)
     {
         if (metadata.IsNegativeTestCase)
         {
-            if (completion.IsNormalCompletion()) return new(TestResultType.FAILURE, "Negative test case was executed successfully.");
+            if (completion.IsNormalCompletion()) return new(TestResultType.FAILURE, testPath, "Negative test case was executed successfully.");
 
             var errorType = Print.GetErrorNameFromValue(completion.Value);
             if (metadata.ExpectedTestResultType != TestResultType.FAILURE || !metadata.IsExpectedNegativeErrorType(errorType))
             {
-                return new TestResult(metadata.ExpectedTestResultType,
+                return new TestResult(metadata.ExpectedTestResultType, testPath,
                     $"Negative test case expected an error type of \"{metadata.NegativeTestCaseType}\" but got a completion of {Print.CompletionToString(vm, completion)}.");
             }
 
-            return new TestResult(TestResultType.SUCCESS);
+            return new TestResult(TestResultType.SUCCESS, testPath);
         }
         else
         {
-            if (completion.IsAbruptCompletion()) return new(TestResultType.FAILURE, Print.CompletionToString(vm, completion));
+            if (completion.IsAbruptCompletion()) return new(TestResultType.FAILURE, testPath, Print.CompletionToString(vm, completion));
 
-            return new(TestResultType.SUCCESS);
+            return new(TestResultType.SUCCESS, testPath);
         }
     }
 
@@ -308,18 +312,44 @@ internal sealed class Test262Runner
         Console.ResetColor();
     }
 
-    static private void LogTestRunStatistics(int testCount, Dictionary<TestResultType, int> testResults)
+    /// <summary>
+    /// Logs the statistics of the current test run.
+    /// </summary>
+    /// <param name="testCount">The total number of tests executed.</param>
+    /// <param name="testResults">The result of every test executed.</param>
+    static private void LogTestRunStatistics(int testCount, Dictionary<TestResultType, List<TestResult>> testResults)
     {
-        var testSuccessCount = testResults[TestResultType.SUCCESS];
-        var testSuccessPercent = testSuccessCount / (double)Math.Max(testCount, 1) * 100;
+        LogTestRunStatisticsToConsole(testCount, testResults);
+        LogTestRunStatisticsToAJsonFile(testResults);
+    }
+
+    static private void LogTestRunStatisticsToConsole(int testCount, Dictionary<TestResultType, List<TestResult>> testResults)
+    {
+        var testSuccesses = testResults[TestResultType.SUCCESS];
+        var testSuccessPercent = testSuccesses.Count / (double)Math.Max(testCount, 1) * 100;
         Console.WriteLine($"{testCount} test cases executed.");
         Console.WriteLine($"{testSuccessPercent:0.##}% of tests passed.");
 
-        foreach (var (result, count) in testResults)
+        foreach (var (result, results) in testResults)
         {
             var emoji = TEST_RESULT_TYPE_TO_EMOJI[result];
-            Console.Write($"{emoji}: {count}    ");
+            Console.Write($"{emoji}: {results.Count}    ");
         }
+    }
+
+    static private void LogTestRunStatisticsToAJsonFile(Dictionary<TestResultType, List<TestResult>> testResults)
+    {
+        JsonObject resultsAsJson = [];
+        foreach (var (_, results) in testResults)
+        {
+            foreach (var result in results)
+            {
+                resultsAsJson.Add(result.TestPath, JsonValue.Create(result));
+            }
+        }
+
+        var resultsJsonString = resultsAsJson.ToString();
+        File.WriteAllText($"test-262-run-{DateTime.Now:yy-M-dd-HH-mm}.txt", resultsJsonString);
     }
 
     // https://github.com/tc39/test262/blob/main/INTERPRETING.md states that assert.js and sta.js must be evaluted before each test file is executed.
