@@ -171,10 +171,16 @@ internal sealed class Test262Runner
     /// <returns>An isolated VM with its own dedicated ECMAScript realm as specified in INTERPRETING.md</returns>
     private VM CreateTestCaseVM(Test262Metadata metadata)
     {
-        var completion = Realm.InitializeHostDefinedRealm(out VM testCaseVm);
-        if (completion.IsAbruptCompletion())
+        var initializeCompletion = Realm.InitializeHostDefinedRealm(out VM testCaseVm);
+        if (initializeCompletion.IsAbruptCompletion())
         {
-            throw new HarnessExecutionFailureException(testCaseVm, completion);
+            throw new HarnessExecutionFailureException(testCaseVm, initializeCompletion);
+        }
+
+        var test262DefiningCompletion = Realm.CreateTest262HostDefinedFunctions(testCaseVm);
+        if (test262DefiningCompletion.IsAbruptCompletion())
+        {
+            throw new HarnessExecutionFailureException(testCaseVm, test262DefiningCompletion);
         }
 
         // raw: The test source code must not be modified in any way, files from the harness/directory must not be evaluated,
