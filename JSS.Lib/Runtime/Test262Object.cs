@@ -13,6 +13,9 @@ internal sealed class Test262Object : Object
     {
         var createRealmBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, createRealm);
         DataProperties.Add("createRealm", new Property(createRealmBuiltin, new(true, false, true)));
+
+        var evalScriptBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, evalScript);
+        DataProperties.Add("evalScript", new Property(evalScriptBuiltin, new(true, false, true)));
     }
 
     private Completion createRealm(VM _, Value? thisValue, List argumentList)
@@ -26,5 +29,34 @@ internal sealed class Test262Object : Object
         if (test262DefiningCompletion.IsAbruptCompletion()) return test262DefiningCompletion;
 
         return newVm.Realm.GlobalObject.DataProperties["$262"].Value;
+    }
+
+    // evalScript - a function which accepts a string value as its first argument and executes it as an ECMAScript script
+    private Completion evalScript(VM vm, Value? thisValue, List argumentList)
+    {
+        // 1. Let hostDefined be any host-defined values for the provide sourceText (obtained in an implementation dependent manner)
+        var sourceText = argumentList[0].AsString();
+
+        // 2. Let realm be the current Realm Record.
+        // 3. Let s be ParseScript(sourceText, realm, hostDefined).
+        Script? s;
+        try
+        {
+            var parser = new Parser(sourceText);
+            s = parser.Parse(vm);
+        }
+        catch (SyntaxErrorException ex)
+        {
+            // 4. If s is a List of errors, then
+            // a. Let error be the first element of s.
+            var error = ex.Message;
+
+            // b. Return Completion { [[Type]]: throw, [[Value]]: error, [[Target]]: empty }.
+            return Completion.ThrowCompletion(error);
+        }
+
+        // 5. Let status be ScriptEvaluation(s).
+        // 6. Return Completion(status).
+        return s!.ScriptEvaluation();
     }
 }
