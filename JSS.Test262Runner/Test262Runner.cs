@@ -56,17 +56,10 @@ internal sealed class Test262Runner
     /// </summary>
     public void StartRunner()
     {
-        // Modules, Test262 includes tests for ECMAScript 2015 module code, denoted by the "module" metadata flag.
-        // Files bearing a name which includes the sequence _FIXTURE MUST NOT be interpreted as standalone tests; they are intended to be referenced by test files.
-        const string TEST_FIXTURE = "_FIXTURE";
-        const string TEST_DIRECTORY = "./test262/test";
-        const string TEST_FILTER = "*.js";
+        var testFiles = GetTestCasePathsToExecute();
+        if (testFiles is null) return;
 
         var testResults = CreateTestResultsDictionary();
-
-        var testFiles = Directory.EnumerateFiles(TEST_DIRECTORY, TEST_FILTER, SearchOption.AllDirectories)
-            .Where(x => !x.Contains(TEST_FIXTURE));
-
         var testCounter = 0;
         var testCount = testFiles.Count();
         foreach (var testFile in testFiles)
@@ -88,6 +81,34 @@ internal sealed class Test262Runner
         }
 
         LogTestRunStatistics(testCount, testResults);
+    }
+
+    /// <summary>
+    /// Gets the paths of test case files to execute or null if command line filter is incorrect.
+    /// </summary>
+    /// <returns>An enumerable containing the paths of test cases to execute or null if command line filter is incorrect.</returns>
+    private IEnumerable<string>? GetTestCasePathsToExecute()
+    {
+        // Modules, Test262 includes tests for ECMAScript 2015 module code, denoted by the "module" metadata flag.
+        // Files bearing a name which includes the sequence _FIXTURE MUST NOT be interpreted as standalone tests; they are intended to be referenced by test files.
+        const string TEST_FIXTURE = "_FIXTURE";
+        const string TEST_DIRECTORY = "./test262/test";
+
+        var filter = _options.Filter;
+        if (!_options.Filter.EndsWith(".js")) filter += ".js";
+
+        try
+        {
+            return Directory.EnumerateFiles(TEST_DIRECTORY, filter, SearchOption.AllDirectories)
+                .Where(x => !x.Contains(TEST_FIXTURE));
+        }
+        catch
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"The filter {filter} is invalid.");
+            Console.ResetColor();
+            return null;
+        }
     }
 
     /// <summary>
