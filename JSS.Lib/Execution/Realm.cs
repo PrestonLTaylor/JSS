@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using JSS.Lib.AST.Values;
 using JSS.Lib.Runtime;
 
@@ -107,6 +106,19 @@ public sealed class Realm
         // FIMXE: 3. Perform AddRestrictedFunctionProperties(realmRec.[[Intrinsics]].[[%Function.prototype%]], realmRec).
 
         // 4. Return UNUSED.
+    }
+
+    // Host-Defined Functions, https://github.com/tc39/test262/blob/main/INTERPRETING.md
+    static public Completion CreateTest262HostDefinedFunctions(VM vm)
+    {
+        // The following values must be defined as writable, configurable, non-enumerable properties of the global scope prior to test execution.
+
+        // $262, An ordinary object
+        var test262Object = new Test262Object(vm.ObjectPrototype);
+        var defineResult = Object.DefinePropertyOrThrow(vm, vm.Realm.GlobalObject, "$262", new Property(test262Object, new(true, false, true)));
+        if (defineResult.IsAbruptCompletion()) return defineResult;
+
+        return Empty.The;
     }
 
     // 9.3.3 SetRealmGlobalObject ( realmRec, globalObj, thisValue ), https://tc39.es/ecma262/#sec-setrealmglobalobject
