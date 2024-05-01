@@ -19,6 +19,9 @@ internal sealed class Test262Object : Object
 
         var gcBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, gc);
         DataProperties.Add("gc", new Property(gcBuiltin, new(true, false, true)));
+
+        // global, a reference to the global object on which $262 was initially defined
+        DataProperties.Add("global", new Property(vm.Realm.GlobalObject, new(true, false, true)));
     }
 
     private Completion createRealm(VM _, Value? thisValue, List argumentList)
@@ -65,6 +68,7 @@ internal sealed class Test262Object : Object
 
     private Completion gc(VM vm, Value? thisValue, List argumentList)
     {
+        // gc, a function that wraps the host's garbage collection invocation mechanism
         GC.Collect();
         return Undefined.The;
     }
