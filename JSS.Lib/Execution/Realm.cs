@@ -115,6 +115,7 @@ public sealed class Realm
 
         // $262, An ordinary object
         var test262Object = new Test262Object(vm.ObjectPrototype);
+        test262Object.Initialize(vm);
         var defineResult = Object.DefinePropertyOrThrow(vm, vm.Realm.GlobalObject, "$262", new Property(test262Object, new(true, false, true)));
         if (defineResult.IsAbruptCompletion()) return defineResult;
 
