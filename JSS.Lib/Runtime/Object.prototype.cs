@@ -26,7 +26,7 @@ internal class ObjectPrototype : Object
     }
 
     // 20.1.3.2 Object.prototype.hasOwnProperty ( V ), https://tc39.es/ecma262/#sec-object.prototype.hasownproperty
-    private Completion hasOwnProperty(VM vm, Value? thisValue, List argumentList)
+    private Completion hasOwnProperty(VM vm, Value thisValue, List argumentList)
     {
         // 1. Let P be ? ToPropertyKey(V).
         var P = argumentList[0].ToPropertyKey(vm);
@@ -41,10 +41,10 @@ internal class ObjectPrototype : Object
     }
 
     // 20.1.3.6 Object.prototype.toString ( ), https://tc39.es/ecma262/#sec-object.prototype.tostring
-    private Completion toString(VM vm, Value? thisValue, List argumentList)
+    private Completion toString(VM vm, Value thisValue, List argumentList)
     {
         // 1. If the this value is undefined, return "[object Undefined]".
-        if (thisValue is null || thisValue.IsUndefined()) return "[object Undefined]";
+        if (thisValue.IsUndefined()) return "[object Undefined]";
 
         // 2. If the this value is null, return "[object Null]".
         if (thisValue.IsNull()) return "[object Null]";

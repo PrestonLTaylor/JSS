@@ -24,10 +24,10 @@ internal sealed class ArrayPrototype : Object
     }
 
     // 23.1.3.18 Array.prototype.join ( separator ), https://tc39.es/ecma262/#sec-array.prototype.join
-    private Completion join(VM vm, Value? thisArgument, List argumentList)
+    private Completion join(VM vm, Value thisArgument, List argumentList)
     {
         // 1. Let O be ? ToObject(this value).
-        var O = thisArgument!.ToObject(vm);
+        var O = thisArgument.ToObject(vm);
         if (O.IsAbruptCompletion()) return O.Completion;
 
         // 2. Let len be ? LengthOfArrayLike(O).
@@ -88,10 +88,10 @@ internal sealed class ArrayPrototype : Object
     }
 
     // 23.1.3.23 Array.prototype.push ( ...items ), https://tc39.es/ecma262/#sec-array.prototype.push
-    private Completion push(VM vm, Value? thisArgument, List argumentList)
+    private Completion push(VM vm, Value thisArgument, List argumentList)
     {
         // 1. Let O be ? ToObject(this value).
-        var O = thisArgument!.ToObject(vm);
+        var O = thisArgument.ToObject(vm);
 
         // 2. Let len be ? LengthOfArrayLike(O).
         var lenResult = O.Value.LengthOfArrayLike();
