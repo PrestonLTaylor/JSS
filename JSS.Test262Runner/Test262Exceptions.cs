@@ -1,6 +1,5 @@
 ﻿using JSS.Common;
 using JSS.Lib.Execution;
-using System.Diagnostics;
 
 namespace JSS.Test262Runner;
 
@@ -14,7 +13,7 @@ internal class Test262Exception : Exception
 
     protected Test262Exception(VM vm, Completion abruptCompletion) : base(Print.CompletionToString(vm, abruptCompletion))
     {
-        Debug.Assert(abruptCompletion.IsAbruptCompletion());
+        throw new InvalidOperationException("Normal completion passed to a Test262Exception.");
     }
 }
 

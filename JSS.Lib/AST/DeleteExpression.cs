@@ -58,7 +58,7 @@ internal sealed class DeleteExpression : IExpression
             var baseEnv = asReference.Base;
 
             // b. Assert: base is an Environment Record.
-            Debug.Assert(baseEnv is Environment);
+            Assert(baseEnv is Environment, "b. Assert: base is an Environment Record.");
 
             // c. Return ? base.DeleteBinding(ref.[[ReferencedName]]).
             var asEnvironment = baseEnv.AsEnvironment();

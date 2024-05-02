@@ -69,7 +69,7 @@ internal sealed class CallExpression : IExpression
                 var refEnv = asReference.Base;
 
                 // ii. Assert: refEnv is an Environment Record.
-                Debug.Assert(refEnv is Environment);
+                Assert(refEnv is Environment, "Assert: refEnv is an Environment Record.");
 
                 // iii. Let thisValue be refEnv.WithBaseObject().
                 var asEnvironment = refEnv as Environment;

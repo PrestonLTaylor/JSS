@@ -37,7 +37,7 @@ internal sealed class UnaryMinusExpression : IExpression
         else
         {
             // a. Assert: oldValue is a BigInt.
-            Debug.Assert(oldValue.Value.IsBigInt());
+            Assert(oldValue.Value.IsBigInt(), "a. Assert: oldValue is a BigInt.");
 
             // FIXME: b. Return BigInt::unaryMinus(oldValue).
             throw new NotImplementedException();

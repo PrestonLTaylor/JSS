@@ -77,7 +77,7 @@ internal sealed class TypeOfExpression : IExpression
         }
 
         // 11. Assert: val is an Object.
-        Debug.Assert(val.Value.IsObject());
+        Assert(val.Value.IsObject(), "11. Assert: val is an Object.");
 
         // 12. NOTE: This step is replaced in section B.3.6.3.
 

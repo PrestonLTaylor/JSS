@@ -134,7 +134,7 @@ public sealed class Realm
         }
 
         // 2. Assert: globalObj is an Object.
-        Debug.Assert(globalObj.IsObject());
+        Assert(globalObj.IsObject(), "2. Assert: globalObj is an Object.");
 
         // 3. If thisValue is undefined, set thisValue to globalObj.
         if (thisValue.IsUndefined())

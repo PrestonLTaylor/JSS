@@ -81,7 +81,7 @@ internal sealed class GlobalEnvironment : Environment
         }
 
         // 3. Assert: If the binding exists, it must be in the Object Environment Record.
-        Debug.Assert(ObjectRecord.HasBinding(N));
+        Assert(ObjectRecord.HasBinding(N), "3. Assert: If the binding exists, it must be in the Object Environment Record.");
 
         // 4. Let ObjRec be envRec.[[ObjectRecord]].
         // 5. Return ? ObjRec.InitializeBinding(N, V).

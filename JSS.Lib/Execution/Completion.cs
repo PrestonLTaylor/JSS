@@ -89,7 +89,8 @@ public sealed class Completion
     public void UpdateEmpty(Value value)
     {
         // 1. Assert: If completionRecord.[[Type]] is either RETURN or THROW, then completionRecord.[[Value]] is not EMPTY.
-        Debug.Assert(!(IsReturnCompletion() || IsThrowCompletion()) || !IsValueEmpty());
+        Assert(!(IsReturnCompletion() || IsThrowCompletion()) || !IsValueEmpty(),
+            "1. Assert: If completionRecord.[[Type]] is either RETURN or THROW, then completionRecord.[[Value]] is not EMPTY.");
 
         // 2. If completionRecord.[[Value]] is not EMPTY, return ? completionRecord.
         if (!IsValueEmpty()) return;
@@ -149,7 +150,7 @@ internal static class CompletionHelper
         // 1. Let val be OperationName().
 
         // 2. Assert: val is a normal completion.
-        Debug.Assert(completion.IsNormalCompletion());
+        Assert(completion.IsNormalCompletion(), "2. Assert: val is a normal completion.");
 
         // 3. Set val to val.[[Value]].
         return completion.Value;
@@ -160,7 +161,7 @@ internal static class CompletionHelper
         // 1. Let val be OperationName().
 
         // 2. Assert: val is a normal completion.
-        Debug.Assert(!abruptOr.IsAbruptCompletion());
+        Assert(!abruptOr.IsAbruptCompletion(), "2. Assert: val is a normal completion.");
 
         // 3. Set val to val.[[Value]].
         return abruptOr.Value;
