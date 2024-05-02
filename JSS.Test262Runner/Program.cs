@@ -8,8 +8,13 @@ test262RepositoryCloner.CloneRepositoryIfNotAlreadyPresent();
 
 Console.OutputEncoding = Encoding.UTF8;
 
-Parser.Default.ParseArguments<CommandLineOptions>(args)
-    .WithParsed(options =>
+Parser.Default.ParseArguments<DiffOptions, RunnerOptions>(args)
+    .WithParsed<DiffOptions>(options =>
+    {
+        var differ = new TestRunDiffer(options);
+        differ.LogTestsDifferences();
+    })
+    .WithParsed<RunnerOptions>(options =>
     {
         Console.WriteLine("\nStarting the test-262 runner...");
         var test262Runner = new Test262Runner(options);
