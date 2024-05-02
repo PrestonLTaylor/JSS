@@ -22,7 +22,7 @@ enum TestResultType
 /// </summary>
 internal sealed class Test262Runner
 {
-    public Test262Runner(CommandLineOptions options)
+    public Test262Runner(RunnerOptions options)
     {
         _options = options;
         _harnessNameToContent = ReadHarnessFiles();
@@ -50,7 +50,7 @@ internal sealed class Test262Runner
     }
 
     // FIXME: Use OneOf instead of throwing exceptions to indicate failures
-    record TestResult(TestResultType Type, string TestPath, string FailureReason = "");
+
 
     /// <summary>
     /// Starts the <see cref="Test262Runner"/> instance.
@@ -297,7 +297,7 @@ internal sealed class Test262Runner
     static private void LogTestResult(string testPath, TestResult testResult)
     {
         var prettyPath = Path.GetRelativePath(Directory.GetCurrentDirectory(), testPath);
-        var emoji = TEST_RESULT_TYPE_TO_EMOJI[testResult.Type];
+        var emoji = TestResult.TEST_RESULT_TYPE_TO_EMOJI[testResult.Type];
         if (testResult.Type == TestResultType.SUCCESS)
         {
             Console.ForegroundColor = ConsoleColor.Green;
@@ -332,7 +332,7 @@ internal sealed class Test262Runner
 
         foreach (var (result, results) in testResults)
         {
-            var emoji = TEST_RESULT_TYPE_TO_EMOJI[result];
+            var emoji = TestResult.TEST_RESULT_TYPE_TO_EMOJI[result];
             Console.Write($"{emoji}: {results.Count}    ");
         }
     }
@@ -355,16 +355,7 @@ internal sealed class Test262Runner
     // https://github.com/tc39/test262/blob/main/INTERPRETING.md states that assert.js and sta.js must be evaluted before each test file is executed.
     static private readonly string[] REQUIRED_HARNESS_FILE_NAMES = ["assert.js", "sta.js"];
 
-    static private readonly Dictionary<TestResultType, string> TEST_RESULT_TYPE_TO_EMOJI = new()
-    {
-        { TestResultType.SUCCESS, "✅" },
-        { TestResultType.METADATA_PARSING_FAILURE, "📝" },
-        { TestResultType.HARNESS_EXECUTION_FAILURE, "⚙️" },
-        { TestResultType.PARSING_FAILURE, "✍️" },
-        { TestResultType.CRASH_FAILURE, "💥" },
-        { TestResultType.FAILURE, "❌" },
-    };
 
-    private readonly CommandLineOptions _options;
+    private readonly RunnerOptions _options;
     private readonly Dictionary<string, string> _harnessNameToContent;
 }
