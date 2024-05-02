@@ -76,7 +76,7 @@ internal sealed class ScriptExecutionContext : ExecutionContext
             var outer = env.OuterEnv;
 
             // d. Assert: outer is not null.
-            Debug.Assert(outer is not null);
+            Assert(outer is not null, "d. Assert: outer is not null.");
 
             // e. Set env to outer.
             env = outer;

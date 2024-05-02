@@ -29,7 +29,7 @@ internal class DeclarativeEnvironment : Environment
     override public Completion CreateMutableBinding(VM _, string N, bool D)
     {
         // 1. Assert: envRec does not already have a binding for N.
-        Debug.Assert(!_identifierToBinding.ContainsKey(N));
+        Assert(!_identifierToBinding.ContainsKey(N), "1. Assert: envRec does not already have a binding for N.");
 
         // 2. Create a mutable binding in envRec for N and record that it is FIXME: uninitialized.
         // FIXME: If D is true, record that the newly created binding may be deleted by a subsequent DeleteBinding call.
@@ -43,7 +43,7 @@ internal class DeclarativeEnvironment : Environment
     override public Completion CreateImmutableBinding(VM _, string N, bool S)
     {
         // 1. Assert: envRec does not already have a binding for N.
-        Debug.Assert(!_identifierToBinding.ContainsKey(N));
+        Assert(!_identifierToBinding.ContainsKey(N), "1. Assert: envRec does not already have a binding for N.");
 
         // 2. Create an immutable binding in envRec for N and record that it is FIXME: uninitialized.
         // If S is true, record that the newly created binding is a strict binding.
@@ -125,7 +125,7 @@ internal class DeclarativeEnvironment : Environment
     override public Completion GetBindingValue(VM _, string N, bool S)
     {
         // 1. Assert: envRec has a binding for N.
-        Debug.Assert(_identifierToBinding.ContainsKey(N));
+        Assert(_identifierToBinding.ContainsKey(N), "1. Assert: envRec has a binding for N.");
 
         // FIXME: 2. If the binding for N in envRec is an uninitialized binding, throw a ReferenceError exception.
 
@@ -138,7 +138,7 @@ internal class DeclarativeEnvironment : Environment
     public override Completion DeleteBinding(string N)
     {
         // 1. Assert: envRec has a binding for N.
-        Debug.Assert(_identifierToBinding.ContainsKey(N));
+        Assert(_identifierToBinding.ContainsKey(N), "1. Assert: envRec has a binding for N.");
 
         // 2. If the binding for N in envRec cannot be deleted, return false.
 

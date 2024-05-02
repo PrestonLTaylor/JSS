@@ -124,7 +124,7 @@ public class Object : Value
     static internal void CreateNonEnumerableDataPropertyOrThrow(VM vm, Object O, string P, Value V)
     {
         // 1. Assert: O is an ordinary, FIXME: extensible object with no non-configurable properties.
-        Debug.Assert(O.IsObject());
+        Assert(O.IsObject(), "1. Assert: O is an ordinary, extensible object with no non-configurable properties.");
 
         // 2. Let newDesc be the PropertyDescriptor { [[Value]]: V, [[Writable]]: true, [[Enumerable]]: false, [[Configurable]]: true }.
         var newDesc = new Property(V, new(true, false, true));
@@ -407,7 +407,7 @@ public class Object : Value
         else
         {
             // i. Assert: Receiver does not currently have a property P.
-            Debug.Assert(!receiver.DataProperties.ContainsKey(P));
+            Assert(!receiver.DataProperties.ContainsKey(P), "i. Assert: Receiver does not currently have a property P.");
 
             // ii. Return ? CreateDataProperty(Receiver, P, V).
             var result = CreateDataProperty(receiver, P, V);

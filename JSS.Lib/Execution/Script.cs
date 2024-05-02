@@ -64,7 +64,7 @@ public sealed class Script
         VM.PopExecutionContext();
 
         // 15. Assert: The execution context stack is not empty.
-        Debug.Assert(VM.HasExecutionContext());
+        Assert(VM.HasExecutionContext(), "15. Assert: The execution context stack is not empty.");
 
         // FIXME: 16. Resume the context that is now on the top of the execution context stack as the running execution context.
 
@@ -124,7 +124,7 @@ public sealed class Script
             if (d is not VarDeclaration or Identifier)
             {
                 // i. Assert: d is either a FunctionDeclaration, FIXME: a GeneratorDeclaration, an AsyncFunctionDeclaration, or an AsyncGeneratorDeclaration.
-                Debug.Assert(d is FunctionDeclaration);
+                Assert(d is FunctionDeclaration, "i. Assert: d is either a FunctionDeclaration, FIXME: a GeneratorDeclaration, an AsyncFunctionDeclaration, or an AsyncGeneratorDeclaration.");
 
                 // ii. NOTE: If there are multiple function declarations for the same name, the last declaration is used.
 

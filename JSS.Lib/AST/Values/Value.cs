@@ -46,55 +46,55 @@ public abstract class Value
 
     public Reference AsReference()
     {
-        Debug.Assert(IsReference());
+        Assert(IsReference(), $"AsReference called on a(n) {ToString()}.");
         return (this as Reference)!;
     }
 
     internal Environment AsEnvironment()
     {
-        Debug.Assert(IsEnvironment());
+        Assert(IsEnvironment(), $"AsEnvironment called on a(n) {ToString()}.");
         return (this as Environment)!;
     }
 
     public Boolean AsBoolean()
     {
-        Debug.Assert(IsBoolean());
+        Assert(IsBoolean(), $"AsBoolean called on a(n) {ToString()}.");
         return (this as Boolean)!;
     }
 
     public String AsString()
     {
-        Debug.Assert(IsString());
+        Assert(IsString(), $"AsString called on a(n) {ToString()}.");
         return (this as String)!;
     }
 
     public Number AsNumber()
     {
-        Debug.Assert(IsNumber());
+        Assert(IsNumber(), $"AsNumber called on a(n) {ToString()}.");
         return (this as Number)!;
     }
 
     public Object AsObject()
     {
-        Debug.Assert(IsObject());
+        Assert(IsObject(), $"AsObject called on a(n) {ToString()}.");
         return (this as Object)!;
     }
 
     internal Property AsProperty()
     {
-        Debug.Assert(IsProperty());
+        Assert(IsProperty(), $"AsProperty called on a(n) {ToString()}.");
         return (this as Property)!;
     }
 
     internal ICallable AsCallable()
     {
-        Debug.Assert(HasInternalCall());
+        Assert(HasInternalCall(), $"AsCallable called on a(n) {ToString()}.");
         return (this as ICallable)!;
     }
 
     internal IConstructable AsConstructable()
     {
-        Debug.Assert(HasInternalConstruct());
+        Assert(HasInternalConstruct(), $"AsConstructable called on a(n) {ToString()}.");
         return (this as IConstructable)!;
     }
 
@@ -140,7 +140,7 @@ public abstract class Value
             var @base = asReference.Base!;
 
             // b. Assert: base is an Environment Record.
-            Debug.Assert(@base.IsEnvironment());
+            Assert(@base.IsEnvironment(), "b. Assert: base is an Environment Record.");
 
             // c. Return ? base.GetBindingValue(V.[[ReferencedName]], FIXME: V.[[Strict]]) (see 9.1).
             var environment = @base.AsEnvironment();
@@ -200,7 +200,7 @@ public abstract class Value
             var @base = reference.Base!;
 
             // b. Assert: base is an Environment Record.
-            Debug.Assert(@base.IsEnvironment());
+            Assert(@base.IsEnvironment(), "b. Assert: base is an Environment Record.");
 
             // c. Return ? base.SetMutableBinding(V.[[ReferencedName]], W, FIXME: V.[[Strict]]) (see 9.1).
             var environment = @base.AsEnvironment();
@@ -568,14 +568,14 @@ public abstract class Value
         // FIXME: 8. If argument is a BigInt, return BigInt::toString(argument, 10).
 
         // 9. Assert: argument is an Object.
-        Debug.Assert(IsObject());
+        Assert(IsObject(), "9. Assert: argument is an Object.");
 
         // 10. Let primValue be ? ToPrimitive(argument, STRING).
         var primValue = ToPrimitive(vm, PreferredType.STRING);
         if (primValue.IsAbruptCompletion()) return primValue;
 
         // 11. Assert: primValue is not an Object.
-        Debug.Assert(!primValue.Value.IsObject());
+        Assert(!primValue.Value.IsObject(), "11. Assert: primValue is not an Object.");
 
         // 12. Return ? ToString(primValue).
         return primValue.Value.ToStringJS(vm);
@@ -682,7 +682,7 @@ public abstract class Value
     static internal Boolean SameValueNonNumber(Value x, Value y)
     {
         // 1. Assert: Type(x) is Type(y).
-        Debug.Assert(x.Type().Equals(y.Type()));
+        Assert(x.Type().Equals(y.Type()), "1. Assert: Type(x) is Type(y).");
 
         // 2. If x is either null or undefined, return true.
         if (x.IsNull() || x.IsUndefined())

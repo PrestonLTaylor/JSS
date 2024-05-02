@@ -36,7 +36,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         var calleeContext = (PrepareForOrdinaryCall(vm, Undefined.The) as ScriptExecutionContext)!;
 
         // 3. Assert: calleeContext is now the running execution context.
-        Debug.Assert(vm.CurrentExecutionContext == calleeContext);
+        Assert(vm.CurrentExecutionContext == calleeContext, "3. Assert: calleeContext is now the running execution context.");
 
         // FIXME: 4. If F.[[IsClassConstructor]] is true, then
         // FIXME: a. Let error be a newly created TypeError object.
@@ -129,7 +129,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
                 var globalEnv = calleeRealm.GlobalEnv;
 
                 // ii. Assert: globalEnv is a Global Environment Record.
-                Debug.Assert(globalEnv is GlobalEnvironment);
+                Assert(globalEnv is GlobalEnvironment, "ii. Assert: globalEnv is a Global Environment Record.");
 
                 // iii. Let thisValue be globalEnv.[[GlobalThisValue]].
                 thisValue = globalEnv.GlobalThisValue;
@@ -145,7 +145,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         }
 
         // 7. Assert: localEnv is a Function Environment Record.
-        Debug.Assert(localEnv is FunctionEnvironment);
+        Assert(localEnv is FunctionEnvironment, "7. Assert: localEnv is a Function Environment Record.");
 
         // 8. Assert: The next step never returns an abrupt completion because localEnv.[[ThisBindingStatus]] is not INITIALIZED.
 
@@ -196,7 +196,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         var calleeContext = (PrepareForOrdinaryCall(vm, Undefined.The) as ScriptExecutionContext)!;
 
         // 5. Assert: calleeContext is now the running execution context.
-        Debug.Assert(vm.CurrentExecutionContext == calleeContext);
+        Assert(vm.CurrentExecutionContext == calleeContext, "5. Assert: calleeContext is now the running execution context.");
 
         // 6. If kind is BASE, then
         if (ConstructorKind == ConstructorKind.BASE)
@@ -243,7 +243,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         if (thisBinding.IsAbruptCompletion()) return thisBinding;
 
         // 13. Assert: thisBinding is an Object.
-        Debug.Assert(thisBinding.Value is Object);
+        Assert(thisBinding.Value is Object, "13. Assert: thisBinding is an Object.");
 
         // 14. Return thisBinding.
         return thisBinding;
@@ -352,7 +352,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
     public void SetFunctionName(VM vm, string name, string prefix = "")
     {
         // 1. Assert: FIXME: (F is an extensible object) that does not have a "name" own property.
-        Debug.Assert(!DataProperties.ContainsKey("name"));
+        Assert(!DataProperties.ContainsKey("name"), "1. Assert: F is an extensible object that does not have a \"name\" own property.");
 
         // FIXME: 2. If name is a Symbol, then
         // FIXME: a. Let description be name's [[Description]] value.
@@ -421,8 +421,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             // a. If d is neither a VariableDeclaration nor a ForBinding nor a BindingIdentifier, then
             if (d is not VarDeclaration or Identifier)
             {
-                // i. Assert: d is either a FunctionDeclaration, a GeneratorDeclaration, an AsyncFunctionDeclaration, or an AsyncGeneratorDeclaration.
-                Debug.Assert(d is FunctionDeclaration);
+                Assert(d is FunctionDeclaration, "i. Assert: d is either a FunctionDeclaration, a GeneratorDeclaration, an AsyncFunctionDeclaration, or an AsyncGeneratorDeclaration.");
 
                 // ii. Let fn be the sole element of the BoundNames of d.
                 var fn = d.BoundNames().FirstOrDefault()!;
@@ -476,7 +475,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         var env = new DeclarativeEnvironment(calleeEnv);
 
         // d. Assert: The VariableEnvironment of calleeContext is calleeEnv.
-        Debug.Assert(calleeContext.VariableEnvironment == calleeEnv);
+        Assert(calleeContext.VariableEnvironment == calleeEnv, "d. Assert: The VariableEnvironment of calleeContext is calleeEnv.");
 
         // e. Set the LexicalEnvironment of calleeContext to env.
         calleeContext.LexicalEnvironment = env;

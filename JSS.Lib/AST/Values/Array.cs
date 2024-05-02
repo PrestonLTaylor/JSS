@@ -27,13 +27,13 @@ internal sealed class Array : Object
 
             // FIXME: b. Assert: IsDataDescriptor(lengthDesc) is true.
             // c. Assert: lengthDesc.[[Configurable]] is false.
-            Debug.Assert(!lengthDesc.Attributes.Configurable);
+            Assert(!lengthDesc.Attributes.Configurable, "c. Assert: lengthDesc.[[Configurable]] is false.");
 
             // d. Let length be lengthDesc.[[Value]].
             var length = lengthDesc.Value.AsNumber();
 
             // e. Assert: length is a non-negative integral Number.
-            Debug.Assert(length >= 0 && double.IsInteger(length));
+            Assert(length >= 0 && double.IsInteger(length), "e. Assert: length is a non-negative integral Number.");
 
             // f. Let index be ! ToUint32(P).
             var pString = new String(P);
@@ -58,7 +58,7 @@ internal sealed class Array : Object
                 succeeded = MUST(OrdinaryDefineOwnProperty(this, "length", lengthDesc)).AsBoolean();
 
                 // iii. Assert: succeeded is true.
-                Debug.Assert(succeeded);
+                Assert(succeeded, "iii. Assert: succeeded is true.");
             }
 
             // k. Return true.
@@ -114,7 +114,7 @@ internal sealed class Array : Object
 
         // FIXME: 8. Assert: IsDataDescriptor(oldLenDesc) is true.
         // 9. Assert: oldLenDesc.[[Configurable]] is false.
-        Debug.Assert(!oldLenDesc.Attributes.Configurable);
+        Assert(!oldLenDesc.Attributes.Configurable, "9. Assert: oldLenDesc.[[Configurable]] is false.");
 
         // 10. Let oldLen be oldLenDesc.[[Value]].
         var oldLen = oldLenDesc.Value.AsNumber();

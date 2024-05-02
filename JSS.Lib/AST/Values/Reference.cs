@@ -47,7 +47,7 @@ public class Reference : Value
     internal Value GetThisValue()
     {
         // 1. Assert: IsPropertyReference(V) is true.
-        Debug.Assert(IsPropertyReference());
+        Assert(IsPropertyReference(), "1. Assert: IsPropertyReference(V) is true.");
 
         // FIXME: (2. If IsSuperReference(V) is true, return V.[[ThisValue]];) otherwise return V.[[Base]].
         return Base ?? Undefined.The;
@@ -57,12 +57,12 @@ public class Reference : Value
     public Completion InitializeReferencedBinding(VM vm, Value W)
     {
         // 1. Assert: IsUnresolvableReference(V) is false.
-        Debug.Assert(!IsUnresolvableReference());
+        Assert(!IsUnresolvableReference(), "1. Assert: IsUnresolvableReference(V) is false.");
 
         // 2. Let base be V.[[Base]].
 
         // 3. Assert: base is an Environment Record.
-        Debug.Assert(Base!.IsEnvironment());
+        Assert(Base!.IsEnvironment(), "3. Assert: base is an Environment Record.");
 
         // 4. Return ? base.InitializeBinding(V.[[ReferencedName]], W).
         var environment = Base.AsEnvironment();

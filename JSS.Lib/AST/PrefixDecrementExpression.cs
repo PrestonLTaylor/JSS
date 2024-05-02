@@ -38,7 +38,7 @@ internal sealed class PrefixDecrementExpression : IExpression
         else
         {
             // a. Assert: oldValue is a BigInt.
-            Debug.Assert(oldValue.Value.IsBigInt());
+            Assert(oldValue.Value.IsBigInt(), "a. Assert: oldValue is a BigInt.");
 
             // FIXME: b. Let newValue be BigInt::subtract(oldValue, 1ℤ).
             throw new NotImplementedException();

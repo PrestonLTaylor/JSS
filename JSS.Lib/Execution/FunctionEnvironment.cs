@@ -44,7 +44,7 @@ internal class FunctionEnvironment : DeclarativeEnvironment
     public Completion BindThisValue(VM vm, Value V)
     {
         // 1. Assert: envRec.[[ThisBindingStatus]] is not LEXICAL.
-        Debug.Assert(ThisBindingStatus != ThisBindingStatus.LEXICAL);
+        Assert(ThisBindingStatus != ThisBindingStatus.LEXICAL, "1. Assert: envRec.[[ThisBindingStatus]] is not LEXICAL.");
 
         // 2. If envRec.[[ThisBindingStatus]] is INITIALIZED, throw a ReferenceError exception.
         if (ThisBindingStatus == ThisBindingStatus.INITIALIZED)
@@ -73,7 +73,7 @@ internal class FunctionEnvironment : DeclarativeEnvironment
     override public Completion GetThisBinding(VM vm)
     {
         // 1. Assert: envRec.[[ThisBindingStatus]] is not LEXICAL.
-        Debug.Assert(ThisBindingStatus != ThisBindingStatus.LEXICAL);
+        Assert(ThisBindingStatus != ThisBindingStatus.LEXICAL, "1. Assert: envRec.[[ThisBindingStatus]] is not LEXICAL.");
 
         // 2. If envRec.[[ThisBindingStatus]] is UNINITIALIZED, throw a ReferenceError exception.
         if (ThisBindingStatus == ThisBindingStatus.UNINITIALIZED)
