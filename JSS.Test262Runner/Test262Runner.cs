@@ -34,7 +34,7 @@ internal sealed class Test262Runner
     /// <returns>A map of the harness file name to the harness' file content.</returns>
     static private Dictionary<string, string> ReadHarnessFiles()
     {
-        const string HARNESS_DIRECTORY = "./test262/harness";
+        const string HARNESS_DIRECTORY = ".\\test262\\harness";
         const string HARNESS_JAVASCRIPT_FILTER = "*.js";
 
         var harnessNameToContent = new Dictionary<string, string>();
@@ -93,7 +93,7 @@ internal sealed class Test262Runner
         // Modules, Test262 includes tests for ECMAScript 2015 module code, denoted by the "module" metadata flag.
         // Files bearing a name which includes the sequence _FIXTURE MUST NOT be interpreted as standalone tests; they are intended to be referenced by test files.
         const string TEST_FIXTURE = "_FIXTURE";
-        const string TEST_DIRECTORY = "./test262/test";
+        const string TEST_DIRECTORY = ".\\test262\\test";
 
         var filter = _options.Filter;
         if (!_options.Filter.EndsWith(".js")) filter += ".js";
@@ -325,6 +325,8 @@ internal sealed class Test262Runner
 
     static private void LogTestRunStatisticsToConsole(int testCount, Dictionary<TestResultType, List<TestResult>> testResults)
     {
+        LogPathGroupedStatisticsToConsole(testResults);
+
         var testSuccesses = testResults[TestResultType.SUCCESS];
         var testSuccessPercent = testSuccesses.Count / (double)Math.Max(testCount, 1) * 100;
         Console.WriteLine($"{testCount} test cases executed.");
@@ -335,6 +337,37 @@ internal sealed class Test262Runner
             var emoji = TestResult.TEST_RESULT_TYPE_TO_EMOJI[result];
             Console.Write($"{emoji}: {results.Count}    ");
         }
+    }
+
+    static private void LogPathGroupedStatisticsToConsole(Dictionary<TestResultType, List<TestResult>> testResults)
+    {
+        // FIXME: Might be more optimal to store the test results in the trie to begin with instead of a dictionary
+        var rootPathTrie = new TestResultPathTrie();
+        foreach (var (type, results) in testResults)
+        {
+            foreach (var result in results)
+            {
+
+                rootPathTrie.Add(result.TestPath, type);
+            }
+        }
+
+        rootPathTrie.Visit((currentPath, currentResultCount) =>
+        {
+            // Removes the "/test262/test/ from being shown
+            const int COUNT_TO_REMOVE_TEST_262_PATH = 15;
+            if (currentPath.Length <= COUNT_TO_REMOVE_TEST_262_PATH) return;
+            var prettyPath = currentPath[COUNT_TO_REMOVE_TEST_262_PATH..];
+
+            Console.Write($"/{prettyPath}/ => ");
+            foreach (var (type, count) in currentResultCount)
+            {
+                if (count == 0) continue;
+                var emoji = TestResult.TEST_RESULT_TYPE_TO_EMOJI[type];
+                Console.Write($"{emoji}: {count}    ");
+            }
+            Console.WriteLine();
+        });
     }
 
     static private void LogTestRunStatisticsToAJsonFile(Dictionary<TestResultType, List<TestResult>> testResults)
