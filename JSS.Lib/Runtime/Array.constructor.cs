@@ -22,7 +22,7 @@ internal sealed class ArrayConstructor : Object
     }
 
     // 23.1.2.2 Array.isArray ( arg ), https://tc39.es/ecma262/#sec-array.isarray
-    private Completion isArray(VM vm, Value? thisArgument, List argumentList)
+    private Completion isArray(VM vm, Value thisArgument, List argumentList)
     {
         // 1. Return ? IsArray(arg).
         return argumentList[0].IsArray();

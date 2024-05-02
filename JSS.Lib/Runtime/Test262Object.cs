@@ -24,7 +24,7 @@ internal sealed class Test262Object : Object
         DataProperties.Add("global", new Property(vm.Realm.GlobalObject, new(true, false, true)));
     }
 
-    private Completion createRealm(VM _, Value? thisValue, List argumentList)
+    private Completion createRealm(VM _, Value thisValue, List argumentList)
     {
         // createRealm - a function which creates a new ECMAScript Realm, defines this API on the new realm's global object,
         // and returns the $262 property of the new realm's global object
@@ -38,7 +38,7 @@ internal sealed class Test262Object : Object
     }
 
     // evalScript - a function which accepts a string value as its first argument and executes it as an ECMAScript script
-    private Completion evalScript(VM vm, Value? thisValue, List argumentList)
+    private Completion evalScript(VM vm, Value thisValue, List argumentList)
     {
         // 1. Let hostDefined be any host-defined values for the provide sourceText (obtained in an implementation dependent manner)
         var sourceText = argumentList[0].AsString();
@@ -66,7 +66,7 @@ internal sealed class Test262Object : Object
         return s!.ScriptEvaluation();
     }
 
-    private Completion gc(VM vm, Value? thisValue, List argumentList)
+    private Completion gc(VM vm, Value thisValue, List argumentList)
     {
         // gc, a function that wraps the host's garbage collection invocation mechanism
         GC.Collect();

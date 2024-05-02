@@ -58,7 +58,7 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
     }
 
     // 20.1.2.4 Object.defineProperty ( O, P, Attributes ), https://tc39.es/ecma262/#sec-object.defineproperty
-    private Completion defineProperty(VM vm, Value? thisArgument, List argumentList)
+    private Completion defineProperty(VM vm, Value thisArgument, List argumentList)
     {
         // 1. If O is not an Object, throw a TypeError exception.
         var O = argumentList[0];
@@ -80,7 +80,7 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
     }
 
     // 20.1.2.8 Object.getOwnPropertyDescriptor ( O, P ), https://tc39.es/ecma262/#sec-object.getownpropertydescriptor
-    private Completion getOwnPropertyDescriptor(VM vm, Value? thisArgument, List argumentList)
+    private Completion getOwnPropertyDescriptor(VM vm, Value thisArgument, List argumentList)
     {
         // 1. Let obj be ? ToObject(O).
         var obj = argumentList[0].ToObject(vm);
@@ -100,7 +100,7 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
     }
 
     // 20.1.2.10 Object.getOwnPropertyNames ( O ), https://tc39.es/ecma262/#sec-object.getownpropertynames
-    private Completion getOwnPropertyNames(VM vm, Value? thisArgument, List argumentList)
+    private Completion getOwnPropertyNames(VM vm, Value thisArgument, List argumentList)
     {
         // 1. Return CreateArrayFromList(? GetOwnPropertyKeys(O, STRING)).
         var ownPropertyKeys = GetOwnPropertyKeys(vm, argumentList[0]);

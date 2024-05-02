@@ -19,13 +19,13 @@ internal sealed class FunctionPrototype : Object
     }
 
     // 20.2.3.3 Function.prototype.call ( thisArg, ...args ), https://tc39.es/ecma262/#sec-function.prototype.call
-    private Completion call(VM vm, Value? thisArg, List argumentList)
+    private Completion call(VM vm, Value thisArg, List argumentList)
     {
         // 1. Let func be the this value.
         var func = thisArg;
 
         // 2. If IsCallable(func) is false, throw a TypeError exception.
-        if (func is null || !func.IsCallable()) return ThrowTypeError(vm, RuntimeErrorType.CallingANonFunction, func?.Type() ?? ValueType.Undefined);
+        if (!func.IsCallable()) return ThrowTypeError(vm, RuntimeErrorType.CallingANonFunction, func?.Type() ?? ValueType.Undefined);
 
         // FIXME: 3. Perform PrepareForTailCall().
 

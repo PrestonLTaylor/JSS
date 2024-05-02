@@ -7,7 +7,7 @@ namespace JSS.Lib.AST.Values;
 internal sealed class BuiltinFunction : Object, ICallable, IConstructable
 {
 #pragma warning disable CS8618 // All properties are initialised in OrdinaryFunctionCreate
-    private BuiltinFunction(Object prototype, Func<VM, Value?, List, Completion> behaviour) : base(prototype)
+    private BuiltinFunction(Object prototype, Func<VM, Value, List, Completion> behaviour) : base(prototype)
     {
         Behaviour = behaviour;
     }
@@ -47,10 +47,11 @@ internal sealed class BuiltinFunction : Object, ICallable, IConstructable
         // 9. Push calleeContext onto the execution context stack; calleeContext is now the running execution context.
         vm.PushExecutionContext(calleeContext);
 
+        // NOTE: Technically a null thisArgument should have no value, but having a value of undefined serves the same purpose and is not visible in JavaScript.
         // 10. Let result be the Completion Record that is the result of evaluating F in a manner that conforms to the specification of F.
         // If thisArgument is UNINITIALIZED, the this value is uninitialized; otherwise, thisArgument provides the this value.
         // argumentsList provides the named parameters. newTarget provides the NewTarget value.
-        var result = Behaviour(vm, thisArgument, argumentsList);
+        var result = Behaviour(vm, thisArgument ?? Undefined.The, argumentsList);
 
         // 11. NOTE: If F is defined in this document, “the specification of F” is the behaviour specified for it via algorithm steps or other means.
 
@@ -62,7 +63,7 @@ internal sealed class BuiltinFunction : Object, ICallable, IConstructable
     }
 
     // 10.3.4 CreateBuiltinFunction ( behaviour, FIXME: length, FIXME: name, FIXME: additionalInternalSlotsList [ , realm [ , prototype [ , FIXME: prefix ] ] ] ), https://tc39.es/ecma262/#sec-createbuiltinfunction
-    static public BuiltinFunction CreateBuiltinFunction(VM vm, Func<VM, Value?, List, Completion> behaviour, Realm? realm = null, Object? prototype = null)
+    static public BuiltinFunction CreateBuiltinFunction(VM vm, Func<VM, Value, List, Completion> behaviour, Realm? realm = null, Object? prototype = null)
     {
         // 1. If realm is not present, set realm to the current Realm Record.
         realm ??= vm.Realm;
@@ -98,6 +99,6 @@ internal sealed class BuiltinFunction : Object, ICallable, IConstructable
         return func;
     }
 
-    public Func<VM, Value?, List, Completion> Behaviour { get; private set; }
+    public Func<VM, Value, List, Completion> Behaviour { get; private set; }
     public Realm Realm { get; private set; }
 }

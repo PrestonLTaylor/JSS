@@ -19,7 +19,7 @@ internal sealed class MathObject : Object
     }
 
     // 21.3.2.26 Math.pow ( base, exponent ), https://tc39.es/ecma262/#sec-math.pow
-    private Completion pow(VM vm, Value? thisArgument, List argumentList)
+    private Completion pow(VM vm, Value thisArgument, List argumentList)
     {
         // 1. Set base to ? ToNumber(base).
         var powBase = argumentList[0].ToNumber();
