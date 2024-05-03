@@ -1,6 +1,5 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.Execution;
-using System.Linq.Expressions;
 
 namespace JSS.Lib.AST;
 
@@ -83,9 +82,13 @@ internal sealed class ForInStatement : INode
         // 3. Let V be undefined.
         var V = (Value)Undefined.The;
 
+        // NOTE: This is a hack for making we don't have a modification while enumerating exception.
+        // This some-what emulates normal JS behaviour as defining a new enumerable property in the for-in loop does not get enumerated over
+        var dataProperties = keyResult.DataProperties.ToDictionary(entry => entry.Key, entry => entry.Value);
+
         Completion status;
         Completion result = Completion.NormalCompletion(Empty.The);
-        foreach (var (name, property) in keyResult.DataProperties)
+        foreach (var (name, property) in dataProperties)
         {
             // NOTE: Skips non-enumerable properties as a enumerable iterator would do
             if (!property.Attributes.Enumerable) continue;
