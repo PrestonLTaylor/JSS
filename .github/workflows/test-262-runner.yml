@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+    ARTIFACT-NAME: "test-262-test-run"
+
 jobs:
   build:
     
@@ -27,11 +30,21 @@ jobs:
       run: dotnet restore JSS.Test262Runner/JSS.Test262Runner.csproj
     - name: Build our Test262Runner
       run: dotnet build --no-restore --configuration Release JSS.Test262Runner/JSS.Test262Runner.csproj
+    - name: Download previous test run artifact
+      uses: dawidd6/action-download-artifact@v3
+      with:
+          name: ${{ env.ARTIFACT-NAME }}
+          if_no_artifact_found: "ignore"
+    - name: Setup previous test run for diffing
+      run: GCI -filter test-262-run*.txt | Rename-Item -newname "from-test-262-run.txt"
     - name: Start our Test262Runner
-    # NOTE: We don't really want CI errors from our runner, so "|| cd ." forces the exit code to 0
-      run: dotnet run --no-build --configuration Release --project JSS.Test262Runner/JSS.Test262Runner.csproj -- -q || cd .
+      run: dotnet run --no-build --configuration Release --project JSS.Test262Runner/JSS.Test262Runner.csproj -- -q
     - name: Upload test run artifact
       uses: actions/upload-artifact@v4
       with:
-          name: test-262-test-run
+          name: ${{ env.ARTIFACT-NAME }}
           path: test-262-run-*.txt
+    - name: Setup current test run for diffing
+      run: GCI -filter "test-262-run*.txt" | Rename-Item -newname "to-test-262-run.txt"
+    - name: Perform test-262 test run diffing
+      run: dotnet run --no-build --configuration Release --project JSS.Test262Runner/JSS.Test262Runner.csproj -- diff -f from-test-262-run.txt -t to-test-262-run.txt
