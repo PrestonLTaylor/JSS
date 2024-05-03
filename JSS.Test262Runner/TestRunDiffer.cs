@@ -52,6 +52,23 @@ internal sealed class TestRunDiffer
 
             Console.ResetColor();
         }
+
+        Console.WriteLine("\nTest-262 Results Diff: ");
+        foreach (var (type, emoji) in TestResult.TEST_RESULT_TYPE_TO_EMOJI)
+        {
+            var fromCount = fromResults
+                .Where(x => x.Value.Type == type)
+                .Count();
+
+            var toCount = toResults
+                .Where(x => x.Value.Type == type)
+                .Count();
+
+            var diffCount = toCount - fromCount;
+            if (diffCount == 0) continue;
+            var diffString = diffCount > 0 ? $"+{diffCount}" : diffCount.ToString();
+            Console.Write($"{emoji}: {diffString}    ");
+        }
     }
 
     /// <summary>
