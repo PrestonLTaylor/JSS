@@ -1,5 +1,6 @@
 ﻿using FluentAssertions;
 using JSS.Lib.AST.Values;
+using JSS.Lib.Execution;
 
 namespace JSS.Lib.UnitTests;
 
@@ -22,10 +23,11 @@ internal sealed class ValueTests
     public void ToInt32_ReturnsNormalCompletion_WithExpectedResult(double input, int expected)
     {
         // Arrange
+        var _ = new Realm(out VM vm);
         Value inputValue = input;
 
         // Act
-        var abruptOr = inputValue.ToInt32();
+        var abruptOr = inputValue.ToInt32(vm);
 
         // Assert
         abruptOr.IsAbruptCompletion().Should().BeFalse();
@@ -49,10 +51,11 @@ internal sealed class ValueTests
     public void ToUint32_ReturnsNormalCompletion_WithExpectedResult(double input, uint expected)
     {
         // Arrange
+        var _ = new Realm(out VM vm);
         Value inputValue = input;
 
         // Act
-        var abruptOr = inputValue.ToUint32();
+        var abruptOr = inputValue.ToUint32(vm);
 
         // Assert
         abruptOr.IsAbruptCompletion().Should().BeFalse();

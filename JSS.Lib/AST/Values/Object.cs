@@ -82,7 +82,7 @@ public class Object : Value
     static internal Completion Set(VM vm, Object O, string P, Value V, bool Throw)
     {
         // 1. Let success be ? O.[[Set]](P, V, O).
-        var success = O.Set(P, V, O);
+        var success = O.Set(vm, P, V, O);
         if (success.IsAbruptCompletion()) return success;
 
         // 2. If success is false and Throw is true, throw a TypeError exception.
@@ -97,20 +97,20 @@ public class Object : Value
     }
 
     // 7.3.5 CreateDataProperty ( O, P, V ), https://tc39.es/ecma262/#sec-createdataproperty
-    static internal AbruptOr<bool> CreateDataProperty(Object O, string P, Value V)
+    static internal AbruptOr<bool> CreateDataProperty(VM vm, Object O, string P, Value V)
     {
         // 1. Let newDesc be the PropertyDescriptor { [[Value]]: V, [[Writable]]: true, [[Enumerable]]: true, [[Configurable]]: true }.
         var newDesc = new Property(V, new(true, true, true));
 
         // 2. Return ? O.[[DefineOwnProperty]](P, newDesc).
-        return O.DefineOwnProperty(P, newDesc);
+        return O.DefineOwnProperty(vm, P, newDesc);
     }
 
     // 7.3.6 CreateDataPropertyOrThrow ( O, P, V ), https://tc39.es/ecma262/#sec-createdatapropertyorthrow
     static internal Completion CreateDataPropertyOrThrow(VM vm, Object O, string P, Value V)
     {
         // 1. Let success be ? CreateDataProperty(O, P, V).
-        var success = CreateDataProperty(O, P, V);
+        var success = CreateDataProperty(vm, O, P, V);
         if (success.IsAbruptCompletion()) return success.Completion;
 
         // 2. If success is false, throw a TypeError exception.
@@ -139,7 +139,7 @@ public class Object : Value
     static internal Completion DefinePropertyOrThrow(VM vm, Object O, string P, Property desc)
     {
         // 1. Let success be ? O.[[DefineOwnProperty]](P, desc).
-        var success = O.DefineOwnProperty(P, desc);
+        var success = O.DefineOwnProperty(vm, P, desc);
         if (success.IsAbruptCompletion()) return success;
 
         // 2. If success is false, throw a TypeError exception.
@@ -188,13 +188,13 @@ public class Object : Value
 
 
     // 7.3.18 LengthOfArrayLike ( obj ), https://tc39.es/ecma262/#sec-lengthofarraylike
-    internal AbruptOr<double> LengthOfArrayLike()
+    internal AbruptOr<double> LengthOfArrayLike(VM vm)
     {
         // 1. Return ℝ(? ToLength(? Get(obj, "length"))).
         var getResult = Get(this, "length");
         if (getResult.IsAbruptCompletion()) return getResult;
 
-        return getResult.Value.ToLength();
+        return getResult.Value.ToLength(vm);
     }
 
     // 10.1.1 [[GetPrototypeOf]] ( ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-getprototypeof
@@ -243,7 +243,7 @@ public class Object : Value
     }
 
     // 10.1.6 [[DefineOwnProperty]] ( P, Desc ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-defineownproperty-p-desc
-    virtual internal Completion DefineOwnProperty(string P, Property desc)
+    virtual internal Completion DefineOwnProperty(VM vm, string P, Property desc)
     {
         // 1. Return ? OrdinaryDefineOwnProperty(O, P, Desc).
         return OrdinaryDefineOwnProperty(this, P, desc);
@@ -335,25 +335,25 @@ public class Object : Value
     }
 
     // 10.1.9 [[Set]] ( P, V, Receiver ), https://tc39.es/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-set-p-v-receiver
-    internal Completion Set(string P, Value V, Object receiver)
+    internal Completion Set(VM vm, string P, Value V, Object receiver)
     {
         // 1. Return ? OrdinarySet(O, P, V, Receiver).
-        return OrdinarySet(this, P, V, receiver);
+        return OrdinarySet(vm, this, P, V, receiver);
     }
 
     // 10.1.9.1 OrdinarySet ( O, P, V, Receiver ), https://tc39.es/ecma262/#sec-ordinaryset
-    static internal Completion OrdinarySet(Object O, string P, Value V, Object receiver)
+    static internal Completion OrdinarySet(VM vm, Object O, string P, Value V, Object receiver)
     {
         // 1. Let ownDesc be ? O.[[GetOwnProperty]](P).
         var ownDesc = O.GetOwnProperty(P);
         if (ownDesc.IsAbruptCompletion()) return ownDesc;
 
         // 2. Return ? OrdinarySetWithOwnDescriptor(O, P, V, Receiver, ownDesc).
-        return O.OrdinarySetWithOwnDescriptor(P, V, receiver, ownDesc.Value);
+        return O.OrdinarySetWithOwnDescriptor(vm, P, V, receiver, ownDesc.Value);
     }
 
     // 10.1.9.2 OrdinarySetWithOwnDescriptor ( O, P, V, Receiver, ownDesc ), https://tc39.es/ecma262/#sec-ordinarysetwithowndescriptor
-    internal Completion OrdinarySetWithOwnDescriptor(string P, Value V, Object receiver, Value ownDesc)
+    internal Completion OrdinarySetWithOwnDescriptor(VM vm, string P, Value V, Object receiver, Value ownDesc)
     {
         // 1. If ownDesc is undefined, then
         if (ownDesc.IsUndefined())
@@ -365,7 +365,7 @@ public class Object : Value
             if (parent is not null)
             {
                 // i. Return ? parent.[[Set]](P, V, Receiver).
-                return parent.Set(P, V, receiver);
+                return parent.Set(vm, P, V, receiver);
             }
             // c. Else,
             else
@@ -401,7 +401,7 @@ public class Object : Value
             existingDesc.Value = V;
 
             // iv. Return ? Receiver.[[DefineOwnProperty]](P, valueDesc).
-            return receiver.DefineOwnProperty(P, existingDesc);
+            return receiver.DefineOwnProperty(vm, P, existingDesc);
         }
         // e. Else,
         else
@@ -410,7 +410,7 @@ public class Object : Value
             Assert(!receiver.DataProperties.ContainsKey(P), "i. Assert: Receiver does not currently have a property P.");
 
             // ii. Return ? CreateDataProperty(Receiver, P, V).
-            var result = CreateDataProperty(receiver, P, V);
+            var result = CreateDataProperty(vm, receiver, P, V);
             if (result.IsAbruptCompletion()) return result.Completion;
             return result.Value;
         }

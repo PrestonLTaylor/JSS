@@ -186,7 +186,7 @@ public abstract class Value
 
             // FIXME: c. Let succeeded be ? baseObj.[[Set]](V.[[ReferencedName]], W, FIXME: GetThisValue(V)).
             var obj = baseObj.Value;
-            var succeeded = obj.Set(reference.ReferencedName, W, obj);
+            var succeeded = obj.Set(vm, reference.ReferencedName, W, obj);
             if (succeeded.IsAbruptCompletion()) return succeeded;
 
             // FIXME: d. If succeeded is false FIXME: (and V.[[Strict]] is true,) throw a TypeError exception.
@@ -420,11 +420,11 @@ public abstract class Value
         // FIXME: 2. If primValue is a BigInt, return primValue.
 
         // 3. Return ? ToNumber(primValue).
-        return primValue.Value.ToNumber();
+        return primValue.Value.ToNumber(vm);
     }
 
     // 7.1.4 ToNumber ( argument ), https://tc39.es/ecma262/#sec-tonumber
-    internal AbruptOr<double> ToNumber()
+    internal AbruptOr<double> ToNumber(VM vm)
     {
         // 1. If argument is a Number, return argument.
         if (IsNumber()) return AsNumber().Value;
@@ -461,18 +461,25 @@ public abstract class Value
             }
         }
 
-        // FIXME: 7. Assert: argument is an Object.
-        // FIXME: 8. Let primValue be ? ToPrimitive(argument, NUMBER).
-        // FIXME: 9. Assert: primValue is not an Object.
+        // 7. Assert: argument is an Object.
+        Assert(IsObject(), "7. Assert: argument is an Object.");
+
+        // 8. Let primValue be ? ToPrimitive(argument, NUMBER).
+        var primValue = ToPrimitive(vm, PreferredType.NUMBER);
+        if (primValue.IsAbruptCompletion()) return primValue;
+
+        // 9. Assert: primValue is not an Object.
+        Assert(!primValue.Value.IsObject(), "9. Assert: primValue is not an Object.");
+
         // 10. Return ? ToNumber(primValue).
-        throw new NotImplementedException();
+        return primValue.Value.ToNumber(vm);
     }
 
     // 7.1.5 ToIntegerOrInfinity ( argument ), https://tc39.es/ecma262/#sec-tointegerorinfinity
-    internal AbruptOr<double> ToIntegerOrInfinity()
+    internal AbruptOr<double> ToIntegerOrInfinity(VM vm)
     {
         // 1. Let number be ? ToNumber(argument).
-        var number = ToNumber();
+        var number = ToNumber(vm);
         if (number.IsAbruptCompletion()) return number;
 
         // 2. If number is one of NaN, +0𝔽, FIXME: (or -0𝔽), return 0.
@@ -489,13 +496,13 @@ public abstract class Value
     }
 
     // 7.1.6 ToInt32 ( argument ), https://tc39.es/ecma262/#sec-toint32
-    internal AbruptOr<int> ToInt32()
+    internal AbruptOr<int> ToInt32(VM vm)
     {
         const long TWO_TO_32 = (long)uint.MaxValue + 1;
         const long TWO_TO_31 = (long)int.MaxValue + 1;
 
         // 1. Let number be ? ToNumber(argument).
-        var number = ToNumber();
+        var number = ToNumber(vm);
         if (number.IsAbruptCompletion()) return number.Completion;
 
         // 2. If number is FIXME: not finite or number is either +0𝔽 FIXME: or -0𝔽, return +0𝔽.
@@ -514,12 +521,12 @@ public abstract class Value
     }
 
     // 7.1.7 ToUint32 ( argument ), https://tc39.es/ecma262/#sec-touint32
-    internal AbruptOr<uint> ToUint32()
+    internal AbruptOr<uint> ToUint32(VM vm)
     {
         const long TWO_TO_32 = (long)uint.MaxValue + 1;
 
         // 1. Let number be ? ToNumber(argument).
-        var number = ToNumber();
+        var number = ToNumber(vm);
         if (number.IsAbruptCompletion()) return number.Completion;
 
         // 2. If number is FIXME: not finite or number is either +0𝔽 FIXME: or -0𝔽, return +0𝔽.
@@ -842,7 +849,7 @@ public abstract class Value
     }
 
     // 7.2.14 IsLooselyEqual ( x, y ), https://tc39.es/ecma262/#sec-islooselyequal
-    static internal Completion IsLooselyEqual(Value x, Value y)
+    static internal Completion IsLooselyEqual(VM vm, Value x, Value y)
     {
         // 1. If Type(x) is Type(y), then
         if (x.Type().Equals(y.Type()))
@@ -868,13 +875,13 @@ public abstract class Value
         // 5. If x is a Number and y is a String, return ! IsLooselyEqual(x, ! ToNumber(y)).
         if (x.IsNumber() && y.IsString())
         {
-            return MUST(IsLooselyEqual(x, MUST(y.ToNumber())));
+            return MUST(IsLooselyEqual(vm, x, MUST(y.ToNumber(vm))));
         }
 
         // 6. If x is a String and y is a Number, return ! IsLooselyEqual(! ToNumber(x), y).
         if (x.IsString() && y.IsNumber())
         {
-            return MUST(IsLooselyEqual(MUST(x.ToNumber()), y));
+            return MUST(IsLooselyEqual(vm, MUST(x.ToNumber(vm)), y));
         }
 
         // FIXME: 7. If x is a BigInt and y is a String, then
@@ -886,15 +893,15 @@ public abstract class Value
         // 9. If x is a Boolean, return !IsLooselyEqual(!ToNumber(x), y).
         if (x.IsBoolean())
         {
-            var xAsNumber = MUST(x.ToNumber());
-            return MUST(IsLooselyEqual(xAsNumber, y));
+            var xAsNumber = MUST(x.ToNumber(vm));
+            return MUST(IsLooselyEqual(vm, xAsNumber, y));
         }
 
         // 10. If y is a Boolean, return !IsLooselyEqual(x, !ToNumber(y)).
         if (y.IsBoolean())
         {
-            var yAsNumber = MUST(y.ToNumber());
-            return MUST(IsLooselyEqual(x, yAsNumber));
+            var yAsNumber = MUST(y.ToNumber(vm));
+            return MUST(IsLooselyEqual(vm, x, yAsNumber));
         }
 
         // FIXME: 11. If x is either a String, a Number, a BigInt, or a Symbol and y is an Object, return !IsLooselyEqual(x, ? ToPrimitive(y)).
@@ -928,10 +935,10 @@ public abstract class Value
     }
 
     // 7.1.20 ToLength ( argument ), https://tc39.es/ecma262/#sec-tolength
-    internal AbruptOr<double> ToLength()
+    internal AbruptOr<double> ToLength(VM vm)
     {
         // 1. Let len be ? ToIntegerOrInfinity(argument).
-        var len = ToIntegerOrInfinity();
+        var len = ToIntegerOrInfinity(vm);
 
         // 2. If len ≤ 0, return +0𝔽.
         if (len.Value <= 0) return 0;

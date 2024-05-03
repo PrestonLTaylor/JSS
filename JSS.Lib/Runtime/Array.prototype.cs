@@ -31,7 +31,7 @@ internal sealed class ArrayPrototype : Object
         if (O.IsAbruptCompletion()) return O.Completion;
 
         // 2. Let len be ? LengthOfArrayLike(O).
-        var lenResult = O.Value.LengthOfArrayLike();
+        var lenResult = O.Value.LengthOfArrayLike(vm);
         if (lenResult.IsAbruptCompletion()) return lenResult;
         var len = (int)lenResult.Value;
 
@@ -94,7 +94,7 @@ internal sealed class ArrayPrototype : Object
         var O = thisArgument.ToObject(vm);
 
         // 2. Let len be ? LengthOfArrayLike(O).
-        var lenResult = O.Value.LengthOfArrayLike();
+        var lenResult = O.Value.LengthOfArrayLike(vm);
         if (lenResult.IsAbruptCompletion()) return lenResult.Completion;
         var len = lenResult.Value;
 
