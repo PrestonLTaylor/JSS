@@ -431,7 +431,8 @@ public abstract class Value
 
         // FIXME: 2. If argument is either a Symbol or a BigInt, throw a TypeError exception.
 
-        // FIXME: 3. If argument is undefined, return NaN.
+        // 3. If argument is undefined, return NaN.
+        if (IsUndefined()) return double.NaN;
 
         // 4. If argument is either null or false, return FIXME: +0𝔽.
         if (IsNull()) return 0.0;
