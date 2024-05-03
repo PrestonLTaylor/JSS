@@ -602,6 +602,12 @@ public abstract class Value
             return new BooleanObject(vm.ObjectPrototype, AsBoolean());
         }
 
+        // Number, Return a new Number object whose [[NumberData]] internal slot is set to argument.
+        if (IsNumber())
+        {
+            return new NumberObject(vm.ObjectPrototype, AsNumber());
+        }
+
         // FIXME: Implement the rest of the conversions
 
         // Object, Return argument.
