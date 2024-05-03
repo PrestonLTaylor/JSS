@@ -596,6 +596,12 @@ public abstract class Value
             return ThrowTypeError(vm, RuntimeErrorType.UnableToConvertToObject, "null");
         }
 
+        // Boolean, Return a new Boolean object whose [[BooleanData]] internal slot is set to argument.
+        if (IsBoolean())
+        {
+            return new BooleanObject(vm.ObjectPrototype, AsBoolean());
+        }
+
         // FIXME: Implement the rest of the conversions
 
         // Object, Return argument.
