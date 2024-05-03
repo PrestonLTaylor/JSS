@@ -10,9 +10,6 @@ jobs:
   build:
     
     runs-on: windows-latest
-
-    # NOTE: We don't want failures for our Test262Runner to count towards CI failures.
-    continue-on-error: true
     
     steps:
     - uses: actions/checkout@v4
@@ -31,5 +28,10 @@ jobs:
     - name: Build our Test262Runner
       run: dotnet build --no-restore --configuration Release JSS.Test262Runner/JSS.Test262Runner.csproj
     - name: Start our Test262Runner
-    # NOTE: the "|| cd ." is a hack so the error code is always 0, see the NOTE on continue-on-error
+    # NOTE: We don't really want CI errors from our runner, so "|| cd ." forces the exit code to 0
       run: dotnet run --no-build --configuration Release --project JSS.Test262Runner/JSS.Test262Runner.csproj -- -q || cd .
+    - name: Upload test run artifact
+      uses: actions/upload-artifact@v4
+      with:
+          name: test-262-test-run
+          path: test-262-run-*.txt
