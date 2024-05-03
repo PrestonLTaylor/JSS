@@ -81,9 +81,10 @@ internal sealed class AbstractOperationTests
     public void ToNumber_ReturnsNormalCompletion_WithExpectedNumber_WhenProvidingValue(Value testCase, double expectedNumber)
     {
         // Arrange
+        var _ = new Realm(out VM vm);
 
         // Act
-        var asNumber = testCase.ToNumber();
+        var asNumber = testCase.ToNumber(vm);
 
         // Assert
         asNumber.IsAbruptCompletion().Should().BeFalse();
@@ -316,10 +317,11 @@ internal sealed class AbstractOperationTests
     public void IsLooselyEqual_ReturnsNormalCompletion_WithExpectedResult(Value lhs, Value rhs, bool expectedResult)
     {
         // Arrange
+        var _ = new Realm(out VM vm);
         var expectedValue = new Boolean(expectedResult);
 
         // Act
-        var completion = Value.IsLooselyEqual(lhs, rhs);
+        var completion = Value.IsLooselyEqual(vm, lhs, rhs);
 
         // Assert
         completion.IsNormalCompletion().Should().BeTrue();

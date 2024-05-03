@@ -11,13 +11,13 @@ internal sealed class Array : Object
     }
 
     // 10.4.2.1 [[DefineOwnProperty]] ( P, Desc ), https://tc39.es/ecma262/#sec-array-exotic-objects-defineownproperty-p-desc
-    internal override Completion DefineOwnProperty(string P, Property desc)
+    internal override Completion DefineOwnProperty(VM vm, string P, Property desc)
     {
         // 1. If P is "length", then
         if (P == "length")
         {
             // a. Return ? ArraySetLength(A, Desc).
-            return ArraySetLength(desc);
+            return ArraySetLength(vm, desc);
         }
         // 2. Else if P is an array index, then
         else if (IsArrayIndex(P))
@@ -37,7 +37,7 @@ internal sealed class Array : Object
 
             // f. Let index be ! ToUint32(P).
             var pString = new String(P);
-            var index = MUST(pString.ToUint32());
+            var index = MUST(pString.ToUint32(vm));
 
             // g. If index ≥ length and lengthDesc.[[Writable]] is false, return false.
             if (index >= length && !lengthDesc.Attributes.Writable) return false;
@@ -90,7 +90,7 @@ internal sealed class Array : Object
     }
 
     // 10.4.2.4 ArraySetLength ( A, Desc ), https://tc39.es/ecma262/#sec-arraysetlength
-    private Completion ArraySetLength(Property desc)
+    private Completion ArraySetLength(VM vm, Property desc)
     {
         // FIXME: 1. If Desc does not have a [[Value]] field, then
         // FIXME: a. Return ! OrdinaryDefineOwnProperty(A, "length", Desc).
@@ -99,7 +99,7 @@ internal sealed class Array : Object
         var newLenDesc = desc.Copy();
 
         // 3. Let newLen be ? ToUint32(Desc.[[Value]]).
-        var newLen = desc.Value.ToUint32();
+        var newLen = desc.Value.ToUint32(vm);
         if (newLen.IsAbruptCompletion()) return newLen.Completion;
 
         // FIXME: 4. Let numberLen be ? ToNumber(Desc.[[Value]]).

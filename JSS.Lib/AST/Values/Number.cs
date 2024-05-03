@@ -1,4 +1,6 @@
-﻿namespace JSS.Lib.AST.Values;
+﻿using JSS.Lib.Execution;
+
+namespace JSS.Lib.AST.Values;
 
 public sealed class Number : Value
 {
@@ -35,10 +37,10 @@ public sealed class Number : Value
     }
 
     // 6.1.6.1.2 Number::bitwiseNOT ( x ), https://tc39.es/ecma262/#sec-numeric-types-number-bitwiseNOT
-    static internal Number BitwiseNOT(Number x)
+    static internal Number BitwiseNOT(VM vm, Number x)
     {
         // 1. Let oldValue be ! ToInt32(x).
-        var oldValue = MUST(x.ToInt32());
+        var oldValue = MUST(x.ToInt32(vm));
 
         // 2. Return the result of applying bitwise complement to oldValue.
         // The mathematical value of the result is exactly representable as a 32-bit two's complement bit string.
@@ -46,7 +48,7 @@ public sealed class Number : Value
     }
 
     // 6.1.6.1.3 Number::exponentiate ( base, exponent ), https://tc39.es/ecma262/#sec-numeric-types-number-exponentiate
-    static internal Number Exponentiate(Number expBase, Number exponent)
+    static internal Number Exponentiate(VM _, Number expBase, Number exponent)
     {
         // FIXME: 1. If exponent is NaN, return NaN.
         // FIXME: 2. If exponent is either + 0𝔽 or - 0𝔽, return 1𝔽.
@@ -121,7 +123,7 @@ public sealed class Number : Value
     }
 
     // 6.1.6.1.4 Number::multiply ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-multiply
-    static internal Number Multiply(Number x, Number y)
+    static internal Number Multiply(VM _, Number x, Number y)
     {
         // FIXME: 1. If x is NaN or y is NaN, return NaN.
 
@@ -163,7 +165,7 @@ public sealed class Number : Value
     }
 
     // 6.1.6.1.5 Number::divide ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-divide
-    static internal Number Divide(Number x, Number y)
+    static internal Number Divide(VM _, Number x, Number y)
     {
         // FIXME: 1. If x is NaN or y is NaN, return NaN.
 
@@ -209,7 +211,7 @@ public sealed class Number : Value
     }
 
     // 6.1.6.1.6 Number::remainder ( n, d ), https://tc39.es/ecma262/#sec-numeric-types-number-remainder
-    static internal Number Remainder(Number n, Number d)
+    static internal Number Remainder(VM _, Number n, Number d)
     {
         // FIXME: 1. If n is NaN or d is NaN, return NaN.
 
@@ -231,7 +233,7 @@ public sealed class Number : Value
     }
 
     // 6.1.6.1.7 Number::add ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-add
-    static internal Number Add(Number x, Number y)
+    static internal Number Add(VM _, Number x, Number y)
     {
         // FIXME: 1. If x is NaN or y is NaN, return NaN.
 
@@ -255,19 +257,19 @@ public sealed class Number : Value
     }
 
     // 6.1.6.1.8 Number::subtract ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-subtract
-    static internal Number Subtract(Number x, Number y)
+    static internal Number Subtract(VM vm, Number x, Number y)
     {
-        return Add(x, UnaryMinus(y));
+        return Add(vm, x, UnaryMinus(y));
     }
 
     // 6.1.6.1.9 Number::leftShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-leftShift
-    static internal Number LeftShift(Number x, Number y)
+    static internal Number LeftShift(VM vm, Number x, Number y)
     {
         // 1. Let lnum be !ToInt32(x).
-        var lnum = MUST(x.ToInt32());
+        var lnum = MUST(x.ToInt32(vm));
 
         // 2. Let rnum be !ToUint32(y).
-        var rnum = MUST(y.ToUint32());
+        var rnum = MUST(y.ToUint32(vm));
 
         // 3. Let shiftCount be ℝ(rnum) modulo 32.
         var shiftCount = rnum % 32;
@@ -278,13 +280,13 @@ public sealed class Number : Value
     }
 
     // 6.1.6.1.10 Number::signedRightShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-signedRightShift
-    static internal Number SignedRightShift(Number x, Number y)
+    static internal Number SignedRightShift(VM vm, Number x, Number y)
     {
         // 1. Let lnum be !ToInt32(x).
-        var lnum = MUST(x.ToInt32());
+        var lnum = MUST(x.ToInt32(vm));
 
         // 2. Let rnum be !ToUint32(y).
-        var rnum = MUST(y.ToUint32());
+        var rnum = MUST(y.ToUint32(vm));
 
         // 3. Let shiftCount be ℝ(rnum) modulo 32.
         var shiftCount = rnum % 32;
@@ -295,13 +297,13 @@ public sealed class Number : Value
     }
 
     // 6.1.6.1.11 Number::unsignedRightShift ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-unsignedRightShift
-    static internal Number UnsignedRightShift(Number x, Number y)
+    static internal Number UnsignedRightShift(VM vm, Number x, Number y)
     {
         // 1. Let lnum be !ToUint32(x).
-        var lnum = MUST(x.ToUint32());
+        var lnum = MUST(x.ToUint32(vm));
 
         // 2. Let rnum be !ToUint32(y).
-        var rnum = MUST(y.ToUint32());
+        var rnum = MUST(y.ToUint32(vm));
 
         // 3. Let shiftCount be ℝ(rnum) modulo 32.
         var shiftCount = rnum % 32;
@@ -374,13 +376,13 @@ public sealed class Number : Value
     }
 
     // 6.1.6.1.16 NumberBitwiseOp ( op, x, y ), https://tc39.es/ecma262/#sec-numberbitwiseop
-    static internal Number NumberBitwiseOp(BitwiseOp op, Number x, Number y)
+    static internal Number NumberBitwiseOp(VM vm, BitwiseOp op, Number x, Number y)
     {
         // 1. Let lnum be !ToInt32(x).
-        var lnum = MUST(x.ToInt32());
+        var lnum = MUST(x.ToInt32(vm));
 
         // 2. Let rnum be !ToInt32(y).
-        var rnum = MUST(y.ToInt32());
+        var rnum = MUST(y.ToInt32(vm));
 
         // 3. Let lbits be the 32-bit two's complement bit string representing ℝ(lnum).
         // 4. Let rbits be the 32-bit two's complement bit string representing ℝ(rnum).
@@ -405,24 +407,24 @@ public sealed class Number : Value
     }
 
     // 6.1.6.1.17 Number::bitwiseAND ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-bitwiseAND
-    static internal Number BitwiseAND(Number x, Number y)
+    static internal Number BitwiseAND(VM vm, Number x, Number y)
     {
         // 1. Return NumberBitwiseOp(&, x, y).
-        return NumberBitwiseOp(BitwiseOp.AND, x, y);
+        return NumberBitwiseOp(vm, BitwiseOp.AND, x, y);
     }
 
     // 6.1.6.1.18 Number::bitwiseXOR ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-bitwiseXOR
-    static internal Number BitwiseXOR(Number x, Number y)
+    static internal Number BitwiseXOR(VM vm, Number x, Number y)
     {
         // 1. Return NumberBitwiseOp(^, x, y).
-        return NumberBitwiseOp(BitwiseOp.XOR, x, y);
+        return NumberBitwiseOp(vm, BitwiseOp.XOR, x, y);
     }
 
     // 6.1.6.1.19 Number::bitwiseOR ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-bitwiseOR
-    static internal Number BitwiseOR(Number x, Number y)
+    static internal Number BitwiseOR(VM vm, Number x, Number y)
     {
         // 1. Return NumberBitwiseOp(|, x, y).
-        return NumberBitwiseOp(BitwiseOp.OR, x, y);
+        return NumberBitwiseOp(vm, BitwiseOp.OR, x, y);
     }
 
     static internal Number NaN

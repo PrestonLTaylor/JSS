@@ -32,7 +32,7 @@ internal sealed class LooseInequalityExpression : IExpression
         if (rval.IsAbruptCompletion()) return rval;
 
         // 5. Let r be ? IsLooselyEqual(rval, lval).
-        var r = Value.IsLooselyEqual(rval.Value, lval.Value);
+        var r = Value.IsLooselyEqual(vm, rval.Value, lval.Value);
         if (r.IsAbruptCompletion()) return r;
 
         // 6. If r is true, return false. Otherwise, return true.

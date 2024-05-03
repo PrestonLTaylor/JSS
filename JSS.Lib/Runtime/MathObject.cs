@@ -22,14 +22,14 @@ internal sealed class MathObject : Object
     private Completion pow(VM vm, Value thisArgument, List argumentList)
     {
         // 1. Set base to ? ToNumber(base).
-        var powBase = argumentList[0].ToNumber();
+        var powBase = argumentList[0].ToNumber(vm);
         if (powBase.IsAbruptCompletion()) return powBase.Completion;
 
         // 2. Set exponent to ? ToNumber(exponent).
-        var exponent = argumentList[1].ToNumber();
+        var exponent = argumentList[1].ToNumber(vm);
         if (exponent.IsAbruptCompletion()) return exponent.Completion;
 
         // 3. Return Number::exponentiate(base, exponent).
-        return Number.Exponentiate(powBase.Value, exponent.Value);
+        return Number.Exponentiate(vm, powBase.Value, exponent.Value);
     }
 }

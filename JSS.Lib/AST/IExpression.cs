@@ -77,7 +77,7 @@ internal abstract class IExpression : INode
         // FIXME: d. If opText is >>>, return ? BigInt::unsignedRightShift(lnum, rnum).
 
         // 7. Let operation be the abstract operation associated with opText and Type(lnum) in the following table:
-        Func<Number, Number, Number> operation = op switch
+        Func<VM, Number, Number, Number> operation = op switch
         {
             BinaryOpType.Exponentiate => Number.Exponentiate,
             BinaryOpType.Multiply => Number.Multiply,
@@ -94,7 +94,7 @@ internal abstract class IExpression : INode
             _ => throw new InvalidOperationException(),
         };
 
-        var result = operation(lnum.Value.AsNumber(), rnum.Value.AsNumber());
+        var result = operation(vm, lnum.Value.AsNumber(), rnum.Value.AsNumber());
         return result;
     }
 
