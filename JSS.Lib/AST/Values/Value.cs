@@ -608,6 +608,12 @@ public abstract class Value
             return new NumberObject(vm.ObjectPrototype, AsNumber());
         }
 
+        // String, Return a new String object whose [[StringData]] internal slot is set to argument.
+        if (IsString())
+        {
+            return new StringObject(vm.ObjectPrototype, AsString());
+        }
+
         // FIXME: Implement the rest of the conversions
 
         // Object, Return argument.
