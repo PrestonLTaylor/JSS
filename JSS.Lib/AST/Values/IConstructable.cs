@@ -5,6 +5,7 @@ namespace JSS.Lib.AST.Values;
 enum ConstructorKind
 {
     BASE,
+    DERIVED
 }
 
 internal interface IConstructable
