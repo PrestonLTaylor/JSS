@@ -1666,6 +1666,130 @@ internal sealed class ParserTests
         objectLiteral.Should().NotBeNull();
     }
 
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsAssignment_WithObjectLiteralRSH_WithLiteralNameDefinition_WhenProvidingObjectLiteral_WithIdentifierDefinition(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"a = {{ a: {expression} }}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var assignmentExpression = expressionStatement!.Expression as BasicAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
+
+        var objectLiteral = assignmentExpression!.Rhs as ObjectLiteral;
+        objectLiteral.Should().NotBeNull();
+
+        objectLiteral!.PropertyDefinitions.Should().HaveCount(1);
+
+        var propertyDefinition = objectLiteral.PropertyDefinitions[0] as PropertyNameDefinition;
+        propertyDefinition!.PropertyName.Should().BeOfType<LiteralPropertyName>();
+        propertyDefinition!.Expression.Should().BeOfType(expectedExpressionType);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsAssignment_WithObjectLiteralRSH_WithLiteralNameDefinition_WhenProvidingObjectLiteral_WithStringLiteralDefinition(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"a = {{ \"a\": {expression} }}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var assignmentExpression = expressionStatement!.Expression as BasicAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
+
+        var objectLiteral = assignmentExpression!.Rhs as ObjectLiteral;
+        objectLiteral.Should().NotBeNull();
+
+        objectLiteral!.PropertyDefinitions.Should().HaveCount(1);
+
+        var propertyDefinition = objectLiteral.PropertyDefinitions[0] as PropertyNameDefinition;
+        propertyDefinition!.PropertyName.Should().BeOfType<LiteralPropertyName>();
+        propertyDefinition!.Expression.Should().BeOfType(expectedExpressionType);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsAssignment_WithObjectLiteralRSH_WithLiteralNameDefinition_WhenProvidingObjectLiteral_WithNumericLiteralDefinition(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"a = {{ 1: {expression} }}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var assignmentExpression = expressionStatement!.Expression as BasicAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
+
+        var objectLiteral = assignmentExpression!.Rhs as ObjectLiteral;
+        objectLiteral.Should().NotBeNull();
+
+        objectLiteral!.PropertyDefinitions.Should().HaveCount(1);
+
+        var propertyDefinition = objectLiteral.PropertyDefinitions[0] as PropertyNameDefinition;
+        propertyDefinition!.PropertyName.Should().BeOfType<LiteralPropertyName>();
+        propertyDefinition!.Expression.Should().BeOfType(expectedExpressionType);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsAssignment_WithObjectLiteralRSH_WithComputedNameDefinition_WhenProvidingObjectLiteral_WithExpression(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"a = {{ [{expression}]: {expression} }}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var assignmentExpression = expressionStatement!.Expression as BasicAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
+
+        var objectLiteral = assignmentExpression!.Rhs as ObjectLiteral;
+        objectLiteral.Should().NotBeNull();
+
+        objectLiteral!.PropertyDefinitions.Should().HaveCount(1);
+
+        var propertyDefinition = objectLiteral.PropertyDefinitions[0] as PropertyNameDefinition;
+        propertyDefinition!.PropertyName.Should().BeOfType<ComputedPropertyName>();
+        propertyDefinition!.Expression.Should().BeOfType(expectedExpressionType);
+    }
+
     // Tests for SyntaxErrors
     static private readonly Dictionary<string, string> unexpectedTokenTestCases = new()
     {
@@ -1761,6 +1885,9 @@ internal sealed class ParserTests
         {"a ?", "}"},
         {"a ? b", "}"},
         {"a ? b :", "}"},
+        { "let a = { a:", "}"},
+        { "let a = { \"a\":", "}"},
+        { "let a = { 1:", "}"},
     };
 
     [TestCaseSource(nameof(unexpectedTokenTestCases))]
@@ -1873,6 +2000,9 @@ internal sealed class ParserTests
         "a ?",
         "a ? b",
         "a ? b :",
+        "let a = { a:",
+        "let a = { \"a\":",
+        "let a = { 1:",
     };
 
     [TestCaseSource(nameof(unexpectedEofTestCases))]
