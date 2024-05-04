@@ -1424,11 +1424,91 @@ public sealed class Parser
 
     private ObjectLiteral ParseObjectLiteral()
     {
-        // FIXME: Implement parsing of PropertyDefinitionList
         _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
+
+        var propertyDefinitionList = ParsePropertyDefinitionList();
+
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
-        return new ObjectLiteral();
+        return new ObjectLiteral(propertyDefinitionList);
+    }
+
+    private List<INode> ParsePropertyDefinitionList()
+    {
+        List<INode> propertyDefinitionList = new();
+
+        while (TryParsePropertyName(out var propertyName))
+        {
+            _consumer.ConsumeTokenOfType(TokenType.Colon);
+
+            var initialValue = ParseAssignmentExpression();
+
+            var propertyNameDefinition = new PropertyNameDefinition(propertyName!, initialValue);
+
+            propertyDefinitionList.Add(propertyNameDefinition);
+
+            if (!_consumer.IsTokenOfType(TokenType.Comma))
+            {
+                break;
+            }
+
+            // NOTE: Trailing commas are allowed in property definition lists
+            _consumer.ConsumeTokenOfType(TokenType.Comma);
+        }
+
+        return propertyDefinitionList;
+    }
+
+    private bool TryParsePropertyName(out INode? propertyName)
+    {
+        if (IsComputedProperty())
+        {
+            propertyName = ParseComputedPropertyName();
+            return true;
+        }
+        else if (TryParseLiteralPropertyName(out propertyName))
+        {
+            return true;
+        }
+
+        propertyName = null;
+        return false;
+    }
+
+    private ComputedPropertyName ParseComputedPropertyName()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.OpenSquare);
+
+        var expression = ParseAssignmentExpression();
+
+        _consumer.ConsumeTokenOfType(TokenType.ClosedSquare);
+
+        return new ComputedPropertyName(expression);
+    }
+
+    private bool TryParseLiteralPropertyName(out INode? literalPropertyName)
+    {
+        INode literal;
+        if (IsIdentifier())
+        {
+            literal = ParseIdentifier();
+        }
+        else if (IsStringLiteral())
+        {
+            literal = ParseStringLiteral();
+        }
+        else if (IsNumericLiteral())
+        {
+            literal = ParseNumericLiteral();
+        }
+        else
+        {
+            literalPropertyName = null;
+            return false;
+        }
+
+        literalPropertyName = new LiteralPropertyName(literal);
+        return true;
     }
 
     // 14.2 Block, https://tc39.es/ecma262/#sec-block
