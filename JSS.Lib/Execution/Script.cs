@@ -11,7 +11,7 @@ public sealed class Script
     {
         VM = vm;
         Realm = vm.Realm;
-        _statementList = statementList;
+        Body = statementList;
     }
 
     // 16.1.6 ScriptEvaluation ( scriptRecord ), https://tc39.es/ecma262/#sec-runtime-semantics-scriptevaluation
@@ -50,7 +50,7 @@ public sealed class Script
         if (result.IsNormalCompletion())
         {
             // a. Set result to Completion(Evaluation of script).
-            result = _statementList.Evaluate(VM);
+            result = Body.Evaluate(VM);
         }
 
         // b. If result.[[Type]] is NORMAL and result.[[Value]] is EMPTY, then
@@ -248,36 +248,36 @@ public sealed class Script
     private List<string> LexicallyDeclaredNames()
     {
         // 1. Return TopLevelLexicallyDeclaredNames of StatementList.
-        return _statementList.TopLevelLexicallyDeclaredNames();
+        return Body.TopLevelLexicallyDeclaredNames();
     }
 
     // 8.2.5 Static Semantics: LexicallyScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-lexicallyscopeddeclarations
     private List<INode> LexicallyScopedDeclarations()
     {
         // 1. Return TopLevelLexicallyScopedDeclarations of StatementList.
-        return _statementList.TopLevelLexicallyScopedDeclarations();
+        return Body.TopLevelLexicallyScopedDeclarations();
     }
 
     // 8.2.6 Static Semantics: VarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-vardeclarednames
     private List<string> VarDeclaredNames()
     {
         // 1. Return TopLevelVarDeclaredNames of StatementList.
-        return _statementList.TopLevelVarDeclaredNames();
+        return Body.TopLevelVarDeclaredNames();
     }
 
     // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
     private List<INode> VarScopedDeclarations()
     {
         // 1. Return TopLevelVarScopedDeclarations of StatementList.
-        return _statementList.TopLevelVarScopedDeclarations();
+        return Body.TopLevelVarScopedDeclarations();
     }
 
     public VM VM { get; }
     public Realm Realm { get; }
     internal IReadOnlyList<INode> ScriptCode
     {
-        get { return _statementList.Statements; }
+        get { return Body.Statements; }
     }
-    private readonly StatementList _statementList;
+    internal StatementList Body { get; }
     // FIXME: LoadedModules
 }

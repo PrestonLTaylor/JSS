@@ -1,4 +1,5 @@
-﻿using JSS.Lib.Runtime;
+﻿using JSS.Lib.AST.Values;
+using JSS.Lib.Runtime;
 
 namespace JSS.Lib.Execution;
 
@@ -8,6 +9,12 @@ public sealed class VM
     internal VM(Realm realm)
     {
         Realm = realm;
+
+        HostEnsureCanCompileStrings = (calleeRealm, parameterStrings, bodyString, direct) =>
+        {
+            // The default implementation of HostEnsureCanCompileStrings is to return NormalCompletion(UNUSED).
+            return Empty.The;
+        };
     }
 
     internal void PushExecutionContext(ExecutionContext context)
@@ -26,6 +33,10 @@ public sealed class VM
     }
 
     public Realm Realm { get; }
+
+    // NOTE: Host defined functions are functions that have default behaviour but can be overriden by hosts that need to have different behaviours
+    // 19.2.1.2 HostEnsureCanCompileStrings ( calleeRealm, parameterStrings, bodyString, direct ), https://tc39.es/ecma262/#sec-hostensurecancompilestrings
+    internal Func<Realm, List<string>, string, bool, Completion> HostEnsureCanCompileStrings { get; set; }
 
     internal ObjectPrototype ObjectPrototype { get => Realm.ObjectPrototype; }
     internal ObjectConstructor ObjectConstructor { get => Realm.ObjectConstructor; }
