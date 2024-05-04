@@ -27,16 +27,16 @@ internal sealed class CallExpression : IExpression
         var func = lref.Value.GetValue(vm);
         if (func.IsAbruptCompletion()) return func;
 
-        // 6. If ref is a Reference Record, FIXME: (IsPropertyReference(ref) is false), and ref.[[ReferencedName]] is "eval", then
+        // 6. If ref is a Reference Record, IsPropertyReference(ref) is false, and ref.[[ReferencedName]] is "eval", then
         var asReference = lref.Value as Reference;
-        if (asReference is not null && asReference.ReferencedName == "eval")
+        if (asReference is not null && asReference.IsPropertyReference() && asReference.ReferencedName == "eval")
         {
-            // FIXME: a.If SameValue(func, % eval %) is true, then
-            // FIXME: i.Let argList be? ArgumentListEvaluation of arguments.
-            // FIXME: ii.If argList has no elements, return undefined.
-            // FIXME: iii.Let evalArg be the first element of argList.
-            // FIXME: iv.If the source text matched by this CallExpression is strict mode code, let strictCaller be true.Otherwise let strictCaller be false.
-            // FIXME: v.Return ? PerformEval(evalArg, strictCaller, true).
+            // FIXME: a. If SameValue(func, % eval %) is true, then
+            // FIXME: i. Let argList be ? ArgumentListEvaluation of arguments.
+            // FIXME: ii. If argList has no elements, return undefined.
+            // FIXME: iii. Let evalArg be the first element of argList.
+            // FIXME: iv. If the source text matched by this CallExpression is strict mode code, let strictCaller be true.Otherwise let strictCaller be false.
+            // FIXME: v. Return ? PerformEval(evalArg, strictCaller, true).
             throw new NotImplementedException();
         }
 

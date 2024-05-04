@@ -160,7 +160,7 @@ public sealed class Realm
         // 1. Let global be realmRec.[[GlobalObject]].
 
         // 2. For each property of the Global Object specified in clause 19, do
-        var globalProperties = CreateGlobalProperties();
+        var globalProperties = CreateGlobalProperties(vm);
         foreach (var property in globalProperties)
         {
             // a. Let name be the String value of the property name.
@@ -179,7 +179,7 @@ public sealed class Realm
         return GlobalObject;
     }
 
-    private Dictionary<string, Property> CreateGlobalProperties()
+    private Dictionary<string, Property> CreateGlobalProperties(VM vm)
     {
         Dictionary<string, Property> globalProperties = new();
 
@@ -189,6 +189,11 @@ public sealed class Realm
 
         // 19.1.4 undefined
         globalProperties.Add("undefined", new Property(Undefined.The, new(false, false, false)));
+
+        // 19.2 Function Properties of the Global Object
+        // 19.2.1 eval ( x ), https://tc39.es/ecma262/#sec-eval-x
+        var evalBuiltinFunction = BuiltinFunction.CreateBuiltinFunction(vm, Eval.eval);
+        globalProperties.Add("eval", new(evalBuiltinFunction, new(true, false, true)));
 
         // 19.3 Constructor Properties of the Global Object
         // 20.5.1 The Error Constructor, https://tc39.es/ecma262/#sec-error-constructor
