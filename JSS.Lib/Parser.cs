@@ -1433,9 +1433,9 @@ public sealed class Parser
         return new ObjectLiteral(propertyDefinitionList);
     }
 
-    private List<INode> ParsePropertyDefinitionList()
+    private List<IPropertyDefinition> ParsePropertyDefinitionList()
     {
-        List<INode> propertyDefinitionList = new();
+        List<IPropertyDefinition> propertyDefinitionList = new();
 
         while (TryParsePropertyName(out var propertyName))
         {
