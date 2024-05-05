@@ -868,7 +868,8 @@ internal sealed class ParserTests
         var switchStatement = rootNodes[0] as SwitchStatement;
         switchStatement.Should().NotBeNull();
         switchStatement!.SwitchExpression.Should().BeOfType(expectedExpressionType);
-        switchStatement.CaseBlocks.Should().BeEmpty();
+        switchStatement.FirstCaseBlocks.Should().BeEmpty();
+        switchStatement.SecondCaseBlocks.Should().BeEmpty();
         switchStatement.DefaultCase.Should().BeNull();
     }
 
@@ -890,7 +891,8 @@ internal sealed class ParserTests
         var switchStatement = rootNodes[0] as SwitchStatement;
         switchStatement.Should().NotBeNull();
         switchStatement!.SwitchExpression.Should().BeOfType(expectedExpressionType);
-        switchStatement.CaseBlocks.Should().BeEmpty();
+        switchStatement.FirstCaseBlocks.Should().BeEmpty();
+        switchStatement.SecondCaseBlocks.Should().BeEmpty();
         switchStatement.DefaultCase.Should().NotBeNull();
 
         var defaultCase = switchStatement.DefaultCase!.Value;
@@ -920,9 +922,9 @@ internal sealed class ParserTests
         switchStatement.Should().NotBeNull();
         switchStatement!.SwitchExpression.Should().BeOfType(expectedExpressionType);
         switchStatement.DefaultCase.Should().BeNull();
-        switchStatement.CaseBlocks.Should().HaveCount(1);
+        switchStatement.FirstCaseBlocks.Should().HaveCount(1);
 
-        var caseBlock = switchStatement.CaseBlocks[0];
+        var caseBlock = switchStatement.FirstCaseBlocks[0];
         caseBlock.CaseExpression.Should().BeOfType(expectedExpressionType);
         caseBlock.StatementList.Should().HaveCount(1);
 
@@ -948,7 +950,8 @@ internal sealed class ParserTests
         switchStatement.Should().NotBeNull();
         switchStatement!.SwitchExpression.Should().NotBeNull();
         switchStatement.DefaultCase.Should().NotBeNull();
-        switchStatement.CaseBlocks.Should().HaveCount(2);
+        switchStatement.FirstCaseBlocks.Should().HaveCount(1);
+        switchStatement.SecondCaseBlocks.Should().HaveCount(1);
     }
     
     // Tests for 14.14 The throw Statement, https://tc39.es/ecma262/#sec-throw-statement

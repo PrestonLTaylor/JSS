@@ -97,32 +97,37 @@ internal readonly struct DefaultBlock
 // 14.12 The switch Statement, https://tc39.es/ecma262/#sec-switch-statement
 internal sealed class SwitchStatement : INode
 {
-    public SwitchStatement(IExpression switchExpression, List<CaseBlock> caseBlocks, DefaultBlock? defaultCase)
+    public SwitchStatement(IExpression switchExpression, List<CaseBlock> firstCaseBlocks, List<CaseBlock> secondCaseBlocks, DefaultBlock? defaultCase)
     {
         SwitchExpression = switchExpression;
-        CaseBlocks = caseBlocks;
+        FirstCaseBlocks = firstCaseBlocks;
+        SecondCaseBlocks = secondCaseBlocks;
         DefaultCase = defaultCase;
     }
 
     // 8.2.4 Static Semantics: LexicallyDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-lexicallydeclarednames
     override public List<string> LexicallyDeclaredNames()
     {
-        // NOTE: We can't really do these steps precisely however, it will result in the same LexicallyDeclaredNames
-        // 1. If the first CaseClauses is present, let names1 be the LexicallyDeclaredNames of the first CaseClauses.
-        // 2. Else, let names1 be a new empty List.
-        // 3. Let names2 be LexicallyDeclaredNames of DefaultClause.
-        // 4. If the second CaseClauses is present, let names3 be the LexicallyDeclaredNames of the second CaseClauses.
-        // 5. Else, let names3 be a new empty List.
         List<string> names = new();
 
-        foreach (var caseBlock in CaseBlocks)
+        // 1. If the first CaseClauses is present, let names1 be the LexicallyDeclaredNames of the first CaseClauses.
+        // 2. Else, let names1 be a new empty List.
+        foreach (var caseBlock in FirstCaseBlocks)
         {
             names.AddRange(caseBlock.LexicallyDeclaredNames());
         }
 
+        // 3. Let names2 be LexicallyDeclaredNames of DefaultClause.
         if (DefaultCase is not null)
         {
             names.AddRange(DefaultCase.Value.LexicallyDeclaredNames());
+        }
+
+        // 4. If the second CaseClauses is present, let names3 be the LexicallyDeclaredNames of the second CaseClauses.
+        // 5. Else, let names3 be a new empty List.
+        foreach (var caseBlock in SecondCaseBlocks)
+        {
+            names.AddRange(caseBlock.LexicallyDeclaredNames());
         }
 
         // 6. Return the list-concatenation of names1, names2, and names3.
@@ -132,21 +137,26 @@ internal sealed class SwitchStatement : INode
     // 8.2.5 Static Semantics: LexicallyScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-lexicallyscopeddeclarations
     override public List<INode> LexicallyScopedDeclarations()
     {
-        // 1. If the first CaseClauses is present, let declarations1 be the LexicallyScopedDeclarations of the first CaseClauses.
-        // 2. Else, let declarations1 be a new empty List.
-        // 3. Let declarations2 be LexicallyScopedDeclarations of DefaultClause.
-        // 4. If the second CaseClauses is present, let declarations3 be the LexicallyScopedDeclarations of the second CaseClauses.
-        // 5. Else, let declarations3 be a new empty List.
         List<INode> declarations = new();
 
-        foreach (var caseBlock in CaseBlocks)
+        // 1. If the first CaseClauses is present, let declarations1 be the LexicallyScopedDeclarations of the first CaseClauses.
+        // 2. Else, let declarations1 be a new empty List.
+        foreach (var caseBlock in FirstCaseBlocks)
         {
             declarations.AddRange(caseBlock.LexicallyScopedDeclarations());
         }
 
+        // 3. Let declarations2 be LexicallyScopedDeclarations of DefaultClause.
         if (DefaultCase is not null)
         {
             declarations.AddRange(DefaultCase.Value.LexicallyScopedDeclarations());
+        }
+
+        // 4. If the second CaseClauses is present, let declarations3 be the LexicallyScopedDeclarations of the second CaseClauses.
+        // 5. Else, let declarations3 be a new empty List.
+        foreach (var caseBlock in SecondCaseBlocks)
+        {
+            declarations.AddRange(caseBlock.LexicallyScopedDeclarations());
         }
 
         // 6. Return the list-concatenation of declarations1, declarations2, and declarations3.
@@ -156,21 +166,26 @@ internal sealed class SwitchStatement : INode
     // 8.2.6 Static Semantics: VarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-vardeclarednames
     override public List<string> VarDeclaredNames()
     {
-        // 1. If the first CaseClauses is present, let names1 be the VarDeclaredNames of the first CaseClauses.
-        // 2. Else, let names1 be a new empty List.
-        // 3. Let names2 be VarDeclaredNames of DefaultClause.
-        // 4. If the second CaseClauses is present, let names3 be the VarDeclaredNames of the second CaseClauses.
-        // 5. Else, let names3 be a new empty List.
         List<string> names = new();
 
-        foreach (var caseBlock in CaseBlocks)
+        // 1. If the first CaseClauses is present, let names1 be the VarDeclaredNames of the first CaseClauses.
+        // 2. Else, let names1 be a new empty List.
+        foreach (var caseBlock in FirstCaseBlocks)
         {
             names.AddRange(caseBlock.VarDeclaredNames());
         }
 
+        // 3. Let names2 be VarDeclaredNames of DefaultClause.
         if (DefaultCase is not null)
         {
             names.AddRange(DefaultCase.Value.VarDeclaredNames());
+        }
+
+        // 4. If the second CaseClauses is present, let names3 be the VarDeclaredNames of the second CaseClauses.
+        // 5. Else, let names3 be a new empty List.
+        foreach (var caseBlock in SecondCaseBlocks)
+        {
+            names.AddRange(caseBlock.VarDeclaredNames());
         }
 
         // 6. Return the list-concatenation of names1, names2, and names3.
@@ -180,21 +195,26 @@ internal sealed class SwitchStatement : INode
     // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
     override public List<INode> VarScopedDeclarations()
     {
-        // 1. If the first CaseClauses is present, let declarations1 be the VarScopedDeclarations of the first CaseClauses.
-        // 2. Else, let declarations1 be a new empty List.
-        // 3. Let declarations2 be VarScopedDeclarations of DefaultClause.
-        // 4. If the second CaseClauses is present, let declarations3 be the VarScopedDeclarations of the second CaseClauses.
-        // 5. Else, let declarations3 be a new empty List.
         List<INode> declarations = new();
 
-        foreach (var caseBlock in CaseBlocks)
+        // 1. If the first CaseClauses is present, let declarations1 be the VarScopedDeclarations of the first CaseClauses.
+        // 2. Else, let declarations1 be a new empty List.
+        foreach (var caseBlock in FirstCaseBlocks)
         {
             declarations.AddRange(caseBlock.VarScopedDeclarations());
         }
 
+        // 3. Let declarations2 be VarScopedDeclarations of DefaultClause.
         if (DefaultCase is not null)
         {
             declarations.AddRange(DefaultCase.Value.VarScopedDeclarations());
+        }
+
+        // 4. If the second CaseClauses is present, let declarations3 be the VarScopedDeclarations of the second CaseClauses.
+        // 5. Else, let declarations3 be a new empty List.
+        foreach (var caseBlock in SecondCaseBlocks)
+        {
+            declarations.AddRange(caseBlock.VarScopedDeclarations());
         }
 
         // 6. Return the list-concatenation of declarations1, declarations2, and declarations3.
@@ -204,6 +224,7 @@ internal sealed class SwitchStatement : INode
     // FIXME: 14.12.4 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-switch-statement-runtime-semantics-evaluation
 
     public IExpression SwitchExpression { get; }
-    public IReadOnlyList<CaseBlock> CaseBlocks { get; }
+    public IReadOnlyList<CaseBlock> FirstCaseBlocks { get; }
     public DefaultBlock? DefaultCase { get; }
+    public IReadOnlyList<CaseBlock> SecondCaseBlocks { get; }
 }
