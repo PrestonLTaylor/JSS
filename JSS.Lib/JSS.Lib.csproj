@@ -3,6 +3,20 @@
     <TargetFramework>net7.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Title>JavaScript Sharp</Title>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <Authors>PrestonTaylor</Authors>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <RepositoryUrl>https://github.com/PrestonLTaylor/JSS/</RepositoryUrl>
+    <Copyright>2023-2024 - Preston Taylor</Copyright>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>JavaScript</PackageTags>
+    <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <Description>A JavaScript engine library for parsing and executing JavaScript scripts.</Description>
+    <Product>JSS</Product>
+    <PackageId>JSS</PackageId>
+    <PackageVersion>$([System.DateTime]::Now.ToString("yy.MM.dd.HHmmss"))</PackageVersion>
   </PropertyGroup>
 
 	<ItemGroup>
@@ -21,6 +35,17 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
             <_Parameter1>JSS.Benchmarks</_Parameter1>
         </AssemblyAttribute>
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="..\LICENSE">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
+      <None Include="..\README.md">
+        <Pack>True</Pack>
+        <PackagePath>\</PackagePath>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
