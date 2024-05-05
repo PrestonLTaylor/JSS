@@ -21,7 +21,7 @@ internal sealed class Block : INode
         var blockEnv = new DeclarativeEnvironment(oldEnv);
 
         // 3. Perform BlockDeclarationInstantiation(StatementList, blockEnv).
-        BlockDeclarationInstantiation(vm, blockEnv);
+        BlockDeclarationInstantiation(vm, Statements, blockEnv);
 
         // 4. Set the running execution context's LexicalEnvironment to blockEnv.
         currentExecutionContext.LexicalEnvironment = blockEnv;
@@ -37,10 +37,10 @@ internal sealed class Block : INode
     }
 
     // 14.2.3 BlockDeclarationInstantiation ( code, env ), https://tc39.es/ecma262/#sec-blockdeclarationinstantiation
-    private void BlockDeclarationInstantiation(VM vm, DeclarativeEnvironment env)
+    static public void BlockDeclarationInstantiation(VM vm, INode code, DeclarativeEnvironment env)
     {
         // 1. Let declarations be the LexicallyScopedDeclarations of code.
-        var declarations = Statements.LexicallyScopedDeclarations();
+        var declarations = code.LexicallyScopedDeclarations();
 
         // FIXME: 2. Let privateEnv be the running execution context's PrivateEnvironment.
 
