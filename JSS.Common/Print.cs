@@ -104,7 +104,8 @@ public sealed class Print
         if (!value.IsObject()) return "";
 
         var asObject = value.AsObject();
-        if (!asObject.DataProperties.TryGetValue("name", out var errorProperty)) return "";
+        var errorProperty = asObject.Get("name", asObject);
+        if (errorProperty.IsAbruptCompletion()) return "";
 
         var errorName = errorProperty.Value;
         if (!errorName.IsString()) return "";
