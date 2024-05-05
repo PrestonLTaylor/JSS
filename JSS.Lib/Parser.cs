@@ -1961,24 +1961,26 @@ public sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
         _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
 
-        List<CaseBlock> caseBlocks = new();
-        ParseCaseBlocks(caseBlocks);
+        var firstCaseBlocks = ParseCaseBlocks();
 
         var defaultBlock = ParseDefaultCase();
 
-        ParseCaseBlocks(caseBlocks);
+        var secondCaseBlocks = ParseCaseBlocks();
 
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
-        return new SwitchStatement(switchExpression, caseBlocks, defaultBlock);
+        return new SwitchStatement(switchExpression, firstCaseBlocks, secondCaseBlocks, defaultBlock);
     }
 
-    private void ParseCaseBlocks(List<CaseBlock> caseBlocks)
+    private List<CaseBlock> ParseCaseBlocks()
     {
+        List<CaseBlock> caseBlocks = new();
         while (IsCaseBlock())
         {
             caseBlocks.Add(ParseCaseBlock());
         }
+
+        return caseBlocks;
     }
 
     private bool IsCaseBlock()
