@@ -49,4 +49,9 @@ internal sealed class TokenConsumer
     {
         while (CanConsume() && _toConsume[_index].type == TokenType.LineTerminator) ++_index;
     }
+
+    public void Rewind(int index = 0)
+    {
+        _index = index;
+    }
 }
