@@ -19,13 +19,37 @@ public sealed class Parser
     public Script Parse(VM vm)
     {
         // 1. Let script be ParseText(sourceText, Script).
+        var isStrict = ParseDirectivePrologue();
         var script = ParseScript();
 
         // NOTE: This step is handled as C# exceptions
         // 2. If script is a List of errors, return script.
 
         // 3. Return Script Record { [[Realm]]: realm, [[ECMAScriptCode]]: script, [[LoadedModules]]: « », [[HostDefined]]: hostDefined }.
-        return new Script(vm, script);
+        return new Script(vm, script, isStrict);
+    }
+
+    // 11.2.1 Directive Prologues and the Use Strict Directive, https://tc39.es/ecma262/#directive-prologue
+    private bool ParseDirectivePrologue()
+    {
+        // NOTE/FIXME: We parse expression statements at the beginning of a script/function twice, if this becomes a perf issue, then we should not do parsing twice.
+        // A Directive Prologue is the longest sequence of ExpressionStatements occurring as the initial StatementListItems or ModuleItems of a FunctionBody,
+        // a ScriptBody, or a ModuleBody and where each ExpressionStatement in the sequence consists entirely of a StringLiteral token FIXME: followed by a semicolon.
+        var isStrict = false;
+        var beforeParseIndex = _consumer.Index;
+
+        // NOTE: We need to check if the current element is a string literal, as otherwise, we'll infinitely recurse back to this function
+        // if the current element is a function declaration/expression.
+        while (IsStringLiteral() && TryParseExpressionStatement(out var expression))
+        {
+            var expressionStatement = expression as ExpressionStatement;
+            if (expressionStatement!.Expression is not StringLiteral) break;
+            var stringLiteral = expressionStatement.Expression as StringLiteral;
+            if (stringLiteral!.Value == "use strict") isStrict = true;
+        }
+
+        _consumer.Rewind(beforeParseIndex);
+        return isStrict;
     }
 
     // 16.1 Scripts, https://tc39.es/ecma262/#sec-scripts
@@ -2174,11 +2198,12 @@ public sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
 
+        var isStrict = ParseDirectivePrologue();
         var body = ParseFunctionBody();
 
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
-        return new FunctionDeclaration(identifier.Name, parameters, body);
+        return new FunctionDeclaration(identifier.Name, parameters, body, isStrict);
     }
 
     private FunctionExpression ParseFunctionExpression()
@@ -2195,11 +2220,12 @@ public sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
 
+        var isStrict = ParseDirectivePrologue();
         var body = ParseFunctionBody();
 
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
-        return new FunctionExpression(identifier?.Name, parameters, body);
+        return new FunctionExpression(identifier?.Name, parameters, body, isStrict);
     }
 
     private StatementList ParseFunctionBody()
@@ -2312,11 +2338,12 @@ public sealed class Parser
 
         _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
 
+        var isStrict = ParseDirectivePrologue();
         var body = ParseFunctionBody();
 
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
-        return new MethodDeclaration(memberIdentifier, parameters, body, isPrivate);
+        return new MethodDeclaration(memberIdentifier, parameters, body, isPrivate, isStrict);
     }
 
     // NOTE: We need to return a null for functions that return a value
