@@ -32,6 +32,16 @@ public sealed class VM
         return _executionContextStack.Count > 0;
     }
 
+    internal void PushStrictness(bool isStrict)
+    {
+        _strictStack.Push(isStrict);
+    }
+
+    internal void PopStrictness()
+    {
+        _strictStack.Pop();
+    }
+
     public Realm Realm { get; }
 
     // NOTE: Host defined functions are functions that have default behaviour but can be overriden by hosts that need to have different behaviours
@@ -59,4 +69,13 @@ public sealed class VM
         }
     }
     private readonly Stack<ExecutionContext> _executionContextStack = new();
+
+    internal bool IsStrict
+    {
+        get
+        {
+            return _strictStack.Peek();
+        }
+    }
+    private readonly Stack<bool> _strictStack = new();
 }

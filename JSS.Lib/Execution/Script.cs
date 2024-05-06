@@ -40,6 +40,7 @@ public sealed class Script
 
         // 10. Push scriptContext onto the execution context stack; scriptContext is now the running execution context.
         VM.PushExecutionContext(scriptContext);
+        VM.PushStrictness(IsStrict);
 
         // 11. Let script be scriptRecord.[[ECMAScriptCode]].
 
@@ -62,6 +63,7 @@ public sealed class Script
 
         // 14. (FIXME: Suspend) scriptContext and remove it from the execution context stack.
         VM.PopExecutionContext();
+        VM.PopStrictness();
 
         // 15. Assert: The execution context stack is not empty.
         Assert(VM.HasExecutionContext(), "15. Assert: The execution context stack is not empty.");
