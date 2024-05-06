@@ -43,7 +43,7 @@ internal sealed class FunctionExpression : IExpression
         // FIXME: 4. Let sourceText be the source text matched by FunctionExpression.
 
         // 5. Let closure be OrdinaryFunctionCreate(%Function.prototype%, sourceText, FormalParameters, FunctionBody, NON-LEXICAL-THIS, env, privateEnv).
-        var closure = FunctionObject.OrdinaryFunctionCreate(vm.FunctionPrototype, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, env!);
+        var closure = FunctionObject.OrdinaryFunctionCreate(vm.FunctionPrototype, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, env!, vm.IsStrict || IsStrict);
 
         // 6. Perform SetFunctionName(closure, name).
         closure.SetFunctionName(vm, name);
@@ -75,7 +75,7 @@ internal sealed class FunctionExpression : IExpression
         // FIXME: 7. Let sourceText be the source text matched by FunctionExpression.
 
         // 8. Let closure be OrdinaryFunctionCreate(%Function.prototype%, sourceText, FormalParameters, FunctionBody, NON-LEXICAL-THIS, funcEnv, privateEnv).
-        var closure = FunctionObject.OrdinaryFunctionCreate(vm.FunctionPrototype, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, funcEnv);
+        var closure = FunctionObject.OrdinaryFunctionCreate(vm.FunctionPrototype, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, funcEnv, vm.IsStrict || IsStrict);
 
         // 9. Perform SetFunctionName(closure, name).
         closure.SetFunctionName(vm, name);

@@ -52,6 +52,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
 
         // 7. Remove calleeContext from the execution context stack and restore callerContext as the running execution context.
         vm.PopExecutionContext();
+        vm.PopStrictness();
 
         // 8. If result.[[Type]] is RETURN, return result.[[Value]].
         if (result.IsReturnCompletion()) return result.Value;
@@ -91,6 +92,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
 
         // 12. Push calleeContext onto the execution context stack; calleeContext is now the running execution context.
         vm.PushExecutionContext(calleeContext);
+        vm.PushStrictness(Strict);
 
         // 13. NOTE: Any exception objects produced after this point are associated with calleeRealm.
         // 14. Return calleeContext.
@@ -251,7 +253,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
 
     // 10.2.3 OrdinaryFunctionCreate ( FIXME: functionPrototype, FIXME: sourceText, ParameterList, Body, thisMode, env, FIXME: privateEnv ), https://tc39.es/ecma262/#sec-ordinaryfunctioncreate
     static public FunctionObject OrdinaryFunctionCreate(Object functionPrototype, IReadOnlyList<Identifier> parameterList, StatementList body, LexicalThisMode thisMode,
-        Environment env)
+        Environment env, bool isStrict)
     {
         // 1. Let internalSlotsList be the internal slots listed in Table 30.
 
@@ -268,8 +270,9 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         // 6. Set F.[[ECMAScriptCode]] to Body.
         f.ECMAScriptCode = body;
 
-        // FIXME: 7. If the source text matched by Body is strict mode code, let Strict be true; else let Strict be false.
-        // FIXME: 8. Set F.[[Strict]] to Strict.
+        // 7. If the source text matched by Body is strict mode code, let Strict be true; else let Strict be false.
+        // 8. Set F.[[Strict]] to Strict.
+        f.Strict = isStrict;
 
         // 9. If thisMode is LEXICAL-THIS, set F.[[ThisMode]] to LEXICAL.
         if (thisMode == LexicalThisMode.LEXICAL_THIS)
@@ -704,4 +707,5 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
     public Environment Environment { get; private set; }
     public ThisMode ThisMode { get; private set; }
     public ConstructorKind ConstructorKind { get; private set; }
+    public bool Strict { get; private set; }
 }
