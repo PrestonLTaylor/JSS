@@ -8,11 +8,12 @@ namespace JSS.Lib.AST;
 internal sealed class FunctionDeclaration : Declaration
 {
     // FIXME: Early errors for parameters having the same name, https://tc39.es/ecma262/#sec-function-definitions-static-semantics-early-errors
-    public FunctionDeclaration(string identifier, List<Identifier> parameters, StatementList body)
+    public FunctionDeclaration(string identifier, List<Identifier> parameters, StatementList body, bool isStrict)
     {
         Identifier = identifier;
         Parameters = parameters;
         Body = body;
+        IsStrict = isStrict;
     }
 
     // 8.2.1 Static Semantics: BoundNames, https://tc39.es/ecma262/#sec-static-semantics-boundnames
@@ -54,4 +55,5 @@ internal sealed class FunctionDeclaration : Declaration
     public string Identifier { get; }
     public IReadOnlyList<Identifier> Parameters { get; }
     public StatementList Body { get; }
+    public bool IsStrict { get; }
 }

@@ -1,17 +1,17 @@
 ﻿using JSS.Lib.AST.Values;
 using JSS.Lib.AST;
-using System.Diagnostics;
 
 namespace JSS.Lib.Execution;
 
 // 16.1.4 Script Records, https://tc39.es/ecma262/#sec-script-records 
 public sealed class Script
 {
-    internal Script(VM vm, StatementList statementList)
+    internal Script(VM vm, StatementList statementList, bool isStrict)
     {
         VM = vm;
         Realm = vm.Realm;
         Body = statementList;
+        IsStrict = isStrict;
     }
 
     // 16.1.6 ScriptEvaluation ( scriptRecord ), https://tc39.es/ecma262/#sec-runtime-semantics-scriptevaluation
@@ -279,5 +279,6 @@ public sealed class Script
         get { return Body.Statements; }
     }
     internal StatementList Body { get; }
+    internal bool IsStrict { get; }
     // FIXME: LoadedModules
 }

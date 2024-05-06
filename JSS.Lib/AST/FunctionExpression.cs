@@ -7,11 +7,12 @@ namespace JSS.Lib.AST;
 // 15.2 Function Definitions, https://tc39.es/ecma262/#sec-function-definitions
 internal sealed class FunctionExpression : IExpression
 {
-    public FunctionExpression(string? identifier, List<Identifier> parameters, StatementList body)
+    public FunctionExpression(string? identifier, List<Identifier> parameters, StatementList body, bool isStrict)
     {
         Identifier = identifier;
         Parameters = parameters;
         Body = body;
+        IsStrict = isStrict;
     }
 
     // 15.2.6 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-function-definitions-runtime-semantics-evaluation
@@ -92,4 +93,5 @@ internal sealed class FunctionExpression : IExpression
     public string? Identifier { get; }
     public IReadOnlyList<Identifier> Parameters { get; }
     public StatementList Body { get; }
+    public bool IsStrict { get; }
 }

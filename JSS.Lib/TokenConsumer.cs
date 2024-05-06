@@ -4,25 +4,25 @@
 internal sealed class TokenConsumer
 {
     private readonly List<Token> _toConsume;
-    private int _index = 0;
+    public int Index { get; private set; } = 0;
 
     public TokenConsumer(List<Token> tokens)
     {
         _toConsume = tokens;
     }
 
-    public bool CanConsume(int offset = 0) => _index + offset < _toConsume.Count;
+    public bool CanConsume(int offset = 0) => Index + offset < _toConsume.Count;
 
     public Token Consume()
     {
         IgnoreLineTerminators();
-        return _toConsume[_index++];
+        return _toConsume[Index++];
     }
 
     public Token Peek(int offset = 0)
     {
         IgnoreLineTerminators();
-        return _toConsume[_index + offset];
+        return _toConsume[Index + offset];
     }
 
     public bool IsTokenOfType(TokenType type)
@@ -42,16 +42,16 @@ internal sealed class TokenConsumer
     public bool IsLineTerminator()
     {
         if (!CanConsume()) return false;
-        return _toConsume[_index].type == TokenType.LineTerminator;
+        return _toConsume[Index].type == TokenType.LineTerminator;
     }
 
     public void IgnoreLineTerminators()
     {
-        while (CanConsume() && _toConsume[_index].type == TokenType.LineTerminator) ++_index;
+        while (CanConsume() && _toConsume[Index].type == TokenType.LineTerminator) ++Index;
     }
 
     public void Rewind(int index = 0)
     {
-        _index = index;
+        Index = index;
     }
 }

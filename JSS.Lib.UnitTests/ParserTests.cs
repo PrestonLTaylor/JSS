@@ -7,6 +7,165 @@ namespace JSS.Lib.UnitTests;
 
 internal sealed class ParserTests
 {
+    // Tests for 11.2.2 Strict Mode Code, https://tc39.es/ecma262/#sec-strict-mode-code
+    static private readonly List<string> useStrictDirectives = new()
+    {
+        "\"use strict\"",
+        "'use strict'",
+    };
+
+    [Test]
+    public void Parse_ReturnsScript_ThatIsNotStrict_WhenNotProvidingAUseStrictDirective()
+    {
+        // Arrange
+        var parser = new Parser("");
+
+        // Act
+        var script = ParseScript(parser);
+
+        // Assert
+        script.IsStrict.Should().BeFalse();
+    }
+
+    [TestCaseSource(nameof(useStrictDirectives))]
+    public void Parse_ReturnsScript_ThatIsStrict_WhenProvidingAUseStrictDirective(string strictDirective)
+    {
+        // Arrange
+        var parser = new Parser(strictDirective);
+
+        // Act
+        var script = ParseScript(parser);
+
+        // Assert
+        script.IsStrict.Should().BeTrue();
+    }
+
+    [Test]
+    public void Parse_ReturnsFunctionDeclaration_ThatIsNotStrict_WhenNotProvidingAUseStrictDirective()
+    {
+        // Arrange
+        var parser = new Parser("function a() {}");
+
+        // Act
+        var script = ParseScript(parser);
+        var rootNodes = script.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var functionDeclaration = rootNodes[0] as FunctionDeclaration;
+        functionDeclaration.Should().NotBeNull();
+        functionDeclaration!.IsStrict.Should().BeFalse();
+    }
+
+    [TestCaseSource(nameof(useStrictDirectives))]
+    public void Parse_ReturnsFunctionDeclaration_ThatIsStrict_WhenProvidingAUseStrictDirective(string strictDirective)
+    {
+        // Arrange
+        var parser = new Parser($"function a() {{ {strictDirective} }}");
+
+        // Act
+        var script = ParseScript(parser);
+        var rootNodes = script.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var functionDeclaration = rootNodes[0] as FunctionDeclaration;
+        functionDeclaration.Should().NotBeNull();
+        functionDeclaration!.IsStrict.Should().BeTrue();
+    }
+
+    [Test]
+    public void Parse_ReturnsFunctionExpression_ThatIsNotStrict_WhenNotProvidingAUseStrictDirective()
+    {
+        // Arrange
+        var parser = new Parser("a = function() {}");
+
+        // Act
+        var script = ParseScript(parser);
+        var rootNodes = script.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var assignmentExpression = expressionStatement!.Expression as BasicAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
+
+        var functionExpression = assignmentExpression!.Rhs as FunctionExpression;
+        functionExpression.Should().NotBeNull();
+        functionExpression!.IsStrict.Should().BeFalse();
+    }
+
+    [TestCaseSource(nameof(useStrictDirectives))]
+    public void Parse_ReturnsFunctionExpression_ThatIsStrict_WhenProvidingAUseStrictDirective(string strictDirective)
+    {
+        // Arrange
+        var parser = new Parser($"a = function() {{ {strictDirective} }}");
+
+        // Act
+        var script = ParseScript(parser);
+        var rootNodes = script.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var assignmentExpression = expressionStatement!.Expression as BasicAssignmentExpression;
+        assignmentExpression.Should().NotBeNull();
+
+        var functionExpression = assignmentExpression!.Rhs as FunctionExpression;
+        functionExpression.Should().NotBeNull();
+        functionExpression!.IsStrict.Should().BeTrue();
+    }
+
+    [Test]
+    public void Parse_ReturnsClassMethod_ThatIsNotStrict_WhenNotProvidingAUseStrictDirective()
+    {
+        // Arrange
+        var parser = new Parser("class a { b() {} }");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var classDeclaration = rootNodes[0] as ClassDeclaration;
+        classDeclaration.Should().NotBeNull();
+        classDeclaration!.Methods.Should().HaveCount(1);
+
+        var method = classDeclaration.Methods[0];
+        method.IsStrict.Should().BeFalse();
+    }
+
+    [TestCaseSource(nameof(useStrictDirectives))]
+    public void Parse_ReturnsClassMethod_ThatIsStrict_WhenProvidingAUseStrictDirective(string strictDirective)
+    {
+        // Arrange
+        var parser = new Parser($"class a {{ b() {{ {strictDirective} }} }}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var classDeclaration = rootNodes[0] as ClassDeclaration;
+        classDeclaration.Should().NotBeNull();
+        classDeclaration!.Methods.Should().HaveCount(1);
+
+        var method = classDeclaration.Methods[0];
+        method.IsStrict.Should().BeTrue();
+    }
+
     static private readonly Dictionary<string, Type> expressionToExpectedTypeTestCases = new()
     {
         { "1 || 2", typeof(LogicalOrExpression) },
