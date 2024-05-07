@@ -709,6 +709,26 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         return names;
     }
 
+    // 10.4.4.6 CreateUnmappedArgumentsObject ( argumentsList ), https://tc39.es/ecma262/#sec-createunmappedargumentsobject
+    private Object CreateUnmappedArgumentsObject(VM vm, List argumentsList)
+    {
+        // FIXME: Other steps are ommited due to brevity, but need to be implemented
+
+        // 1. Let len be the number of elements in argumentsList.
+        var len = argumentsList.Count;
+
+        // 2. Let obj be OrdinaryObjectCreate(%Object.prototype%, FIXME: « [[ParameterMap]] »).
+        var obj = new Object(vm.ObjectPrototype);
+
+        // FIXME: 3. Set obj.[[ParameterMap]] to undefined.
+
+        // 4. Perform ! DefinePropertyOrThrow(obj, "length", PropertyDescriptor { [[Value]]: 𝔽(len), [[Writable]]: true, [[Enumerable]]: false, [[Configurable]]: true }).
+        MUST(DefinePropertyOrThrow(vm, obj, "length", new(len, new(true, false, true))));
+
+        // 9. Return obj.
+        return obj;
+    }
+
     // FIXME: Have a seperate arguments object class to support the all of the arguments functionality
     // 10.4.4.7 CreateMappedArgumentsObject ( func, formals, argumentsList, env ), https://tc39.es/ecma262/#sec-createmappedargumentsobject
     private Object CreateMappedArgumentsObject(VM vm, List argumentsList, Environment _)
