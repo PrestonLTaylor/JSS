@@ -141,11 +141,22 @@ internal sealed class Test262Runner
         try
         {
             testCaseMetadata = Test262Metadata.Create(testCase);
-            var testCaseVm = CreateTestCaseVM(testCaseMetadata);
-            var testCaseScript = ParseAsGlobalCode(testCaseVm, testCase);
-            var testCompletion = testCaseScript.ScriptEvaluation();
 
-            return CreateTestCaseResult(testPath, testCaseVm, testCaseMetadata, testCompletion);
+            TestResult? result = null;
+            if (ShouldRunInNonStrictMode(testCaseMetadata))
+            {
+                result = ExecuteTestCaseString(testCaseMetadata, testPath, testCase);
+                if (result.Type != TestResultType.SUCCESS) return result;
+            }
+            if (ShouldRunInStrictMode(testCaseMetadata))
+            {
+                // To run in strict mode, the test contents must be modified prior to execution a "use strict" directive must be inserted
+                // as the initial character sequence of the file, followed by a semicolon (;) and newline character (\n)
+                result = ExecuteTestCaseString(testCaseMetadata, testPath, "'use strict';\n" + testCase);
+            }
+
+            return result!;
+
         }
         catch (MetadataParsingFailureException ex)
         {
@@ -166,6 +177,44 @@ internal sealed class Test262Runner
         {
             return new(TestResultType.CRASH_FAILURE, testPath, ex.Message);
         }
+    }
+
+    /// <summary>
+    /// Determines if a test case should be ran in non-strict mode.
+    /// If a test case has the "raw" flag set or does not have the "onlyStrict" flag set then it should be ran in non-strict mode.
+    /// </summary>
+    /// <param name="metadata">The metadata associated with a test case.</param>
+    /// <returns><see cref="true"/> if the test case should be ran in non-strict mode, otherwise, <see cref="false"/>.</returns>
+    static private bool ShouldRunInNonStrictMode(Test262Metadata metadata)
+    {
+        return metadata.HasFlag("raw") || !metadata.HasFlag("onlyStrict");
+    }
+
+    /// <summary>
+    /// Determines if a test case should be ran in strict mode.
+    /// If a test case has does not have the "raw" or "noStrict" flag set then it should be ran in strict mode.
+    /// </summary>
+    /// <param name="metadata">The metadata associated with a test case.</param>
+    /// <returns><see cref="true"/> if the test case should be ran in strict mode, otherwise, <see cref="false"/>.</returns>
+    static private bool ShouldRunInStrictMode(Test262Metadata metadata)
+    {
+        return !metadata.HasFlag("raw") && !metadata.HasFlag("noStrict");
+    }
+
+    /// <summary>
+    /// Executes a test case string and reports the result of executing the provided test case.
+    /// </summary>
+    /// <param name="metadata">The metadata associated with the test case.</param>
+    /// <param name="testCase">The path of the test case.</param>
+    /// <param name="testCase">The test case string to execute.</param>
+    /// <returns>The result of executing the test case string.</returns>
+    private TestResult ExecuteTestCaseString(Test262Metadata metadata, string testPath, string testCase)
+    {
+        var testCaseVm = CreateTestCaseVM(metadata);
+        var testCaseScript = ParseAsGlobalCode(testCaseVm, testCase);
+        var testCompletion = testCaseScript.ScriptEvaluation();
+
+        return CreateTestCaseResult(testPath, testCaseVm, metadata, testCompletion);
     }
 
     /// <summary>
