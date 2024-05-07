@@ -13,6 +13,32 @@ internal sealed class ForInStatement : INode
         IterationStatement = iterationStatement;
     }
 
+    // 8.2.6 Static Semantics: VarDeclaredNames, https://tc39.es/ecma262/#sec-static-semantics-vardeclarednames
+    public override List<string> VarDeclaredNames()
+    {
+        // 1. Let names1 be the BoundNames of ForBinding.
+        var names = Identifier.BoundNames();
+
+        // 2. Let names2 be the VarDeclaredNames of Statement.
+        names.AddRange(IterationStatement.VarDeclaredNames());
+
+        // 3. Return the list-concatenation of names1 and names2.
+        return names;
+    }
+
+    // 8.2.7 Static Semantics: VarScopedDeclarations, https://tc39.es/ecma262/#sec-static-semantics-varscopeddeclarations
+    public override List<INode> VarScopedDeclarations()
+    {
+        // 1. Let declarations1 be « ForBinding ».
+        var declarations = new List<INode>() { Identifier };
+
+        // 2. Let declarations2 be VarScopedDeclarations of Statement.
+        declarations.AddRange(IterationStatement.VarScopedDeclarations());
+
+        // 3. Return the list-concatenation of declarations1 and declarations2.
+        return declarations;
+    }
+
     // 14.7.5.5 Runtime Semantics: ForInOfLoopEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-forinofloopevaluation
     public override Completion Evaluate(VM vm)
     {
