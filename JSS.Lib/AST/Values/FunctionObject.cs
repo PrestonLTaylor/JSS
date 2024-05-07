@@ -522,13 +522,20 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         List<string> parameterBindings;
         if (argumentsObjectNeeded)
         {
-            // FIXME: a. If strict is true or simpleParameterList is false, then
-            // FIXME: i. Let ao be CreateUnmappedArgumentsObject(argumentsList).
-            // FIXME: b. Else,
-
-            // i. NOTE: A mapped argument object is only provided for non - strict functions that don't have a rest parameter, any parameter default value initializers, or any destructured parameters.
-            // ii. Let ao be CreateMappedArgumentsObject(func, formals, argumentsList, env).
-            var ao = CreateMappedArgumentsObject(vm, argumentsList, env);
+            // a. If strict is true FIXME: or simpleParameterList is false, then
+            Object ao;
+            if (Strict)
+            {
+                // i. Let ao be CreateUnmappedArgumentsObject(argumentsList).
+                ao = CreateUnmappedArgumentsObject(vm, argumentsList);
+            }
+            // b. Else,
+            else
+            {
+                // i. NOTE: A mapped argument object is only provided for non - strict functions that don't have a rest parameter, any parameter default value initializers, or any destructured parameters.
+                // ii. Let ao be CreateMappedArgumentsObject(func, formals, argumentsList, env).
+                ao = CreateMappedArgumentsObject(vm, argumentsList, env);
+            }
 
             // c. If strict is true, then
             if (Strict)
