@@ -21,14 +21,14 @@ internal abstract class Environment : Value
     virtual public Value WithBaseObject() { throw new NotImplementedException(); }
     virtual public Completion GetThisBinding(VM vm) { throw new InvalidOperationException(); }
 
-    // 9.1.2.1 GetIdentifierReference( env, name, FIXME: strict ), https://tc39.es/ecma262/#sec-getidentifierreference
-    static public Completion GetIdentifierReference(Environment? env, string name)
+    // 9.1.2.1 GetIdentifierReference( env, name, strict ), https://tc39.es/ecma262/#sec-getidentifierreference
+    static public Completion GetIdentifierReference(Environment? env, string name, bool strict)
     {
         // 1. If env is null, then
         if (env is null)
         {
             // a. Return the Reference Record { [[Base]]: UNRESOLVABLE, [[ReferencedName]]: name, [[Strict]]: strict, [[ThisValue]]: EMPTY }.
-            return Reference.Unresolvable(name, Empty.The);
+            return Reference.Unresolvable(name, strict, Empty.The);
         }
 
         // 2. Let exists be ? env.HasBinding(name).
@@ -38,7 +38,7 @@ internal abstract class Environment : Value
         if (exists)
         {
             // a. Return the Reference Record { [[Base]]: env, [[ReferencedName]]: name, [[Strict]]: strict, [[ThisValue]]: EMPTY }.
-            return Reference.Resolvable(env, name, Empty.The);
+            return Reference.Resolvable(env, name, strict, Empty.The);
         }
         // 4. Else,
         else
@@ -46,8 +46,8 @@ internal abstract class Environment : Value
             // a. Let outer be env.[[OuterEnv]].
             var outer = env.OuterEnv;
 
-            // b. Return ? GetIdentifierReference(outer, name, FIXME: strict).
-            return GetIdentifierReference(outer, name);
+            // b. Return ? GetIdentifierReference(outer, name, strict).
+            return GetIdentifierReference(outer, name, strict);
         }
     }
 

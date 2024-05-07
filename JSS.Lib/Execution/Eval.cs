@@ -98,10 +98,8 @@ internal static class Eval
         // FIXME: h. If inClassFieldInitializer is true and ContainsArguments of body is true, throw a SyntaxError exception.
 
         // 12. If strictCaller is true, let strictEval be true.
-        bool strictEval = false;
-        if (strictCaller) strictEval = true;
-
-        // FIXME: 13. Else, let strictEval be ScriptIsStrict of script.
+        // 13. Else, let strictEval be ScriptIsStrict of script.
+        var strictEval = strictCaller || script.IsStrict;
 
         // 14. Let runningContext be the running execution context.
         var runningContext = (vm.CurrentExecutionContext as ScriptExecutionContext)!;
@@ -111,14 +109,14 @@ internal static class Eval
 
         // 16. If direct is true, then
         DeclarativeEnvironment lexEnv;
-        Environment? varEnv;
+        Environment varEnv;
         if (direct)
         {
             // a. Let lexEnv be NewDeclarativeEnvironment(runningContext's LexicalEnvironment).
             lexEnv = new DeclarativeEnvironment(runningContext.LexicalEnvironment);
 
             // b. Let varEnv be runningContext's VariableEnvironment.
-            varEnv = runningContext.VariableEnvironment;
+            varEnv = runningContext.VariableEnvironment!;
 
             // FIXME: c. Let privateEnv be runningContext's PrivateEnvironment.
         }
@@ -129,7 +127,7 @@ internal static class Eval
             lexEnv = new DeclarativeEnvironment(evalRealm.GlobalEnv);
 
             // b. Let varEnv be evalRealm.[[GlobalEnv]].
-            varEnv = evalRealm.GlobalEnv;
+            varEnv = evalRealm.GlobalEnv!;
 
             // FIXME: c. Let privateEnv be null.
         }
@@ -155,6 +153,7 @@ internal static class Eval
 
         // 27. Push evalContext onto the execution context stack; evalContext is now the running execution context.
         vm.PushExecutionContext(evalContext);
+        vm.PushStrictness(strictEval);
 
         // 28. Let result be Completion(EvalDeclarationInstantiation(body, varEnv, lexEnv, FIXME: privateEnv, strictEval)).
         var result = EvalDeclarationInstantiation(vm, body, varEnv, lexEnv, strictEval);
@@ -174,6 +173,7 @@ internal static class Eval
 
         // 31. FIXME (Suspend evalContext) and remove it from the execution context stack.
         vm.PopExecutionContext();
+        vm.PopStrictness();
 
         // FIXME: 32. Resume the context that is now on the top of the execution context stack as the running execution context.
 
@@ -426,6 +426,7 @@ internal static class Eval
 
                 // i. Perform ? varEnv.CreateGlobalVarBinding(vn, true).
                 var createResult = globalVarEnv!.CreateGlobalVarBinding(vm, vn, true);
+                if (createResult.IsAbruptCompletion()) return createResult;
             }
             // b. Else,
             else

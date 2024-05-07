@@ -142,9 +142,9 @@ public abstract class Value
             // b. Assert: base is an Environment Record.
             Assert(@base.IsEnvironment(), "b. Assert: base is an Environment Record.");
 
-            // c. Return ? base.GetBindingValue(V.[[ReferencedName]], FIXME: V.[[Strict]]) (see 9.1).
+            // c. Return ? base.GetBindingValue(V.[[ReferencedName]], V.[[Strict]]) (see 9.1).
             var environment = @base.AsEnvironment();
-            return environment.GetBindingValue(vm, asReference.ReferencedName, false);
+            return environment.GetBindingValue(vm, asReference.ReferencedName, asReference.Strict);
         }
     }
 
@@ -162,7 +162,8 @@ public abstract class Value
         // 2. If IsUnresolvableReference(V) is true, then
         if (reference.IsUnresolvableReference())
         {
-            // FIXME: a. If V.[[Strict]] is true, throw a ReferenceError exception.
+            // a. If V.[[Strict]] is true, throw a ReferenceError exception.
+            if (reference.Strict) return ThrowReferenceError(vm, RuntimeErrorType.FailedToSet, reference.ReferencedName);
 
             // b. Let globalObj be GetGlobalObject().
             var globalObj = Realm.GetGlobalObject(vm);
@@ -189,7 +190,9 @@ public abstract class Value
             var succeeded = obj.Set(vm, reference.ReferencedName, W, obj);
             if (succeeded.IsAbruptCompletion()) return succeeded;
 
-            // FIXME: d. If succeeded is false FIXME: (and V.[[Strict]] is true,) throw a TypeError exception.
+            // d. If succeeded is false and V.[[Strict]] is true, throw a TypeError exception.
+            if (!succeeded.Value.AsBoolean() && reference.Strict) return ThrowTypeError(vm, RuntimeErrorType.FailedToSet, reference.ReferencedName);
+
             // e. Return UNUSED.
             return Empty.The;
         }
@@ -202,9 +205,9 @@ public abstract class Value
             // b. Assert: base is an Environment Record.
             Assert(@base.IsEnvironment(), "b. Assert: base is an Environment Record.");
 
-            // c. Return ? base.SetMutableBinding(V.[[ReferencedName]], W, FIXME: V.[[Strict]]) (see 9.1).
+            // c. Return ? base.SetMutableBinding(V.[[ReferencedName]], W, V.[[Strict]]) (see 9.1).
             var environment = @base.AsEnvironment();
-            return environment.SetMutableBinding(vm, reference.ReferencedName, W, false);
+            return environment.SetMutableBinding(vm, reference.ReferencedName, W, reference.Strict);
         }
     }
 

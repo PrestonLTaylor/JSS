@@ -23,19 +23,18 @@ internal sealed class PropertyExpression : IExpression
         var baseValue = baseReference.Value.GetValue(vm);
         if (baseValue.IsAbruptCompletion()) return baseValue;
 
-        // FIXME: 3. If the source text matched by this MemberExpression is strict mode code, let strict be true; else let strict be false.
-
+        // 3. Let strict be IsStrict(this MemberExpression).
         // 4. Return EvaluatePropertyAccessWithIdentifierKey(baseValue, IdentifierName, strict).
-        return EvaluatePropertyAccessWithIdentifierKey(baseValue.Value);
+        return EvaluatePropertyAccessWithIdentifierKey(baseValue.Value, vm.IsStrict);
     }
 
-    // 13.3.4 EvaluatePropertyAccessWithIdentifierKey, https://tc39.es/ecma262/#sec-evaluate-property-access-with-identifier-key
-    private Reference EvaluatePropertyAccessWithIdentifierKey(Value baseValue)
+    // 13.3.4 EvaluatePropertyAccessWithIdentifierKey ( baseValue, identifierName, strict ), https://tc39.es/ecma262/#sec-evaluate-property-access-with-identifier-key
+    private Reference EvaluatePropertyAccessWithIdentifierKey(Value baseValue, bool strict)
     {
         // 1. Let propertyNameString be StringValue of identifierName.
 
         // 2. Return the Reference Record { [[Base]]: baseValue, [[ReferencedName]]: propertyNameString, [[Strict]]: strict, [[ThisValue]]: EMPTY }.
-        return Reference.Resolvable(baseValue, Rhs, Empty.The);
+        return Reference.Resolvable(baseValue, Rhs, strict, Empty.The);
     }
 
     public IExpression Lhs { get; }
