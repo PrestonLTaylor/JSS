@@ -50,11 +50,9 @@ internal sealed class ScriptExecutionContext : ExecutionContext
         // NOTE: This Assert is implicit
         // 2. Assert: env is an Environment Record.
 
-        // FIXME: 3. If the source text matched by the syntactic production that is being evaluated is contained in strict mode code,
-        // let strict be true; else let strict be false.
-
+        // 3. Let strict be IsStrict(the syntactic production that is being evaluated).
         // 4. Return ? GetIdentifierReference(env, name, strict).
-        return Environment.GetIdentifierReference(env, name);
+        return Environment.GetIdentifierReference(env, name, vm.IsStrict);
     }
 
     // 9.4.3 GetThisEnvironment ( ), https://tc39.es/ecma262/#sec-getthisenvironment

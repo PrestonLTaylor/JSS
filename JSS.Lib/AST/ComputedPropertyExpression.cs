@@ -23,14 +23,13 @@ internal sealed class ComputedPropertyExpression : IExpression
         var baseValue = baseReference.Value.GetValue(vm);
         if (baseValue.IsAbruptCompletion()) return baseValue;
 
-        // 3. If the source text matched by this MemberExpression is strict mode code, let strict be true; else let strict be false.
-
+        // 3. Let strict be IsStrict(this MemberExpression).
         // 4. Return ? EvaluatePropertyAccessWithExpressionKey(baseValue, Expression, strict).
-        return EvaluatePropertyAccessWithExpressionKey(vm, baseValue.Value);
+        return EvaluatePropertyAccessWithExpressionKey(vm, baseValue.Value, vm.IsStrict);
     }
 
     // 13.3.3 EvaluatePropertyAccessWithExpressionKey ( baseValue, expression, strict ), https://tc39.es/ecma262/#sec-evaluate-property-access-with-expression-key
-    private Completion EvaluatePropertyAccessWithExpressionKey(VM vm, Value baseValue)
+    private Completion EvaluatePropertyAccessWithExpressionKey(VM vm, Value baseValue, bool strict)
     {
         // 1. Let propertyNameReference be ? Evaluation of expression.
         var propertyNameReference = Rhs.Evaluate(vm);
@@ -46,7 +45,7 @@ internal sealed class ComputedPropertyExpression : IExpression
 
         // 4. Return the Reference Record { [[Base]]: baseValue, [[ReferencedName]]: propertyKey, [[Strict]]: strict, [[ThisValue]]: EMPTY }.
         var propertyString = propertyKey.Value.AsString();
-        return Reference.Resolvable(baseValue, propertyString.Value, Empty.The);
+        return Reference.Resolvable(baseValue, propertyString.Value, strict, Empty.The);
     }
 
     public IExpression Lhs { get; }

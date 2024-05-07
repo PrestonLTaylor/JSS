@@ -270,7 +270,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         // 6. Set F.[[ECMAScriptCode]] to Body.
         f.ECMAScriptCode = body;
 
-        // 7. If the source text matched by Body is strict mode code, let Strict be true; else let Strict be false.
+        // 7. Let Strict be IsStrict(Body).
         // 8. Set F.[[Strict]] to Strict.
         f.Strict = isStrict;
 
@@ -279,7 +279,11 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         {
             f.ThisMode = ThisMode.LEXICAL;
         }
-        // FIXME: 10. Else if Strict is true, set F.[[ThisMode]] to STRICT.
+        // 10. Else if Strict is true, set F.[[ThisMode]] to STRICT.
+        else if (isStrict)
+        {
+            f.ThisMode = ThisMode.STRICT;
+        }
         // 11. Else, set F.[[ThisMode]] to GLOBAL.
         else
         {
@@ -389,7 +393,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         var calleeContext = (vm.CurrentExecutionContext as ScriptExecutionContext)!;
 
         // 2. Let code be func.[[ECMAScriptCode]].
-        // FIXME: 3. Let strict be func.[[Strict]].
+        // 3. Let strict be func.[[Strict]].
         // 4. Let formals be func.[[FormalParameters]].
 
         // 5. Let parameterNames be the BoundNames of formals.
@@ -463,25 +467,33 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         // FIXME: a. If functionNames contains "arguments" or lexicalNames contains "arguments", then
         // FIXME: i. Set argumentsObjectNeeded to false.
 
-        // FIXME: 19. If strict is true or hasParameterExpressions is false, then
-        // FIXME: a. NOTE: Only a single Environment Record is needed for the parameters, since calls to eval in strict mode code cannot create new bindings
-        // which are visible outside of the eval.
-        // FIXME: b. Let env be the LexicalEnvironment of calleeContext.
-        // FIXME: 20. Else,
-        // a. NOTE: A separate Environment Record is needed to ensure that bindings created by direct eval calls in the formal parameter list are outside the
-        // environment where parameters are declared.
+        // 19. If strict is true or FIXME: hasParameterExpressions is false, then
+        Environment env;
+        if (Strict)
+        {
+            // a. NOTE: Only a single Environment Record is needed for the parameters, since calls to eval in strict mode code cannot create new bindings
+            // which are visible outside of the eval.
+            // b. Let env be the LexicalEnvironment of calleeContext.
+            env = calleeContext.LexicalEnvironment!;
+        }
+        // 20. Else,
+        else
+        {
+            // a. NOTE: A separate Environment Record is needed to ensure that bindings created by direct eval calls in the formal parameter list are outside the
+            // environment where parameters are declared.
 
-        // b. Let calleeEnv be the LexicalEnvironment of calleeContext.
-        var calleeEnv = calleeContext.LexicalEnvironment;
+            // b. Let calleeEnv be the LexicalEnvironment of calleeContext.
+            var calleeEnv = calleeContext.LexicalEnvironment;
 
-        // c. Let env be NewDeclarativeEnvironment(calleeEnv).
-        var env = new DeclarativeEnvironment(calleeEnv);
+            // c. Let env be NewDeclarativeEnvironment(calleeEnv).
+            env = new DeclarativeEnvironment(calleeEnv);
 
-        // d. Assert: The VariableEnvironment of calleeContext is calleeEnv.
-        Assert(calleeContext.VariableEnvironment == calleeEnv, "d. Assert: The VariableEnvironment of calleeContext is calleeEnv.");
+            // d. Assert: The VariableEnvironment of calleeContext is calleeEnv.
+            Assert(calleeContext.VariableEnvironment == calleeEnv, "d. Assert: The VariableEnvironment of calleeContext is calleeEnv.");
 
-        // e. Set the LexicalEnvironment of calleeContext to env.
-        calleeContext.LexicalEnvironment = env;
+            // e. Set the LexicalEnvironment of calleeContext to env.
+            calleeContext.LexicalEnvironment = env;
+        }
 
         // 21. For each String paramName of parameterNames, do
         foreach (var paramName in parameterNames)
@@ -518,13 +530,20 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
             // ii. Let ao be CreateMappedArgumentsObject(func, formals, argumentsList, env).
             var ao = CreateMappedArgumentsObject(vm, argumentsList, env);
 
-            // FIXME: c. If strict is true, then
-            // FIXME: i. Perform ! env.CreateImmutableBinding("arguments", false).
-            // FIXME: ii. NOTE: In strict mode code early errors prevent attempting to assign to this binding, so its mutability is not observable.
+            // c. If strict is true, then
+            if (Strict)
+            {
+                // i. Perform ! env.CreateImmutableBinding("arguments", false).
+                MUST(env.CreateImmutableBinding(vm, "arguments", false));
 
+                // ii. NOTE: In strict mode code early errors prevent attempting to assign to this binding, so its mutability is not observable.
+            }
             // d. Else,
-            // i. Perform ! env.CreateMutableBinding("arguments", false).
-            MUST(env.CreateMutableBinding(vm, "arguments", false));
+            else
+            {
+                // i. Perform ! env.CreateMutableBinding("arguments", false).
+                MUST(env.CreateMutableBinding(vm, "arguments", false));
+            }
 
             // e. Perform ! env.InitializeBinding("arguments", ao).
             MUST(env.InitializeBinding(vm, "arguments", ao));
@@ -608,14 +627,23 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
 
         // 29. NOTE: Annex B.3.2.1 adds additional steps at this point.
 
-        // FIXME: 30. If strict is false, then
-        // FIXME: a. Let lexEnv be NewDeclarativeEnvironment(varEnv).
-        // FIXME: b. NOTE: Non-strict functions use a separate Environment Record for top-level lexical declarations so that a direct eval can determine whether
-        // any var scoped declarations introduced by the eval code conflict with pre-existing top-level lexically scoped declarations. This is not needed for
-        // strict functions because a strict direct eval always places all declarations into a new Environment Record.
-        // FIXME: 31. Else,
-        // a. Let lexEnv be varEnv.
-        var lexEnv = varEnv;
+        // 30. If strict is false, then
+        DeclarativeEnvironment lexEnv;
+        if (!Strict)
+        {
+            // a. Let lexEnv be NewDeclarativeEnvironment(varEnv).
+            lexEnv = new DeclarativeEnvironment(varEnv);
+
+            // b. NOTE: Non-strict functions use a separate Environment Record for top-level lexical declarations so that a direct eval can determine whether
+            // any var scoped declarations introduced by the eval code conflict with pre-existing top-level lexically scoped declarations. This is not needed for
+            // strict functions because a strict direct eval always places all declarations into a new Environment Record.
+        }
+        // 31. Else,
+        else
+        {
+            // a. Let lexEnv be varEnv.
+            lexEnv = varEnv;
+        }
 
         // 32. Set the LexicalEnvironment of calleeContext to lexEnv.
         calleeContext.LexicalEnvironment = lexEnv;

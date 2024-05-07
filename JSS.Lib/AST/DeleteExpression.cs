@@ -25,7 +25,8 @@ internal sealed class DeleteExpression : IExpression
         // 3. If IsUnresolvableReference(ref) is true, then
         if (asReference.IsUnresolvableReference())
         {
-            // FIXME: a. Assert: ref.[[Strict]] is false.
+            // a. Assert: ref.[[Strict]] is false.
+            Assert(!asReference.Strict, "a. Assert: ref.[[Strict]] is false.");
 
             // b. Return true.
             return true;
@@ -46,7 +47,8 @@ internal sealed class DeleteExpression : IExpression
             var deleteStatus = baseObj.Value.Delete(asReference.ReferencedName);
             if (deleteStatus.IsAbruptCompletion()) return deleteStatus.Completion;
 
-            // FIXME: e. If deleteStatus is false and ref.[[Strict]] is true, throw a TypeError exception.
+            // e. If deleteStatus is false and ref.[[Strict]] is true, throw a TypeError exception.
+            if (!deleteStatus.Value && asReference.Strict) return ThrowTypeError(vm, RuntimeErrorType.FailedToDelete, asReference.ReferencedName);
 
             // f. Return deleteStatus.
             return deleteStatus.Value;

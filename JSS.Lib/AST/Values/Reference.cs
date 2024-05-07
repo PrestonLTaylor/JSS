@@ -6,24 +6,25 @@ namespace JSS.Lib.AST.Values;
 // 6.2.5 The Reference Record Specification Type, https://tc39.es/ecma262/#sec-reference-record-specification-type
 public class Reference : Value
 {
-    internal Reference(Value? @base, string referencedName, Value thisValue)
+    internal Reference(Value? @base, string referencedName, bool strict, Value thisValue)
     {
         Base = @base;
         ReferencedName = referencedName;
+        Strict = strict;
         ThisValue = thisValue;
     }
 
     override public bool IsReference() { return true; }
     override public ValueType Type() { throw new InvalidOperationException("Tried to get the Type of Reference"); }
 
-    static public Reference Unresolvable(string referencedName, Value thisValue)
+    static public Reference Unresolvable(string referencedName, bool strict, Value thisValue)
     {
-        return new Reference(null, referencedName, thisValue);
+        return new Reference(null, referencedName, strict, thisValue);
     }
 
-    static public Reference Resolvable(Value @base, string referencedName, Value thisValue)
+    static public Reference Resolvable(Value @base, string referencedName, bool strict, Value thisValue)
     {
-        return new Reference(@base, referencedName, thisValue);
+        return new Reference(@base, referencedName, strict, thisValue);
     }
 
     // 6.2.5.1 IsPropertyReference ( V ), https://tc39.es/ecma262/#sec-ispropertyreference
@@ -69,13 +70,12 @@ public class Reference : Value
         return environment.InitializeBinding(vm, ReferencedName, W);
     }
 
-    // FIXME: Base can have a ECMAScript language value
     public Value? Base { get; }
 
     // FIXME: ReferencedName can be a Symbol or Private Name
     public string ReferencedName { get; }
 
-    // FIXME: [[Strict]]
+    public bool Strict { get; }
 
     public Value ThisValue { get; }
 }
