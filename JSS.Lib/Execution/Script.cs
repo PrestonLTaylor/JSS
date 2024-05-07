@@ -123,7 +123,7 @@ public sealed class Script
             var d = varDeclarations[i];
 
             // a. If d is not either a VariableDeclaration, a ForBinding, or a BindingIdentifier, then
-            if (d is not VarDeclaration or Identifier)
+            if (d is not VarDeclaration and not Identifier)
             {
                 // i. Assert: d is either a FunctionDeclaration, FIXME: a GeneratorDeclaration, an AsyncFunctionDeclaration, or an AsyncGeneratorDeclaration.
                 Assert(d is FunctionDeclaration, "i. Assert: d is either a FunctionDeclaration, FIXME: a GeneratorDeclaration, an AsyncFunctionDeclaration, or an AsyncGeneratorDeclaration.");
