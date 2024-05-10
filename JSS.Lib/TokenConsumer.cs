@@ -39,10 +39,10 @@ internal sealed class TokenConsumer
         return Consume();
     }
 
-    public bool IsLineTerminator()
+    public bool IsLineTerminator(int offset = 0)
     {
         if (!CanConsume()) return false;
-        return _toConsume[Index].type == TokenType.LineTerminator;
+        return _toConsume[Index + offset].type == TokenType.LineTerminator;
     }
 
     public void IgnoreLineTerminators()
