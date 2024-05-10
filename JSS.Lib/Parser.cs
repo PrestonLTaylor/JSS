@@ -916,7 +916,8 @@ public sealed class Parser
         }
 
         // NOTE: If there is no postfix update operator, then the inner expression is the fully parsed expression
-        if (!IsUpdateOperator())
+        // NOTE: No line terminators are allowed between an expression and postfix update operator
+        if (_consumer.CanConsume(-1) && _consumer.IsLineTerminator(-1) || !IsUpdateOperator())
         {
             parsedExpression = innerExpression;
             return true;
@@ -1938,7 +1939,7 @@ public sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.Continue);
 
         Identifier? label = null;
-        if (IsIdentifier())
+        if (!_consumer.IsLineTerminator() && IsIdentifier())
         {
             label = ParseIdentifier();
         }
@@ -1959,7 +1960,7 @@ public sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.Break);
 
         Identifier? label = null;
-        if (IsIdentifier())
+        if (!_consumer.IsLineTerminator() && IsIdentifier())
         {
             label = ParseIdentifier();
         }
@@ -1979,9 +1980,8 @@ public sealed class Parser
     {
         _consumer.ConsumeTokenOfType(TokenType.Return);
 
-        if (_consumer.IsLineTerminator()) return new ReturnStatement(null);
-
-        TryParseExpression(out IExpression? returnExpression);
+        IExpression? returnExpression = null;
+        if (!_consumer.IsLineTerminator()) TryParseExpression(out returnExpression);
 
         ParseSemicolon();
 

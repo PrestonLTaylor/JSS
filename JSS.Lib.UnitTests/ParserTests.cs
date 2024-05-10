@@ -232,6 +232,70 @@ internal sealed class ParserTests
         AssertThatSyntaxErrorMatchesExpected(parser, expectedException);
     }
 
+    [Test]
+    public void Parse_PreventsLineTerminator_BetweenExpressionAndPostfixUpdateOperator()
+    {
+        // Arrange
+        var parser = new Parser("a\n++");
+        var expectedException = ErrorHelper.CreateSyntaxError(ErrorType.UnexpectedEOF);
+
+        // Act
+
+        // Assert
+        AssertThatSyntaxErrorMatchesExpected(parser, expectedException);
+    }
+
+    [Test]
+    public void Parse_PreventsLineTerminator_BetweenContinueAndLabelIdentifier()
+    {
+        // Arrange
+        var parser = new Parser("continue\nidentifier");
+
+        // Act
+        var script = ParseScript(parser);
+
+        // Assert
+        script.ScriptCode.Should().HaveCount(2);
+
+        var continueStatement = script.ScriptCode[0] as ContinueStatement;
+        continueStatement.Should().NotBeNull();
+        continueStatement!.Label.Should().BeNull();
+    }
+
+    [Test]
+    public void Parse_PreventsLineTerminator_BetweenBreakAndLabelIdentifier()
+    {
+        // Arrange
+        var parser = new Parser("break\nidentifier");
+
+        // Act
+        var script = ParseScript(parser);
+
+        // Assert
+        script.ScriptCode.Should().HaveCount(2);
+
+        var breakStatement = script.ScriptCode[0] as BreakStatement;
+        breakStatement.Should().NotBeNull();
+        breakStatement!.Label.Should().BeNull();
+    }
+
+    [Test]
+    public void Parse_PreventsLineTerminator_BetweenReturnAndExpression()
+    {
+        // Arrange
+        var parser = new Parser("return\nidentifier");
+
+        // Act
+        var script = ParseScript(parser);
+
+        // Assert
+        script.ScriptCode.Should().HaveCount(2);
+
+        var returnStatement = script.ScriptCode[0] as ReturnStatement;
+        returnStatement.Should().NotBeNull();
+        returnStatement!.ReturnExpression.Should().BeNull();
+    }
+
     static private readonly Dictionary<string, Type> expressionToExpectedTypeTestCases = new()
     {
         { "1 || 2", typeof(LogicalOrExpression) },
