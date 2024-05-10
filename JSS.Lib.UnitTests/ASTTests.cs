@@ -214,7 +214,7 @@ internal sealed class ASTTests
         CreateNormalDoWhileTestCase("false", "1", 1),
         CreateNormalDoWhileTestCase("false", EscapeString("a"), "a"),
         CreateNormalDoWhileTestCase("false", "continue", Undefined.The),
-        CreateBreakDoWhileTestCase("false", "break", Undefined.The),
+        CreateNormalDoWhileTestCase("false", "break", Undefined.The),
         CreateReturnDoWhileTestCase("false", "return null", Null.The),
         CreateThrowDoWhileTestCase("false", "throw null", Null.The),
 
@@ -556,11 +556,6 @@ internal sealed class ASTTests
     static private object[] CreateNormalDoWhileTestCase(string expression, string statement, Value expected)
     {
         return new object[] { $"do {{ {statement} }} while ({expression})", Completion.NormalCompletion(expected) };
-    }
-
-    static private object[] CreateBreakDoWhileTestCase(string expression, string statement, Value expected)
-    {
-        return new object[] { $"do {{ {statement} }} while ({expression})", Completion.BreakCompletion(expected, "") };
     }
 
     static private object[] CreateReturnDoWhileTestCase(string expression, string statement, Value expected)
