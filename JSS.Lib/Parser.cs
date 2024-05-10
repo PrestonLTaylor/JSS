@@ -1558,7 +1558,7 @@ public sealed class Parser
         return _consumer.IsTokenOfType(TokenType.Let);
     }
 
-    private LetDeclaration ParseLetDeclaration()
+    private LetDeclaration ParseLetDeclaration(bool automaticSemicolonCandiate = true)
     {
         _consumer.ConsumeTokenOfType(TokenType.Let);
 
@@ -1573,6 +1573,8 @@ public sealed class Parser
             initializer = ParseInitializer();
         }
 
+        ParseSemicolon(automaticSemicolonCandiate);
+
         return new LetDeclaration(identifierToken.data, initializer);
     }
 
@@ -1581,7 +1583,7 @@ public sealed class Parser
         return _consumer.IsTokenOfType(TokenType.Const);
     }
 
-    private ConstDeclaration ParseConstDeclaration()
+    private ConstDeclaration ParseConstDeclaration(bool automaticSemicolonCandiate = true)
     {
         _consumer.ConsumeTokenOfType(TokenType.Const);
 
@@ -1593,6 +1595,8 @@ public sealed class Parser
 
         var initializer = ParseInitializer();
 
+        ParseSemicolon(automaticSemicolonCandiate);
+
         return new ConstDeclaration(identifierToken.data, initializer);
     }
 
@@ -1602,11 +1606,13 @@ public sealed class Parser
         return _consumer.IsTokenOfType(TokenType.Var);
     }
 
-    private VarStatement ParseVarStatement()
+    private VarStatement ParseVarStatement(bool automaticSemicolonCandiate = true)
     {
         _consumer.ConsumeTokenOfType(TokenType.Var);
 
         var declarationList = ParseVarDeclarationList();
+
+        ParseSemicolon(automaticSemicolonCandiate);
 
         return new VarStatement(declarationList);
     }
@@ -1691,6 +1697,8 @@ public sealed class Parser
             return false;
         }
 
+        ParseSemicolon();
+
         parsedExpressionStatement = new ExpressionStatement(expression!);
         return true;
     }
@@ -1758,6 +1766,10 @@ public sealed class Parser
 
         IExpression? whileExpression;
         if (!TryParseWhileExpression(out whileExpression)) ThrowUnexpectedTokenSyntaxError<DoWhileStatement>();
+
+        // NOTE: We only have to consume a semi-colon if there is one present due to automatic semi-colon insterion
+        // The previous token is ) and the inserted semicolon would then be parsed as the terminating semicolon of a do-while statement (14.7.2).
+        if (_consumer.IsTokenOfType(TokenType.SemiColon)) _consumer.ConsumeTokenOfType(TokenType.SemiColon);
 
         return new DoWhileStatement(whileExpression!, iterationStatement);
     }
@@ -1844,8 +1856,6 @@ public sealed class Parser
     {
         TryParseForInitializationExpression(out INode? initializationExpression);
 
-        _consumer.ConsumeTokenOfType(TokenType.SemiColon);
-
         TryParseExpression(out IExpression? testExpression);
 
         _consumer.ConsumeTokenOfType(TokenType.SemiColon);
@@ -1863,25 +1873,27 @@ public sealed class Parser
     {
         if (TryParseExpression(out IExpression? expression))
         {
+            _consumer.ConsumeTokenOfType(TokenType.SemiColon);
             initializationExpression = expression;
             return true;
         }
         if (IsVarStatement())
         {
-            initializationExpression = ParseVarStatement();
+            initializationExpression = ParseVarStatement(false);
             return true;
         }
         if (IsLetDeclaration())
         {
-            initializationExpression = ParseLetDeclaration();
+            initializationExpression = ParseLetDeclaration(false);
             return true;
         }
         if (IsConstDeclaration())
         {
-            initializationExpression = ParseConstDeclaration();
+            initializationExpression = ParseConstDeclaration(false);
             return true;
         }
 
+        _consumer.ConsumeTokenOfType(TokenType.SemiColon);
         initializationExpression = null;
         return false;
     }
@@ -1931,6 +1943,8 @@ public sealed class Parser
             label = ParseIdentifier();
         }
 
+        ParseSemicolon();
+
         return new ContinueStatement(label);
     }
 
@@ -1950,6 +1964,8 @@ public sealed class Parser
             label = ParseIdentifier();
         }
 
+        ParseSemicolon();
+
         return new BreakStatement(label);
     }
 
@@ -1966,6 +1982,9 @@ public sealed class Parser
         if (_consumer.IsLineTerminator()) return new ReturnStatement(null);
 
         TryParseExpression(out IExpression? returnExpression);
+
+        ParseSemicolon();
+
         return new ReturnStatement(returnExpression);
     }
 
@@ -2068,6 +2087,8 @@ public sealed class Parser
 
         var throwExpression = ParseExpression();
 
+        ParseSemicolon();
+
         return new ThrowStatement(throwExpression);
     }
 
@@ -2152,6 +2173,9 @@ public sealed class Parser
     private DebuggerStatement ParseDebuggerStatement()
     {
         _consumer.ConsumeTokenOfType(TokenType.Debugger);
+
+        ParseSemicolon();
+
         return new DebuggerStatement();
     }
 
@@ -2344,6 +2368,37 @@ public sealed class Parser
         _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
 
         return new MethodDeclaration(memberIdentifier, parameters, body, isPrivate, isStrict);
+    }
+
+    // 12.10.1 Rules of Automatic Semicolon Insertion, https://tc39.es/ecma262/multipage/ecmascript-language-lexical-grammar.html#sec-rules-of-automatic-semicolon-insertion
+    private void ParseSemicolon(bool automaticSemicolonCandiate = true)
+    {
+        if (_consumer.IsTokenOfType(TokenType.SemiColon))
+        {
+            _consumer.ConsumeTokenOfType(TokenType.SemiColon);
+            return;
+        }
+
+        if (automaticSemicolonCandiate && IsValidAutomaticSemicolonInsertionOffender())
+        {
+            return;
+        }
+
+        ThrowUnexpectedTokenSyntaxError<SyntaxErrorException>();
+    }
+
+    private bool IsValidAutomaticSemicolonInsertionOffender()
+    {
+        // The end of the input stream of tokens is encountered.
+        if (!_consumer.CanConsume()) return true;
+
+        // The offending token is }.
+        if (_consumer.Peek().type == TokenType.ClosedBrace) return true;
+
+        // The offending token is separated from the previous token by at least one LineTerminator.
+        // FIXME: Because of always ignoring line terminators, we have to do this hack,
+        // we should probably just store the line count of tokens and use that to determine line terminators instead.
+        return _consumer.IsLineTerminator() || (_consumer.CanConsume(-1) && _consumer.IsLineTerminator(-1));
     }
 
     // NOTE: We need to return a null for functions that return a value

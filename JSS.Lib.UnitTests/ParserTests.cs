@@ -166,6 +166,72 @@ internal sealed class ParserTests
         method.IsStrict.Should().BeTrue();
     }
 
+    // Tests for 12.10 Automatic Semicolon Insertion, https://tc39.es/ecma262/multipage/ecmascript-language-lexical-grammar.html#sec-automatic-semicolon-insertion
+    [Test]
+    public void Parse_HandlesSemiColonInsertion_WhenThereIsEndOfFile_WithNoSemicolon()
+    {
+        // Arrange
+        var parser = new Parser("let a");
+
+        // Act
+        var script = ParseScript(parser);
+
+        // Assert
+        script.ScriptCode.Should().HaveCount(1);
+    }
+
+    [Test]
+    public void Parse_HandlesSemiColonInsertion_WhenThereIsLineTerminatorSeperatingStatements()
+    {
+        // Arrange
+        var parser = new Parser("let a\nlet b;");
+
+        // Act
+        var script = ParseScript(parser);
+
+        // Assert
+        script.ScriptCode.Should().HaveCount(2);
+    }
+
+    [Test]
+    public void Parse_HandlesSemiColonInsertion_WhenThereIsClosedBraceSeperatingStatements()
+    {
+        // Arrange
+        var parser = new Parser("{ let a } let b;");
+
+        // Act
+        var script = ParseScript(parser);
+
+        // Assert
+        script.ScriptCode.Should().HaveCount(2);
+    }
+
+    [Test]
+    public void Parse_HandlesSemiColonInsertion_WhenThereIsNoSemiColonAfterDoWhileTerminator()
+    {
+        // Arrange
+        var parser = new Parser("do { } while (false) let a;");
+
+        // Act
+        var script = ParseScript(parser);
+
+        // Assert
+        script.ScriptCode.Should().HaveCount(2);
+    }
+
+    [Test]
+    public void Parse_DoesntInsertSemiColon_WhenThereIsNoSemiColonBetweenTwoStatementsOnTheSameLine()
+    {
+        // Arrange
+        var parser = new Parser("let a let b");
+        var expectedException = ErrorHelper.CreateSyntaxError(ErrorType.UnexpectedToken, "let");
+
+        // Act
+
+        // Assert
+        AssertThatSyntaxErrorMatchesExpected(parser, expectedException);
+    }
+
     static private readonly Dictionary<string, Type> expressionToExpectedTypeTestCases = new()
     {
         { "1 || 2", typeof(LogicalOrExpression) },
@@ -1096,7 +1162,7 @@ internal sealed class ParserTests
     public void Parse_ReturnsSwitchStatement_WithADefaultAndCaseBlocks_WhenProvidingSwitch_WithADefaultAndCaseBlocks()
     {
         // Arrange
-        var parser = new Parser("switch (1) { case 2: 3 default: 4 case 5: 6 }");
+        var parser = new Parser("switch (1) { case 2: 3; default: 4; case 5: 6; }");
 
         // Act
         var parsedProgram = ParseScript(parser);
