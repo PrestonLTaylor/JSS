@@ -4,7 +4,7 @@ using JSS.Lib.Execution;
 namespace JSS.Lib.AST;
 
 // 14.7.4 The for Statement, https://tc39.es/ecma262/#sec-for-statement
-internal sealed class ForStatement : INode
+internal sealed class ForStatement : INode, IBreakableStatement
 {
     public ForStatement(INode? initializationExpression, INode? testExpression, INode? incrementExpression, INode iterationStatement)
     {
@@ -49,7 +49,7 @@ internal sealed class ForStatement : INode
     }
 
     // 14.7.4.2 Runtime Semantics: ForLoopEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-forloopevaluation
-    override public Completion Evaluate(VM vm)
+    public Completion EvaluateFromLabelled(VM vm)
     {
         if (InitializationExpression is VarStatement)
         {
@@ -161,6 +161,15 @@ internal sealed class ForStatement : INode
                 if (incValue.IsAbruptCompletion()) return incValue;
             }
         }
+    }
+
+    // 14.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-statement-semantics-runtime-semantics-evaluation
+    public override Completion Evaluate(VM vm)
+    {
+        // FIXME: 1. Let newLabelSet be a new empty List.
+
+        // 2. Return ? LabelledEvaluation of this BreakableStatement with argument newLabelSet.
+        return LabelledStatement.LabelledBreakableEvaluation(vm, this);
     }
 
     public INode? InitializationExpression { get; }

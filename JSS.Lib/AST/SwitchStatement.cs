@@ -98,7 +98,7 @@ internal readonly struct DefaultBlock
 }
 
 // 14.12 The switch Statement, https://tc39.es/ecma262/#sec-switch-statement
-internal sealed class SwitchStatement : INode
+internal sealed class SwitchStatement : INode, IBreakableStatement
 {
     public SwitchStatement(IExpression switchExpression, List<CaseBlock> firstCaseBlocks, List<CaseBlock> secondCaseBlocks, DefaultBlock? defaultCase)
     {
@@ -439,7 +439,7 @@ internal sealed class SwitchStatement : INode
     }
 
     // 14.12.4 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-switch-statement-runtime-semantics-evaluation
-    public override Completion Evaluate(VM vm)
+    public Completion EvaluateFromLabelled(VM vm)
     {
         // 1. Let exprRef be ? Evaluation of Expression.
         var exprRef = SwitchExpression.Evaluate(vm);
@@ -468,12 +468,17 @@ internal sealed class SwitchStatement : INode
         // 8. Set the running execution context's LexicalEnvironment to oldEnv.
         executionContext.LexicalEnvironment = oldEnv;
 
-        // FIXME/NOTE: I'm not sure if this is a spec bug (probably not) or a bug in our code, but if we have a break completion here,
-        // we'll return the break completion and not execute anything else.
-        if (R.IsBreakCompletion()) R = R.Value;
-
         // 9. Return R.
         return R;
+    }
+
+    // 14.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-statement-semantics-runtime-semantics-evaluation
+    public override Completion Evaluate(VM vm)
+    {
+        // FIXME: 1. Let newLabelSet be a new empty List.
+
+        // 2. Return ? LabelledEvaluation of this BreakableStatement with argument newLabelSet.
+        return LabelledStatement.LabelledBreakableEvaluation(vm, this);
     }
 
     public IExpression SwitchExpression { get; }

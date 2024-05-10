@@ -4,7 +4,7 @@ using JSS.Lib.Execution;
 namespace JSS.Lib.AST;
 
 // 14.7.5 The for-in, for-of, and for-await-of Statements, https://tc39.es/ecma262/#sec-for-in-and-for-of-statements
-internal sealed class ForInStatement : INode
+internal sealed class ForInStatement : INode, IBreakableStatement
 {
     public ForInStatement(Identifier identifier, IExpression expression, INode iterationStatement)
     {
@@ -40,7 +40,7 @@ internal sealed class ForInStatement : INode
     }
 
     // 14.7.5.5 Runtime Semantics: ForInOfLoopEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-forinofloopevaluation
-    public override Completion Evaluate(VM vm)
+    public Completion EvaluateFromLabelled(VM vm)
     {
         // 1. Let keyResult be ? ForIn/OfHeadEvaluation(« », Expression, ENUMERATE).
         var keyResult = ForInOfHeadEvaluation(vm);
@@ -152,6 +152,15 @@ internal sealed class ForInStatement : INode
         // 1. Return ? UpdateEmpty(result, V).
         result!.UpdateEmpty(V);
         return result;
+    }
+
+    // 14.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-statement-semantics-runtime-semantics-evaluation
+    public override Completion Evaluate(VM vm)
+    {
+        // FIXME: 1. Let newLabelSet be a new empty List.
+
+        // 2. Return ? LabelledEvaluation of this BreakableStatement with argument newLabelSet.
+        return LabelledStatement.LabelledBreakableEvaluation(vm, this);
     }
 
     public Identifier Identifier { get; }
