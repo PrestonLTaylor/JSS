@@ -99,8 +99,8 @@ public sealed class Completion
         Value = value;
     }
 
-    // 14.7.1.1 LoopContinues ( completion, FIXME: labelSet ), https://tc39.es/ecma262/#sec-loopcontinues
-    public Boolean LoopContinues()
+    // 14.7.1.1 LoopContinues ( completion, labelSet ), https://tc39.es/ecma262/#sec-loopcontinues
+    public Boolean LoopContinues(List<string> labelSet)
     {
         // 1. If completion.[[Type]] is NORMAL, return true.
         if (IsNormalCompletion())
@@ -120,7 +120,9 @@ public sealed class Completion
             return true;
         }
 
-        // FIXME: 4. If labelSet contains completion.[[Target]], return true.
+        // FIXME: Maybe use a hash-set and do some benchmarks
+        // 4. If labelSet contains completion.[[Target]], return true.
+        if (labelSet.Contains(Target)) return true;
 
         // 5. Return false.
         return false;

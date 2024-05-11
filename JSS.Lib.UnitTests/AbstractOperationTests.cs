@@ -331,21 +331,24 @@ internal sealed class AbstractOperationTests
 
     static private readonly object[] loopContinuesValueToExpectedResultTestCases =
     {
-        new object[] { Completion.NormalCompletion(Undefined.The), true },
-        new object[] { Completion.ThrowCompletion(Undefined.The), false },
-        new object[] { Completion.BreakCompletion(Undefined.The, ""), false },
-        new object[] { Completion.ReturnCompletion(Undefined.The), false },
-        new object[] { Completion.ContinueCompletion(Undefined.The, ""), true },
+        new object[] { Completion.NormalCompletion(Undefined.The), true, new List<string>() },
+        new object[] { Completion.ThrowCompletion(Undefined.The), false, new List<string>() },
+        new object[] { Completion.BreakCompletion(Undefined.The, ""), false, new List<string>() },
+        new object[] { Completion.ReturnCompletion(Undefined.The), false, new List<string>() },
+        new object[] { Completion.ContinueCompletion(Undefined.The, ""), true, new List<string>() },
+        new object[] { Completion.BreakCompletion(Undefined.The, "label"), false, new List<string>() { "label" } },
+        new object[] { Completion.ContinueCompletion(Undefined.The, "label"), true, new List<string>() { "label" } },
+        new object[] { Completion.ContinueCompletion(Undefined.The, "label"), false, new List<string>() { "notlabel" } },
     };
 
     [TestCaseSource(nameof(loopContinuesValueToExpectedResultTestCases))]
-    public void LoopContinues_ReturnsExpectedBoolean_WhenProvidedCompletion(Completion completion, bool expectedResult)
+    public void LoopContinues_ReturnsExpectedBoolean_WhenProvidedCompletion(Completion completion, bool expectedResult, List<string> labelSet)
     {
         // Arrange
         var expectedValue = new Boolean(expectedResult);
 
         // Act
-        var result = completion.LoopContinues();
+        var result = completion.LoopContinues(labelSet);
 
         // Assert
         result.Should().Be(expectedValue);

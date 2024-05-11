@@ -4,7 +4,7 @@ using JSS.Lib.Execution;
 namespace JSS.Lib.AST;
 
 // 14.7.5 The for-in, for-of, and for-await-of Statements, https://tc39.es/ecma262/#sec-for-in-and-for-of-statements
-internal sealed class ForInStatement : INode, IBreakableStatement
+internal sealed class ForInStatement : IIterationStatement
 {
     public ForInStatement(Identifier identifier, IExpression expression, INode iterationStatement)
     {
@@ -40,14 +40,14 @@ internal sealed class ForInStatement : INode, IBreakableStatement
     }
 
     // 14.7.5.5 Runtime Semantics: ForInOfLoopEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-forinofloopevaluation
-    public Completion EvaluateFromLabelled(VM vm)
+    public override Completion LoopEvaluation(VM vm, List<string> labelSet)
     {
         // 1. Let keyResult be ? ForIn/OfHeadEvaluation(« », Expression, ENUMERATE).
         var keyResult = ForInOfHeadEvaluation(vm);
         if (keyResult.IsAbruptCompletion()) return keyResult.Completion;
 
         // 2. Return ? ForIn/OfBodyEvaluation(LeftHandSideExpression, Statement, keyResult, ENUMERATE, ASSIGNMENT, labelSet).
-        return ForInOfBodyEvaluation(vm, keyResult.Value);
+        return ForInOfBodyEvaluation(vm, keyResult.Value, labelSet);
     }
 
     // 14.7.5.6 ForIn/OfHeadEvaluation ( FIXME: uninitializedBoundNames, expr, FIXME: iterationKind ), https://tc39.es/ecma262/#sec-runtime-semantics-forinofheadevaluation
@@ -100,7 +100,7 @@ internal sealed class ForInStatement : INode, IBreakableStatement
     }
 
     // 14.7.5.7 ForIn/OfBodyEvaluation ( lhs, stmt, iteratorRecord, iterationKind, lhsKind, labelSet [ , iteratorKind ] ), https://tc39.es/ecma262/#sec-runtime-semantics-forin-div-ofbodyevaluation-lhs-stmt-iterator-lhskind-labelset
-    private Completion ForInOfBodyEvaluation(VM vm, Object keyResult)
+    private Completion ForInOfBodyEvaluation(VM vm, Object keyResult, List<string> labelSet)
     {
         // FIXME: Go through prototype data properties, if we need it before we implement iterators
         // FIXME: Other steps omitted for breavity, we mimic the enumerate iterator kind by only going through enumerable properties
@@ -145,6 +145,14 @@ internal sealed class ForInStatement : INode, IBreakableStatement
             // j. Let result be Completion(Evaluation of stmt).
             result = IterationStatement.Evaluate(vm);
 
+            // l. If LoopContinues(result, labelSet) is false, then
+            if (!result.LoopContinues(labelSet))
+            {
+                // 1. Return ? UpdateEmpty(result, V).
+                result.UpdateEmpty(V);
+                return result;
+            }
+
             // m. If result.[[Value]] is not EMPTY, set V to result.[[Value]].
             if (!result.Value.IsEmpty()) V = result.Value;
         }
@@ -152,15 +160,6 @@ internal sealed class ForInStatement : INode, IBreakableStatement
         // 1. Return ? UpdateEmpty(result, V).
         result!.UpdateEmpty(V);
         return result;
-    }
-
-    // 14.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-statement-semantics-runtime-semantics-evaluation
-    public override Completion Evaluate(VM vm)
-    {
-        // FIXME: 1. Let newLabelSet be a new empty List.
-
-        // 2. Return ? LabelledEvaluation of this BreakableStatement with argument newLabelSet.
-        return LabelledStatement.LabelledBreakableEvaluation(vm, this);
     }
 
     public Identifier Identifier { get; }

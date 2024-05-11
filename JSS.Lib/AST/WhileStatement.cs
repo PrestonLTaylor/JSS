@@ -5,7 +5,7 @@ using JSS.Lib.Execution;
 namespace JSS.Lib.AST;
 
 // 14.7.3 The while Statement, https://tc39.es/ecma262/#sec-while-statement
-internal sealed class WhileStatement : INode, IBreakableStatement
+internal sealed class WhileStatement : IIterationStatement
 {
     public WhileStatement(IExpression whileExpression, INode iterationStatement)
     {
@@ -28,7 +28,7 @@ internal sealed class WhileStatement : INode, IBreakableStatement
     }
 
     // 14.7.3.2 Runtime Semantics: WhileLoopEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-whileloopevaluation
-    public Completion EvaluateFromLabelled(VM vm)
+    public override Completion LoopEvaluation(VM vm, List<string> labelSet)
     {
         // 1.Let V be undefined.
         var V = (Value)Undefined.The;
@@ -54,7 +54,7 @@ internal sealed class WhileStatement : INode, IBreakableStatement
             var stmtResult = IterationStatement.Evaluate(vm);
 
             // e. If LoopContinues(stmtResult, labelSet) is false, return ? UpdateEmpty(stmtResult, V).
-            if (!stmtResult.LoopContinues().Value)
+            if (!stmtResult.LoopContinues(labelSet))
             {
                 stmtResult.UpdateEmpty(V);
                 return stmtResult;
@@ -66,15 +66,6 @@ internal sealed class WhileStatement : INode, IBreakableStatement
                 V = stmtResult.Value;
             }
         }
-    }
-
-    // 14.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-statement-semantics-runtime-semantics-evaluation
-    public override Completion Evaluate(VM vm)
-    {
-        // FIXME: 1. Let newLabelSet be a new empty List.
-
-        // 2. Return ? LabelledEvaluation of this BreakableStatement with argument newLabelSet.
-        return LabelledStatement.LabelledBreakableEvaluation(vm, this);
     }
 
     public IExpression WhileExpression { get; }
