@@ -4,7 +4,7 @@ using JSS.Lib.Execution;
 namespace JSS.Lib.AST;
 
 // FIXME: Parse and evaluate LabelledStatements
-internal class LabelledStatement : INode
+internal sealed class LabelledStatement : INode
 {
     public LabelledStatement(Identifier identifier, INode labelledItem)
     {
@@ -12,26 +12,49 @@ internal class LabelledStatement : INode
         LabelledItem = labelledItem;
     }
 
-    // 14.13.4 Runtime Semantics: LabelledEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-labelledevaluation
-    static public Completion LabelledBreakableEvaluation(VM vm, IBreakableStatement breakableStatement)
-    {
-        // 1. Let stmtResult be Completion(LoopEvaluation of IterationStatement FIXME: with argument labelSet)/Completion(Evaluation of SwitchStatement).
-        var stmtResult = breakableStatement.EvaluateFromLabelled(vm);
 
-        // 2. If stmtResult is a break completion, then
-        if (stmtResult.IsBreakCompletion())
+    // 14.13.3 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-labelled-statements-runtime-semantics-evaluation
+    public override Completion Evaluate(VM vm)
+    {
+        // 1. Return ? LabelledEvaluation of this LabelledStatement with argument « ».
+        return LabelledEvaluation(vm, new());
+    }
+
+    // 14.13.4 Runtime Semantics: LabelledEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-labelledevaluation
+    private Completion LabelledEvaluation(VM vm, List<string> labelSet)
+    {
+        // 1. Let label be the StringValue of LabelIdentifier.
+        // 2. Let newLabelSet be the list-concatenation of labelSet and « label ».
+        // NOTE: If labelSet ever needs to be used after Step 3, we need to create a new list.
+        labelSet.Add(Identifier.Name);
+
+        // 3. Let stmtResult be Completion(LabelledEvaluation of LabelledItem with argument newLabelSet).
+        Completion stmtResult;
+        if (LabelledItem is LabelledStatement innerLabelledStatement)
         {
-            // a. If stmtResult.[[Target]] is EMPTY, then
-            if (stmtResult.Target.Length == 0)
-            {
-                // i. If stmtResult.[[Value]] is EMPTY, set stmtResult to NormalCompletion(undefined).
-                if (stmtResult.IsValueEmpty()) stmtResult = Undefined.The;
-                // ii. Else, set stmtResult to NormalCompletion(stmtResult.[[Value]]).
-                else stmtResult = stmtResult.Value;
-            }
+            stmtResult = innerLabelledStatement.LabelledEvaluation(vm, labelSet);
+        }
+        else if (LabelledItem is SwitchStatement switchStatement)
+        {
+            stmtResult = switchStatement.Evaluate(vm);
+        }
+        else if (LabelledItem is IIterationStatement iterationStatement)
+        {
+            stmtResult = iterationStatement.LabelledEvaluation(vm, labelSet);
+        }
+        else
+        {
+            stmtResult = LabelledItem.Evaluate(vm);
         }
 
-        // 3. Return ? stmtResult.
+        // 4. If stmtResult is a break completion and stmtResult.[[Target]] is label, then
+        if (stmtResult.IsBreakCompletion() && stmtResult.Target == Identifier.Name)
+        {
+            // a. Set stmtResult to NormalCompletion(stmtResult.[[Value]]).
+            stmtResult = stmtResult.Value;
+        }
+
+        // 5. Return ? stmtResult.
         return stmtResult;
     }
 

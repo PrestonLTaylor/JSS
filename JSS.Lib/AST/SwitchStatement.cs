@@ -98,7 +98,7 @@ internal readonly struct DefaultBlock
 }
 
 // 14.12 The switch Statement, https://tc39.es/ecma262/#sec-switch-statement
-internal sealed class SwitchStatement : INode, IBreakableStatement
+internal sealed class SwitchStatement : INode
 {
     public SwitchStatement(IExpression switchExpression, List<CaseBlock> firstCaseBlocks, List<CaseBlock> secondCaseBlocks, DefaultBlock? defaultCase)
     {
@@ -438,8 +438,32 @@ internal sealed class SwitchStatement : INode, IBreakableStatement
         return Value.IsStrictlyEqual(input, clauseSelector.Value);
     }
 
-    // 14.12.4 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-switch-statement-runtime-semantics-evaluation
-    public Completion EvaluateFromLabelled(VM vm)
+    // NOTE: Evaluate defaults to the LabelledEvaluation for switch statements, https://tc39.es/ecma262/#sec-statement-semantics-runtime-semantics-evaluation
+    // 14.13.4 Runtime Semantics: LabelledEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-labelledevaluation
+    public override Completion Evaluate(VM vm)
+    {
+        // 1. Let stmtResult be Completion(Evaluation of SwitchStatement).
+        var stmtResult = LabelledEvaluation(vm);
+
+        // 2. If stmtResult is a break completion, then
+        if (stmtResult.IsBreakCompletion())
+        {
+            // a. If stmtResult.[[Target]] is EMPTY, then
+            if (stmtResult.Target.Length == 0)
+            {
+                // i. If stmtResult.[[Value]] is EMPTY, set stmtResult to NormalCompletion(undefined).
+                if (stmtResult.IsValueEmpty()) stmtResult = Undefined.The;
+                // ii. Else, set stmtResult to NormalCompletion(stmtResult.[[Value]]).
+                else stmtResult = stmtResult.Value;
+            }
+        }
+
+        // 3. Return ? stmtResult.
+        return stmtResult;
+    }
+
+    // 14.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-switch-statement-runtime-semantics-evaluation
+    public Completion LabelledEvaluation(VM vm)
     {
         // 1. Let exprRef be ? Evaluation of Expression.
         var exprRef = SwitchExpression.Evaluate(vm);
@@ -470,15 +494,6 @@ internal sealed class SwitchStatement : INode, IBreakableStatement
 
         // 9. Return R.
         return R;
-    }
-
-    // 14.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-statement-semantics-runtime-semantics-evaluation
-    public override Completion Evaluate(VM vm)
-    {
-        // FIXME: 1. Let newLabelSet be a new empty List.
-
-        // 2. Return ? LabelledEvaluation of this BreakableStatement with argument newLabelSet.
-        return LabelledStatement.LabelledBreakableEvaluation(vm, this);
     }
 
     public IExpression SwitchExpression { get; }

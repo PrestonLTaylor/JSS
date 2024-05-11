@@ -4,7 +4,7 @@ using JSS.Lib.Execution;
 namespace JSS.Lib.AST;
 
 // 14.7.4 The for Statement, https://tc39.es/ecma262/#sec-for-statement
-internal sealed class ForStatement : INode, IBreakableStatement
+internal sealed class ForStatement : IIterationStatement
 {
     public ForStatement(INode? initializationExpression, INode? testExpression, INode? incrementExpression, INode iterationStatement)
     {
@@ -49,11 +49,11 @@ internal sealed class ForStatement : INode, IBreakableStatement
     }
 
     // 14.7.4.2 Runtime Semantics: ForLoopEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-forloopevaluation
-    public Completion EvaluateFromLabelled(VM vm)
+    public override Completion LoopEvaluation(VM vm, List<string> labelSet)
     {
         if (InitializationExpression is VarStatement)
         {
-            return EvaluationWithVarStatement(vm);
+            return EvaluationWithVarStatement(vm, labelSet);
         }
         else if (InitializationExpression is LetDeclaration or ConstDeclaration)
         {
@@ -62,11 +62,11 @@ internal sealed class ForStatement : INode, IBreakableStatement
         }
         else
         {
-            return EvaluationWithExpression(vm);
+            return EvaluationWithExpression(vm, labelSet);
         }
     }
 
-    public Completion EvaluationWithVarStatement(VM vm)
+    public Completion EvaluationWithVarStatement(VM vm, List<string> labelSet)
     {
         // 1. Perform ? Evaluation of VariableDeclarationList.
         var varResult = InitializationExpression!.Evaluate(vm);
@@ -77,10 +77,10 @@ internal sealed class ForStatement : INode, IBreakableStatement
         // 3. If the second Expression is present, let increment be the second Expression; otherwise, let increment be EMPTY.
 
         // 4. Return ? ForBodyEvaluation(test, increment, Statement, « », labelSet).
-        return ForBodyEvaluation(vm);
+        return ForBodyEvaluation(vm, labelSet);
     }
 
-    public Completion EvaluationWithExpression(VM vm)
+    public Completion EvaluationWithExpression(VM vm, List<string> labelSet)
     {
         // 1. If the first Expression is present, then
         if (InitializationExpression is not null)
@@ -99,11 +99,11 @@ internal sealed class ForStatement : INode, IBreakableStatement
         // 3. If the third Expression is present, let increment be the third Expression; otherwise, let increment be EMPTY.
 
         // 4. Return ? ForBodyEvaluation(test, increment, Statement, « », labelSet).
-        return ForBodyEvaluation(vm);
+        return ForBodyEvaluation(vm, labelSet);
     }
 
-    // 14.7.4.3 ForBodyEvaluation ( test, increment, stmt, FIXME: perIterationBindings, FIXME: labelSet ), https://tc39.es/ecma262/#sec-forbodyevaluation
-    private Completion ForBodyEvaluation(VM vm)
+    // 14.7.4.3 ForBodyEvaluation ( test, increment, stmt, FIXME: perIterationBindings, labelSet ), https://tc39.es/ecma262/#sec-forbodyevaluation
+    private Completion ForBodyEvaluation(VM vm, List<string> labelSet)
     {
         // 1. Let V be undefined.
         var V = (Value)Undefined.The;
@@ -135,7 +135,7 @@ internal sealed class ForStatement : INode, IBreakableStatement
             var result = IterationStatement.Evaluate(vm);
 
             // c. If LoopContinues(result, labelSet) is false, return ? UpdateEmpty(result, V).
-            if (!result.LoopContinues().Value)
+            if (!result.LoopContinues(labelSet))
             {
                 result.UpdateEmpty(V);
                 return result;
@@ -161,15 +161,6 @@ internal sealed class ForStatement : INode, IBreakableStatement
                 if (incValue.IsAbruptCompletion()) return incValue;
             }
         }
-    }
-
-    // 14.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-statement-semantics-runtime-semantics-evaluation
-    public override Completion Evaluate(VM vm)
-    {
-        // FIXME: 1. Let newLabelSet be a new empty List.
-
-        // 2. Return ? LabelledEvaluation of this BreakableStatement with argument newLabelSet.
-        return LabelledStatement.LabelledBreakableEvaluation(vm, this);
     }
 
     public INode? InitializationExpression { get; }
