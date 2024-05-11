@@ -4,8 +4,14 @@ using JSS.Lib.Execution;
 namespace JSS.Lib.AST;
 
 // FIXME: Parse and evaluate LabelledStatements
-internal class LabelledStatement
+internal class LabelledStatement : INode
 {
+    public LabelledStatement(Identifier identifier, INode labelledItem)
+    {
+        Identifier = identifier;
+        LabelledItem = labelledItem;
+    }
+
     // 14.13.4 Runtime Semantics: LabelledEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-labelledevaluation
     static public Completion LabelledBreakableEvaluation(VM vm, IBreakableStatement breakableStatement)
     {
@@ -28,4 +34,7 @@ internal class LabelledStatement
         // 3. Return ? stmtResult.
         return stmtResult;
     }
+
+    public Identifier Identifier { get; }
+    public INode LabelledItem { get; }
 }

@@ -1242,6 +1242,45 @@ internal sealed class ParserTests
         switchStatement.FirstCaseBlocks.Should().HaveCount(1);
         switchStatement.SecondCaseBlocks.Should().HaveCount(1);
     }
+
+    // Tests for 14.13 Labelled Statements, https://tc39.es/ecma262/#sec-labelled-statements
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsLabelledStatement_WhenProvidingLabelledStatement(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        const string expectedIdentifier = "identifier";
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"{expectedIdentifier} : {expression}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var labelledStatement = rootNodes[0] as LabelledStatement;
+        labelledStatement.Should().NotBeNull();
+        labelledStatement!.Identifier.Name.Should().Be(expectedIdentifier);
+
+        var expressionStatement = labelledStatement.LabelledItem as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+        expressionStatement!.Expression.Should().BeOfType(expectedExpressionType);
+    }
+
+    [Test]
+    public void Parse_ThrowsSyntaxError_WhenLabelledStatmentItem_IsFunctionDeclaration()
+    {
+        // Arrange
+        var parser = new Parser("a : function b() {}");
+        var expectedException = ErrorHelper.CreateSyntaxError(ErrorType.UnexpectedToken, "function");
+
+        // Act
+
+        // Assert
+        AssertThatSyntaxErrorMatchesExpected(parser, expectedException);
+    }
     
     // Tests for 14.14 The throw Statement, https://tc39.es/ecma262/#sec-throw-statement
     [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
@@ -2177,9 +2216,10 @@ internal sealed class ParserTests
         {"a ?", "}"},
         {"a ? b", "}"},
         {"a ? b :", "}"},
-        { "let a = { a:", "}"},
-        { "let a = { \"a\":", "}"},
-        { "let a = { 1:", "}"},
+        {"let a = { a:", "}"},
+        {"let a = { \"a\":", "}"},
+        {"let a = { 1:", "}"},
+        {"a :", "}"}
     };
 
     [TestCaseSource(nameof(unexpectedTokenTestCases))]
@@ -2295,6 +2335,7 @@ internal sealed class ParserTests
         "let a = { a:",
         "let a = { \"a\":",
         "let a = { 1:",
+        "a :",
     };
 
     [TestCaseSource(nameof(unexpectedEofTestCases))]

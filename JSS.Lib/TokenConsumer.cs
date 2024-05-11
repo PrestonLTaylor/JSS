@@ -25,10 +25,10 @@ internal sealed class TokenConsumer
         return _toConsume[Index + offset];
     }
 
-    public bool IsTokenOfType(TokenType type)
+    public bool IsTokenOfType(TokenType type, int offset = 0)
     {
         IgnoreLineTerminators();
-        return CanConsume() && Peek().type == type;
+        return CanConsume(offset) && Peek(offset).type == type;
     }
 
     public Token ConsumeTokenOfType(TokenType type)

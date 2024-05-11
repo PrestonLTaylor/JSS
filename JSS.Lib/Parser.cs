@@ -111,6 +111,11 @@ public sealed class Parser
             statement = ParseVarStatement();
             return true;
         }
+        if (IsLabelledStatement())
+        {
+            statement = ParseLabelledStatement();
+            return true;
+        }
         if (IsEmptyStatement())
         {
             statement = ParseEmptyStatement();
@@ -2071,6 +2076,29 @@ public sealed class Parser
                 _ => true,
             };
         });
+    }
+
+    // 14.13 Labelled Statements, https://tc39.es/ecma262/#sec-labelled-statements
+    private bool IsLabelledStatement()
+    {
+        return _consumer.IsTokenOfType(TokenType.Identifier) && _consumer.IsTokenOfType(TokenType.Colon, 1);
+    }
+
+    private LabelledStatement ParseLabelledStatement()
+    {
+        var identifier = ParseIdentifier();
+
+        _consumer.ConsumeTokenOfType(TokenType.Colon);
+
+        var labelledItem = ParseLabelledItem();
+
+        return new LabelledStatement(identifier, labelledItem);
+    }
+
+    private INode ParseLabelledItem()
+    {
+        if (IsFunctionDeclaration()) return ThrowUnexpectedTokenSyntaxError<INode>()!;
+        return ParseStatement();
     }
 
     // 14.14 The throw Statement, https://tc39.es/ecma262/#sec-throw-statement
