@@ -1427,8 +1427,7 @@ public sealed class Parser
     private StringLiteral ParseStringLiteral()
     {
         var stringLiteral = _consumer.ConsumeTokenOfType(TokenType.String);
-        var stringValue = stringLiteral.Data[1..^1];
-        return new StringLiteral(stringValue);
+        return new StringLiteral(stringLiteral.Data);
     }
 
     // 13.2.4 Array Initializer, https://tc39.es/ecma262/#sec-array-initializer

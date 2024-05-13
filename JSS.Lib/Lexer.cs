@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using JSS.Lib.AST;
+using System.Text;
 
 namespace JSS.Lib;
 
@@ -355,17 +356,47 @@ internal sealed class Lexer
         return _consumer.Peek() == '\'' || _consumer.Peek() == '"';
     }
 
-    // FIXME: Implement support for fully lexxing https://tc39.es/ecma262/#prod-StringLiteral (e.g. escape sequences)
+    // FIXME: Implement support for fully lexxing https://tc39.es/ecma262/#prod-StringLiteral (e.g. multi-character escape sequences)
     private Token LexStringLiteral()
     {
         var quoteCodePoint = _consumer.Consume();
 
-        var consumedString = _consumer.ConsumeWhile((codePoint) => codePoint != quoteCodePoint);
+        StringBuilder stringLiteral = new();
+        while (_consumer.CanConsume())
+        {
+            var current = _consumer.Consume();
 
-        // FIXME: Error if no closing quote is given
-        _consumer.TryConsumeString(quoteCodePoint.ToString());
+            if (current == quoteCodePoint)
+            {
+                return new Token { Type = TokenType.String, Data = stringLiteral.ToString() };
+            }
+            else if (current == '\\')
+            {
+                stringLiteral.Append(LexEscapeSequence());
+            }
+            else
+            {
+                stringLiteral.Append(current);
+            }
+        }
 
-        return new Token { Type = TokenType.String, Data = quoteCodePoint + consumedString + quoteCodePoint };
+        ErrorHelper.ThrowSyntaxError(ErrorType.UnexpectedEOF);
+        return default;
+    }
+
+    private char LexEscapeSequence()
+    {
+        var escapedCharacter = _consumer.Consume();
+        return escapedCharacter switch
+        {
+            'b' => '\b',
+            't' => '\t',
+            'n' => '\n',
+            'v' => '\v',
+            'f' => '\f',
+            'r' => '\r',
+            _ => escapedCharacter,
+        };
     }
 
     // FIXME: 12.9.5 Regular Expression Literals, https://tc39.es/ecma262/#sec-literals-regular-expression-literals
