@@ -28,26 +28,26 @@ internal sealed class TokenConsumer
     public bool IsTokenOfType(TokenType type, int offset = 0)
     {
         IgnoreLineTerminators();
-        return CanConsume(offset) && Peek(offset).type == type;
+        return CanConsume(offset) && Peek(offset).Type == type;
     }
 
     public Token ConsumeTokenOfType(TokenType type)
     {
         IgnoreLineTerminators();
         if (!CanConsume()) ErrorHelper.ThrowSyntaxError(ErrorType.UnexpectedEOF);
-        if (!IsTokenOfType(type)) ErrorHelper.ThrowSyntaxError(ErrorType.UnexpectedToken, Peek().data);
+        if (!IsTokenOfType(type)) ErrorHelper.ThrowSyntaxError(ErrorType.UnexpectedToken, Peek().Data);
         return Consume();
     }
 
     public bool IsLineTerminator(int offset = 0)
     {
         if (!CanConsume()) return false;
-        return _toConsume[Index + offset].type == TokenType.LineTerminator;
+        return _toConsume[Index + offset].Type == TokenType.LineTerminator;
     }
 
     public void IgnoreLineTerminators()
     {
-        while (CanConsume() && _toConsume[Index].type == TokenType.LineTerminator) ++Index;
+        while (CanConsume() && _toConsume[Index].Type == TokenType.LineTerminator) ++Index;
     }
 
     public void Rewind(int index = 0)

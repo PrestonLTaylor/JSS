@@ -540,7 +540,7 @@ internal sealed class LexerTests
 
     private void AssertThatTokenIs(Token actual, TokenType expectedType, string expectedData)
     {
-        actual.type.Should().Be(expectedType);
-        actual.data.Should().Be(expectedData);
+        actual.Type.Should().Be(expectedType);
+        actual.Data.Should().Be(expectedData);
     }
 }
