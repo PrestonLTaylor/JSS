@@ -371,7 +371,7 @@ public sealed class Parser
 
     private bool IsBinaryOpAssignmentOperator()
     {
-        return _consumer.CanConsume() && _consumer.Peek().type switch
+        return _consumer.CanConsume() && _consumer.Peek().Type switch
         {
             TokenType.ExponentiationAssignment or TokenType.MultiplyAssignment or TokenType.DivisionAssignment 
                 or TokenType.ModuloAssignment or TokenType.PlusAssignment or TokenType.MinusAssignment or TokenType.LeftShiftAssignment
@@ -396,7 +396,7 @@ public sealed class Parser
 
     private BinaryOpType BinaryOpTokenToBinaryOpType(Token binaryOp)
     {
-        return binaryOp.type switch
+        return binaryOp.Type switch
         {
             TokenType.ExponentiationAssignment => BinaryOpType.Exponentiate, 
             TokenType.MultiplyAssignment => BinaryOpType.Multiply,
@@ -410,7 +410,7 @@ public sealed class Parser
             TokenType.BitwiseAndAssignment => BinaryOpType.BitwiseAND,
             TokenType.BitwiseXorAssignment => BinaryOpType.BitwiseXOR,
             TokenType.BitwiseOrAssignment => BinaryOpType.BitwiseOR,
-            _ => throw new InvalidOperationException($"Parser Bug: Tried to get a binary op type with a token of type {binaryOp.type}"),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to get a binary op type with a token of type {binaryOp.Type}"),
         };
     }
 
@@ -631,7 +631,7 @@ public sealed class Parser
 
     private bool IsEqualityOperator()
     {
-        return _consumer.CanConsume() && _consumer.Peek().type switch
+        return _consumer.CanConsume() && _consumer.Peek().Type switch
         {
             TokenType.EqualEquals or TokenType.StrictEqualsEquals or TokenType.NotEquals or TokenType.StrictNotEquals => true,
             _ => false,
@@ -640,13 +640,13 @@ public sealed class Parser
 
     private IExpression CreateEqualityExpression(IExpression lhs, IExpression rhs, Token equalityToken)
     {
-        return equalityToken.type switch
+        return equalityToken.Type switch
         {
             TokenType.EqualEquals => new LooseEqualityExpression(lhs, rhs),
             TokenType.StrictEqualsEquals => new StrictEqualityExpression(lhs, rhs),
             TokenType.NotEquals => new LooseInequalityExpression(lhs, rhs),
             TokenType.StrictNotEquals => new StrictInequalityExpression(lhs, rhs),
-            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an equality expression with a token of type {equalityToken.type}"),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an equality expression with a token of type {equalityToken.Type}"),
         };
     }
 
@@ -678,7 +678,7 @@ public sealed class Parser
 
     private bool IsRelationalOperator()
     {
-        return _consumer.CanConsume() && _consumer.Peek().type switch
+        return _consumer.CanConsume() && _consumer.Peek().Type switch
         {
             TokenType.LessThan or TokenType.GreaterThan or TokenType.LessThanEqual or 
             TokenType.GreaterThanEqual or TokenType.InstanceOf or TokenType.In => true,
@@ -688,7 +688,7 @@ public sealed class Parser
 
     private IExpression CreateRelationalOperator(IExpression lhs, IExpression rhs, Token relationalToken)
     {
-        return relationalToken.type switch
+        return relationalToken.Type switch
         {
             TokenType.LessThan => new LessThanExpression(lhs, rhs),
             TokenType.GreaterThan => new GreaterThanExpression(lhs, rhs),
@@ -696,7 +696,7 @@ public sealed class Parser
             TokenType.GreaterThanEqual => new GreaterThanEqualsExpression(lhs, rhs),
             TokenType.InstanceOf => new InstanceOfExpression(lhs, rhs),
             TokenType.In => new InExpression(lhs, rhs),
-            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an relational expression with a token of type {relationalToken.type}"),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an relational expression with a token of type {relationalToken.Type}"),
         };
     }
 
@@ -726,7 +726,7 @@ public sealed class Parser
 
     private bool IsBitwiseShiftOperator()
     {
-        return _consumer.CanConsume() && _consumer.Peek().type switch
+        return _consumer.CanConsume() && _consumer.Peek().Type switch
         {
             TokenType.LeftShift or TokenType.RightShift or TokenType.UnsignedRightShift => true,
             _ => false,
@@ -735,12 +735,12 @@ public sealed class Parser
 
     private IExpression CreateBitwiseShiftOperator(IExpression lhs, IExpression rhs, Token shiftToken)
     {
-        return shiftToken.type switch
+        return shiftToken.Type switch
         {
             TokenType.LeftShift => new LeftShiftExpression(lhs, rhs),
             TokenType.RightShift => new RightShiftExpression(lhs, rhs),
             TokenType.UnsignedRightShift => new UnsignedRightShiftExpression(lhs, rhs),
-            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an shift expression with a token of type {shiftToken.type}"),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an shift expression with a token of type {shiftToken.Type}"),
         };
     }
 
@@ -770,7 +770,7 @@ public sealed class Parser
 
     private bool IsAdditiveOperator()
     {
-        return _consumer.CanConsume() && _consumer.Peek().type switch
+        return _consumer.CanConsume() && _consumer.Peek().Type switch
         {
             TokenType.Plus or TokenType.Minus => true,
             _ => false,
@@ -779,11 +779,11 @@ public sealed class Parser
 
     private IExpression CreateAdditiveOperator(IExpression lhs, IExpression rhs, Token additiveToken)
     {
-        return additiveToken.type switch
+        return additiveToken.Type switch
         {
             TokenType.Plus => new AdditionExpression(lhs, rhs),
             TokenType.Minus => new SubtractionExpression(lhs, rhs),
-            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an additive expression with a token of type {additiveToken.type}"),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an additive expression with a token of type {additiveToken.Type}"),
         };
     }
 
@@ -813,7 +813,7 @@ public sealed class Parser
 
     private bool IsMultiplicativeOperator()
     {
-        return _consumer.CanConsume() && _consumer.Peek().type switch
+        return _consumer.CanConsume() && _consumer.Peek().Type switch
         {
             TokenType.Multiply or TokenType.Division or TokenType.Modulo => true,
             _ => false,
@@ -822,12 +822,12 @@ public sealed class Parser
 
     private IExpression CreateMultiplicativeOperator(IExpression lhs, IExpression rhs, Token multiplicativeToken)
     {
-        return multiplicativeToken.type switch
+        return multiplicativeToken.Type switch
         {
             TokenType.Multiply => new MultiplicationExpression(lhs, rhs),
             TokenType.Division => new DivisionExpression(lhs, rhs),
             TokenType.Modulo => new ModuloExpression(lhs, rhs),
-            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an multiplicative expression with a token of type {multiplicativeToken.type}"),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an multiplicative expression with a token of type {multiplicativeToken.Type}"),
         };
     }
 
@@ -884,7 +884,7 @@ public sealed class Parser
 
     private bool IsUnaryOperator()
     {
-        return _consumer.CanConsume() && _consumer.Peek().type switch
+        return _consumer.CanConsume() && _consumer.Peek().Type switch
         {
             TokenType.Delete or TokenType.Void or TokenType.TypeOf or TokenType.Plus
             or TokenType.Minus or TokenType.BitwiseNot or TokenType.Not => true,
@@ -894,7 +894,7 @@ public sealed class Parser
 
     private IExpression CreateUnaryExpression(IExpression innerExpression, Token unaryToken)
     {
-        return unaryToken.type switch
+        return unaryToken.Type switch
         {
             TokenType.Delete => new DeleteExpression(innerExpression),
             TokenType.Void => new VoidExpression(innerExpression),
@@ -903,7 +903,7 @@ public sealed class Parser
             TokenType.Minus => new UnaryMinusExpression(innerExpression),
             TokenType.BitwiseNot => new BitwiseNotExpression(innerExpression),
             TokenType.Not => new LogicalNotExpression(innerExpression),
-            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an unary expression with a token of type {unaryToken.type}"),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create an unary expression with a token of type {unaryToken.Type}"),
         };
     }
 
@@ -950,7 +950,7 @@ public sealed class Parser
 
     private bool IsUpdateOperator()
     {
-        return _consumer.CanConsume() && _consumer.Peek().type switch
+        return _consumer.CanConsume() && _consumer.Peek().Type switch
         {
             TokenType.Increment or TokenType.Decrement => true,
             _ => false,
@@ -959,21 +959,21 @@ public sealed class Parser
 
     private IExpression CreatePrefixUpdateExpression(IExpression innerExpression, Token prefixUpdateToken)
     {
-        return prefixUpdateToken.type switch
+        return prefixUpdateToken.Type switch
         {
             TokenType.Increment => new PrefixIncrementExpression(innerExpression),
             TokenType.Decrement => new PrefixDecrementExpression(innerExpression),
-            _ => throw new InvalidOperationException($"Parser Bug: Tried to create a prefix update expression with a token of type {prefixUpdateToken.type}"),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create a prefix update expression with a token of type {prefixUpdateToken.Type}"),
         };
     }
 
     private IExpression CreatePostfixUpdateExpression(IExpression innerExpression, Token prefixUpdateToken)
     {
-        return prefixUpdateToken.type switch
+        return prefixUpdateToken.Type switch
         {
             TokenType.Increment => new PostfixIncrementExpression(innerExpression),
             TokenType.Decrement => new PostfixDecrementExpression(innerExpression),
-            _ => throw new InvalidOperationException($"Parser Bug: Tried to create a prefix update expression with a token of type {prefixUpdateToken.type}"),
+            _ => throw new InvalidOperationException($"Parser Bug: Tried to create a prefix update expression with a token of type {prefixUpdateToken.Type}"),
         };
     }
 
@@ -1377,7 +1377,7 @@ public sealed class Parser
     private Identifier ParseIdentifier()
     {
         var identifierToken = _consumer.ConsumeTokenOfType(TokenType.Identifier);
-        return new Identifier(identifierToken.data);
+        return new Identifier(identifierToken.Data);
     }
 
     // 13.2.3 Literals, https://tc39.es/ecma262/#sec-primary-expression-literals
@@ -1401,7 +1401,7 @@ public sealed class Parser
     {
         // FIXME: This doesn't have an explicit assertion
         var booleanToken = _consumer.Consume();
-        var booleanValue = booleanToken.type == TokenType.True;
+        var booleanValue = booleanToken.Type == TokenType.True;
         return new BooleanLiteral(booleanValue);
     }
 
@@ -1415,7 +1415,7 @@ public sealed class Parser
         var numericToken = _consumer.ConsumeTokenOfType(TokenType.Number);
         // FIXME: Proper error reporting
         // FIXME: Parse numbers according to the JS spec rather than the C# parse library
-        var numericValue = double.Parse(numericToken.data);
+        var numericValue = double.Parse(numericToken.Data);
         return new NumericLiteral(numericValue);
     }
 
@@ -1427,7 +1427,7 @@ public sealed class Parser
     private StringLiteral ParseStringLiteral()
     {
         var stringLiteral = _consumer.ConsumeTokenOfType(TokenType.String);
-        var stringValue = stringLiteral.data[1..^1];
+        var stringValue = stringLiteral.Data[1..^1];
         return new StringLiteral(stringValue);
     }
 
@@ -1581,7 +1581,7 @@ public sealed class Parser
 
         ParseSemicolon(automaticSemicolonCandiate);
 
-        return new LetDeclaration(identifierToken.data, initializer);
+        return new LetDeclaration(identifierToken.Data, initializer);
     }
 
     private bool IsConstDeclaration()
@@ -1603,7 +1603,7 @@ public sealed class Parser
 
         ParseSemicolon(automaticSemicolonCandiate);
 
-        return new ConstDeclaration(identifierToken.data, initializer);
+        return new ConstDeclaration(identifierToken.Data, initializer);
     }
 
     // 14.3.2 Variable Statement, https://tc39.es/ecma262/#sec-variable-statement
@@ -1655,7 +1655,7 @@ public sealed class Parser
             initializer = ParseInitializer();
         }
 
-        return new(identifierToken.data, initializer);
+        return new(identifierToken.Data, initializer);
     }
 
     private bool IsInitializer()
@@ -1712,12 +1712,12 @@ public sealed class Parser
     // For [lookahead ∉ { {, function, async [no LineTerminator here] function, class, let [ }]
     private bool IsAmbiguousForExpressionStatement()
     {
-        return _consumer.CanConsume() && _consumer.Peek().type switch
+        return _consumer.CanConsume() && _consumer.Peek().Type switch
         {
             TokenType.OpenBrace or TokenType.Function or TokenType.Class => true,
             // FIXME: Check for async function
             // FIXME: This is a bit janky
-            TokenType.Let => _consumer.CanConsume(1) && _consumer.Peek(1).type == TokenType.OpenSquare,
+            TokenType.Let => _consumer.CanConsume(1) && _consumer.Peek(1).Type == TokenType.OpenSquare,
             _ => false,
         };
     }
@@ -1840,7 +1840,7 @@ public sealed class Parser
         int parenDepth = 1;
         while (_consumer.CanConsume(offset))
         {
-            var current = _consumer.Peek(offset).type;
+            var current = _consumer.Peek(offset).Type;
 
             if (current == TokenType.OpenParen) ++parenDepth;
             if (current == TokenType.ClosedParen)
@@ -1928,7 +1928,7 @@ public sealed class Parser
     {
         var identifier = _consumer.Peek();
 
-        if (identifier.data != "in") ThrowUnexpectedTokenSyntaxError<ForInStatement>();
+        if (identifier.Data != "in") ThrowUnexpectedTokenSyntaxError<ForInStatement>();
 
         _consumer.Consume();
     }
@@ -2070,7 +2070,7 @@ public sealed class Parser
     {
         return ParseStatementListWhile(() =>
         {
-            return _consumer.CanConsume() && _consumer.Peek().type switch
+            return _consumer.CanConsume() && _consumer.Peek().Type switch
             {
                 TokenType.Case or TokenType.Default or TokenType.ClosedBrace => false,
                 _ => true,
@@ -2348,7 +2348,7 @@ public sealed class Parser
         if (!_consumer.IsTokenOfType(TokenType.Identifier)) return false;
 
         var identifier = _consumer.Peek();
-        if (identifier.data != "static") return false;
+        if (identifier.Data != "static") return false;
 
         _consumer.Consume();
         return true;
@@ -2364,12 +2364,12 @@ public sealed class Parser
         if (_consumer.IsTokenOfType(TokenType.Identifier))
         {
             var identifier = _consumer.Consume();
-            return identifier.data;
+            return identifier.Data;
         }
         else if (_consumer.IsTokenOfType(TokenType.PrivateIdentifier))
         {
             var identifier = _consumer.Consume();
-            return identifier.data[1..];
+            return identifier.Data[1..];
         }
 
         return ThrowUnexpectedTokenSyntaxError<string>()!;
@@ -2421,7 +2421,7 @@ public sealed class Parser
         if (!_consumer.CanConsume()) return true;
 
         // The offending token is }.
-        if (_consumer.Peek().type == TokenType.ClosedBrace) return true;
+        if (_consumer.Peek().Type == TokenType.ClosedBrace) return true;
 
         // The offending token is separated from the previous token by at least one LineTerminator.
         // FIXME: Because of always ignoring line terminators, we have to do this hack,
@@ -2435,7 +2435,7 @@ public sealed class Parser
         if (_consumer.CanConsume())
         {
             var unexpectedToken = _consumer.Peek();
-            ErrorHelper.ThrowSyntaxError(ErrorType.UnexpectedToken, unexpectedToken.data);
+            ErrorHelper.ThrowSyntaxError(ErrorType.UnexpectedToken, unexpectedToken.Data);
         }
 
         ErrorHelper.ThrowSyntaxError(ErrorType.UnexpectedEOF);

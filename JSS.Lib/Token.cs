@@ -119,6 +119,6 @@ internal enum TokenType
 // FIXME: Support character/line numbers with tokens
 internal struct Token
 {
-    public TokenType type;
-    public string data;
+    public TokenType Type;
+    public string Data;
 }

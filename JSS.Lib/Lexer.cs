@@ -1,4 +1,6 @@
-﻿namespace JSS.Lib;
+﻿using System.Text;
+
+namespace JSS.Lib;
 
 internal sealed class Lexer
 {
@@ -202,7 +204,7 @@ internal sealed class Lexer
 
 	private Token LexLineTerminator()
 	{
-		return new Token { type = TokenType.LineTerminator, data = _consumer.Consume().ToString() };
+		return new Token { Type = TokenType.LineTerminator, Data = _consumer.Consume().ToString() };
 	}
 
     // 12.4 Comments, https://tc39.es/ecma262/#sec-comments
@@ -255,8 +257,8 @@ internal sealed class Lexer
 		// Consumes the # so we can lex the identifier
 		_consumer.Consume();
 		var identifierToken = LexIdentifier();
-		identifierToken.type = TokenType.PrivateIdentifier;
-		identifierToken.data = '#' + identifierToken.data;
+		identifierToken.Type = TokenType.PrivateIdentifier;
+		identifierToken.Data = '#' + identifierToken.Data;
 		return identifierToken;
 	}
 
@@ -286,7 +288,7 @@ internal sealed class Lexer
 	private Token LexIdentifier()
 	{
 		var consumedIdentifier = _consumer.ConsumeWhile((_) => IsIdentifierPart());
-		return new Token { type = TokenType.Identifier, data = consumedIdentifier };
+		return new Token { Type = TokenType.Identifier, Data = consumedIdentifier };
 	}
 
     // 12.7.2 Keywords and Reserved Words, https://tc39.es/ecma262/#sec-keywords-and-reserved-words
@@ -302,7 +304,7 @@ internal sealed class Lexer
 				_consumer.TryConsumeString(reservedWord);
 
 				var tokenType = kv.Value;
-				token = new Token { type = tokenType, data = reservedWord };
+				token = new Token { Type = tokenType, Data = reservedWord };
 				return true;
 			}
 		}
@@ -322,7 +324,7 @@ internal sealed class Lexer
                 _consumer.TryConsumeString(punctuator);
 
                 var tokenType = kv.Value;
-                token = new Token { type = tokenType, data = punctuator };
+                token = new Token { Type = tokenType, Data = punctuator };
                 return true;
             }
         }
@@ -344,7 +346,7 @@ internal sealed class Lexer
     {
         // FIXME: The SourceCharacter immediately following a NumericLiteral must not be an IdentifierStart or DecimalDigit.
         var consumedLiteral = _consumer.ConsumeWhile((_) => IsDecimalLiteral());
-        return new Token { type = TokenType.Number, data = consumedLiteral };
+        return new Token { Type = TokenType.Number, Data = consumedLiteral };
     }
 
     // 12.9.4 String Literals, https://tc39.es/ecma262/#sec-literals-string-literals
@@ -363,10 +365,9 @@ internal sealed class Lexer
         // FIXME: Error if no closing quote is given
         _consumer.TryConsumeString(quoteCodePoint.ToString());
 
-        return new Token { type = TokenType.String, data = quoteCodePoint + consumedString + quoteCodePoint };
+        return new Token { Type = TokenType.String, Data = quoteCodePoint + consumedString + quoteCodePoint };
     }
 
     // FIXME: 12.9.5 Regular Expression Literals, https://tc39.es/ecma262/#sec-literals-regular-expression-literals
     // FIXME: 12.9.6 Template Literal Lexical Components, https://tc39.es/ecma262/#sec-template-literal-lexical-components
-    // FIXME: 12.10 Automatic Semicolon Insertion, https://tc39.es/ecma262/#sec-automatic-semicolon-insertion
 }
