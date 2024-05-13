@@ -16,7 +16,7 @@
     <Description>A JavaScript engine library for parsing and executing JavaScript scripts.</Description>
     <Product>JSS</Product>
     <PackageId>JSS</PackageId>
-    <PackageVersion>$([System.DateTime]::Now.ToString("yy.MM.dd.HHmmss"))</PackageVersion>
+    <PackageVersion Condition="'$(DesignTimeBuild)' != 'true' OR '$(BuildingProject)' == 'true'">$([System.DateTime]::Now.ToString("yy.MM.dd.HHmmss"))</PackageVersion>
   </PropertyGroup>
 
 	<ItemGroup>
