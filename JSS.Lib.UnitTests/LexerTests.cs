@@ -529,16 +529,47 @@ internal sealed class LexerTests
     {
         // Arrange
         var lexer = new Lexer(stringLiteral);
+        var unquotedStringLiteral = stringLiteral[1..^1];
 
         // Act
         var tokens = lexer.Lex().ToList();
 
         // Assert
         tokens.Should().HaveCount(1);
-        AssertThatTokenIs(tokens[0], TokenType.String, stringLiteral);
+        AssertThatTokenIs(tokens[0], TokenType.String, unquotedStringLiteral);
     }
 
-    private void AssertThatTokenIs(Token actual, TokenType expectedType, string expectedData)
+    static private readonly Dictionary<string, string> escapeSequenceTestCases = new()
+    {
+        { "\\\\", "\\" },
+        { "\\'", "'" },
+        { "\\\"", "\"" },
+        { "\\b", "\b" },
+        { "\\t", "\t" },
+        { "\\n", "\n" },
+        { "\\v", "\v" },
+        { "\\f", "\f" },
+        { "\\r", "\r" },
+        { "\\z", "z" },
+    };
+
+    [TestCaseSource(nameof(escapeSequenceTestCases))]
+    public void Lex_ReturnsStringLiteral_WhenProvidingEscapeSequence(KeyValuePair<string, string> testCase)
+    {
+        // Arrange
+        var stringLiteral = testCase.Key;
+        var expectedStringLiteral = testCase.Value;
+        var lexer = new Lexer($"'{stringLiteral}'");
+
+        // Act
+        var tokens = lexer.Lex().ToList();
+
+        // Assert
+        tokens.Should().HaveCount(1);
+        AssertThatTokenIs(tokens[0], TokenType.String, expectedStringLiteral);
+    }
+
+    static private void AssertThatTokenIs(Token actual, TokenType expectedType, string expectedData)
     {
         actual.Type.Should().Be(expectedType);
         actual.Data.Should().Be(expectedData);
