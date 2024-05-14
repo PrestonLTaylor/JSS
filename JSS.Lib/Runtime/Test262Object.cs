@@ -11,13 +11,13 @@ internal sealed class Test262Object : Object
 
     public void Initialize(VM vm)
     {
-        var createRealmBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, createRealm);
+        var createRealmBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, createRealm, 0, "createRealm");
         DataProperties.Add("createRealm", new Property(createRealmBuiltin, new(true, false, true)));
 
-        var evalScriptBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, evalScript);
+        var evalScriptBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, evalScript, 1, "evalScript");
         DataProperties.Add("evalScript", new Property(evalScriptBuiltin, new(true, false, true)));
 
-        var gcBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, gc);
+        var gcBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, gc, 0, "gc");
         DataProperties.Add("gc", new Property(gcBuiltin, new(true, false, true)));
 
         // global, a reference to the global object on which $262 was initially defined

@@ -18,7 +18,7 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
         DataProperties.Add("length", new Property(1, new Attributes(true, false, true)));
 
         // 20.1.2.4 Object.defineProperty ( O, P, Attributes ), https://tc39.es/ecma262/#sec-object.defineproperty
-        var definePropertyBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, defineProperty);
+        var definePropertyBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, defineProperty, 3, "defineProperty");
         DataProperties.Add("defineProperty", new Property(definePropertyBuiltin, new(true, false, true)));
 
         // 20.1.2.21 Object.prototype, The initial value of Object.prototype is the Object prototype object.
@@ -26,11 +26,11 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
         DataProperties.Add("prototype", new Property(realm.ObjectPrototype, new(false, false, false)));
 
         // 20.1.2.8 Object.getOwnPropertyDescriptor ( O, P ), https://tc39.es/ecma262/#sec-object.getownpropertydescriptor
-        var getOwnPropertyDescriptorBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, getOwnPropertyDescriptor);
+        var getOwnPropertyDescriptorBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, getOwnPropertyDescriptor, 2, "getOwnPropertyDescriptor");
         DataProperties.Add("getOwnPropertyDescriptor", new Property(getOwnPropertyDescriptorBuiltin, new(true, false, true)));
 
         // 20.1.2.10 Object.getOwnPropertyNames ( O ), https://tc39.es/ecma262/#sec-object.getownpropertynames
-        var getOwnPropertyNamesBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, getOwnPropertyNames);
+        var getOwnPropertyNamesBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, getOwnPropertyNames, 1, "getOwnPropertyNames");
         DataProperties.Add("getOwnPropertyNames", new Property(getOwnPropertyNamesBuiltin, new(true, false, true)));
     }
 
