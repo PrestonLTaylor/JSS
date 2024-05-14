@@ -50,9 +50,13 @@ public sealed class Number : Value
     // 6.1.6.1.3 Number::exponentiate ( base, exponent ), https://tc39.es/ecma262/#sec-numeric-types-number-exponentiate
     static internal Number Exponentiate(VM _, Number expBase, Number exponent)
     {
-        // FIXME: 1. If exponent is NaN, return NaN.
+        // 1. If exponent is NaN, return NaN.
+        if (double.IsNaN(exponent)) return double.NaN;
+
         // FIXME: 2. If exponent is either + 0𝔽 or - 0𝔽, return 1𝔽.
-        // FIXME: 3. If base is NaN, return NaN.
+
+        // 3. If base is NaN, return NaN.
+        if (double.IsNaN(expBase)) return double.NaN;
 
         // 4. If base is +∞𝔽, then
         if (expBase.Value == double.PositiveInfinity)
@@ -125,7 +129,8 @@ public sealed class Number : Value
     // 6.1.6.1.4 Number::multiply ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-multiply
     static internal Number Multiply(VM _, Number x, Number y)
     {
-        // FIXME: 1. If x is NaN or y is NaN, return NaN.
+        // 1. If x is NaN or y is NaN, return NaN.
+        if (double.IsNaN(x) || double.IsNaN(y)) return double.NaN;
 
         // 2. If x is either +∞𝔽 or -∞𝔽, then
         if (double.IsInfinity(x.Value))
@@ -167,7 +172,8 @@ public sealed class Number : Value
     // 6.1.6.1.5 Number::divide ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-divide
     static internal Number Divide(VM _, Number x, Number y)
     {
-        // FIXME: 1. If x is NaN or y is NaN, return NaN.
+        // 1. If x is NaN or y is NaN, return NaN.
+        if (double.IsNaN(x) || double.IsNaN(y)) return double.NaN;
 
         // 2. If x is either +∞𝔽 or -∞𝔽, then
         if (double.IsInfinity(x))
@@ -213,7 +219,8 @@ public sealed class Number : Value
     // 6.1.6.1.6 Number::remainder ( n, d ), https://tc39.es/ecma262/#sec-numeric-types-number-remainder
     static internal Number Remainder(VM _, Number n, Number d)
     {
-        // FIXME: 1. If n is NaN or d is NaN, return NaN.
+        // 1. If n is NaN or d is NaN, return NaN.
+        if (double.IsNaN(n) || double.IsNaN(d)) return double.NaN;
 
         // 2. If n is either +∞𝔽 or -∞𝔽, return NaN.
         if (double.IsInfinity(n.Value)) return double.NaN;
@@ -221,7 +228,9 @@ public sealed class Number : Value
         // 3. If d is either +∞𝔽 or -∞𝔽, return n.
         if (double.IsInfinity(d)) return n;
 
-        // FIXME: 4. If d is either + 0𝔽 or -0𝔽, return NaN.
+        // 4. If d is either + 0𝔽 or FIXME: -0𝔽, return NaN.
+        if (d == 0) return double.NaN;
+
         // FIXME: 5. If n is either + 0𝔽 or -0𝔽, return n.
         // FIXME: 6. Assert: n and d are finite and non-zero.
         // FIXME: 7. Let quotient be ℝ(n) / ℝ(d).
@@ -235,7 +244,8 @@ public sealed class Number : Value
     // 6.1.6.1.7 Number::add ( x, y ), https://tc39.es/ecma262/#sec-numeric-types-number-add
     static internal Number Add(VM _, Number x, Number y)
     {
-        // FIXME: 1. If x is NaN or y is NaN, return NaN.
+        // 1. If x is NaN or y is NaN, return NaN.
+        if (double.IsNaN(x) || double.IsNaN(y)) return double.NaN;
 
         // 2. If x is +∞𝔽 and y is -∞𝔽, return NaN.
         if (x.Value == double.PositiveInfinity && y.Value == double.NegativeInfinity) return double.NaN;
@@ -316,8 +326,12 @@ public sealed class Number : Value
     // 6.1.6.1.12 Number::lessThan(x, y), https://tc39.es/ecma262/#sec-numeric-types-number-lessThan
     static internal Value LessThan(Number x, Number y)
     {
-        // FIXME: 1. If x is NaN, return undefined.
-        // FIXME: 2. If y is NaN, return undefined.
+        // 1. If x is NaN, return undefined.
+        if (double.IsNaN(x)) return Undefined.The;
+
+        // 2. If y is NaN, return undefined.
+        if (double.IsNaN(y)) return Undefined.The;
+
         // FIXME: 3. If x is y, return false.
         // FIXME: 4. If x is +0𝔽 and y is -0𝔽, return false.
         // FIXME: 5. If x is -0𝔽 and y is +0𝔽, return false.
