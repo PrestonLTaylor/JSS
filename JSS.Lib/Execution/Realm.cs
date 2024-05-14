@@ -198,6 +198,10 @@ public sealed class Realm
         var evalBuiltinFunction = BuiltinFunction.CreateBuiltinFunction(vm, Eval.eval);
         globalProperties.Add("eval", new(evalBuiltinFunction, new(true, false, true)));
 
+        // 19.2.3 isNaN ( number )
+        var isNaNBuiltinFunction = BuiltinFunction.CreateBuiltinFunction(vm, isNaN);
+        globalProperties.Add("isNaN", new(isNaNBuiltinFunction, new(true, false, true)));
+
         // 19.3 Constructor Properties of the Global Object
         // 20.5.1 The Error Constructor, https://tc39.es/ecma262/#sec-error-constructor
         globalProperties.Add("Error", new Property(ErrorConstructor, new(true, false, true)));
@@ -281,6 +285,18 @@ public sealed class Realm
 
         // 12. Return UNUSED.
         return Empty.The;
+    }
+
+    // 19.2.3 isNaN ( number ), https://tc39.es/ecma262/#sec-isnan-number
+    static private Completion isNaN(VM vm, Value thisValue, List argumentList)
+    {
+        // 1. Let num be ? ToNumber(number).
+        var num = argumentList[0].ToNumber(vm);
+        if (num.IsAbruptCompletion()) return num.Completion;
+
+        // 2. If num is NaN, return true.
+        // 3. Otherwise, return false.
+        return double.IsNaN(num.Value);
     }
 
     internal Agent Agent { get; }
