@@ -356,10 +356,10 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
     }
 
     // 10.2.9 SetFunctionName ( F, name [ , prefix ] ), https://tc39.es/ecma262/#sec-setfunctionname
-    public void SetFunctionName(VM vm, string name, string prefix = "")
+    static public void SetFunctionName(VM vm, Object F, string name, string prefix = "")
     {
         // 1. Assert: FIXME: (F is an extensible object) that does not have a "name" own property.
-        Assert(!DataProperties.ContainsKey("name"), "1. Assert: F is an extensible object that does not have a \"name\" own property.");
+        Assert(!F.DataProperties.ContainsKey("name"), "1. Assert: F is an extensible object that does not have a \"name\" own property.");
 
         // FIXME: 2. If name is a Symbol, then
         // FIXME: a. Let description be name's [[Description]] value.
@@ -381,7 +381,7 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         }
 
         // 6. Perform ! DefinePropertyOrThrow(F, "name", PropertyDescriptor { [[Value]]: name, [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: true }).
-        MUST(DefinePropertyOrThrow(vm, this, "name", new Property(name, new Attributes(false, false, true))));
+        MUST(DefinePropertyOrThrow(vm, F, "name", new Property(name, new Attributes(false, false, true))));
 
         // 7. Return unused.
     }

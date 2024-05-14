@@ -17,11 +17,11 @@ internal class ObjectPrototype : Object
         DataProperties.Add("constructor", new Property(realm.ObjectConstructor, new Attributes(true, false, true)));
 
         // 20.1.3.2 Object.prototype.hasOwnProperty ( V ), https://tc39.es/ecma262/#sec-object.prototype.hasownproperty
-        var hasOwnPropertyBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, hasOwnProperty);
+        var hasOwnPropertyBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, hasOwnProperty, 1, "hasOwnProperty");
         DataProperties.Add("hasOwnProperty", new Property(hasOwnPropertyBuiltin, new Attributes(true, false, true)));
 
         // 20.1.3.6 Object.prototype.toString ( ), https://tc39.es/ecma262/#sec-object.prototype.tostring
-        var toStringBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toString);
+        var toStringBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toString, 0, "toString");
         DataProperties.Add("toString", new Property(toStringBuiltin, new Attributes(true, false, true)));
     }
 

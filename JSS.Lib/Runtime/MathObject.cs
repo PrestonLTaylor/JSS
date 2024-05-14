@@ -14,7 +14,7 @@ internal sealed class MathObject : Object
     public void Initialize(VM vm)
     {
         // 21.3.2.26 Math.pow ( base, exponent ), https://tc39.es/ecma262/#sec-math.pow
-        var powBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, pow);
+        var powBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, pow, 2, "pow");
         DataProperties.Add("pow", new(powBuiltin, new(true, false, true)));
     }
 

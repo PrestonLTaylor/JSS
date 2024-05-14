@@ -46,7 +46,7 @@ internal sealed class FunctionExpression : IExpression
         var closure = FunctionObject.OrdinaryFunctionCreate(vm.FunctionPrototype, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, env!, vm.IsStrict || IsStrict);
 
         // 6. Perform SetFunctionName(closure, name).
-        closure.SetFunctionName(vm, name);
+        FunctionObject.SetFunctionName(vm, closure, name);
 
         // 7. Perform MakeConstructor(closure).
         closure.MakeConstructor(vm);
@@ -78,7 +78,7 @@ internal sealed class FunctionExpression : IExpression
         var closure = FunctionObject.OrdinaryFunctionCreate(vm.FunctionPrototype, Parameters, Body, LexicalThisMode.NON_LEXICAL_THIS, funcEnv, vm.IsStrict || IsStrict);
 
         // 9. Perform SetFunctionName(closure, name).
-        closure.SetFunctionName(vm, name);
+        FunctionObject.SetFunctionName(vm, closure, name);
 
         // 10. Perform MakeConstructor(closure).
         closure.MakeConstructor(vm);

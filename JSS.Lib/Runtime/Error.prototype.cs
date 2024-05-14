@@ -23,7 +23,7 @@ internal sealed class ErrorPrototype : Object
         DataProperties.Add("name", new Property("Error", new(true, false, false)));
 
         // 20.5.3.4 Error.prototype.toString ( ), https://tc39.es/ecma262/#sec-error.prototype.tostring
-        var toStringBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toString);
+        var toStringBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toString, 0, "toString");
         DataProperties.Add("toString", new Property(toStringBuiltin, new(false, false, false)));
     }
 

@@ -14,7 +14,7 @@ internal sealed class ArrayConstructor : Object
     public void Initialize(Realm realm, VM vm)
     {
         // 23.1.2.2 Array.isArray ( arg ), https://tc39.es/ecma262/#sec-array.isarray
-        var isArrayBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, isArray);
+        var isArrayBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, isArray, 1, "isArray");
         DataProperties.Add("isArray", new(isArrayBuiltin, new(true, false, true)));
 
         // 23.1.2.4 Array.prototype, https://tc39.es/ecma262/#sec-array.prototype

@@ -198,15 +198,15 @@ public sealed class Realm
 
         // 19.2 Function Properties of the Global Object
         // 19.2.1 eval ( x ), https://tc39.es/ecma262/#sec-eval-x
-        var evalBuiltinFunction = BuiltinFunction.CreateBuiltinFunction(vm, Eval.eval);
+        var evalBuiltinFunction = BuiltinFunction.CreateBuiltinFunction(vm, Eval.eval, 1, "eval");
         globalProperties.Add("eval", new(evalBuiltinFunction, new(true, false, true)));
 
         // 19.2.2 isFinite ( number )
-        var isFiniteBuiltinFunction = BuiltinFunction.CreateBuiltinFunction(vm, isFinite);
+        var isFiniteBuiltinFunction = BuiltinFunction.CreateBuiltinFunction(vm, isFinite, 1, "isFinite");
         globalProperties.Add("isFinite", new(isFiniteBuiltinFunction, new(true, false, true)));
 
         // 19.2.3 isNaN ( number )
-        var isNaNBuiltinFunction = BuiltinFunction.CreateBuiltinFunction(vm, isNaN);
+        var isNaNBuiltinFunction = BuiltinFunction.CreateBuiltinFunction(vm, isNaN, 1, "isNaN");
         globalProperties.Add("isNaN", new(isNaNBuiltinFunction, new(true, false, true)));
 
         // 19.3 Constructor Properties of the Global Object

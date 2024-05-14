@@ -62,8 +62,9 @@ internal sealed class BuiltinFunction : Object, ICallable, IConstructable
         return result;
     }
 
-    // 10.3.4 CreateBuiltinFunction ( behaviour, FIXME: length, FIXME: name, FIXME: additionalInternalSlotsList [ , realm [ , prototype [ , FIXME: prefix ] ] ] ), https://tc39.es/ecma262/#sec-createbuiltinfunction
-    static public BuiltinFunction CreateBuiltinFunction(VM vm, Func<VM, Value, List, Completion> behaviour, Realm? realm = null, Object? prototype = null)
+    // 10.3.4 CreateBuiltinFunction ( behaviour, length, name, FIXME: additionalInternalSlotsList [ , realm [ , prototype [ , prefix ] ] ] ), https://tc39.es/ecma262/#sec-createbuiltinfunction
+    static public BuiltinFunction CreateBuiltinFunction(VM vm, Func<VM, Value, List, Completion> behaviour, int length, string name,
+        Realm? realm = null, Object? prototype = null, string prefix = "")
     {
         // 1. If realm is not present, set realm to the current Realm Record.
         realm ??= vm.Realm;
@@ -88,12 +89,14 @@ internal sealed class BuiltinFunction : Object, ICallable, IConstructable
 
         // FIXME: 9. Set func.[[InitialName]] to null.
 
-        // FIXME: 10. Perform SetFunctionLength(func, length).
+        // 10. Perform SetFunctionLength(func, length).
+        FunctionObject.SetFunctionLength(vm, func, length);
 
-        // FIXME: 11. If prefix is not present, then
-        // FIXME: a. Perform SetFunctionName(func, name).
-        // FIXME: 12. Else,
-        // FIXME: a. Perform SetFunctionName(func, name, prefix).
+        // 11. If prefix is not present, then
+        // a. Perform SetFunctionName(func, name).
+        // 12. Else,
+        // a. Perform SetFunctionName(func, name, prefix).
+        FunctionObject.SetFunctionName(vm, func, name, prefix);
 
         // 13. Return func.
         return func;
