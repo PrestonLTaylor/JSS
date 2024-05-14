@@ -198,6 +198,10 @@ public sealed class Realm
         var evalBuiltinFunction = BuiltinFunction.CreateBuiltinFunction(vm, Eval.eval);
         globalProperties.Add("eval", new(evalBuiltinFunction, new(true, false, true)));
 
+        // 19.2.2 isFinite ( number )
+        var isFiniteBuiltinFunction = BuiltinFunction.CreateBuiltinFunction(vm, isFinite);
+        globalProperties.Add("isFinite", new(isFiniteBuiltinFunction, new(true, false, true)));
+
         // 19.2.3 isNaN ( number )
         var isNaNBuiltinFunction = BuiltinFunction.CreateBuiltinFunction(vm, isNaN);
         globalProperties.Add("isNaN", new(isNaNBuiltinFunction, new(true, false, true)));
@@ -285,6 +289,18 @@ public sealed class Realm
 
         // 12. Return UNUSED.
         return Empty.The;
+    }
+
+    // 19.2.2 isFinite ( number ), https://tc39.es/ecma262/#sec-isfinite-number
+    static private Completion isFinite(VM vm, Value thisValue, List argumentList)
+    {
+        // 1. Let num be ? ToNumber(number).
+        var num = argumentList[0].ToNumber(vm);
+        if (num.IsAbruptCompletion()) return num.Completion;
+
+        // 2. If num is not finite, return false.
+        // 3. Otherwise, return true.
+        return double.IsFinite(num.Value);
     }
 
     // 19.2.3 isNaN ( number ), https://tc39.es/ecma262/#sec-isnan-number
