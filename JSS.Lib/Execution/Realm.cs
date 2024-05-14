@@ -187,6 +187,9 @@ public sealed class Realm
         // 19.1.2 Infinity
         globalProperties.Add("Infinity", new Property(Number.Infinity, new(false, false, false)));
 
+        // 19.1.3 NaN
+        globalProperties.Add("NaN", new Property(Number.NaN, new(false, false, false)));
+
         // 19.1.4 undefined
         globalProperties.Add("undefined", new Property(Undefined.The, new(false, false, false)));
 
