@@ -184,6 +184,9 @@ public sealed class Realm
         Dictionary<string, Property> globalProperties = new();
 
         // 19.1 Value Properties of the Global Object
+        // 19.1.1 globalThis, The initial value of the "globalThis" property of the global object in a Realm Record realm is realm.[[GlobalEnv]].[[GlobalThisValue]].
+        globalProperties.Add("globalThis", new Property(GlobalEnv!.GlobalThisValue, new(true, false, true)));
+
         // 19.1.2 Infinity
         globalProperties.Add("Infinity", new Property(Number.Infinity, new(false, false, false)));
 
