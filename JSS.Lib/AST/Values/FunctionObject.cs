@@ -386,6 +386,18 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         // 7. Return unused.
     }
 
+    // 10.2.10 SetFunctionLength ( F, length ), https://tc39.es/ecma262/#sec-setfunctionlength
+    static public void SetFunctionLength(VM vm, Object F, int length)
+    {
+        // 1. Assert: FIXME: (F is an extensible object) that does not have a "length" own property.
+        Assert(!F.DataProperties.ContainsKey("length"), "1. Assert: F is an extensible object that does not have a \"length\" own property.");
+
+        // 2. Perform ! DefinePropertyOrThrow(F, "length", PropertyDescriptor { [[Value]]: 𝔽(length), [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: true }).
+        MUST(DefinePropertyOrThrow(vm, F, "length", new Property(length, new(false, false, true))));
+
+        // 3. Return unused.
+    }
+
     // 10.2.11 FunctionDeclarationInstantiation ( func, argumentsList ), https://tc39.es/ecma262/#sec-functiondeclarationinstantiation
     private Completion FunctionDeclarationInstantiation(VM vm, List argumentsList)
     {
