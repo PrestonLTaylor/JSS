@@ -1580,6 +1580,177 @@ internal sealed class ParserTests
         parameters[0].Name.Should().Be(expectedParameterIdentifier);
     }
 
+    // Tests for 15.3 Arrow Function Definitions, https://tc39.es/ecma262/#sec-arrow-function-definitions
+    [Test]
+    public void Parse_ReturnsArrowFunctionExpression_WithNoParameters_WhenProvidingArrowFunction_WithNoParameters()
+    {
+        // Arrange
+        var parser = new Parser("() => {}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var arrowFunctionExpression = expressionStatement!.Expression as ArrowFunctionExpression;
+        arrowFunctionExpression.Should().NotBeNull();
+        arrowFunctionExpression!.Parameters.Should().BeEmpty();
+    }
+
+    [Test]
+    public void Parse_ReturnsArrowFunctionExpression_WithAParameter_WhenProvidingArrowFunction_WithAnUncoveredParameter()
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        var parser = new Parser($"{expectedIdentifier} => {{ }}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var arrowFunctionExpression = expressionStatement!.Expression as ArrowFunctionExpression;
+        arrowFunctionExpression.Should().NotBeNull();
+        arrowFunctionExpression!.Parameters.Should().HaveCount(1);
+
+        var parameter = arrowFunctionExpression.Parameters[0];
+        parameter.Should().NotBeNull();
+        parameter!.Name.Should().Be(expectedIdentifier);
+    }
+
+    [Test]
+    public void Parse_ReturnsArrowFunctionExpression_WithAParameter_WhenProvidingArrowFunction_WithACoveredParameter()
+    {
+        // Arrange
+        const string expectedIdentifier = "expectedIdentifier";
+        var parser = new Parser($"({expectedIdentifier}) => {{ }}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var arrowFunctionExpression = expressionStatement!.Expression as ArrowFunctionExpression;
+        arrowFunctionExpression.Should().NotBeNull();
+        arrowFunctionExpression!.Parameters.Should().HaveCount(1);
+
+        var parameter = arrowFunctionExpression.Parameters[0];
+        parameter.Should().NotBeNull();
+        parameter!.Name.Should().Be(expectedIdentifier);
+    }
+
+    [Test]
+    public void Parse_ReturnsArrowFunctionExpression_WithAnEmptyStatementList_WhenProvidingArrowFunction_WithAnEmptyBody()
+    {
+        // Arrange
+        var parser = new Parser("() => {}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var arrowFunctionExpression = expressionStatement!.Expression as ArrowFunctionExpression;
+        arrowFunctionExpression.Should().NotBeNull();
+
+        var body = arrowFunctionExpression!.Body as StatementList;
+        body.Should().NotBeNull();
+        body!.Statements.Should().BeEmpty();
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsArrowFunctionExpression_WithAnExpressionBody_WhenProvidingArrowFunction_WithAnUncoveredAssignmentExpressionBody
+        (KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"() => {expression}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var arrowFunctionExpression = expressionStatement!.Expression as ArrowFunctionExpression;
+        arrowFunctionExpression.Should().NotBeNull();
+
+        var body = arrowFunctionExpression!.Body as ExpressionBody;
+        body.Should().NotBeNull();
+        body!.Expression.Should().BeOfType(expectedExpressionType);
+    }
+
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsArrowFunctionExpression_WithAStatementList_WhenProvidingArrowFunction_WithAStatementList
+        (KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"() => {{ {expression} }}");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var arrowFunctionExpression = expressionStatement!.Expression as ArrowFunctionExpression;
+        arrowFunctionExpression.Should().NotBeNull();
+
+        var body = arrowFunctionExpression!.Body as StatementList;
+        body.Should().NotBeNull();
+
+        body!.Statements.Should().HaveCount(1);
+
+        var bodyExpressionStatement = body.Statements[0] as ExpressionStatement;
+        bodyExpressionStatement.Should().NotBeNull();
+        bodyExpressionStatement!.Expression.Should().BeOfType(expectedExpressionType);
+    }
+
+    [Test]
+    public void Parse_ThrowsSyntaxError_WhenArrowFunctionHead_IsSeperatedByLineTerminator()
+    {
+        // Assert
+        var parser = new Parser("()\n=> { }");
+        var expectedException = ErrorHelper.CreateSyntaxError(ErrorType.ArrowFunctionHeadHasLineTerminator);
+
+        // Act
+
+        // Assert
+        AssertThatSyntaxErrorMatchesExpected(parser, expectedException);
+    }
+
     // Tests for 15.7 Class Definitions, https://tc39.es/ecma262/#sec-class-definitions
     [Test]
     public void Parse_ReturnsEmptyClassDeclaration_WhenProvidingEmptyClass()
@@ -2219,7 +2390,9 @@ internal sealed class ParserTests
         {"let a = { a:", "}"},
         {"let a = { \"a\":", "}"},
         {"let a = { 1:", "}"},
-        {"a :", "}"}
+        {"a :", "}"},
+        {"a =>", "}" },
+        {"(a) =>", "}" }
     };
 
     [TestCaseSource(nameof(unexpectedTokenTestCases))]
@@ -2336,6 +2509,8 @@ internal sealed class ParserTests
         "let a = { \"a\":",
         "let a = { 1:",
         "a :",
+        "a =>",
+        "(a) =>",
     };
 
     [TestCaseSource(nameof(unexpectedEofTestCases))]
