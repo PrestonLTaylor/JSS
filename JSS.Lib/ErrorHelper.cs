@@ -2,6 +2,7 @@
 
 internal enum ErrorType
 {
+    ArrowFunctionHeadHasLineTerminator,
     ConstWithoutInitializer,
     IllegalNewLineAfterThrow,
     TryWithoutCatchOrFinally,
@@ -35,6 +36,7 @@ internal sealed class ErrorHelper
 
     static private readonly Dictionary<ErrorType, string> errorTypeToFormatString = new()
     {
+        { ErrorType.ArrowFunctionHeadHasLineTerminator, "SyntaxError: An arrow function's '=>' should be on the same line as their arguments." },
         { ErrorType.ConstWithoutInitializer, "SyntaxError: Missing initializer in const declaration" },
         { ErrorType.IllegalNewLineAfterThrow, "SyntaxError: Illegal newline after throw" },
         { ErrorType.TryWithoutCatchOrFinally, "SyntaxError: Try statement without catch or finally blocks" },

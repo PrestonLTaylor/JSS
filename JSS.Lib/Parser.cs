@@ -249,6 +249,11 @@ public sealed class Parser
 
     private bool TryParseAssignmentExpression(out IExpression? parsedExpression)
     {
+        if (TryParseArrowFunction(out parsedExpression))
+        {
+            return true;
+        }
+
         if (!TryParseConditionalExpression(out IExpression? lhs))
         {
             parsedExpression = null;
@@ -262,6 +267,67 @@ public sealed class Parser
         }
 
         return true;
+    }
+
+    private bool TryParseArrowFunction(out IExpression? arrowFunction)
+    {
+        if (!TryParseArrowFunctionHead(out var parameters))
+        {
+            arrowFunction = null;
+            return false;
+        }
+
+        var body = ParseConciseBody(out var isStrict);
+
+        arrowFunction = new ArrowFunctionExpression(parameters!, body, isStrict);
+        return true;
+    }
+
+    private bool TryParseArrowFunctionHead(out List<Identifier>? arrowFunctionParameters)
+    {
+        var previousIndex = _consumer.Index;
+        if (IsIdentifier())
+        {
+            arrowFunctionParameters = new() { ParseIdentifier() };
+        }
+        else if (!TryParseFormalParameters(out arrowFunctionParameters))
+        {
+            _consumer.Rewind(previousIndex);
+            return false;
+        }
+
+        var isLineTerminatorAfterArguments = _consumer.IsLineTerminator();
+        if (!_consumer.IsTokenOfType(TokenType.ArrowFunction))
+        {
+            _consumer.Rewind(previousIndex);
+            return false;
+        }
+
+        // The '=>' of an arrow function must be on the same line as defined in the spec
+        if (isLineTerminatorAfterArguments) ErrorHelper.ThrowSyntaxError(ErrorType.ArrowFunctionHeadHasLineTerminator);
+        _consumer.ConsumeTokenOfType(TokenType.ArrowFunction);
+        return true;
+    }
+
+    private INode ParseConciseBody(out bool isStrict)
+    {
+        if (_consumer.IsTokenOfType(TokenType.OpenBrace))
+        {
+            _consumer.ConsumeTokenOfType(TokenType.OpenBrace);
+
+            isStrict = ParseDirectivePrologue();
+            var body = ParseFunctionBody();
+
+            _consumer.ConsumeTokenOfType(TokenType.ClosedBrace);
+            return body;
+        }
+        else
+        {
+            isStrict = false;
+
+            var expression = ParseAssignmentExpression();
+            return new ExpressionBody(expression);
+        }
     }
 
     private bool IsLeftHandSideExpressionNode(IExpression expression)
@@ -2207,6 +2273,26 @@ public sealed class Parser
     }
 
     // 15.1 Parameter Lists, https://tc39.es/ecma262/#sec-parameter-lists
+    private bool TryParseFormalParameters(out List<Identifier>? formalParameters)
+    {
+        var previousIndex = _consumer.Index;
+
+        try
+        {
+            _consumer.ConsumeTokenOfType(TokenType.OpenParen);
+            formalParameters = ParseFormalParameters();
+            _consumer.ConsumeTokenOfType(TokenType.ClosedParen);
+        }
+        catch
+        {
+            _consumer.Rewind(previousIndex);
+            formalParameters = null;
+            return false;
+        }
+
+        return true;
+    }
+
     private List<Identifier> ParseFormalParameters()
     {
         // FIXME: Parse FormalParameters as BindingElements, https://tc39.es/ecma262/#prod-FormalParameter
