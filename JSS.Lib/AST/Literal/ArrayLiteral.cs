@@ -4,6 +4,11 @@ namespace JSS.Lib.AST.Literal;
 
 internal sealed class ArrayLiteral : IExpression
 {
+    public ArrayLiteral(List<IExpression?> elements)
+    {
+        Elements = elements;
+    }
+
     // 13.2.4.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-array-initializer-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
@@ -14,4 +19,6 @@ internal sealed class ArrayLiteral : IExpression
         // 3. Return array.
         return array;
     }
+
+    public IReadOnlyList<IExpression?> Elements { get; }
 }

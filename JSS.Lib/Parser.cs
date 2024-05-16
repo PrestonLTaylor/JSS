@@ -1504,11 +1504,31 @@ public sealed class Parser
 
     private ArrayLiteral ParseArrayLiteral()
     {
-        // FIXME: Implement parsing of ElementList
         _consumer.ConsumeTokenOfType(TokenType.OpenSquare);
+
+        var elements = ParseElementList();
+
         _consumer.ConsumeTokenOfType(TokenType.ClosedSquare);
 
-        return new ArrayLiteral();
+        return new ArrayLiteral(elements);
+    }
+
+    private List<IExpression?> ParseElementList()
+    {
+        var elements = new List<IExpression?>();
+        while (!_consumer.IsTokenOfType(TokenType.ClosedSquare))
+        {
+            // FIXME: Parse SpreadElement
+            // NOTE: We count a null as an elision, if TryParseAssignmentExpression fails, expression will contain null
+            TryParseAssignmentExpression(out var expression);
+            elements.Add(expression);
+
+            // If there is no comma then we can't parse any more elements
+            if (!_consumer.IsTokenOfType(TokenType.Comma)) break;
+            _consumer.ConsumeTokenOfType(TokenType.Comma);
+        }
+
+        return elements;
     }
 
     // 13.2.5 Object Initializer, https://tc39.es/ecma262/#prod-ObjectLiteral

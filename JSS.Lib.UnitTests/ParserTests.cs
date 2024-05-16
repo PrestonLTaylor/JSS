@@ -2118,7 +2118,6 @@ internal sealed class ParserTests
         assignmentExpression.Rhs.Should().BeOfType(expectedExpressionType);
     }
 
-    // FIXME: More tests when we don't only parse empty array literals
     // Tests for ArrayLiteral
     [Test]
     public void Parse_ReturnsAssignment_WithArrayLiteralRHS_WhenProvidingAssignment_WithArrayLiteralRHS()
@@ -2141,6 +2140,58 @@ internal sealed class ParserTests
 
         var objectLiteral = assignmentExpression!.Rhs as ArrayLiteral;
         objectLiteral.Should().NotBeNull();
+        objectLiteral!.Elements.Should().HaveCount(0);
+    }
+
+    [TestCaseSource(nameof(expressionToExpectedTypeTestCases))]
+    public void Parse_ReturnsArrayLiteral_WithAssignmentExpressionData_WhenProvidingArrayLiteral_WithDataElement(KeyValuePair<string, Type> expressionToExpectedType)
+    {
+        // Arrange
+        var expression = expressionToExpectedType.Key;
+        var expectedExpressionType = expressionToExpectedType.Value;
+        var parser = new Parser($"[{expression}]");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var objectLiteral = expressionStatement!.Expression as ArrayLiteral;
+        objectLiteral.Should().NotBeNull();
+        objectLiteral!.Elements.Should().HaveCount(1);
+
+        var element = objectLiteral.Elements[0];
+        element.Should().NotBeNull();
+        element.Should().BeOfType(expectedExpressionType);
+    }
+
+    [Test]
+    public void Parse_ReturnsArrayLiteral_WithNullDataElement_WhenProvidingArrayLiteral_WithElision()
+    {
+        // Arrange
+        var parser = new Parser("[,]");
+
+        // Act
+        var parsedProgram = ParseScript(parser);
+        var rootNodes = parsedProgram.ScriptCode;
+
+        // Assert
+        rootNodes.Should().HaveCount(1);
+
+        var expressionStatement = rootNodes[0] as ExpressionStatement;
+        expressionStatement.Should().NotBeNull();
+
+        var objectLiteral = expressionStatement!.Expression as ArrayLiteral;
+        objectLiteral.Should().NotBeNull();
+        objectLiteral!.Elements.Should().HaveCount(1);
+
+        var element = objectLiteral.Elements[0];
+        element.Should().BeNull();
     }
 
     // FIXME: More tests when we don't only parse empty object literals
