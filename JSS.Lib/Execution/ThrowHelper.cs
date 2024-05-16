@@ -78,7 +78,7 @@ internal static class ThrowHelper
     {
         List arguments = new();
         arguments.Values.Add(message);
-        var constructResult = constructor.Construct(vm, arguments);
+        var constructResult = constructor.Construct(vm, arguments, Undefined.The);
         if (constructResult.IsAbruptCompletion()) return constructResult;
         return Completion.ThrowCompletion(constructResult.Value);
     }

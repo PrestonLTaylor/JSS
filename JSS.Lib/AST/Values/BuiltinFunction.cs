@@ -1,5 +1,4 @@
 ﻿using JSS.Lib.Execution;
-using JSS.Lib.Runtime;
 
 namespace JSS.Lib.AST.Values;
 
@@ -7,7 +6,7 @@ namespace JSS.Lib.AST.Values;
 internal sealed class BuiltinFunction : Object, ICallable, IConstructable
 {
 #pragma warning disable CS8618 // All properties are initialised in OrdinaryFunctionCreate
-    private BuiltinFunction(Object prototype, Func<VM, Value, List, Completion> behaviour) : base(prototype)
+    private BuiltinFunction(Object prototype, Func<VM, Value, List, Object, Completion> behaviour) : base(prototype)
     {
         Behaviour = behaviour;
     }
@@ -17,18 +16,18 @@ internal sealed class BuiltinFunction : Object, ICallable, IConstructable
     public Completion Call(VM vm, Value thisArgument, List argumentList)
     {
         // 1. Return ? BuiltinCallOrConstruct(F, thisArgument, argumentsList, undefined).
-        return BuiltinCallOrConstruct(vm, thisArgument, argumentList);
+        return BuiltinCallOrConstruct(vm, thisArgument, argumentList, Undefined.The);
     }
 
-    // 10.3.2 [[Construct]] ( argumentsList, FIXME: newTarget ), https://tc39.es/ecma262/#sec-built-in-function-objects-construct-argumentslist-newtarget
-    public Completion Construct(VM vm, List argumentsList)
+    // 10.3.2 [[Construct]] ( argumentsList, newTarget ), https://tc39.es/ecma262/#sec-built-in-function-objects-construct-argumentslist-newtarget
+    public Completion Construct(VM vm, List argumentsList, Object newTarget)
     {
         // 1. Return ? BuiltinCallOrConstruct(F, UNINITIALIZED, argumentsList, newTarget).
-        return BuiltinCallOrConstruct(vm, null, argumentsList);
+        return BuiltinCallOrConstruct(vm, null, argumentsList, newTarget);
     }
 
-    // 10.3.3 BuiltinCallOrConstruct ( F, thisArgument, argumentsList, FIXME: newTarget ), https://tc39.es/ecma262/#sec-builtincallorconstruct
-    private Completion BuiltinCallOrConstruct(VM vm, Value? thisArgument, List argumentsList)
+    // 10.3.3 BuiltinCallOrConstruct ( F, thisArgument, argumentsList, newTarget ), https://tc39.es/ecma262/#sec-builtincallorconstruct
+    private Completion BuiltinCallOrConstruct(VM vm, Value? thisArgument, List argumentsList, Object newTarget)
     {
         // 1. Let callerContext be the running execution context.
         var callerContext = (vm.CurrentExecutionContext as ScriptExecutionContext)!;
@@ -51,7 +50,7 @@ internal sealed class BuiltinFunction : Object, ICallable, IConstructable
         // 10. Let result be the Completion Record that is the result of evaluating F in a manner that conforms to the specification of F.
         // If thisArgument is UNINITIALIZED, the this value is uninitialized; otherwise, thisArgument provides the this value.
         // argumentsList provides the named parameters. newTarget provides the NewTarget value.
-        var result = Behaviour(vm, thisArgument ?? Undefined.The, argumentsList);
+        var result = Behaviour(vm, thisArgument ?? Undefined.The, argumentsList, newTarget);
 
         // 11. NOTE: If F is defined in this document, “the specification of F” is the behaviour specified for it via algorithm steps or other means.
 
@@ -63,7 +62,7 @@ internal sealed class BuiltinFunction : Object, ICallable, IConstructable
     }
 
     // 10.3.4 CreateBuiltinFunction ( behaviour, length, name, FIXME: additionalInternalSlotsList [ , realm [ , prototype [ , prefix ] ] ] ), https://tc39.es/ecma262/#sec-createbuiltinfunction
-    static public BuiltinFunction CreateBuiltinFunction(VM vm, Func<VM, Value, List, Completion> behaviour, int length, string name,
+    static public BuiltinFunction CreateBuiltinFunction(VM vm, Func<VM, Value, List, Object, Completion> behaviour, int length, string name,
         Realm? realm = null, Object? prototype = null, string prefix = "")
     {
         // 1. If realm is not present, set realm to the current Realm Record.
@@ -102,6 +101,6 @@ internal sealed class BuiltinFunction : Object, ICallable, IConstructable
         return func;
     }
 
-    public Func<VM, Value, List, Completion> Behaviour { get; private set; }
+    public Func<VM, Value, List, Object, Completion> Behaviour { get; private set; }
     public Realm Realm { get; private set; }
 }

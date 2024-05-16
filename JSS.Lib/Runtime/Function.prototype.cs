@@ -19,7 +19,7 @@ internal sealed class FunctionPrototype : Object
     }
 
     // 20.2.3.3 Function.prototype.call ( thisArg, ...args ), https://tc39.es/ecma262/#sec-function.prototype.call
-    private Completion call(VM vm, Value thisArg, List argumentList)
+    private Completion call(VM vm, Value thisArg, List argumentList, Object newTarget)
     {
         // 1. Let func be the this value.
         var func = thisArg;

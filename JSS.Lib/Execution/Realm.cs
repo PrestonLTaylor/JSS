@@ -295,7 +295,7 @@ public sealed class Realm
     }
 
     // 19.2.2 isFinite ( number ), https://tc39.es/ecma262/#sec-isfinite-number
-    static private Completion isFinite(VM vm, Value thisValue, List argumentList)
+    static private Completion isFinite(VM vm, Value thisValue, List argumentList, Object newTarget)
     {
         // 1. Let num be ? ToNumber(number).
         var num = argumentList[0].ToNumber(vm);
@@ -307,7 +307,7 @@ public sealed class Realm
     }
 
     // 19.2.3 isNaN ( number ), https://tc39.es/ecma262/#sec-isnan-number
-    static private Completion isNaN(VM vm, Value thisValue, List argumentList)
+    static private Completion isNaN(VM vm, Value thisValue, List argumentList, Object newTarget)
     {
         // 1. Let num be ? ToNumber(number).
         var num = argumentList[0].ToNumber(vm);

@@ -22,11 +22,11 @@ internal sealed class ErrorConstructor : Object, ICallable, IConstructable
     // 20.5.1.1 Error ( message [ , options ] ), https://tc39.es/ecma262/#sec-error-message
     public Completion Call(VM vm, Value thisArgument, List argumentList)
     {
-        return Construct(vm, argumentList);
+        return Construct(vm, argumentList, Undefined.The);
     }
 
     // 20.5.1.1 Error ( message [ , options ] ), https://tc39.es/ecma262/#sec-error-message
-    public Completion Construct(VM vm, List argumentsList)
+    public Completion Construct(VM vm, List argumentsList, Object newTarget)
     {
         // FIXME: 1. If NewTarget is undefined, let newTarget be the active function object; else let newTarget be NewTarget.
 

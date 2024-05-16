@@ -36,7 +36,7 @@ internal class StringConstructor : Object, ICallable, IConstructable
     }
 
     // 22.1.1.1 String ( value ), https://tc39.es/ecma262/#sec-string-constructor-string-value
-    public Completion Construct(VM vm, List argumentsList)
+    public Completion Construct(VM vm, List argumentsList, Object newTarget)
     {
         throw new NotImplementedException();
     }
