@@ -53,7 +53,7 @@ internal sealed class NewExpression : IExpression
 
         // 6. Return ? Construct(constructor, argList).
         var constructable = constructor.Value.AsConstructable();
-        return constructable.Construct(vm, argList);
+        return IConstructable.Construct(vm, constructable, argList);
     }
 
     public IExpression Expression { get; }
