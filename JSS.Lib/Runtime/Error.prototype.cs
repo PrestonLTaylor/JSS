@@ -28,7 +28,7 @@ internal sealed class ErrorPrototype : Object
     }
 
     // 20.5.3.4 Error.prototype.toString ( ), https://tc39.es/ecma262/#sec-error.prototype.tostring
-    private Completion toString(VM vm, Value thisArgument, List argumentList)
+    private Completion toString(VM vm, Value thisArgument, List argumentList, Object newTarget)
     {
         // 1. Let O be the this value.
 

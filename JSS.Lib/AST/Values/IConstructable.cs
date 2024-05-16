@@ -20,8 +20,8 @@ internal interface IConstructable
         argumentsList ??= new List();
 
         // 3. Return ? F.[[Construct]](argumentsList, newTarget).
-        return F.Construct(vm, argumentsList);
+        return F.Construct(vm, argumentsList, (newTarget as Object)!);
     }
 
-    public Completion Construct(VM vm, List argumentsList);
+    public Completion Construct(VM vm, List argumentsList, Object newTarget);
 }

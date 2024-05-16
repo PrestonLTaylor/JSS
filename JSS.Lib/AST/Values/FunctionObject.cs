@@ -1,5 +1,4 @@
 ﻿using JSS.Lib.Execution;
-using System.Diagnostics;
 
 namespace JSS.Lib.AST.Values;
 
@@ -173,9 +172,8 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         return EvaluateBody(vm, argumentsList);
     }
 
-    // NOTE: newTarget is the constructor being used, so for this function object, it is the C# this
     // 10.2.2 [[Construct]] ( argumentsList, newTarget ), https://tc39.es/ecma262/#sec-ecmascript-function-objects-construct-argumentslist-newtarget
-    public Completion Construct(VM vm, List argumentsList)
+    public Completion Construct(VM vm, List argumentsList, Object newTarget)
     {
         // 1. Let callerContext be the running execution context.
         var callerContext = (vm.CurrentExecutionContext as ScriptExecutionContext)!;
@@ -188,14 +186,14 @@ internal sealed class FunctionObject : Object, ICallable, IConstructable
         if (ConstructorKind == ConstructorKind.BASE)
         {
             // a. Let thisArgument be ? FIXME: OrdinaryCreateFromConstructor(newTarget, "%Object.prototype%").
-            var getResult = Get(this, "prototype");
+            var getResult = Get(newTarget, "prototype");
             if (getResult.IsAbruptCompletion()) return getResult;
             var prototype = getResult.Value.IsObject() ? getResult.Value.AsObject() : vm.ObjectPrototype;
             thisArgument = new Object(prototype);
         }
 
-        // 4. Let calleeContext be PrepareForOrdinaryCall(F, FIXME: newTarget).
-        var calleeContext = (PrepareForOrdinaryCall(vm, Undefined.The) as ScriptExecutionContext)!;
+        // 4. Let calleeContext be PrepareForOrdinaryCall(F, newTarget).
+        var calleeContext = (PrepareForOrdinaryCall(vm, newTarget) as ScriptExecutionContext)!;
 
         // 5. Assert: calleeContext is now the running execution context.
         Assert(vm.CurrentExecutionContext == calleeContext, "5. Assert: calleeContext is now the running execution context.");

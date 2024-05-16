@@ -6,7 +6,7 @@ namespace JSS.Lib.Execution;
 internal static class Eval
 {
     // 19.2.1 eval ( x ), https://tc39.es/ecma262/#sec-eval-x
-    static public Completion eval(VM vm, Value thisValue, List argumentList)
+    static public Completion eval(VM vm, Value thisValue, List argumentList, Object newTarget)
     {
         // 1. Return ? PerformEval(x, false, false).
         return PerformEval(vm, argumentList[0], false, false);
