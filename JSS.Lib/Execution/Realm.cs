@@ -60,7 +60,7 @@ public sealed class Realm
         BooleanPrototype = new(ObjectPrototype);
         BooleanConstructor = new(FunctionPrototype);
 
-        BooleanPrototype.Initialize(this);
+        BooleanPrototype.Initialize(this, vm);
         BooleanConstructor.Initialize(this);
 
         StringConstructor = new(FunctionPrototype);
