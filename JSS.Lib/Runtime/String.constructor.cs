@@ -21,7 +21,7 @@ internal class StringConstructor : Object, ICallable, IConstructable
     {
         // 1. If value is not present, then
         string s;
-        if (argumentsList.Values.Count == 0)
+        if (argumentsList.Count == 0)
         {
             s = "";
         }
