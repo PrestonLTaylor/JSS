@@ -3,7 +3,7 @@
 namespace JSS.Lib.AST.Values;
 
 // 10.3 Built-in Function Objects, https://tc39.es/ecma262/#sec-built-in-function-objects
-internal sealed class BuiltinFunction : Object, ICallable, IConstructable
+internal sealed class BuiltinFunction : Object, ICallable
 {
 #pragma warning disable CS8618 // All properties are initialised in OrdinaryFunctionCreate
     private BuiltinFunction(Object prototype, Func<VM, Value, List, Object, Completion> behaviour) : base(prototype)
@@ -19,6 +19,7 @@ internal sealed class BuiltinFunction : Object, ICallable, IConstructable
         return BuiltinCallOrConstruct(vm, thisArgument, argumentList, Undefined.The);
     }
 
+    // NOTE: Extract to "BuiltinConstructor" when we need it, however, we currently have no builtin constructors that aren't %X.constructor%s
     // 10.3.2 [[Construct]] ( argumentsList, newTarget ), https://tc39.es/ecma262/#sec-built-in-function-objects-construct-argumentslist-newtarget
     public Completion Construct(VM vm, List argumentsList, Object newTarget)
     {
