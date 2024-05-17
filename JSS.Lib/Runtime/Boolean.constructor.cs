@@ -11,6 +11,12 @@ internal sealed class BooleanConstructor : Object, ICallable, IConstructable
     {
     }
 
+    public void Initialize(Realm realm)
+    {
+        // 20.3.2.1 Boolean.prototype, The initial value of Boolean.prototype is the Boolean prototype object.
+        DataProperties.Add("prototype", new(realm.BooleanPrototype, new(false, false, false)));
+    }
+
     // 20.3.1.1 Boolean ( value ), https://tc39.es/ecma262/#sec-boolean-constructor-boolean-value
     public Completion Call(VM vm, Value thisArgument, List argumentList)
     {

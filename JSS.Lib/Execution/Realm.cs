@@ -57,7 +57,10 @@ public sealed class Realm
 
         FunctionPrototype.Initialize(vm);
 
+        BooleanPrototype = new(ObjectPrototype);
         BooleanConstructor = new(FunctionPrototype);
+
+        BooleanConstructor.Initialize(this);
 
         StringConstructor = new(FunctionPrototype);
 
@@ -338,6 +341,7 @@ public sealed class Realm
     internal ObjectPrototype ObjectPrototype { get; private set; }
     internal ObjectConstructor ObjectConstructor { get; private set; }
     internal FunctionPrototype FunctionPrototype { get; private set; }
+    internal BooleanPrototype BooleanPrototype { get; private set; }
     internal BooleanConstructor BooleanConstructor { get; private set; }
     internal StringConstructor StringConstructor { get; private set; }
     internal NumberConstructor NumberConstructor { get; private set; }
