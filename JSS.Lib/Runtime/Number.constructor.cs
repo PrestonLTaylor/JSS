@@ -3,6 +3,7 @@ using JSS.Lib.Execution;
 
 namespace JSS.Lib.Runtime;
 
+// 21.1.1 The Number Constructor, https://tc39.es/ecma262/#sec-number-constructor
 internal sealed class NumberConstructor : Object, ICallable, IConstructable
 {
     // The Number constructor has a [[Prototype]] internal slot whose value is %Function.prototype%.

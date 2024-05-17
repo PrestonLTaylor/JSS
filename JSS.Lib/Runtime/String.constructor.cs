@@ -3,6 +3,7 @@ using JSS.Lib.Execution;
 
 namespace JSS.Lib.Runtime;
 
+// 22.1.1 The String Constructor, https://tc39.es/ecma262/#sec-string-constructor
 internal class StringConstructor : Object, ICallable, IConstructable
 {
     // The String constructor has a [[Prototype]] internal slot whose value is %Function.prototype%.
