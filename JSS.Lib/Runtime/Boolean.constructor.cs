@@ -34,7 +34,7 @@ internal sealed class BooleanConstructor : Object, ICallable, IConstructable
 
         // FIXME: 3. Let O be ? OrdinaryCreateFromConstructor(NewTarget, "%Boolean.prototype%", « [[BooleanData]] »).
         // 4. Set O.[[BooleanData]] to b.
-        var O = new BooleanObject(vm.ObjectPrototype, b);
+        var O = new BooleanObject(vm.BooleanPrototype, b);
 
         // 5. Return O.
         return O;
