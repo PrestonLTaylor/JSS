@@ -610,7 +610,7 @@ public abstract class Value
         // Boolean, Return a new Boolean object whose [[BooleanData]] internal slot is set to argument.
         if (IsBoolean())
         {
-            return new BooleanObject(vm.ObjectPrototype, AsBoolean());
+            return new BooleanObject(vm.BooleanPrototype, AsBoolean());
         }
 
         // Number, Return a new Number object whose [[NumberData]] internal slot is set to argument.
