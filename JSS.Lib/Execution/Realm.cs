@@ -57,6 +57,8 @@ public sealed class Realm
 
         FunctionPrototype.Initialize(vm);
 
+        BooleanConstructor = new(FunctionPrototype);
+
         StringConstructor = new(FunctionPrototype);
 
         NumberConstructor = new(FunctionPrototype);
@@ -237,6 +239,9 @@ public sealed class Realm
         // 20.1.1 The Object Constructor, https://tc39.es/ecma262/#sec-object-constructor
         globalProperties.Add("Object", new Property(ObjectConstructor, new(true, false, true)));
 
+        // 20.3.1 The Boolean Constructor, https://tc39.es/ecma262/#sec-boolean-constructor
+        globalProperties.Add("Boolean", new Property(BooleanConstructor, new(true, false, true)));
+
         // 21.1.1 The Number Constructor, https://tc39.es/ecma262/#sec-number-constructor
         globalProperties.Add("Number", new Property(NumberConstructor, new(true, false, true)));
 
@@ -333,6 +338,7 @@ public sealed class Realm
     internal ObjectPrototype ObjectPrototype { get; private set; }
     internal ObjectConstructor ObjectConstructor { get; private set; }
     internal FunctionPrototype FunctionPrototype { get; private set; }
+    internal BooleanConstructor BooleanConstructor { get; private set; }
     internal StringConstructor StringConstructor { get; private set; }
     internal NumberConstructor NumberConstructor { get; private set; }
     internal ArrayPrototype ArrayPrototype { get; private set; }
