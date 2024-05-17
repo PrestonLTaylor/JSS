@@ -60,6 +60,7 @@ public sealed class Realm
         StringConstructor = new(FunctionPrototype);
 
         NumberConstructor = new(FunctionPrototype);
+        NumberConstructor.Initialize();
 
         ArrayPrototype = new(ObjectPrototype);
         ArrayConstructor = new(FunctionPrototype);
