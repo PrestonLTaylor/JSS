@@ -20,8 +20,13 @@ internal sealed class BooleanPrototype : BooleanObject
         // 20.3.3.2 Boolean.prototype.toString ( ), https://tc39.es/ecma262/#sec-boolean.prototype.tostring
         var toStringBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toString, 0, "toString");
         DataProperties.Add("toString", new(toStringBuiltin, new(true, false, true)));
+
+        // 20.3.3.3 Boolean.prototype.valueOf ( ), https://tc39.es/ecma262/#sec-boolean.prototype.valueof
+        var valueOfBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, valueOf, 0, "valueOf");
+        DataProperties.Add("valueOf", new(valueOfBuiltin, new(true, false, true)));
     }
 
+    // 20.3.3.2 Boolean.prototype.toString ( ), https://tc39.es/ecma262/#sec-boolean.prototype.tostring
     private Completion toString(VM vm, Value thisValue, List argumentList, Object newTarget)
     {
         // 1. Let b be ? ThisBooleanValue(this value).
@@ -30,6 +35,15 @@ internal sealed class BooleanPrototype : BooleanObject
 
         // 2. If b is true, return "true"; else return "false".
         return b.Value ? "true" : "false";
+    }
+
+    // 20.3.3.3 Boolean.prototype.valueOf ( ), https://tc39.es/ecma262/#sec-boolean.prototype.valueof
+    private Completion valueOf(VM vm, Value thisValue, List argumentList, Object newTarget)
+    {
+        // 1. Return ? ThisBooleanValue(this value).
+        var result = ThisBooleanValue(vm, thisValue);
+        if (result.IsAbruptCompletion()) return result.Completion;
+        return result.Value;
     }
 
     // 20.3.3.3.1 ThisBooleanValue ( value ), https://tc39.es/ecma262/#sec-thisbooleanvalue
