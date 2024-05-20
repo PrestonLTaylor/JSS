@@ -13,7 +13,7 @@ internal class Test262Exception : Exception
 
     protected Test262Exception(VM vm, Completion abruptCompletion) : base(Print.CompletionToString(vm, abruptCompletion))
     {
-        throw new InvalidOperationException("Normal completion passed to a Test262Exception.");
+        if (abruptCompletion.IsNormalCompletion()) throw new InvalidOperationException("Normal completion passed to a Test262Exception.");
     }
 }
 
