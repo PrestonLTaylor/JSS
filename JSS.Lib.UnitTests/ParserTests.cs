@@ -491,7 +491,14 @@ internal sealed class ParserTests
 
     static private readonly Dictionary<string, double> numericLiteralToValueTestCases = new()
     {
-        { "0", 0.0 }, { "1", 1.0 }, { "123", 123.0 }, { "1234567890", 1234567890.0 }
+        { "0", 0.0 },
+        { "0.0", 0.0 },
+        { "1", 1.0 },
+        { "1.0", 1.0 },
+        { "0.5", 0.5 },
+        { "1.5", 1.5 },
+        { "123", 123.0 },
+        { "1234567890", 1234567890.0 }
     };
 
     [TestCaseSource(nameof(numericLiteralToValueTestCases))]

@@ -1,6 +1,7 @@
 ﻿using JSS.Lib.AST;
 using JSS.Lib.AST.Literal;
 using JSS.Lib.Execution;
+using System.Text;
 
 namespace JSS.Lib;
 
@@ -1478,11 +1479,34 @@ public sealed class Parser
 
     private NumericLiteral ParseNumericLiteral()
     {
-        var numericToken = _consumer.ConsumeTokenOfType(TokenType.Number);
+        StringBuilder numericLiteral = new();
+
+        var integerToken = _consumer.ConsumeTokenOfType(TokenType.Number);
+        numericLiteral.Append(integerToken.Data);
+
+        if (IsDecimalPart())
+        {
+            numericLiteral.Append(ParseDecimalPart());
+        }
+
         // FIXME: Proper error reporting
         // FIXME: Parse numbers according to the JS spec rather than the C# parse library
-        var numericValue = double.Parse(numericToken.Data);
+        var numericValue = double.Parse(numericLiteral.ToString());
         return new NumericLiteral(numericValue);
+    }
+
+    private bool IsDecimalPart()
+    {
+        return _consumer.IsTokenOfType(TokenType.Dot);
+    }
+
+    private string ParseDecimalPart()
+    {
+        _consumer.ConsumeTokenOfType(TokenType.Dot);
+        if (!IsNumericLiteral()) return ".0";
+
+        var decimalToken = _consumer.ConsumeTokenOfType(TokenType.Number);
+        return $".{decimalToken.Data}";
     }
 
     private bool IsStringLiteral()
