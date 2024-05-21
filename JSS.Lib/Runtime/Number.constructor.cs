@@ -11,10 +11,14 @@ internal sealed class NumberConstructor : Object, ICallable, IConstructable
     {
     }
 
-    public void Initialize()
+    public void Initialize(VM vm)
     {
         // 21.1.2.1 Number.EPSILON, The value of Number.EPSILON is the Number value for the magnitude of the difference between 1 and the smallest value greater than 1 that is representable as a Number value.
         DataProperties.Add("EPSILON", new(2.2204460492503130808472633361816E-16, new(false, false, false)));
+
+        // 21.1.2.4 Number.isNaN ( number ), https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-number.isnan
+        var isNaNBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, isNaN, 1, "isNaN");
+        DataProperties.Add("isNaN", new(isNaNBuiltin, new(true, false, true)));
 
         // 21.1.2.6 Number.MAX_SAFE_INTEGER, The value of Number.MAX_SAFE_INTEGER is 9007199254740991𝔽 (𝔽(2**53 - 1)).
         DataProperties.Add("MAX_SAFE_INTEGER", new(Math.Pow(2, 53) - 1, new(false, false, false)));
@@ -75,5 +79,17 @@ internal sealed class NumberConstructor : Object, ICallable, IConstructable
 
         // 6. Return O.
         return O;
+    }
+
+    // 21.1.2.4 Number.isNaN ( number ), https://tc39.es/ecma262/multipage/numbers-and-dates.html#sec-number.isnan
+    private Completion isNaN(VM vm, Value thisArgument, List argumentList, Object newTarget)
+    {
+        // 1. If number is not a Number, return false.
+        var number = argumentList[0];
+        if (!number.IsNumber()) return false;
+
+        // 2. If number is NaN, return true.
+        // 3. Otherwise, return false.
+        return double.IsNaN(number.AsNumber());
     }
 }
