@@ -259,7 +259,7 @@ internal sealed class Test262Runner
             {
                 // NOTE: We throw the base Exception to signify that this would be a crash failure if executed.
                 // FIXME: Test cases using tcoHelper will check to prove TCO works, however, we have no TCO functionality and will cause the runner to crash with a stack overflow exception.
-                if (requiredHarnessFile == "tcoHelper.js") throw new Exception("tcoHelper.js was included, this test case will probably cause a stack overflow exception.");
+                //if (requiredHarnessFile == "tcoHelper.js") throw new Exception("tcoHelper.js was included, this test case will probably cause a stack overflow exception.");
 
                 var harnessScriptString = _harnessNameToContent[requiredHarnessFile];
                 var harnessScript = ParseAsGlobalCode(vm, harnessScriptString);
