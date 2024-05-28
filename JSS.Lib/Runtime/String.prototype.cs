@@ -20,6 +20,10 @@ internal sealed class StringPrototype : Object
         // 22.1.3.28 String.prototype.toLowerCase ( ), https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.tolowercase
         var toLowerCaseBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toLowerCase, 0, "toLowerCase");
         DataProperties.Add("toLowerCase", new(toLowerCaseBuiltin, new(true, false, true)));
+
+        // 22.1.3.29 String.prototype.toString ( ), https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.tostring
+        var toStringBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toString, 0, "toString");
+        DataProperties.Add("toString", new(toStringBuiltin, new(true, false, true)));
     }
 
     // 22.1.3.28 String.prototype.toLowerCase ( ), https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.tolowercase
@@ -47,5 +51,36 @@ internal sealed class StringPrototype : Object
 
         // 6. Return L.
         return L;
+    }
+
+    // 22.1.3.29 String.prototype.toString ( ), https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.tostring
+    private Completion toString(VM vm, Value thisValue, List argumentList, Object newTarget)
+    {
+        // 1. Return ? ThisStringValue(this value).
+        var result = ThisStringValue(vm, thisValue);
+        if (result.IsAbruptCompletion()) return result.Completion;
+        return result.Value;
+    }
+
+    // 22.1.3.35.1 ThisStringValue ( value ), https://tc39.es/ecma262/multipage/text-processing.html#sec-thisstringvalue
+    private AbruptOr<String> ThisStringValue(VM vm, Value value)
+    {
+        // 1. If value is a String, return value.
+        if (value.IsString()) return value.AsString();
+
+        // 2. If value is an Object and value has a [[StringData]] internal slot, then
+        if (value is StringObject stringObject)
+        {
+            // a. Let s be value.[[StringData]].
+            var s = stringObject.StringData;
+
+            // b. Assert: s is a String.
+
+            // c. Return s.
+            return s;
+        }
+
+        // 3. Throw a TypeError exception.
+        return ThrowTypeError(vm, RuntimeErrorType.ThisIsNotAString);
     }
 }
