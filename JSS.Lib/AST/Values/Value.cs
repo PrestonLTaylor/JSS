@@ -649,6 +649,20 @@ public abstract class Value
         return MUST(key.Value.ToStringJS(vm));
     }
 
+    // 7.2.1 RequireObjectCoercible ( argument ), https://tc39.es/ecma262/multipage/abstract-operations.html#sec-requireobjectcoercible
+    internal Completion RequireObjectCoercible(VM vm)
+    {
+        // Undefined, Throw a TypeError exception.
+        if (IsUndefined()) return ThrowTypeError(vm, RuntimeErrorType.UnableToConvertToObject, "undefined");
+
+        // Null, Throw a TypeError exception.
+        if (IsNull()) return ThrowTypeError(vm, RuntimeErrorType.UnableToConvertToObject, "null");
+
+        // NOTE: Every type asides from undefined and null just return the themselves.
+        // Return argument.
+        return this;
+    }
+
     // 7.2.2 IsArray ( argument ), https://tc39.es/ecma262/#sec-isarray
     internal bool IsArray()
     {
@@ -666,7 +680,6 @@ public abstract class Value
         // 4. Return false.
         return false;
     }
-
 
     // 7.2.3 IsCallable ( argument ), https://tc39.es/ecma262/#sec-iscallable
     internal bool IsCallable()

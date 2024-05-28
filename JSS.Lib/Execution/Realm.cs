@@ -66,7 +66,7 @@ public sealed class Realm
         StringPrototype = new(ObjectPrototype);
         StringConstructor = new(FunctionPrototype);
 
-        StringPrototype.Initialize(this);
+        StringPrototype.Initialize(this, vm);
 
         NumberConstructor = new(FunctionPrototype);
         NumberConstructor.Initialize(vm);
