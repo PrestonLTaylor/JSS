@@ -920,8 +920,24 @@ public abstract class Value
             return MUST(IsLooselyEqual(vm, x, yAsNumber));
         }
 
-        // FIXME: 11. If x is either a String, a Number, a BigInt, or a Symbol and y is an Object, return !IsLooselyEqual(x, ? ToPrimitive(y)).
+        // 11. If x is either a String, a Number, FIXME: (a BigInt, or a Symbol) and y is an Object, return !IsLooselyEqual(x, ? ToPrimitive(y)).
+        if ((x.IsString() || x.IsNumber()) && y.IsObject())
+        {
+            var primitive = y.ToPrimitive(vm);
+            if (primitive.IsAbruptCompletion()) return primitive;
+
+            return MUST(IsLooselyEqual(vm, x, primitive.Value));
+        }
+
         // FIXME: 12. If x is an Object and y is either a String, a Number, a BigInt, or a Symbol, return !IsLooselyEqual(? ToPrimitive(x), y).
+        if (x.IsObject() && (y.IsString() || y.IsNumber()))
+        {
+            var primitive = x.ToPrimitive(vm);
+            if (primitive.IsAbruptCompletion()) return primitive;
+
+            return MUST(IsLooselyEqual(vm, primitive.Value, y));
+        }
+
         // FIXME: 13. If x is a BigInt and y is a Number, or if x is a Number and y is a BigInt, then
         // FIXME: a. If x is not finite or y is not finite, return false.
         // FIXME: b. If ℝ(x) = ℝ(y), return true; otherwise return false.
