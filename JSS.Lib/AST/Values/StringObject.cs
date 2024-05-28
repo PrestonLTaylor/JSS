@@ -6,8 +6,8 @@ namespace JSS.Lib.AST.Values;
 internal sealed class StringObject : Object
 {
     // FIXME: String instances are String exotic objects and have the internal methods specified for such objects.
-    // FIXME: String instances inherit properties from the String prototype object.
     // FIXME: String instances have a "length" property, and a set of enumerable properties with integer-indexed names.
+    // String instances inherit properties from the String prototype object.
     // 10.4.3.4 StringCreate ( value, prototype ), https://tc39.es/ecma262/#sec-stringcreate
     public StringObject(VM vm, String value, Object prototype) : base(prototype)
     {

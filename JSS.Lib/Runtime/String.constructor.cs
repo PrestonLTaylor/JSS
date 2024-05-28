@@ -42,6 +42,6 @@ internal class StringConstructor : Object, ICallable, IConstructable
         if (newTarget.IsUndefined()) return s;
 
         // 4. Return StringCreate(s, FIXME: ? GetPrototypeFromConstructor(NewTarget, "%String.prototype%")).
-        return new StringObject(vm, s, vm.ObjectPrototype);
+        return new StringObject(vm, s, vm.StringPrototype);
     }
 }

@@ -622,7 +622,7 @@ public abstract class Value
         // String, Return a new String object whose [[StringData]] internal slot is set to argument.
         if (IsString())
         {
-            return new StringObject(vm, AsString(), vm.ObjectPrototype);
+            return new StringObject(vm, AsString(), vm.StringPrototype);
         }
 
         // FIXME: Implement the rest of the conversions
