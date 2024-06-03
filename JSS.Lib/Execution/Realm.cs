@@ -68,7 +68,9 @@ public sealed class Realm
 
         StringPrototype.Initialize(this, vm);
 
+        NumberPrototype = new(ObjectPrototype);
         NumberConstructor = new(FunctionPrototype);
+
         NumberConstructor.Initialize(vm);
 
         ArrayPrototype = new(ObjectPrototype);
@@ -349,6 +351,7 @@ public sealed class Realm
     internal BooleanConstructor BooleanConstructor { get; private set; }
     internal StringPrototype StringPrototype { get; private set; }
     internal StringConstructor StringConstructor { get; private set; }
+    internal NumberPrototype NumberPrototype { get; private set; }
     internal NumberConstructor NumberConstructor { get; private set; }
     internal ArrayPrototype ArrayPrototype { get; private set; }
     internal ArrayConstructor ArrayConstructor { get; private set; }
