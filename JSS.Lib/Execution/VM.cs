@@ -58,6 +58,7 @@ public sealed class VM
     internal FunctionPrototype FunctionPrototype { get => Realm.FunctionPrototype; }
     internal BooleanPrototype BooleanPrototype { get => Realm.BooleanPrototype; }
     internal StringPrototype StringPrototype { get => Realm.StringPrototype; }
+    internal NumberPrototype NumberPrototype { get => Realm.NumberPrototype; }
     internal ArrayPrototype ArrayPrototype { get => Realm.ArrayPrototype; }
     internal ErrorPrototype ErrorPrototype { get => Realm.ErrorPrototype; }
 
