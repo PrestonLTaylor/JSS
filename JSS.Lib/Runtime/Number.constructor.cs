@@ -75,7 +75,7 @@ internal sealed class NumberConstructor : Object, ICallable, IConstructable
 
         // FIXME: 4. Let O be ? OrdinaryCreateFromConstructor(NewTarget, "%Number.prototype%", « [[NumberData]] »).
         // 5. Set O.[[NumberData]] to n.
-        var O = new NumberObject(vm.ObjectPrototype, n);
+        var O = new NumberObject(vm.NumberPrototype, n);
 
         // 6. Return O.
         return O;

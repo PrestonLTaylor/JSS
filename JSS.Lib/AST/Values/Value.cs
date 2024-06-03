@@ -616,7 +616,7 @@ public abstract class Value
         // Number, Return a new Number object whose [[NumberData]] internal slot is set to argument.
         if (IsNumber())
         {
-            return new NumberObject(vm.ObjectPrototype, AsNumber());
+            return new NumberObject(vm.NumberPrototype, AsNumber());
         }
 
         // String, Return a new String object whose [[StringData]] internal slot is set to argument.
