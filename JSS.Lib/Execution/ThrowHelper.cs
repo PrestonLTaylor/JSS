@@ -6,6 +6,7 @@ namespace JSS.Lib.Execution;
 enum RuntimeErrorType
 {
     AssignmentToConst,
+    ArgumentOutOfRange,
     ArrayLengthTooLarge,
     BindingNotDefined,
     BindingThisToAlreadyThisInitializedEnvironment,
@@ -30,6 +31,7 @@ enum RuntimeErrorType
     RhsOfInstanceOfIsNotObject,
     ThisIsNotABoolean,
     ThisIsNotAString,
+    ThisIsNotANumber,
     ThisIsNotAnObject,
     TriedToDefinePropertyOnNonObject,
     UnableToConvertObjectToPrimitive,
@@ -76,6 +78,18 @@ internal static class ThrowHelper
         }
     }
 
+    static public Completion ThrowRangeError(VM vm, RuntimeErrorType type, params object?[] args)
+    {
+        try
+        {
+            return ConstructError(vm, vm.RangeErrorConstructor, CreateErrorMessage(type, args));
+        }
+        catch (KeyNotFoundException)
+        {
+            return ThrowRangeError(vm, RuntimeErrorType.UnknownError, type);
+        }
+    }
+
     static private Completion ConstructError(VM vm, NativeErrorConstructor constructor, string message)
     {
         List arguments = new();
@@ -94,6 +108,7 @@ internal static class ThrowHelper
     static private readonly Dictionary<RuntimeErrorType, string> errorTypeToFormatString = new()
     {
         { RuntimeErrorType.AssignmentToConst, "invalid assignment to const {0}" },
+        { RuntimeErrorType.ArgumentOutOfRange, "{0} argument must be between {1} and {2}" },
         { RuntimeErrorType.ArrayLengthTooLarge, "length {0} too large for array" },
         { RuntimeErrorType.BindingNotDefined, "{0} is not defined" },
         { RuntimeErrorType.BindingThisToAlreadyThisInitializedEnvironment, "tried to bind a this value to already this-initialized function environment" },
@@ -118,6 +133,7 @@ internal static class ThrowHelper
         { RuntimeErrorType.RhsOfInstanceOfIsNotObject, "rhs of 'instanceof' should be an Object, but got {0}" },
         { RuntimeErrorType.ThisIsNotABoolean, "this is not a boolean" },
         { RuntimeErrorType.ThisIsNotAString, "this is not a string" },
+        { RuntimeErrorType.ThisIsNotANumber, "this is not a number" },
         { RuntimeErrorType.ThisIsNotAnObject, "this is not an object" },
         { RuntimeErrorType.TriedToDefinePropertyOnNonObject, "tried to define a property on a {0}" },
         { RuntimeErrorType.UnableToConvertObjectToPrimitive, "unable to convert object to a primitive" },
