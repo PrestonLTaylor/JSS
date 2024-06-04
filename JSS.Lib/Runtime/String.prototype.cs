@@ -22,6 +22,9 @@ internal sealed class StringPrototype : Object
 
         // 22.1.3.29 String.prototype.toString ( ), https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.tostring
         InternalDefineProperty(vm, "toString", 0, toString, new(true, false, true));
+
+        // 22.1.3.35 String.prototype.valueOf ( ), https://tc39.es/ecma262/#sec-string.prototype.valueof
+        InternalDefineProperty(vm, "valueOf", 0, valueOf, new(true, false, true));
     }
 
     // 22.1.3.28 String.prototype.toLowerCase ( ), https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.tolowercase
@@ -53,6 +56,15 @@ internal sealed class StringPrototype : Object
 
     // 22.1.3.29 String.prototype.toString ( ), https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.tostring
     private Completion toString(VM vm, Value thisValue, List argumentList, Object newTarget)
+    {
+        // 1. Return ? ThisStringValue(this value).
+        var result = ThisStringValue(vm, thisValue);
+        if (result.IsAbruptCompletion()) return result.Completion;
+        return result.Value;
+    }
+
+    // 22.1.3.35 String.prototype.valueOf ( ), https://tc39.es/ecma262/#sec-string.prototype.valueof
+    private Completion valueOf(VM vm, Value thisValue, List argumentList, Object newTarget)
     {
         // 1. Return ? ThisStringValue(this value).
         var result = ThisStringValue(vm, thisValue);
