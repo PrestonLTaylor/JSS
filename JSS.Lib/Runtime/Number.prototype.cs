@@ -20,7 +20,11 @@ internal sealed class NumberPrototype : Object
 		// 21.1.3.6 Number.prototype.toString ( [ radix ] ), https://tc39.es/ecma262/#sec-number.prototype.tostring
 		var toStringBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toString, 1, "toString");
 		DataProperties.Add("toString", new(toStringBuiltin, new(true, false, true)));
-	}
+
+		// 21.1.3.7 Number.prototype.valueOf ( ), https://tc39.es/ecma262/#sec-number.prototype.valueof
+        var valueOfBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, valueOf, 0, "valueOf");
+        DataProperties.Add("valueOf", new(valueOfBuiltin, new(true, false, true)));
+    }
 
 	// 21.1.3.6 Number.prototype.toString ( [ radix ] ), https://tc39.es/ecma262/#sec-number.prototype.tostring
 	private Completion toString(VM vm, Value thisValue, List argumentList, Object newTarget)
@@ -51,8 +55,17 @@ internal sealed class NumberPrototype : Object
 		return x.Value.Value.ToString();
 	}
 
-	// 21.1.3.7.1 ThisNumberValue ( value ), https://tc39.es/ecma262/#sec-thisnumbervalue
-	private AbruptOr<Number> ThisNumberValue(VM vm, Value value)
+	// 21.1.3.7 Number.prototype.valueOf ( ), https://tc39.es/ecma262/#sec-number.prototype.valueof
+	private Completion valueOf(VM vm, Value thisValue, List argumentList, Object newTarget)
+	{
+        // 1. Return ? ThisNumberValue(this value).
+        var result = ThisNumberValue(vm, thisValue);
+        if (result.IsAbruptCompletion()) return result.Completion;
+        return result.Value;
+    }
+
+    // 21.1.3.7.1 ThisNumberValue ( value ), https://tc39.es/ecma262/#sec-thisnumbervalue
+    private AbruptOr<Number> ThisNumberValue(VM vm, Value value)
 	{
 		// 1. If value is a Number, return value.
 		if (value.IsNumber()) return value.AsNumber();
