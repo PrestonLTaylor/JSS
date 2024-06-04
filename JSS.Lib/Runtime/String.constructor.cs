@@ -11,6 +11,13 @@ internal class StringConstructor : Object, ICallable, IConstructable
     {
     }
 
+    public void Initialize(Realm realm)
+    {
+        // 22.1.2.3 String.prototype, https://tc39.es/ecma262/#sec-string.prototype
+        // This property has the attributes { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: false }.
+        InternalDefineProperty("prototype", realm.StringPrototype, new(false, false, false));
+    }
+
     // 22.1.1.1 String ( value ), https://tc39.es/ecma262/#sec-string-constructor-string-value
     public Completion Call(VM vm, Value thisArgument, List argumentList)
     {
