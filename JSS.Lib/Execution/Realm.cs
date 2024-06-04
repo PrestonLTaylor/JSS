@@ -71,7 +71,7 @@ public sealed class Realm
         NumberPrototype = new(ObjectPrototype);
         NumberConstructor = new(FunctionPrototype);
 
-        NumberPrototype.Initialize(this);
+        NumberPrototype.Initialize(this, vm);
         NumberConstructor.Initialize(vm);
 
         ArrayPrototype = new(ObjectPrototype);
