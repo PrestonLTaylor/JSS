@@ -17,6 +17,9 @@ internal sealed class StringPrototype : Object
         // 22.1.3.1 String.prototype.at ( index ), https://tc39.es/ecma262/#sec-string.prototype.at
         InternalDefineProperty(vm, "at", 1, at, new(true, false, true));
 
+        // 22.1.3.2 String.prototype.charAt ( pos ), https://tc39.es/ecma262/#sec-string.prototype.charat
+        InternalDefineProperty(vm, "charAt", 1, charAt, new(true, false, true));
+
         // 22.1.3.6 String.prototype.constructor, The initial value of String.prototype.constructor is %String%.
         InternalDefineProperty("constructor", realm.StringConstructor, new(true, false, true));
 
@@ -66,6 +69,31 @@ internal sealed class StringPrototype : Object
 
         // 8. Return the substring of S from k to k + 1.
         return S.Value.Substring(k, 1);
+    }
+
+    // 22.1.3.2 String.prototype.charAt ( pos ), https://tc39.es/ecma262/#sec-string.prototype.charat
+    private Completion charAt(VM vm, Value thisValue, List argumentList, Object newTarget)
+    {
+        // 1. Let O be ? RequireObjectCoercible(this value).
+        var O = thisValue.RequireObjectCoercible(vm);
+        if (O.IsAbruptCompletion()) return O;
+
+        // 2. Let S be ? ToString(O).
+        var S = O.Value.ToStringJS(vm);
+        if (S.IsAbruptCompletion()) return S.Completion;
+
+        // 3. Let position be ? ToIntegerOrInfinity(pos).
+        var position = argumentList[0].ToIntegerOrInfinity(vm);
+        if (position.IsAbruptCompletion()) return position.Completion;
+
+        // 4. Let size be the length of S.
+        var size = S.Value.Length;
+
+        // 5. If position < 0 or position ≥ size, return the empty String.
+        if (position.Value < 0 || position.Value >= size) return "";
+
+        // 6. Return the substring of S from position to position + 1.
+        return S.Value.Substring((int)position.Value, 1);
     }
 
     // 22.1.3.28 String.prototype.toLowerCase ( ), https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.tolowercase
