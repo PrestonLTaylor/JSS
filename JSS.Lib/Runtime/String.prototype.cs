@@ -20,6 +20,9 @@ internal sealed class StringPrototype : Object
         // 22.1.3.2 String.prototype.charAt ( pos ), https://tc39.es/ecma262/#sec-string.prototype.charat
         InternalDefineProperty(vm, "charAt", 1, charAt, new(true, false, true));
 
+        // 22.1.3.3 String.prototype.charCodeAt ( pos ), https://tc39.es/ecma262/#sec-string.prototype.charcodeat
+        InternalDefineProperty(vm, "charCodeAt", 1, charCodeAt, new(true, false, true));
+
         // 22.1.3.6 String.prototype.constructor, The initial value of String.prototype.constructor is %String%.
         InternalDefineProperty("constructor", realm.StringConstructor, new(true, false, true));
 
@@ -94,6 +97,31 @@ internal sealed class StringPrototype : Object
 
         // 6. Return the substring of S from position to position + 1.
         return S.Value.Substring((int)position.Value, 1);
+    }
+
+    // 22.1.3.3 String.prototype.charCodeAt ( pos ), https://tc39.es/ecma262/#sec-string.prototype.charcodeat
+    private Completion charCodeAt(VM vm, Value thisValue, List argumentList, Object newTarget)
+    {
+        // 1. Let O be ? RequireObjectCoercible(this value).
+        var O = thisValue.RequireObjectCoercible(vm);
+        if (O.IsAbruptCompletion()) return O;
+
+        // 2. Let S be ? ToString(O).
+        var S = O.Value.ToStringJS(vm);
+        if (S.IsAbruptCompletion()) return S.Completion;
+
+        // 3. Let position be ? ToIntegerOrInfinity(pos).
+        var position = argumentList[0].ToIntegerOrInfinity(vm);
+        if (position.IsAbruptCompletion()) return position.Completion;
+
+        // 4. Let size be the length of S.
+        var size = S.Value.Length;
+
+        // 5. If position < 0 or position ≥ size, return NaN.
+        if (position.Value < 0 || position.Value >= size) return double.NaN;
+
+        // 6. Return the Number value for the numeric value of the code unit at index position within the String S.
+        return S.Value[(int)position.Value];
     }
 
     // 22.1.3.28 String.prototype.toLowerCase ( ), https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.tolowercase
