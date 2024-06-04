@@ -14,15 +14,13 @@ internal class ObjectPrototype : Object
     public void Initialize(Realm realm, VM vm)
     {
         // 20.1.3.1 Object.prototype.constructor, The initial value of Object.prototype.constructor is %Object%.
-        DataProperties.Add("constructor", new Property(realm.ObjectConstructor, new Attributes(true, false, true)));
+        InternalDefineProperty("constructor", realm.ObjectConstructor, new(true, false, true));
 
         // 20.1.3.2 Object.prototype.hasOwnProperty ( V ), https://tc39.es/ecma262/#sec-object.prototype.hasownproperty
-        var hasOwnPropertyBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, hasOwnProperty, 1, "hasOwnProperty");
-        DataProperties.Add("hasOwnProperty", new Property(hasOwnPropertyBuiltin, new Attributes(true, false, true)));
+        InternalDefineProperty(vm, "hasOwnProperty", 1, hasOwnProperty, new(true, false, true));
 
         // 20.1.3.6 Object.prototype.toString ( ), https://tc39.es/ecma262/#sec-object.prototype.tostring
-        var toStringBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toString, 0, "toString");
-        DataProperties.Add("toString", new Property(toStringBuiltin, new Attributes(true, false, true)));
+        InternalDefineProperty(vm, "toString", 0, toString, new(true, false, true));
     }
 
     // 20.1.3.2 Object.prototype.hasOwnProperty ( V ), https://tc39.es/ecma262/#sec-object.prototype.hasownproperty

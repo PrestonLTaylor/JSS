@@ -14,11 +14,11 @@ internal class NativeErrorConstructor : Object, ICallable, IConstructable
     public void Initialize(Object prototype, string name)
     {
         // Each NativeError constructor has a "name" property whose value is the String value "NativeError".
-        DataProperties.Add("name", new(name, new(false, false, false)));
+        InternalDefineProperty("name", name, new(false, false, false));
 
         // 20.5.6.2.1 NativeError.prototype, The initial value of NativeError.prototype is a NativeError prototype object (20.5.6.3).
         // Each NativeError constructor has a distinct prototype object.
-        DataProperties.Add("prototype", new(prototype, new(false, false, false)));
+        InternalDefineProperty("prototype", prototype, new(false, false, false));
         _nativePrototype = prototype;
     }
 

@@ -11,13 +11,13 @@ internal class NativeErrorPrototype : Object
     public void Initialize(Object constructor, string name)
     {
         // 20.5.6.3.1 NativeError.prototype.constructor, The initial value of the "constructor" property of the prototype for a given NativeError constructor is the constructor itself.
-        DataProperties.Add("constructor", new(constructor, new(false, false, false)));
+        InternalDefineProperty("constructor", constructor, new(false, false, false));
 
         // 20.5.6.3.2 NativeError.prototype.message, The initial value of the "message" property of the prototype for a given NativeError constructor is the empty String.
-        DataProperties.Add("message", new("", new(false, false, false)));
+        InternalDefineProperty("message", "", new(false, false, false));
 
         // 20.5.6.3.3 NativeError.prototype.name, The initial value of the "name" property of the prototype for a given NativeError constructor
         // is the String value consisting of the name of the constructor (the name used instead of NativeError).
-        DataProperties.Add("name", new(name, new(false, false, false)));
+        InternalDefineProperty("name", name, new(false, false, false));
     }
 }

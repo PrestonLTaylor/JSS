@@ -15,15 +15,13 @@ internal sealed class StringPrototype : Object
     public void Initialize(Realm realm, VM vm)
     {
         // 22.1.3.6 String.prototype.constructor, The initial value of String.prototype.constructor is %String%.
-        DataProperties.Add("constructor", new(realm.StringConstructor, new(true, false, true)));
+        InternalDefineProperty("constructor", realm.StringConstructor, new(true, false, true));
 
         // 22.1.3.28 String.prototype.toLowerCase ( ), https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.tolowercase
-        var toLowerCaseBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toLowerCase, 0, "toLowerCase");
-        DataProperties.Add("toLowerCase", new(toLowerCaseBuiltin, new(true, false, true)));
+        InternalDefineProperty(vm, "toLowerCase", 0, toLowerCase, new(true, false, true));
 
         // 22.1.3.29 String.prototype.toString ( ), https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.tostring
-        var toStringBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toString, 0, "toString");
-        DataProperties.Add("toString", new(toStringBuiltin, new(true, false, true)));
+        InternalDefineProperty(vm, "toString", 0, toString, new(true, false, true));
     }
 
     // 22.1.3.28 String.prototype.toLowerCase ( ), https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.tolowercase

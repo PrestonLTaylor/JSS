@@ -14,17 +14,16 @@ internal sealed class ErrorPrototype : Object
     public void Initialize(Realm realm, VM vm)
     {
         // 20.5.3.1 Error.prototype.constructor, The initial value of Error.prototype.constructor is %Error%.
-        DataProperties.Add("constructor", new Property(realm.ErrorConstructor, new(true, false, false)));
+        InternalDefineProperty("constructor", realm.ErrorConstructor, new(true, false, false));
 
         // 20.5.3.2 Error.prototype.message, The initial value of Error.prototype.message is the empty String.
-        DataProperties.Add("message", new Property("", new(true, false, false)));
+        InternalDefineProperty("message", "", new(true, false, false));
 
         // 20.5.3.3 Error.prototype.name, The initial value of Error.prototype.name is "Error".
-        DataProperties.Add("name", new Property("Error", new(true, false, false)));
+        InternalDefineProperty("name", "Error", new(true, false, false));
 
         // 20.5.3.4 Error.prototype.toString ( ), https://tc39.es/ecma262/#sec-error.prototype.tostring
-        var toStringBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toString, 0, "toString");
-        DataProperties.Add("toString", new Property(toStringBuiltin, new(false, false, false)));
+        InternalDefineProperty(vm, "toString", 0, toString, new(false, false, false));
     }
 
     // 20.5.3.4 Error.prototype.toString ( ), https://tc39.es/ecma262/#sec-error.prototype.tostring

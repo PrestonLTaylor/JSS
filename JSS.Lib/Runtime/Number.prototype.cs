@@ -15,15 +15,13 @@ internal sealed class NumberPrototype : Object
 	public void Initialize(Realm realm, VM vm)
 	{
 		// 21.1.3.1 Number.prototype.constructor, https://tc39.es/ecma262/#sec-number.prototype.constructor
-		DataProperties.Add("constructor", new(realm.NumberConstructor, new(true, false, true)));
+		InternalDefineProperty("constructor", realm.NumberConstructor, new(true, false, true));
 
 		// 21.1.3.6 Number.prototype.toString ( [ radix ] ), https://tc39.es/ecma262/#sec-number.prototype.tostring
-		var toStringBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toString, 1, "toString");
-		DataProperties.Add("toString", new(toStringBuiltin, new(true, false, true)));
+		InternalDefineProperty(vm, "toString", 1, toString, new(true, false, true));
 
 		// 21.1.3.7 Number.prototype.valueOf ( ), https://tc39.es/ecma262/#sec-number.prototype.valueof
-        var valueOfBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, valueOf, 0, "valueOf");
-        DataProperties.Add("valueOf", new(valueOfBuiltin, new(true, false, true)));
+		InternalDefineProperty(vm, "valueOf", 0, valueOf, new(true, false, true));
     }
 
 	// 21.1.3.6 Number.prototype.toString ( [ radix ] ), https://tc39.es/ecma262/#sec-number.prototype.tostring

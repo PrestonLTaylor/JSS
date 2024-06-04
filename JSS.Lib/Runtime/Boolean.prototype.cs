@@ -15,15 +15,13 @@ internal sealed class BooleanPrototype : BooleanObject
     public void Initialize(Realm realm, VM vm)
     {
         // 20.3.3.1 Boolean.prototype.constructor, The initial value of Boolean.prototype.constructor is %Boolean%.
-        DataProperties.Add("constructor", new(realm.BooleanConstructor, new(true, false, true)));
+        InternalDefineProperty("constructor", realm.BooleanConstructor, new(true, false, true));
 
         // 20.3.3.2 Boolean.prototype.toString ( ), https://tc39.es/ecma262/#sec-boolean.prototype.tostring
-        var toStringBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, toString, 0, "toString");
-        DataProperties.Add("toString", new(toStringBuiltin, new(true, false, true)));
+        InternalDefineProperty(vm, "toString", 0, toString, new(true, false, true));
 
         // 20.3.3.3 Boolean.prototype.valueOf ( ), https://tc39.es/ecma262/#sec-boolean.prototype.valueof
-        var valueOfBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, valueOf, 0, "valueOf");
-        DataProperties.Add("valueOf", new(valueOfBuiltin, new(true, false, true)));
+        InternalDefineProperty(vm, "valueOf", 0, valueOf, new(true, false, true));
     }
 
     // 20.3.3.2 Boolean.prototype.toString ( ), https://tc39.es/ecma262/#sec-boolean.prototype.tostring
