@@ -21,7 +21,7 @@ public sealed class VM
     {
         // FIXME: We currently have to rely on limiting our stack size as we would throw a stack overflow exception which is uncatchable.
         // We should use a bytecode VM instead of an AST so that memory instead of stack size is the limiting factor
-        const int MAXIMUM_STACK_DEPTH = 700;
+        const int MAXIMUM_STACK_DEPTH = 250;
         if (_executionContextStack.Count >= MAXIMUM_STACK_DEPTH) throw new InvalidOperationException($"Maximum stack depth ({MAXIMUM_STACK_DEPTH}) reached inside of JSS.");
 
         _executionContextStack.Push(context);
