@@ -35,7 +35,7 @@ public class Object : Value
         DataProperties.Add(name, new(value, attributes));
     }
 
-    internal void InternalDefineProperty(VM vm, string name, int length, Func<VM, Value, List, Object, Completion> behaviour, Attributes attributes)
+    internal void InternalDefineProperty(VM vm, string name, int length, BuiltinBehaviour behaviour, Attributes attributes)
     {
         var builtin = BuiltinFunction.CreateBuiltinFunction(vm, behaviour, length, name);
         DataProperties.Add(name, new(builtin, attributes));

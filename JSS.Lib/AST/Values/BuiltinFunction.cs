@@ -1,4 +1,6 @@
-﻿using JSS.Lib.Execution;
+﻿global using BuiltinBehaviour = System.Func<JSS.Lib.Execution.VM, JSS.Lib.AST.Values.Value, JSS.Lib.AST.Values.List, JSS.Lib.AST.Values.Object, JSS.Lib.Execution.Completion>;
+
+using JSS.Lib.Execution;
 
 namespace JSS.Lib.AST.Values;
 
@@ -6,7 +8,7 @@ namespace JSS.Lib.AST.Values;
 internal sealed class BuiltinFunction : Object, ICallable
 {
 #pragma warning disable CS8618 // All properties are initialised in OrdinaryFunctionCreate
-    private BuiltinFunction(Object prototype, Func<VM, Value, List, Object, Completion> behaviour) : base(prototype)
+    private BuiltinFunction(Object prototype, BuiltinBehaviour behaviour) : base(prototype)
     {
         Behaviour = behaviour;
     }
@@ -63,7 +65,7 @@ internal sealed class BuiltinFunction : Object, ICallable
     }
 
     // 10.3.4 CreateBuiltinFunction ( behaviour, length, name, FIXME: additionalInternalSlotsList [ , realm [ , prototype [ , prefix ] ] ] ), https://tc39.es/ecma262/#sec-createbuiltinfunction
-    static public BuiltinFunction CreateBuiltinFunction(VM vm, Func<VM, Value, List, Object, Completion> behaviour, int length, string name,
+    static public BuiltinFunction CreateBuiltinFunction(VM vm, BuiltinBehaviour behaviour, int length, string name,
         Realm? realm = null, Object? prototype = null, string prefix = "")
     {
         // 1. If realm is not present, set realm to the current Realm Record.
@@ -102,6 +104,6 @@ internal sealed class BuiltinFunction : Object, ICallable
         return func;
     }
 
-    public Func<VM, Value, List, Object, Completion> Behaviour { get; private set; }
+    public BuiltinBehaviour Behaviour { get; private set; }
     public Realm Realm { get; private set; }
 }
