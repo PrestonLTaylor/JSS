@@ -16,7 +16,7 @@ internal sealed class ErrorConstructor : Object, ICallable, IConstructable
     {
         // 20.5.2.1 Error.prototype, The initial value of Error.prototype is the Error prototype object.
         // This property has the attributes { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: false }.
-        DataProperties.Add("prototype", new(realm.ErrorPrototype, new(false, false, false)));
+        InternalDefineProperty("prototype", realm.ErrorPrototype, new(false, false, false));
     }
 
     // 20.5.1.1 Error ( message [ , options ] ), https://tc39.es/ecma262/#sec-error-message

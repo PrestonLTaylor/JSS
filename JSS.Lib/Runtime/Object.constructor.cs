@@ -15,23 +15,20 @@ internal class ObjectConstructor : Object, ICallable, IConstructable
     {
         // The Object constructor has a "length" property whose value is 1𝔽.
         // FIXME: We should probably have a method for internally defining properties
-        DataProperties.Add("length", new Property(1, new Attributes(true, false, true)));
+        InternalDefineProperty("length", 1, new(true, false, true));
 
         // 20.1.2.4 Object.defineProperty ( O, P, Attributes ), https://tc39.es/ecma262/#sec-object.defineproperty
-        var definePropertyBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, defineProperty, 3, "defineProperty");
-        DataProperties.Add("defineProperty", new Property(definePropertyBuiltin, new(true, false, true)));
+        InternalDefineProperty(vm, "defineProperty", 3, defineProperty, new(true, false, true));
 
         // 20.1.2.21 Object.prototype, The initial value of Object.prototype is the Object prototype object.
         // This property has the attributes { [[Writable]]: false, [[Enumerable]]: false, [[Configurable]]: false }.
-        DataProperties.Add("prototype", new Property(realm.ObjectPrototype, new(false, false, false)));
+        InternalDefineProperty("prototype", realm.ObjectPrototype, new(false, false, false));
 
         // 20.1.2.8 Object.getOwnPropertyDescriptor ( O, P ), https://tc39.es/ecma262/#sec-object.getownpropertydescriptor
-        var getOwnPropertyDescriptorBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, getOwnPropertyDescriptor, 2, "getOwnPropertyDescriptor");
-        DataProperties.Add("getOwnPropertyDescriptor", new Property(getOwnPropertyDescriptorBuiltin, new(true, false, true)));
+        InternalDefineProperty(vm, "getOwnPropertyDescriptor", 2, getOwnPropertyDescriptor, new(true, false, true));
 
         // 20.1.2.10 Object.getOwnPropertyNames ( O ), https://tc39.es/ecma262/#sec-object.getownpropertynames
-        var getOwnPropertyNamesBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, getOwnPropertyNames, 1, "getOwnPropertyNames");
-        DataProperties.Add("getOwnPropertyNames", new Property(getOwnPropertyNamesBuiltin, new(true, false, true)));
+        InternalDefineProperty(vm, "getOwnPropertyNames", 1, getOwnPropertyNames, new(true, false, true));
     }
 
     // 20.1.1.1 Object ( [ value ] ), https://tc39.es/ecma262/#sec-object-value

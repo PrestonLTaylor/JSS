@@ -14,8 +14,7 @@ internal sealed class FunctionPrototype : Object
     public void Initialize(VM vm)
     {
         // 20.2.3.3 Function.prototype.call ( thisArg, ...args ), https://tc39.es/ecma262/#sec-function.prototype.call
-        var callBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, call, 1, "call");
-        DataProperties.Add("call", new Property(callBuiltin, new(true, false, true)));
+        InternalDefineProperty(vm, "call", 1, call, new(true, false, true));
     }
 
     // 20.2.3.3 Function.prototype.call ( thisArg, ...args ), https://tc39.es/ecma262/#sec-function.prototype.call

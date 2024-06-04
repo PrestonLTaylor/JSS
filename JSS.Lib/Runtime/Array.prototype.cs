@@ -15,12 +15,10 @@ internal sealed class ArrayPrototype : Object
     public void Initialize(VM vm)
     {
         // 23.1.3.18 Array.prototype.join ( separator ), https://tc39.es/ecma262/#sec-array.prototype.join
-        var joinBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, join, 1, "join");
-        DataProperties.Add("join", new(joinBuiltin, new(true, false, true)));
+        InternalDefineProperty(vm, "join", 1, join, new(true, false, true));
 
         // 23.1.3.23 Array.prototype.push ( ...items ), https://tc39.es/ecma262/#sec-array.prototype.push
-        var pushBuiltin = BuiltinFunction.CreateBuiltinFunction(vm, push, 1, "push");
-        DataProperties.Add("push", new(pushBuiltin, new(true, false, true)));
+        InternalDefineProperty(vm, "push", 1, push, new(true, false, true));
     }
 
     // 23.1.3.18 Array.prototype.join ( separator ), https://tc39.es/ecma262/#sec-array.prototype.join
