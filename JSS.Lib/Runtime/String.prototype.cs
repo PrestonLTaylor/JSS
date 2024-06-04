@@ -32,6 +32,9 @@ internal sealed class StringPrototype : Object
         // 22.1.3.29 String.prototype.toString ( ), https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.tostring
         InternalDefineProperty(vm, "toString", 0, toString, new(true, false, true));
 
+        // 22.1.3.30 String.prototype.toUpperCase ( ), https://tc39.es/ecma262/#sec-string.prototype.touppercase
+        InternalDefineProperty(vm, "toUpperCase", 0, toUpperCase, new(true, false, true));
+
         // 22.1.3.35 String.prototype.valueOf ( ), https://tc39.es/ecma262/#sec-string.prototype.valueof
         InternalDefineProperty(vm, "valueOf", 0, valueOf, new(true, false, true));
     }
@@ -158,6 +161,36 @@ internal sealed class StringPrototype : Object
         var result = ThisStringValue(vm, thisValue);
         if (result.IsAbruptCompletion()) return result.Completion;
         return result.Value;
+    }
+
+    // 22.1.3.30 String.prototype.toUpperCase ( ), https://tc39.es/ecma262/#sec-string.prototype.touppercase
+    private Completion toUpperCase(VM vm, Value thisValue, List argumentList, Object newTarget)
+    {
+        // It behaves in exactly the same way as String.prototype.toLowerCase, except that the String is mapped using the toUppercase algorithm of the Unicode Default Case Conversion.
+        // NOTE: I've kept the steps from toLowerCase but changed toLowercase to toUppercase in step 4.
+
+        // 1. Let O be ? RequireObjectCoercible(this value).
+        var O = thisValue.RequireObjectCoercible(vm);
+        if (O.IsAbruptCompletion()) return O;
+
+        // 2. Let S be ? ToString(O).
+        var S = O.Value.ToStringJS(vm);
+        if (S.IsAbruptCompletion()) return S.Completion;
+
+        // 3. Let sText be StringToCodePoints(S).
+        var sText = S.Value.ToCharArray();
+
+        // 4. Let lowerText be the result of toUppercase(sText), according to the Unicode Default Case Conversion algorithm.
+        for (var i = 0; i < sText.Length; i++)
+        {
+            sText[i] = char.ToUpper(sText[i]);
+        }
+
+        // 5. Let L be CodePointsToString(lowerText).
+        var L = new string(sText);
+
+        // 6. Return L.
+        return L;
     }
 
     // 22.1.3.35 String.prototype.valueOf ( ), https://tc39.es/ecma262/#sec-string.prototype.valueof
