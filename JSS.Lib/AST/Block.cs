@@ -13,6 +13,11 @@ internal sealed class Block : INode
     // 14.2.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-block-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let oldEnv be the running execution context's LexicalEnvironment.
         var currentExecutionContext = (vm.CurrentExecutionContext as ScriptExecutionContext)!;
         var oldEnv = currentExecutionContext.LexicalEnvironment;

@@ -8,6 +8,11 @@ internal abstract class IIterationStatement : INode
     // 14.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-statement-semantics-runtime-semantics-evaluation
     public override Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let newLabelSet be a new empty List.
         // 2. Return ? LabelledEvaluation of this BreakableStatement with argument newLabelSet.
         return LabelledEvaluation(vm, new());

@@ -90,6 +90,11 @@ internal static class ThrowHelper
         }
     }
 
+    static public Completion ThrowCancellationError(VM vm)
+    {
+        return ConstructError(vm, vm.EvalErrorConstructor, "a cancellation was requested while executing a script");
+    }
+
     static private Completion ConstructError(VM vm, NativeErrorConstructor constructor, string message)
     {
         List arguments = new();

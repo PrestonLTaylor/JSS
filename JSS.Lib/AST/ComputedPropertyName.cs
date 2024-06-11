@@ -13,6 +13,11 @@ internal sealed class ComputedPropertyName : INode
     // 13.2.5.4 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-object-initializer-runtime-semantics-evaluation
     public override Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let exprValue be ? Evaluation of AssignmentExpression.
         var exprValue = Expression.Evaluate(vm);
         if (exprValue.IsAbruptCompletion()) return exprValue;

@@ -16,6 +16,11 @@ internal sealed class CallExpression : IExpression
     // 13.3.6.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-function-calls-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let expr be the CallMemberExpression that is covered by CoverCallExpressionAndAsyncArrowHead.
         // 2. Let memberExpr be the MemberExpression of expr.
         // 3. Let arguments be the Arguments of expr.

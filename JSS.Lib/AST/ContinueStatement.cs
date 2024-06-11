@@ -14,6 +14,11 @@ internal sealed class ContinueStatement : INode
     // 14.8.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-continue-statement-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let label be the StringValue of LabelIdentifier.
         var label = Label is not null ? Label.Name : "";
 

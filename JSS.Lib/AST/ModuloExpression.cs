@@ -14,6 +14,11 @@ internal sealed class ModuloExpression : IExpression
     // 13.7.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-multiplicative-operators-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let opText be the source text matched by MultiplicativeOperator.
         // 2. Return ? EvaluateStringOrNumericBinaryExpression(MultiplicativeExpression, opText, ExponentiationExpression).
         return EvaluateStringOrNumericBinaryExpression(vm, Lhs, BinaryOpType.Remainder, Rhs);

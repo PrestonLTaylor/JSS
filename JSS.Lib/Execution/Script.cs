@@ -15,8 +15,10 @@ public sealed class Script
     }
 
     // 16.1.6 ScriptEvaluation ( scriptRecord ), https://tc39.es/ecma262/#sec-runtime-semantics-scriptevaluation
-    public Completion ScriptEvaluation()
+    public Completion ScriptEvaluation(CancellationToken cancellationToken = default)
     {
+        VM.CancellationToken = cancellationToken;
+
         // 1. Let globalEnv be scriptRecord.[[Realm]].[[GlobalEnv]].
         var globalEnv = Realm.GlobalEnv;
 

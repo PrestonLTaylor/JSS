@@ -15,6 +15,11 @@ internal sealed class PostfixDecrementExpression : IExpression
     // 13.4.3.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-postfix-decrement-operator-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let lhs be ? Evaluation of LeftHandSideExpression.
         var lhs = Expression.Evaluate(vm);
         if (lhs.IsAbruptCompletion()) return lhs;

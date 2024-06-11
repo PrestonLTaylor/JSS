@@ -14,6 +14,11 @@ internal sealed class ExponentiationExpression : IExpression
     // 13.6.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-exp-operator-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Return ? EvaluateStringOrNumericBinaryExpression(UpdateExpression, **, ExponentiationExpression).
         return EvaluateStringOrNumericBinaryExpression(vm, Lhs, BinaryOpType.Exponentiate, Rhs);
     }

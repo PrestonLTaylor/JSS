@@ -48,6 +48,11 @@ internal sealed class IfStatement : INode
     // 14.6.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-if-statement-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         if (ElseCaseStatement is null)
         {
             return EvaluateWithoutElse(vm);

@@ -15,6 +15,11 @@ internal sealed class PrefixDecrementExpression : IExpression
     // 13.4.5.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-prefix-decrement-operator-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let expr be ? Evaluation of UnaryExpression.
         var expr = Expression.Evaluate(vm);
         if (expr.IsAbruptCompletion()) return expr;

@@ -14,6 +14,11 @@ internal sealed class AdditionExpression : IExpression
     // 13.8.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-addition-operator-plus-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Return ? EvaluateStringOrNumericBinaryExpression(AdditiveExpression, +, MultiplicativeExpression).
         return EvaluateStringOrNumericBinaryExpression(vm, Lhs, BinaryOpType.Add, Rhs);
     }

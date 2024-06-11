@@ -442,6 +442,11 @@ internal sealed class SwitchStatement : INode
     // 14.13.4 Runtime Semantics: LabelledEvaluation, https://tc39.es/ecma262/#sec-runtime-semantics-labelledevaluation
     public override Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let stmtResult be Completion(Evaluation of SwitchStatement).
         var stmtResult = LabelledEvaluation(vm);
 

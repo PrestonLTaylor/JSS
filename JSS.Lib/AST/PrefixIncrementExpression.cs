@@ -15,6 +15,11 @@ internal sealed class PrefixIncrementExpression : IExpression
     // FIXME: 13.4.4.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-prefix-increment-operator-runtime-semantics-evaluation
     public override Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let expr be ? Evaluation of UnaryExpression.
         var expr = Expression.Evaluate(vm);
 

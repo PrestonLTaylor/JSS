@@ -13,6 +13,11 @@ internal sealed class ThrowStatement : INode
     // 14.14.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-throw-statement-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let exprRef be ? Evaluation of Expression.
         var exprRef = ThrowExpression.Evaluate(vm);
         if (exprRef.IsAbruptCompletion()) return exprRef;

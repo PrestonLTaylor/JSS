@@ -22,6 +22,11 @@ internal sealed class ConstDeclaration : Declaration
     // 14.3.1.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-let-and-const-declarations-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let bindingId be StringValue of BindingIdentifier.
         // 2. Let lhs be ! ResolveBinding(bindingId).
         var lhs = MUST(ScriptExecutionContext.ResolveBinding(vm, Identifier));
