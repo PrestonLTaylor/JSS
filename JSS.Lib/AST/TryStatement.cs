@@ -145,6 +145,11 @@ internal sealed class TryStatement : INode
     // 14.15.3 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-try-statement-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         if (CatchBlock is not null && FinallyBlock is not null)
         {
             return EvaluateWithCatchAndFinally(vm);

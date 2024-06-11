@@ -14,6 +14,11 @@ internal sealed class BasicAssignmentExpression : IExpression
     // 13.15.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-assignment-operators-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // FIXME: 1. If LeftHandSideExpression is neither an ObjectLiteral nor an ArrayLiteral, then
 
         // a. Let lref be ? Evaluation of LeftHandSideExpression.

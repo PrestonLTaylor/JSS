@@ -14,6 +14,11 @@ internal sealed class LogicalOrExpression : IExpression
     // 13.13.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-binary-logical-operators-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let lref be ? Evaluation of LogicalORExpression.
         var lref = Lhs.Evaluate(vm);
         if (lref.IsAbruptCompletion()) return lref;

@@ -15,6 +15,11 @@ internal sealed class PostfixIncrementExpression : IExpression
     // 13.4.2.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-postfix-increment-operator-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let lhs be ? Evaluation of LeftHandSideExpression.
         var lhs = Expression.Evaluate(vm);
 

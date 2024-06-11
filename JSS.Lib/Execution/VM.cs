@@ -93,4 +93,6 @@ public sealed class VM
         }
     }
     private readonly Stack<bool> _strictStack = new();
+
+    internal CancellationToken CancellationToken { get; set; } = default;
 }

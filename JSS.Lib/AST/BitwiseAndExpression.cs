@@ -14,6 +14,11 @@ internal sealed class BitwiseAndExpression : IExpression
     // 13.12.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-binary-bitwise-operators-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Return ? EvaluateStringOrNumericBinaryExpression(BitwiseANDExpression, &, EqualityExpression).
         return EvaluateStringOrNumericBinaryExpression(vm, Lhs, BinaryOpType.BitwiseAND, Rhs);
     }

@@ -10,6 +10,11 @@ internal sealed class DebuggerStatement : INode
     // 14.16.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-debugger-statement-runtime-semantics-evaluation
     public override Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. If an implementation-defined debugging facility is available and enabled, then
         if (Debugger.IsAttached)
         {

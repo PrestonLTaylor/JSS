@@ -13,6 +13,11 @@ internal sealed class ExpressionStatement : INode
     // 14.5.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-expression-statement-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let exprRef be ? Evaluation of Expression.
         var exprRef = Expression.Evaluate(vm);
         if (exprRef.IsAbruptCompletion()) return exprRef;

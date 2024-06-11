@@ -15,6 +15,11 @@ internal sealed class TypeOfExpression : IExpression
     // 13.5.3.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-typeof-operator-runtime-semantics-evaluation
     public override Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let val be ? Evaluation of UnaryExpression.
         var val = Expression.Evaluate(vm);
         if (val.IsAbruptCompletion()) return val;

@@ -14,6 +14,11 @@ internal sealed class LeftShiftExpression : IExpression
     // 13.9.1.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-left-shift-operator-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Return ? EvaluateStringOrNumericBinaryExpression(ShiftExpression, <<, AdditiveExpression).
         return EvaluateStringOrNumericBinaryExpression(vm, Lhs, BinaryOpType.LeftShift, Rhs);
     }

@@ -43,6 +43,11 @@ internal sealed class VarStatement : INode
     // 14.3.2.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-variable-statement-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Perform ? Evaluation of VariableDeclarationList.
         foreach (var declaration in Declarations)
         {

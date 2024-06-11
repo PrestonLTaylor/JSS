@@ -14,6 +14,11 @@ internal sealed class ReturnStatement : INode
     // 14.10.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-return-statement-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         if (ReturnExpression is null)
         {
             return EvaluateWithNoExpression();

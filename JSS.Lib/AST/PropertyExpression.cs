@@ -15,6 +15,11 @@ internal sealed class PropertyExpression : IExpression
     // 13.3.2.1 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-property-accessors-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let baseReference be ? Evaluation of MemberExpression.
         var baseReference = Lhs.Evaluate(vm);
         if (baseReference.IsAbruptCompletion()) return baseReference;

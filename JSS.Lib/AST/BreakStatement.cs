@@ -15,6 +15,11 @@ internal sealed class BreakStatement : INode
     // 14.9.2 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-break-statement-runtime-semantics-evaluation
     override public Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Let label be the StringValue of LabelIdentifier.
         var label = Label is not null ? Label.Name : "";
 

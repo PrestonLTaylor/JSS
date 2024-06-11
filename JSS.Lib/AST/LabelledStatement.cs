@@ -16,6 +16,11 @@ internal sealed class LabelledStatement : INode
     // 14.13.3 Runtime Semantics: Evaluation, https://tc39.es/ecma262/#sec-labelled-statements-runtime-semantics-evaluation
     public override Completion Evaluate(VM vm)
     {
+        if (vm.CancellationToken.IsCancellationRequested)
+        {
+            return ThrowCancellationError(vm);
+        }
+
         // 1. Return ? LabelledEvaluation of this LabelledStatement with argument « ».
         return LabelledEvaluation(vm, new());
     }
